@@ -16,7 +16,7 @@ export interface IEditableTextFieldProps {
 
 export const EditableTextField: React.FunctionComponent<
     IEditableTextFieldProps
-> = ({ value, onSave, className }) => {
+> = ({ value, onSave, readOnly, className }) => {
     const [editMode, setEditMode] = React.useState(false);
     const editorRef = React.useRef<RichTextEditor>(null);
 
@@ -72,7 +72,8 @@ export const EditableTextField: React.FunctionComponent<
                 readOnly={!editMode}
                 ref={editorRef}
             />
-            {toggleEditModeButton}
+
+            {readOnly || toggleEditModeButton}
         </div>
     );
 

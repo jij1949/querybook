@@ -28,6 +28,7 @@ export const DataTableColumnCard: React.FunctionComponent<IProps> = ({
     const userCommentsContent = (
         <EditableTextField
             value={column.description as ContentState}
+            readOnly={true}
             onSave={updateDataColumnDescription.bind(null, column.id)}
         />
     );
