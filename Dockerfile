@@ -25,6 +25,13 @@ RUN npm i -g npm@8.5.0 \
     && yarn config set cache-folder /mnt/yarn-cache/cache \
     && yarn config set yarn-offline-mirror /mnt/yarn-offline-mirror
 
+#awscliv2 - https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+RUN mkdir -p /tmp/awscliv2 && cd /tmp/awscliv2 && \
+    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip -q awscliv2.zip && \
+    ./aws/install && \
+    rm -rf /tmp/awscliv2
+
 WORKDIR /opt/querybook
 
 COPY requirements requirements/
