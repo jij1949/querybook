@@ -87,7 +87,7 @@ class TrinoCursor(CursorBaseClass):
 
     def _update_tracking_url(self, poll_result):
         if self._tracking_url is None:
-            self._tracking_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/plan.html?{poll_result['queryId']}"
+            self._tracking_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/query.html?{poll_result['queryId']}"
 
     def _update_percent_complete(self, poll_result):
         self._percent_complete = poll_result.get("progressPercentage", 0)
