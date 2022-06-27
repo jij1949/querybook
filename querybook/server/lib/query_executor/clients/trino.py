@@ -1,4 +1,6 @@
 import trino
+
+from os import environ
 from lib.query_executor.base_client import ClientBaseClass, CursorBaseClass
 from lib.query_executor.connection_string.trino import get_trino_connection_conf
 
@@ -12,6 +14,9 @@ class TrinoClient(ClientBaseClass):
         host = trino_conf.host
         port = 8080 if not trino_conf.port else trino_conf.port
 
+        username = environ['SERVICE_USERNAME']
+        password = environ['SERVICE_PASSWORD']
+
         connection = trino.dbapi.connect(
             host=host,
             port=port,
@@ -19,6 +24,7 @@ class TrinoClient(ClientBaseClass):
             schema=trino_conf.schema,
             user=proxy_user or username,
             http_scheme=trino_conf.protocol,
+            auth=trino.auth.BasicAuthentication(username, password)
         )
         self._connection = connection
         super(TrinoClient, self).__init__()
