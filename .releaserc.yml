@@ -1,0 +1,32 @@
+branches:
+  - main
+  - master
+
+tagFormat: ${version}
+
+plugins:
+  - - "@semantic-release/commit-analyzer"
+    - preset: conventionalcommits
+
+  - - "@semantic-release/release-notes-generator"
+    - preset: conventionalcommits
+      presetConfig:
+        issuePrefixes:
+            - "EGDL-"
+            - "EGAP-"
+            - "EGDPO-"
+            - "EGANP-"
+        issueUrlFormat: "https://jira.expedia.biz/browse/{{prefix}}{{id}}"
+
+  - - "@semantic-release/changelog"
+    - changelogTitle: "# Changelog\n\nAll notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines."
+
+  - - "@semantic-release/git"
+    - message: "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      assets:
+        - CHANGELOG.md
+
+  - - "@semantic-release/github"
+    - githubUrl: https://github.expedia.biz
+      githubApiPathPrefix: /api/v3
+

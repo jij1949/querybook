@@ -1,0 +1,46 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  GIT_AUTHOR_NAME: s-eg-data-platform
+  GIT_AUTHOR_EMAIL: s-eg-data-platform@expediagroup.com
+  GIT_COMMITTER_NAME: s-eg-data-platform
+  GIT_COMMITTER_EMAIL: s-eg-data-platform@expediagroup.com
+
+jobs:
+  release:
+    runs-on: eg-default
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+      new_release_major_version: ${{ steps.semantic.outputs.new_release_major_version }}
+      new_release_minor_version: ${{ steps.semantic.outputs.new_release_minor_version }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # This is important to allow Semantic Release to push changes
+          # using different credentials
+          persist-credentials: false
+
+      # Release the next version
+      - name: Semantic Release
+        run: |
+          npx \
+          -p semantic-release@18.0.1 \
+          -p @semantic-release/changelog@6.0.1 \
+          -p @semantic-release/exec@6.0.3 \
+          -p @semantic-release/github@8.0.2 \
+          -p @semantic-release/git@10.0.1 \
+          -p conventional-changelog-conventionalcommits@4.6.1 \
+          semantic-release --debug --no-ci
+        env:
+          # The default `secrets.GITHUB_TOKEN` will not trigger
+          # dependent workflows, so using a PAT instead
+          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          GITHUB_URL: https://github.expedia.biz

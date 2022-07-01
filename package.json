@@ -12,10 +12,6 @@
         "lint": "eslint 'querybook/webapp/*/**/*.{ts,tsx}' --quiet --fix",
         "tsc-check": "tsc --noEmit"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+ssh://git@github.com:pinterest/querybook.git"
-    },
     "keywords": [
         "querybook",
         "big",
