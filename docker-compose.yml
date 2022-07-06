@@ -34,6 +34,8 @@ services:
             PORT: '${PORT:-10001}'
             APIPORT: '${APIPORT:-3000}'
             HOT_RELOAD: '${HOT_RELOAD:-true}'
+        env_file:
+            - ./.env.local
         restart: 'always'
         volumes: *querybook-volumes
         depends_on: *querybook-depends-on
@@ -43,6 +45,8 @@ services:
         tty: true
         stdin_open: true
         command: './querybook/scripts/runservice worker -c 5'
+        env_file:
+            - ./.env.local
         volumes: *querybook-volumes
         depends_on: *querybook-depends-on
     scheduler:
@@ -51,6 +55,8 @@ services:
         tty: true
         stdin_open: true
         command: './querybook/scripts/runservice scheduler --pidfile="/opt/celerybeat.pid"'
+        env_file:
+            - ./.env.local
         volumes: *querybook-volumes
         depends_on: *querybook-depends-on
     redis:

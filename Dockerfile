@@ -2,6 +2,12 @@ FROM python:3.7.9
 ARG PRODUCTION=true
 ARG EXTRA_PIP_INSTALLS=""
 
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+COPY certs/* /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
 ## Install Querybook package requirements + NodeJS
 # Installing build-essential and python-dev for uwsgi
 RUN rm -rf /var/lib/apt/lists/* \
