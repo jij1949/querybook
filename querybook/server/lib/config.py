@@ -4,6 +4,9 @@ import yaml
 from const.path import CONFIG_PATH
 
 
+VAULT_PATH = "/vault/secrets"
+ADDITIONAL_CONFIG_FILE = os.environ.get("ADDITIONAL_CONFIG_FILE", None)
+
 __config = None
 
 
@@ -14,6 +17,12 @@ def get_config():
         for c in os.listdir(CONFIG_PATH):
             with open(os.path.join(CONFIG_PATH, "./{}".format(c))) as f:
                 __config[c.split(".")[0]] = yaml.load(f, Loader=yaml.FullLoader)
+        if ADDITIONAL_CONFIG_FILE:
+            try:
+                with open(ADDITIONAL_CONFIG_FILE) as f:
+                    __config["additional"] = yaml.load(f, Loader=yaml.FullLoader)
+            except IOError:
+                print("{} not found".format(ADDITIONAL_CONFIG_FILE))
     return __config
 
 
