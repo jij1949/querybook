@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.6.1...0.7.0) (2022-07-11)
+
+
+### Features
+
+* Add additional config file ([3e48456](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3e4845672e9b7ddb7e10a081c29f737d61bdc330))
+
 ### [0.6.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.6.0...0.6.1) (2022-07-06)
 
 
