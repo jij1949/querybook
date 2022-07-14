@@ -1,13 +1,18 @@
 import { isEmpty } from 'lodash';
 import moment from 'moment';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import CreatableSelect from 'react-select/creatable';
 
 import { TableTagGroupSelect } from 'components/DataTableTags/TableTagGroupSelect';
 import { UserAvatar } from 'components/UserBadge/UserAvatar';
 import { UserSelect } from 'components/UserSelect/UserSelect';
-import { IDataDocPreview, IQueryPreview, ITablePreview } from 'const/search';
+import {
+    IBoardPreview,
+    IDataDocPreview,
+    IQueryPreview,
+    ITablePreview,
+} from 'const/search';
 import { useShallowSelector } from 'hooks/redux/useShallowSelector';
 import { titleize } from 'lib/utils';
 import { getCurrentEnv } from 'lib/utils/query-string';
@@ -44,7 +49,12 @@ import { EmptyText } from 'ui/StyledText/StyledText';
 import { Tabs } from 'ui/Tabs/Tabs';
 
 import { SearchDatePicker } from './SearchDatePicker';
-import { DataDocItem, DataTableItem, QueryItem } from './SearchResultItem';
+import {
+    BoardItem,
+    DataDocItem,
+    DataTableItem,
+    QueryItem,
+} from './SearchResultItem';
 import { TableSelect } from './TableSelect';
 
 import './SearchOverview.scss';
@@ -69,7 +79,6 @@ export const SearchOverview: React.FunctionComponent = () => {
         searchRequest,
         queryMetastores,
         queryEngines,
-        queryEngineById,
         metastoreId,
     } = useShallowSelector((state: IStoreState) => ({
         ...state.search,
@@ -119,31 +128,32 @@ export const SearchOverview: React.FunctionComponent = () => {
         dispatch(dataTableSearchActions.selectMetastore(newMetastoreId));
     }, []);
 
-    const SEARCH_TABS = queryMetastores.length
-        ? [
-              {
-                  name: 'Query',
-                  key: SearchType.Query,
-              },
-              {
-                  name: 'DataDoc',
-                  key: SearchType.DataDoc,
-              },
-              {
-                  name: 'Tables',
-                  key: SearchType.Table,
-              },
-          ]
-        : [
-              {
-                  name: 'Query',
-                  key: SearchType.Query,
-              },
-              {
-                  name: 'DataDoc',
-                  key: SearchType.DataDoc,
-              },
-          ];
+    const searchTabs = useMemo(() => {
+        const searchTabs = [
+            {
+                name: 'Query',
+                key: SearchType.Query,
+            },
+            {
+                name: 'DataDoc',
+                key: SearchType.DataDoc,
+            },
+        ];
+
+        if (queryMetastores.length) {
+            searchTabs.push({
+                name: 'Tables',
+                key: SearchType.Table,
+            });
+        }
+
+        searchTabs.push({
+            name: 'List',
+            key: SearchType.Board,
+        });
+
+        return searchTabs;
+    }, [queryMetastores.length]);
 
     const [showAddSearchAuthor, setShowAddSearchAuthor] = React.useState(false);
 
@@ -222,7 +232,7 @@ export const SearchOverview: React.FunctionComponent = () => {
     const searchTypeDOM = (
         <div className="search-types mv4">
             <Tabs
-                items={SEARCH_TABS}
+                items={searchTabs}
                 selectedTabKey={searchType}
                 onSelect={onSearchTabSelect}
             />
@@ -295,7 +305,10 @@ export const SearchOverview: React.FunctionComponent = () => {
     );
 
     const orderByDOM = (
-        <Dropdown customButtonRenderer={orderByButtonFormatter} isRight>
+        <Dropdown
+            customButtonRenderer={orderByButtonFormatter}
+            layout={['bottom', 'right']}
+        >
             <ListMenu
                 items={[SearchOrder.Recency, SearchOrder.Relevance].map(
                     (choice) => ({
@@ -311,7 +324,6 @@ export const SearchOverview: React.FunctionComponent = () => {
                     })
                 )}
                 type="select"
-                isRight
             />
         </Dropdown>
     );
@@ -336,11 +348,20 @@ export const SearchOverview: React.FunctionComponent = () => {
                       url={`/${environment.name}/datadoc/${result.id}/`}
                   />
               ))
-            : (results as ITablePreview[]).map((result) => (
+            : searchType === SearchType.Table
+            ? (results as ITablePreview[]).map((result) => (
                   <DataTableItem
                       key={result.id}
                       preview={result}
                       url={`/${environment.name}/table/${result.id}/`}
+                      searchString={searchString}
+                  />
+              ))
+            : (results as IBoardPreview[]).map((result) => (
+                  <BoardItem
+                      key={result.id}
+                      preview={result}
+                      url={`/${environment.name}/list/${result.id}/`}
                       searchString={searchString}
                   />
               ));
@@ -578,18 +599,18 @@ export const SearchOverview: React.FunctionComponent = () => {
                     {dateFilterDOM}
                 </div>
             </>
-        ) : (
+        ) : searchType === 'Table' ? (
             <>
                 <div className="search-filter">
                     <span className="filter-title">Metastore</span>
                     {metastoreSelectDOM}
                 </div>
                 <div className="search-filter">
-                    <span className="filter-title">Featured</span>
+                    <span className="filter-title">Top Tier</span>
                     <div className="result-item-golden horizontal-space-between">
                         <span>
-                            <span>featured only</span>
-                            <Icon className="award ml4" name="Award" />
+                            <span>top tier only</span>
+                            <Icon className="crown ml4" name="Crown" />
                         </span>
                         <Checkbox
                             value={!!searchFilters.golden}
@@ -613,6 +634,20 @@ export const SearchOverview: React.FunctionComponent = () => {
                     <span className="filter-title">Search Settings</span>
                     {searchSettingsDOM}
                 </div>
+            </>
+        ) : (
+            <>
+                <div className="search-filter">
+                    <span className="filter-title">Authors</span>
+                    {getAuthorFiltersDOM('owner_uid')}
+                </div>
+
+                {queryMetastores.length && (
+                    <div className="search-filter">
+                        <span className="filter-title">Tables</span>
+                        {tableFilterDOM}
+                    </div>
+                )}
             </>
         );
 

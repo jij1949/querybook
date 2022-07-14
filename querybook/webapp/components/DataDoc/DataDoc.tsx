@@ -16,7 +16,6 @@ import {
     ISearchAndReplaceHandles,
     SearchAndReplace,
 } from 'components/SearchAndReplace/SearchAndReplace';
-import { DataDocUIGuide } from 'components/UIGuide/DataDocUIGuide';
 import {
     CELL_TYPE,
     DataCellUpdateFields,
@@ -562,7 +561,6 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                             isEditable={isEditable}
                             pasteCellAt={this.pasteCellAt}
                         />
-                        <DataDocUIGuide hideButton={numberOfCells !== 0} />
                     </div>
                 </div>
             );
@@ -703,7 +701,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                 className={clsx({
                     DataDoc: true,
                 })}
-                key="data-hub-data-doc"
+                key="querybook-data-doc"
             >
                 <DataDocContext.Provider value={this.getDataDocContextState()}>
                     <SearchAndReplace

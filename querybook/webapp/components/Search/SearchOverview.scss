@@ -46,7 +46,7 @@
                 align-items: center;
             }
 
-            .award svg {
+            .crown svg {
                 color: var(--color-accent);
                 height: 16px;
                 stroke-width: 2.5px;
@@ -80,7 +80,7 @@
 
             .search-filters {
                 flex: 3 1 0;
-                padding: 8px 8px 0px;
+                padding: 8px 8px;
                 overflow-y: scroll;
 
                 .search-filter {

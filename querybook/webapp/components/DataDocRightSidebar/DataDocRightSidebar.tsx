@@ -1,12 +1,13 @@
-import { debounce } from 'lodash';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { DataDocBoardsButton } from 'components/DataDocBoardsButton/DataDocBoardsButton';
 import { DataDocDAGExporterButton } from 'components/DataDocDAGExporter/DataDocDAGExporterButton';
 import { DataDocTemplateButton } from 'components/DataDocTemplateButton/DataDocTemplateButton';
+import { DataDocUIGuide } from 'components/UIGuide/DataDocUIGuide';
 import { IDataDoc } from 'const/datadoc';
 import { useAnnouncements } from 'hooks/redux/useAnnouncements';
-import { getScrollParent, smoothScroll } from 'lib/utils';
+import { useScrollToTop } from 'hooks/ui/useScrollToTop';
 import { fetchDAGExporters } from 'redux/dataDoc/action';
 import { IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
@@ -45,29 +46,10 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
     const numAnnouncements = useAnnouncements().length;
     const exporterExists = useExporterExists();
 
-    const [showScrollToTop, setShowScrollToTop] = React.useState(false);
     const selfRef = React.useRef<HTMLDivElement>();
-
-    const checkParentScroll = React.useCallback(
-        debounce((scrollTop: number) => {
-            setShowScrollToTop(scrollTop > 230);
-        }, 500),
-        []
-    );
-
-    React.useEffect(() => {
-        const scrollParent = getScrollParent(selfRef.current);
-        const scrollFunction = (e) => checkParentScroll(e.target.scrollTop);
-        if (scrollParent) {
-            scrollParent.addEventListener('scroll', scrollFunction);
-        }
-
-        return () => {
-            if (scrollParent && scrollFunction) {
-                scrollParent.removeEventListener('scroll', scrollFunction);
-            }
-        };
-    }, []);
+    const { showScrollToTop, scrollToTop } = useScrollToTop({
+        containerRef: selfRef,
+    });
 
     const deleteButtonDOM = isEditable ? (
         <DeleteDataDocButton docId={dataDoc.id} />
@@ -80,6 +62,9 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
             title="Delete"
         />
     );
+
+    const boardsButtonDOM = <DataDocBoardsButton dataDoc={dataDoc} />;
+
     const templateButtonDOM = (
         <DataDocTemplateButton
             dataDoc={dataDoc}
@@ -97,12 +82,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
                 <IconButton
                     icon="ArrowUp"
                     className={showScrollToTop ? '' : 'hide-button'}
-                    onClick={() => {
-                        const scrollParent = getScrollParent(selfRef.current);
-                        if (scrollParent) {
-                            smoothScroll(scrollParent, 0, 200);
-                        }
-                    }}
+                    onClick={scrollToTop}
                 />
                 <IconButton
                     icon={defaultCollapse ? 'Maximize2' : 'Minimize2'}
@@ -114,6 +94,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
                     tooltipPos="left"
                     onClick={onCollapse}
                 />
+                <DataDocUIGuide />
                 <IconButton
                     icon="Loading"
                     className={isSaving ? '' : 'hide-button'}
@@ -133,6 +114,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
                 {isEditable && exporterExists && (
                     <DataDocDAGExporterButton docId={dataDoc.id} />
                 )}
+                {boardsButtonDOM}
                 {templateButtonDOM}
                 {scheduleButtonDOM}
                 <IconButton
