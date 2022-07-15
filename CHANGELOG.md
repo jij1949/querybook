@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.8.0...0.9.0) (2022-07-15)
+
+
+### Features
+
+* add username+password authorization into Trino client ([dfb68a2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dfb68a2539d737b2e52fa09e2e3aff7c11f40346))
+
 ## [0.8.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.7.0...0.8.0) (2022-07-14)
 
 
