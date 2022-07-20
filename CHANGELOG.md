@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.9.0...0.10.0) (2022-07-20)
+
+
+### Features
+
+* Add auto updating timestamp (#936) ([cb668cb](https://github.expedia.biz/eg-analytics-platform/querybook/commit/cb668cb6b12ba3955ef0e6c95838a8eee925246b))
+* Collapse and expand ad hoc query execution results (#937) ([8e1e7c6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8e1e7c67dcb0ea341d8d4321c830371773333508))
+
 ## [0.9.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.8.0...0.9.0) (2022-07-15)
 
 
