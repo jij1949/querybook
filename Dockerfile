@@ -4,6 +4,7 @@ ARG EXTRA_PIP_INSTALLS=""
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     ca-certificates \
+    curl nano openssl telnet dnsutils \
     && rm -rf /var/lib/apt/lists/*
 COPY certs/* /usr/local/share/ca-certificates/
 RUN update-ca-certificates
