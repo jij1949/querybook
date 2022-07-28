@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.10.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.10.0...0.10.1) (2022-07-28)
+
+
+### Bug Fixes
+
+* Install some additional packages ([4c827b4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4c827b45d5c3919989ddd488038862f532268b91))
+
 ## [0.10.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.9.0...0.10.0) (2022-07-20)
 
 
