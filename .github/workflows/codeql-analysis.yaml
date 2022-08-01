@@ -1,49 +1,49 @@
 ---
 name: GHAS-CodeQL-Scan
 on:
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - master
-  schedule:
-    - cron: '11 19 * * 0'
-  push:
-    branches:
-      - master
+    workflow_dispatch:
+    pull_request:
+        branches:
+            - master
+    schedule:
+        - cron: '11 19 * * 0'
+    push:
+        branches:
+            - master
 jobs:
-  analyze:
-    name: Analyze
-    runs-on:
-      - eg-securityscan
-    strategy:
-      fail-fast: false
-      matrix:
-        language:
-          - typescript
-          - python
-          - javascript
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Setup Python
-        if: matrix.language == 'python'
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-      - name: Install Python dependencies
-        if: matrix.language == 'python'
-        run: |
-          python -m pip install --upgrade pip
-          pip install  -r ./requirements.txt -r ./requirements/auth -r ./requirements/test.txt -r ./requirements/platform -r ./requirements/engine -r ./requirements/base.txt -r ./requirements/prod.txt -r ./requirements/metastore -r ./requirements/extra.txt -r ./requirements/exporter -r ./requirements/dev.txt -r ./requirements/shared 
-          echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-          queries: security-extended
-          # ℹ️ CodeQL will attempt to auto-install Python dependencies. This 
-          # behavior must be disabled when steps 'Setup Python' and 
-          # 'Install Python dependencies' are included in the workflow.
-          setup-python-dependencies: false
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+    analyze:
+        name: Analyze
+        runs-on:
+            - eg-securityscan
+        strategy:
+            fail-fast: false
+            matrix:
+                language:
+                    - typescript
+                    - python
+                    - javascript
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+            - name: Setup Python
+              if: matrix.language == 'python'
+              uses: actions/setup-python@v4
+              with:
+                  python-version: 3.x
+            - name: Install Python dependencies
+              if: matrix.language == 'python'
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install  -r ./requirements.txt
+                  echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
+            - name: Initialize CodeQL
+              uses: github/codeql-action/init@v2
+              with:
+                  languages: ${{ matrix.language }}
+                  queries: security-extended
+                  # ℹ️ CodeQL will attempt to auto-install Python dependencies. This
+                  # behavior must be disabled when steps 'Setup Python' and
+                  # 'Install Python dependencies' are included in the workflow.
+                  setup-python-dependencies: false
+            - name: Perform CodeQL Analysis
+              uses: github/codeql-action/analyze@v2
