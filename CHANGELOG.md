@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.10.1...0.11.0) (2022-08-01)
+
+
+### Features
+
+* add 'All' button in the 'Hide columns' menu (#949) ([4f978ed](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4f978edf65bdd1dc64a7b6e12d6eae9f5ba90a87))
+* add confirmation before execution if the query drops any tables (#946) ([9eb303b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9eb303b423b3b459c379563f98addc1540a6fd62))
+* add Multi-line and multi-cursor editing (#941) ([127e7e4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/127e7e4157dad278821b745738612cf3f73a66cf))
+* Add templating support for Adhoc query (#939) ([53e88c9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/53e88c962d81f3c6eb74e47b4baa52433d541b30))
+* Merge remote-tracking branch 'upstream/master' ([6f75e43](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6f75e4396af265a2f3567124f360c79f8fb52b10))
+* Update Okta auth method to provide full names (#945) ([7438cac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7438cac676485a700c4997f11d437556af201e09))
+
+
+### Bug Fixes
+
+* adhoc template query (#944) ([a443f2b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a443f2bfedf2cd8c40a51098c59843041f349bdb))
+* getStatementType vs invalid queries (#948) ([82996b2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/82996b2072a771f9a4f61a9cdc123ddf7fb4466e))
+* list drag and drop (#938) ([d03f88d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d03f88d3aec37e8d09e3915106f4b3ef64f3642e))
+* various board related bugs (#943) ([f7e85f8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f7e85f8d4dd0a85f33c961efcd8d0fdbbef7233f))
+
 ### [0.10.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.10.0...0.10.1) (2022-07-28)
 
 
