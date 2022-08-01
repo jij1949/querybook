@@ -24,8 +24,5 @@ jobs:
             - uses: actions/setup-node@v2
               with:
                   node-version: '14'
-            - name: Get yarn cache directory path
-              id: yarn-cache-dir-path
-              run: echo "::set-output name=dir::$(yarn cache dir)"
             - run: yarn install --frozen-lockfile --prefer-offline
             - run: ./querybook/scripts/run_test --node
