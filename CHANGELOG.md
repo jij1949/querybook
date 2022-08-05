@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.11.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.11.0...0.11.1) (2022-08-05)
+
+
+### Bug Fixes
+
+* Fix readonly attributes ([df33776](https://github.expedia.biz/eg-analytics-platform/querybook/commit/df33776727870708e3257bc09caba4c38bc66a8c))
+* Use internal Docker repository ([2be85f0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2be85f0d9d4a2ea3bf8f84c92aca4c46e899234f))
+
 ## [0.11.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.10.1...0.11.0) (2022-08-01)
 
 
