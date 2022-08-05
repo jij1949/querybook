@@ -108,7 +108,7 @@ export const DataTableViewOverview: React.FC<
     const description = table.description ? (
         <EditableTextField
             value={table.description as DraftJs.ContentState}
-            readOnly={true}
+            readonly={true}
             onSave={onDescriptionSave}
         />
     ) : null;
