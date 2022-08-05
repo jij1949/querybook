@@ -1,4 +1,4 @@
-FROM python:3.7.9
+FROM hub-docker-remote.artylab.expedia.biz/python:3.7.9
 ARG PRODUCTION=true
 ARG EXTRA_PIP_INSTALLS=""
 

@@ -1,60 +1,68 @@
 name: Publish Docker
 on:
-  release:
-    types:
-      - published
-  push:
-    branches-ignore:
-      - main
-      - master
+    release:
+        types:
+            - published
+    push:
+        branches-ignore:
+            - main
+            - master
 
 env:
-  REGISTRY: egdataplatform-docker-internal-local.artylab.expedia.biz
-  IMAGE_NAME: egdp-querybook
+    IMAGE_NAME: egdp-querybook
+    PUBLIC_REGISTRY: hub-docker-remote.artylab.expedia.biz
+    REGISTRY: egdataplatform-docker-internal-local.artylab.expedia.biz
 
 jobs:
-  publish-docker:
-    name: Push Docker image to Docker Hub
-    runs-on: eg-default
+    publish-docker:
+        name: Push Docker image to Docker Hub
+        runs-on: eg-default
 
-    steps:
-      - name: Checkout ${{ github.event.release.tag_name }}
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.release.tag_name }}
+        steps:
+            - name: Checkout ${{ github.event.release.tag_name }}
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ github.event.release.tag_name }}
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: actions/docker-login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.ARTYLAB_USER }}
-          password: ${{ secrets.ARTYLAB_PASS }}
+            - name: Log into registry ${{ env.REGISTRY }}
+              uses: actions/docker-login-action@v1
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ secrets.ARTYLAB_USER }}
+                  password: ${{ secrets.ARTYLAB_PASS }}
 
-      - name: Setup Docker Buildx
-        uses: actions/docker-setup-buildx-action@v1
-        with:
-          driver: docker
+            - name: Log into public registry ${{ env.PUBLIC_REGISTRY }}
+              uses: actions/docker-login-action@v1
+              with:
+                  registry: ${{ env.PUBLIC_REGISTRY }}
+                  username: ${{ secrets.ARTYLAB_USER }}
+                  password: ${{ secrets.ARTYLAB_PASS }}
 
-      - name: Docker metadata
-        uses: actions/docker-metadata-action@v3
-        id: meta
-        with:
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=true
-          tags: |
-            type=semver,pattern={{version}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
-            type=semver,pattern={{major}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
-            type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short,enable=${{ github.event_name == 'push' }}
+            - name: Setup Docker Buildx
+              uses: actions/docker-setup-buildx-action@v1
+              with:
+                  driver: docker
 
-      - name: Docker build
-        uses: actions/docker-build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            EXTRA_PIP_INSTALLS=extra.txt
+            - name: Docker metadata
+              uses: actions/docker-metadata-action@v3
+              id: meta
+              with:
+                  images: |
+                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+                  flavor: |
+                      latest=true
+                  tags: |
+                      type=semver,pattern={{version}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
+                      type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
+                      type=semver,pattern={{major}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
+                      type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short,enable=${{ github.event_name == 'push' }}
+
+            - name: Docker build
+              uses: actions/docker-build-push-action@v2
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
+                  build-args: |
+                      EXTRA_PIP_INSTALLS=extra.txt
