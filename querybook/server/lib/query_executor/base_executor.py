@@ -18,7 +18,6 @@ from lib.form import AllFormField
 from lib.logger import get_logger
 from lib.query_executor.base_client import ClientBaseClass
 from lib.query_executor.utils import (
-    spread_dict,
     merge_str,
     parse_exception,
     format_if_internal_error_with_stack_trace,
@@ -81,12 +80,10 @@ class QueryExecutorLogger(object):
                 session=session,
             ).to_dict()
 
-        query_execution = spread_dict(
-            query_execution,
-            {
-                "total": len(self._statement_ranges),
-            },
-        )
+        query_execution = query_execution | {
+            "total": len(self._statement_ranges),
+        }
+
         socketio.emit(
             "query_start",
             query_execution,
@@ -309,12 +306,9 @@ class QueryExecutorLogger(object):
             )
 
     def update_progress(self):
-        progress = spread_dict(
-            self._statement_progress,
-            {
-                "total": len(self._statement_ranges),
-            },
-        )
+        progress = self._statement_progress | {
+            "total": len(self._statement_ranges),
+        }
 
         self._celery_task.update_state(state="PROGRESS", meta=progress)
 
@@ -597,7 +591,7 @@ class QueryExecutorBaseClass(metaclass=ABCMeta):
         else:
             self._on_query_completion()
 
-    def _handle_exception(self, e, stack_trace: str):
+    def _handle_exception(self, exc: Exception, stack_trace: str):
         try:
             # Try our best to fetch logs again
             if self._cursor:
@@ -607,11 +601,11 @@ class QueryExecutorBaseClass(metaclass=ABCMeta):
             pass
         finally:
             # Update logger
-            error_type, error_str, error_extracted = self._parse_exception(e)
+            error_type, error_str, error_extracted = self._parse_exception(exc)
             self._logger.on_exception(
                 error_type,
                 format_if_internal_error_with_stack_trace(
-                    error_type, error_str, stack_trace
+                    exc, error_type, error_str, stack_trace
                 ),
                 error_extracted,
             )
