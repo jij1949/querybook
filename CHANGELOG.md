@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.11.1...0.12.0) (2022-08-15)
+
+
+### Features
+
+* Add breadcrumb for board in querybook (#962) ([5d06c0f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5d06c0f486889855cffc44365545775da58af4f6))
+* add table name drop and drop (#952) ([8e330d3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8e330d315fac2f5f975f03a17f574606fb2e71fe))
+* Allow executors to return warnings for query executions (#963) ([f766f29](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f766f294d1bc187b3780bf4f21ea2fd60f9dc92d))
+* dont show stack trace is exception is recognitizable (#957) ([06a54d6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/06a54d68b597a5de7499c9adba71121ff422121e))
+* Ignore null values when detecting types (#958) ([4e977b4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4e977b48eb46910462fcec045f7e4e23d57aa432))
+* Merge remote-tracking branch 'upstream/master' ([dd71995](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dd71995fc0cf0dd6770c47bb4f573e3c0edd45b1))
+
+
+### Bug Fixes
+
+* auto add trailing slash at end (#965) ([12e7519](https://github.expedia.biz/eg-analytics-platform/querybook/commit/12e751930094f4bc5707177a1160a2e82c9aca49))
+* DELETE http does not work without params (#954) ([8ac6cde](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8ac6cdee89b8322d1c7660877cb4423b2556598b))
+* docs_website/package.json & docs_website/yarn.lock to reduce vulnerabilities (#951) ([0576134](https://github.expedia.biz/eg-analytics-platform/querybook/commit/057613426646b4c8f95756b54f3367a483ffe1b9))
+* Prod build fails to install uwsgi (#955) ([5466fd8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5466fd8bc01933d21cfc610b90a0e7fe794f10e7))
+* revert back to python 3.9 (#956) ([214118c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/214118c2137dfec580cba5dbeb4e0a19351f3c62))
+
 ### [0.11.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.11.0...0.11.1) (2022-08-05)
 
 
