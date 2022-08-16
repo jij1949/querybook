@@ -1,10 +1,6 @@
 import json
 
-from trino.exceptions import Error, TrinoQueryError
-from const.query_execution import QueryExecutionErrorType
-from lib.query_executor.base_executor import QueryExecutorBaseClass
-from lib.query_executor.utils import get_parsed_syntax_error
-from lib.query_executor.executor_template.templates import trino_executor_template
+from lib.query_executor.executors.trino import TrinoQueryExecutor
 from executor_plugin.eg_trino.eg_trino_client import EGTrinoClient
 from logic import (
     admin as admin_logic,
@@ -21,7 +17,7 @@ def get_trino_error_dict(e):
     return None
 
 
-class EGTrinoQueryExecutor(QueryExecutorBaseClass):
+class EGTrinoQueryExecutor(TrinoQueryExecutor):
 
     def __init__(self, query_execution_id: int, celery_task, query: str, statement_ranges, client_setting):
         super().__init__(query_execution_id, celery_task, query, statement_ranges, client_setting)
@@ -35,14 +31,6 @@ class EGTrinoQueryExecutor(QueryExecutorBaseClass):
     @classmethod
     def EXECUTOR_NAME(cls):
         return "egtrino"
-
-    @classmethod
-    def EXECUTOR_LANGUAGE(cls):
-        return "trino"
-
-    @classmethod
-    def EXECUTOR_TEMPLATE(cls):
-        return trino_executor_template
 
     @property
     def meta_info(self):
@@ -61,32 +49,6 @@ class EGTrinoQueryExecutor(QueryExecutorBaseClass):
         if self._warning == "" and not self._json_csv_warning_checked:
             self._warning = self._get_warning_message()
         return self._warning
-
-    def _parse_exception(self, e):
-        error_type = QueryExecutionErrorType.INTERNAL.value
-        error_str = str(e)
-        error_extracted = None
-
-        if isinstance(e, TrinoQueryError):
-            try:
-                line_number, column_number = e.error_location
-                return get_parsed_syntax_error(
-                    e.message,
-                    line_number - 1,
-                    column_number - 1,
-                )
-            except Exception:
-                return QueryExecutionErrorType.ENGINE.value, e.message, error_extracted
-
-        if isinstance(e, Error):
-            error_type = QueryExecutionErrorType.ENGINE.value
-            try:
-                error_dict = get_trino_error_dict(e)
-                if error_dict:
-                    error_extracted = error_dict.get("message", None)
-            except Exception:
-                pass
-        return error_type, error_str, error_extracted
 
     def _run_next_statement(self):
         if self._current_query_index < len(self._statement_ranges):
