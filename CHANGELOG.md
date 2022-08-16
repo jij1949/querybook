@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.12.0...0.13.0) (2022-08-16)
+
+
+### Features
+
+* AD Sync Task ([232d036](https://github.expedia.biz/eg-analytics-platform/querybook/commit/232d0366be606552a90a83d76f2b3487cbd20e00))
+
 ## [0.12.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.11.1...0.12.0) (2022-08-15)
 
 
