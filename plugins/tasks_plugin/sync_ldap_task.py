@@ -19,11 +19,6 @@ from logic.environment import (
 
 LOG = get_logger(__file__)
 
-
-def fatal(msg):
-    log(msg)
-    sys.exit(-1)
-
 ################################
 # ------- LDAP Helpers ------- #
 ################################
@@ -56,7 +51,7 @@ def ad_connect(args, ad_server, ad_bind_user, ad_bind_password):
         use_referral_cache=True,
     )
 
-    LOG.debug(f"AD server: {ad_server}, bind user: {conn.extend.standard.who_am_i()}")
+    LOG.info(f"AD server: {ad_server}, bind user: {conn.extend.standard.who_am_i()}")
 
     return conn
 
@@ -107,7 +102,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
         visited_groups = []
 
     try:
-        LOG.debug(f"Querying AD membership of group {ad_group}... ")
+        LOG.info(f"Querying AD membership of group {ad_group}... ")
         visited_groups.append(ad_group)
         start = time.time()
 
@@ -133,7 +128,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                                 not in visited_groups
                             ):
                                 if args.tracead:
-                                    LOG.debug(
+                                    LOG.info(
                                         "Found member group {0}".format(
                                             entry["attributes"]["sAMAccountName"]
                                         )
@@ -149,7 +144,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                                     ad_group_members.extend(sub_members)
                             else:
                                 if args.tracead:
-                                    LOG.debug(
+                                    LOG.info(
                                         f"Already queried group {entry['attributes']['sAMAccountName']}, skipping.")
                         # Filter users with no email or
                         #  is a Service account
@@ -161,7 +156,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                             )
                         ):
                             if args.tracead:
-                                LOG.debug(
+                                LOG.info(
                                     f"Found user {entry['attributes']['sAMAccountName']}")
                             ad_group_members.append(
                                 entry["attributes"]["sAMAccountName"])
@@ -172,7 +167,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                             )
                         total_entries += 1
         end = time.time()
-        LOG.debug(
+        LOG.info(
             f"Examined {total_entries} entries, took {round(end - start, 1)} seconds"
         )
         success = True
@@ -228,6 +223,10 @@ def update_user_environments_with_groups(environment_id, user_groups, session=No
     users_to_add, users_to_remove = get_environment_users_delta(
         environment_id, user_groups, session=session)
 
+    LOG.info(f'Total users: {len(user_groups)}')
+    LOG.info(f'Users to add: {len(users_to_add)}')
+    LOG.info(f'Users to remove: {len(users_to_remove)}')
+
     for username in users_to_add:
         user = get_user_by_name(username, session=session)
         if user:
@@ -258,7 +257,7 @@ def sync_ldap_task(self):
     '''
     :return: returns None , runs the task of grabbing users from each env and syncing them to querybook
     '''
-    LOG.debug('Syncing LDAP...')
+    LOG.info('Syncing LDAP...')
     with DBSession() as session:
         args = Object()
         args.dryrun = False
