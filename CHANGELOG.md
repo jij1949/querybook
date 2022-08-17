@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.13.1...0.14.0) (2022-08-17)
+
+
+### Features
+
+* Add eg_trino_executor ([c961d4a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c961d4ad24f167ee4c4b81158ab020f46bee3bea))
+* Add plugin executor to include Json and CSV warnings ([0b34eb9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0b34eb9e55fcd5dccc5cff939dd67b068f88d8cc))
+
 ### [0.13.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.13.0...0.13.1) (2022-08-16)
 
 
