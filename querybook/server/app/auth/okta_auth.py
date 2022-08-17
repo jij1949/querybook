@@ -110,8 +110,7 @@ class OktaLoginManager(OAuthLoginManager):
 
     def _parse_user_profile(self, resp):
         user = resp.json()
-        username = user["email"].split("@")[0]
-        return username, user["email"], user["name"]
+        return user["preferred_username"], user["email"], user["name"]
 
     @with_session
     def login_user(self, username, email, fullname, session=None):
