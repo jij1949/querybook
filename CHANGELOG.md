@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.14.0...0.15.0) (2022-08-18)
+
+
+### Features
+
+* Automatically add a row limit to queries ([8cda37e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8cda37eb2fcda211f01bb1bc4cfc3872325d4e5e))
+* Split Trino and Presto language, add Trino-specific keywords ([a7b716f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a7b716f4d01c1389eee4c4d4f2a748d909ad450d))
+
+
+### Bug Fixes
+
+* Extend sql-limiter to support nested queries and union queries ([ca5b510](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ca5b510dfe4879feaee31b751b40c979cbd2ebf0))
+* Use Okta preferred username ([6dcc75c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6dcc75c25b71e9c2161068bee1e675de644e2c8e))
+
 ## [0.14.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.13.1...0.14.0) (2022-08-17)
 
 
