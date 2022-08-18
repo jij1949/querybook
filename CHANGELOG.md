@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.15.0...0.16.0) (2022-08-18)
+
+
+### Features
+
+* Adds access control to Query Engines ([6e2bb11](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6e2bb11fdde5703562a01d5f86ed1571e96e15c5))
+
 ## [0.15.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.14.0...0.15.0) (2022-08-18)
 
 
