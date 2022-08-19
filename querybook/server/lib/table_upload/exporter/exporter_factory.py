@@ -11,6 +11,7 @@ ALL_TABLE_UPLOAD_EXPORTERS: List[BaseTableUploadExporter] = import_modules(
         ("lib.table_upload.exporter.s3_exporter", "S3CSVExporter"),
         ("lib.table_upload.exporter.s3_exporter", "S3ParquetExporter"),
         ("lib.table_upload.exporter.sqlalchemy_exporter", "SqlalchemyExporter"),
+        ("lib.table_upload.exporter.trino_exporter", "TrinoExporter"),
     ]
 )
 ALL_TABLE_UPLOAD_EXPORTER_BY_NAME: Dict[str, BaseTableUploadExporter] = {
