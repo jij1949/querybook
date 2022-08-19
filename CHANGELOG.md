@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.16.0...0.17.0) (2022-08-19)
+
+
+### Features
+
+* Add global_groups to sync groups to all environments ([32ae596](https://github.expedia.biz/eg-analytics-platform/querybook/commit/32ae596a39931ab83083fdf4171f6be4482a5e47))
+
+
+### Bug Fixes
+
+* Add Trino exporter for table upload (#13) ([9dc2b79](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9dc2b799aa5418a51b33be93bc683bdc24c9a1aa))
+
 ## [0.16.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.15.0...0.16.0) (2022-08-18)
 
 
