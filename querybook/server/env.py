@@ -10,6 +10,7 @@ additional_config = get_config_value("additional", {})
 querybook_config = get_config_value("querybook_config", {})
 querybook_default_config = get_config_value("querybook_default_config", {})
 
+
 class MissingConfigException(Exception):
     pass
 
@@ -79,6 +80,14 @@ class QuerybookSettings(object):
     LDAP_CONN = get_env_config("LDAP_CONN")
     LDAP_USE_TLS = str(get_env_config("LDAP_USE_TLS")).lower() == "true"
     LDAP_USE_BIND_USER = str(get_env_config("LDAP_USE_BIND_USER")).lower() == "true"
+
+    # Get global groups and check for empty string
+    LDAP_GLOBAL_GROUPS = (
+        get_env_config("LDAP_GLOBAL_GROUPS").split(",")
+        if get_env_config("LDAP_GLOBAL_GROUPS")
+        else []
+    )
+
     # For direct authentication
     LDAP_USER_DN = get_env_config("LDAP_USER_DN")
     # For searches using bind user

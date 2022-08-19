@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import time
+
 from app.db import DBSession, with_session
 from app.flask_app import celery
 from lib.logger import get_logger
@@ -30,6 +31,7 @@ ad_server = QuerybookSettings.LDAP_CONN
 ad_bind_user = QuerybookSettings.LDAP_BIND_USER
 ad_bind_password = QuerybookSettings.LDAP_BIND_PASSWORD
 bind_domain = QuerybookSettings.LDAP_SEARCH
+global_groups = QuerybookSettings.LDAP_GLOBAL_GROUPS
 
 
 def ad_connect(args, ad_server, ad_bind_user, ad_bind_password):
@@ -262,25 +264,40 @@ def sync_ldap_task(self):
         args = Object()
         args.dryrun = False
         args.tracead = False
+
         env_list = get_all_environment(False, session=session)
 
         # Creating a dictionary to map each env to a security group format  { <env>: 'qb-env-{{ env }} }
         security_env_list = {env.name: f"qb-env-{env.name}" for env in env_list}
 
+        conn = ad_connect(args, ad_server, ad_bind_user, ad_bind_password)
+
+        # Get global groups members since they should be added to all environments
+        LOG.debug(f'Getting global groups members: {global_groups}')
+        global_groups_members = get_groups_members_list(args, global_groups, conn)
+
         for env in env_list:
             try:
-                security_group = security_env_list[env.name]
+                LOG.debug(f'Environment {env}')
+                env_security_group = security_env_list[env.name]
+                members_list = get_groups_members_list(args, [env_security_group], conn)
+                members_list.extend(global_groups_members)
 
-                conn = ad_connect(args, ad_server, ad_bind_user, ad_bind_password)
-
-                group_info = ad_query_group_existence(args, conn, security_group)
-                if group_info:
-                    membership = ad_query_group_membership(args, conn, security_group)
-                    membership_list = membership[1]
-                    update_user_environments_with_groups(environment_id=env.id, user_groups=set(membership_list),
-                                                         session=session)
-                else:
-                    LOG.warning(f'Group "{security_group}" does not exist')
+                update_user_environments_with_groups(
+                    environment_id=env.id, user_groups=set(members_list), session=session)
             except Exception as e:
                 LOG.error(e, exc_info=True)
                 raise e
+
+
+def get_groups_members_list(args, groups, conn):
+    groups_members = []
+    for security_group in groups:
+        group_info = ad_query_group_existence(args, conn, security_group)
+        if group_info:
+            membership = ad_query_group_membership(args, conn, security_group)
+            groups_members.extend(membership[1])
+            LOG.debug(f'Found {len(membership[1])} members for {security_group}')
+        else:
+            LOG.warning(f'Group "{security_group}" does not exist')
+    return groups_members
