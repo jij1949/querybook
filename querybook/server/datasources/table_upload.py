@@ -33,7 +33,7 @@ def perform_table_upload():
     verify_import_config_permissions(import_config)
 
     table_config = json.loads(request.form["table_config"])
-    engine_id = request.form["engine_id"]
+    engine_id = int(request.form["engine_id"])
     verify_query_engine_permission(engine_id)
 
     importer = get_importer(import_config, file_uploaded)
