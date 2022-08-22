@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.17.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.17.0...0.17.1) (2022-08-22)
+
+
+### Bug Fixes
+
+* Convert engine_id from str to int ([874bd4c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/874bd4cc566c1ef7e698bbf344cf27855733d48f))
+
 ## [0.17.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.16.0...0.17.0) (2022-08-19)
 
 
