@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.17.1...0.18.0) (2022-08-23)
+
+
+### Features
+
+* Add `feature_params` to Environments ([5b115e7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5b115e74c7595113bbe0fd96b7a706689934a03e))
+* Additional access control settings for Environments/Query Engines ([6d3ab79](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6d3ab79446b4b4aed8bdb0c59fc1f42eaf839942))
+* Configurable AD sync for Environments, Query Engines ([060494b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/060494bd46e0dd4fafe2bbb7e7c418df63623ca4))
+
 ### [0.17.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.17.0...0.17.1) (2022-08-22)
 
 
