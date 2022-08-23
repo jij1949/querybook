@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.18.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.18.0...0.18.1) (2022-08-23)
+
+
+### Bug Fixes
+
+* Implement impersonation on Trino Exporter for table upload ([560aa1c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/560aa1c118d786c8f0852bce2864947c0be2c4e8))
+
 ## [0.18.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.17.1...0.18.0) (2022-08-23)
 
 
