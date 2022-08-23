@@ -1,20 +1,17 @@
-from typing import Tuple
-
+from .base_exporter import BaseTableUploadExporter
 from app.db import with_session
+from logic import user as logic
 from logic.admin import get_query_engine_by_id
 from lib.query_executor.all_executors import get_executor_class
 from lib.query_executor.clients.trino import TrinoClient
 from lib.query_executor.connection_string.trino import get_trino_connection_conf
 from lib.query_executor.executor_factory import get_client_setting_from_engine
-
 from lib.table_upload.exporter.utils import (
     update_pandas_df_column_name_type,
 )
-from .base_exporter import BaseTableUploadExporter
-
-from sqlalchemy import create_engine
 from trino.auth import BasicAuthentication
-
+from typing import Tuple
+from sqlalchemy import create_engine
 
 default_pandas_to_sql_config = {
     "schema": None,
@@ -27,6 +24,9 @@ default_pandas_to_sql_config = {
 class TrinoExporter(BaseTableUploadExporter):
     @with_session
     def _get_trino_connection(self, session=None):
+        user_info = logic.get_user_by_id(self._uid, session=session)
+        impersonate_user = user_info.username
+
         engine = get_query_engine_by_id(self._engine_id, session=session)
         executor = get_executor_class(engine.language, engine.executor)
         executor_params = engine.get_engine_params()
@@ -45,9 +45,10 @@ class TrinoExporter(BaseTableUploadExporter):
         pwd = client_settings["password"]
 
         trino_engine = create_engine(
-            f"trino://{username}:{pwd}@{host}:{port}/{catalog}",
+            f"trino://{username}@{host}:{port}/{catalog}",
             connect_args={
                 "auth": BasicAuthentication(username, pwd),
+                "user": impersonate_user,
                 "http_scheme": "https",
             },
         )
