@@ -39,6 +39,9 @@ services:
         restart: 'always'
         volumes: *querybook-volumes
         depends_on: *querybook-depends-on
+        profiles:
+            - all
+            - web
     worker:
         container_name: querybook_worker
         image: *querybook-image
@@ -49,6 +52,9 @@ services:
             - ./.env.local
         volumes: *querybook-volumes
         depends_on: *querybook-depends-on
+        profiles:
+            - all
+            - worker
     scheduler:
         container_name: querybook_scheduler
         image: *querybook-image
@@ -59,6 +65,10 @@ services:
             - ./.env.local
         volumes: *querybook-volumes
         depends_on: *querybook-depends-on
+        profiles:
+            - all
+            - scheduler
+            - infra
     redis:
         container_name: querybook_redis
         image: redis:5.0.9
@@ -72,6 +82,10 @@ services:
             interval: 30s
             timeout: 10s
             retries: 3
+        profiles:
+            - all
+            - infra
+            - redis
     mysql:
         container_name: querybook_mysql
         image: mysql:8.0
@@ -102,6 +116,10 @@ services:
             timeout: 30s
             retries: 3
         command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+        profiles:
+            - all
+            - infra
+            - mysql
     elasticsearch:
         container_name: querybook_elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
@@ -130,6 +148,10 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+        profiles:
+            - all
+            - infra
+            - elasticsearch
 
     # EMAIL SERVER EXAMPLE
     # If you need email to work use this
