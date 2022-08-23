@@ -146,6 +146,27 @@ export const AdminEnvironment: React.FunctionComponent<IProps> = ({
                                         <UserEnvironmentEditor
                                             environmentId={item.id}
                                         />
+
+                                        <SimpleField
+                                            stacked
+                                            name="feature_params.access_control_groups"
+                                            type="input"
+                                            label="Access Control Security Groups"
+                                        />
+
+                                        <SimpleField
+                                            stacked
+                                            name="feature_params.enable_ad_sync"
+                                            type="toggle"
+                                            label="Sync Access Control Groups"
+                                        />
+
+                                        <SimpleField
+                                            stacked
+                                            name="feature_params.sync_global_groups"
+                                            type="toggle"
+                                            label="Include Global Groups"
+                                        />
                                     </div>
                                 </div>
                             </>
