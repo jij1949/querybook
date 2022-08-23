@@ -19,6 +19,7 @@ def create_environment(
     shareable=None,
     commit=True,
     session=None,
+    feature_params=None,
 ):
     return Environment.create(
         {
@@ -29,6 +30,7 @@ def create_environment(
             "hidden": hidden,
             "deleted_at": deleted_at,
             "shareable": shareable,
+            "feature_params": feature_params,
         },
         commit=commit,
         session=session,
@@ -98,7 +100,15 @@ def update_environment(id, commit=True, session=None, **field_to_update):
     return Environment.update(
         id,
         fields=field_to_update,
-        field_names=["name", "description", "image", "public", "hidden", "shareable"],
+        field_names=[
+            "name",
+            "description",
+            "image",
+            "public",
+            "hidden",
+            "shareable",
+            "feature_params",
+        ],
         commit=commit,
         session=session,
     )

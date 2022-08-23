@@ -433,9 +433,11 @@ def create_environment(
     hidden=None,
     deleted_at=None,
     shareable=None,
+    feature_params=None,
 ):
     return environment_logic.create_environment(
         name=name,
+        feature_params=feature_params,
         description=description,
         image=image,
         public=public,

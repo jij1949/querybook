@@ -40,6 +40,9 @@ class Environment(CRUDMixin, Base):
 
     deleted_at = sql.Column(sql.DateTime)
 
+    # JSON field to store additional features
+    feature_params = sql.Column(sql.JSON, default={}, nullable=False)
+
     users = relationship(
         "User",
         secondary="user_environment",
