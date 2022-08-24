@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.18.1...0.19.0) (2022-08-24)
+
+
+### Features
+
+* Display better error message to users without access ([3efd6ee](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3efd6eef9b4481690e038995de5729d1ed02da73))
+
 ### [0.18.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.18.0...0.18.1) (2022-08-23)
 
 
