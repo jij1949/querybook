@@ -1,11 +1,11 @@
 from app.flask_app import celery
+from models.datadoc import DATADOC_SCHEDULE_PREFIX
 
 from models.schedule import (
     TaskSchedule,
 )
 from app.db import with_session
 from logic.schedule import (
-    DATADOC_SCHEDULE_PREFIX,
     update_task_schedule,
     with_task_logging,
 )
