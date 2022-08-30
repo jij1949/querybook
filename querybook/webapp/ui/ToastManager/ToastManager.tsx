@@ -18,6 +18,9 @@ export const ToastManager: React.FC = () => (
             success: {
                 duration: 3000,
             },
+            error: {
+                duration: 10000,
+            },
         }}
     />
 );

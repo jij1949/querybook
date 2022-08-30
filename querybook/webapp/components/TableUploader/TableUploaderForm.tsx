@@ -71,11 +71,22 @@ export const TableUploaderForm: React.FC<ITableUploaderFormProps> = ({
             const createTablePromise =
                 TableUploadResource.createTable(uploadForm);
 
-            const { data: tableId } = await toast.promise(createTablePromise, {
-                loading: 'Creating table...',
-                success: 'Table created!',
-                error: 'Fail to create table',
-            });
+            const { data: tableId } = await toast.promise(
+                createTablePromise,
+                {
+                    loading: 'Creating table...',
+                    success: 'Table created!',
+                    error: 'Fail to create table',
+                },
+                {
+                    success: {
+                        duration: 10000,
+                    },
+                    error: {
+                        duration: 10000,
+                    },
+                }
+            );
 
             navigateWithinEnv(`/table/${tableId}`);
             onHide();
