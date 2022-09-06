@@ -1,7 +1,10 @@
 import requests
+import trino
 
 from os import environ
 from lib.query_executor.clients.trino import TrinoClient, TrinoCursor
+from lib.query_executor.connection_string.trino import get_trino_connection_conf
+from logic.user import get_user_by_name
 
 
 class EGTrinoClient(TrinoClient):
@@ -16,10 +19,29 @@ class EGTrinoClient(TrinoClient):
     ):
         self._username = username
         self._password = password
-        super(EGTrinoClient, self).__init__(connection_string, username, password, proxy_user, args, kwargs)
+
+        trino_conf = get_trino_connection_conf(connection_string)
+
+        host = trino_conf.host
+        port = 8080 if not trino_conf.port else trino_conf.port
+
+        auth = trino.auth.BasicAuthentication(username, password)
+
+        connection = trino.dbapi.connect(
+            host=host,
+            port=port,
+            catalog=trino_conf.catalog,
+            schema=trino_conf.schema,
+            auth=auth,
+            user=proxy_user if proxy_user else username,
+            http_scheme=trino_conf.protocol,
+            source='querybook',
+        )
+        self._connection = connection
+        super(TrinoClient, self).__init__()
 
     def cursor(self):
-        return EGTrinoCursor(cursor=self._connection.cursor(), username = self._username, password = self._password)
+        return EGTrinoCursor(cursor=self._connection.cursor(), username=self._username, password=self._password)
 
 
 class EGTrinoCursor(TrinoCursor):
@@ -64,4 +86,4 @@ class EGTrinoCursor(TrinoCursor):
             if r.status_code != 200:
                 return ""
             r = s.get(info_url)
-            return r.text 
+            return r.text

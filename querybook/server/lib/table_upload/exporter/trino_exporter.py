@@ -50,6 +50,7 @@ class TrinoExporter(BaseTableUploadExporter):
                 "auth": BasicAuthentication(username, pwd),
                 "user": impersonate_user,
                 "http_scheme": "https",
+                "source": "querybook",
             },
         )
 
