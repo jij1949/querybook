@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.19.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.19.0...0.19.1) (2022-09-07)
+
+
+### Bug Fixes
+
+* Set source property as 'querybook' in Trino connection ([e08b1a8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e08b1a887d2b7e5736181ba11b32fda928421593))
+
 ## [0.19.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.18.1...0.19.0) (2022-08-24)
 
 
