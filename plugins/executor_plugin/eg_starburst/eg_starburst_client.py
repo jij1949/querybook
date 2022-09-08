@@ -1,0 +1,77 @@
+import requests
+
+from os import environ
+from lib.query_executor.clients.trino import TrinoClient, TrinoCursor
+
+
+class EGStarburstClient(TrinoClient):
+    def __init__(
+        self,
+        connection_string,
+        username=None,
+        password=None,
+        proxy_user=None,
+        *args,
+        **kwargs,
+    ):
+        self._username = username
+        self._password = password
+        super(EGStarburstClient, self).__init__(connection_string,
+                                                username, password, proxy_user, args, kwargs)
+
+    def cursor(self):
+        return EGStarburstCursor(cursor=self._connection.cursor(), username=self._username, password=self._password)
+
+
+class EGStarburstCursor(TrinoCursor):
+    def __init__(self, cursor, username, password):
+        self._cursor = cursor
+        self.rows = []
+        self._init_query_state_vars()
+        self._request = cursor._request
+        self._execution_info = ""
+        self._starburst_tracking_url = None
+        self._user = username
+        self._password = password
+
+    def poll(self):
+        # this needs to be take care
+        self.rows.extend(self._cursor._query.fetch())
+        self._cursor._iterator = iter(self.rows)
+        poll_result = self._cursor.stats
+        completed = self._cursor._query._finished
+        if poll_result:
+            self._update_percent_complete(poll_result)
+            self._update_tracking_url(poll_result)
+            self._update_execution_info(poll_result)
+
+        return completed
+
+    @property
+    def starburst_tracking_url(self):
+        return self._startburst_tracking_url
+
+    def _update_starburst_tracking_url(self, poll_result):
+        if self._starburst_tracking_url is None:
+            self._starburst_tracking_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/insights/query/{poll_result['queryId']}"
+
+    @property
+    def execution_info(self):
+        return self._execution_info
+
+    def _update_execution_info(self, poll_result):
+        execution_info = self.get_execution_info(poll_result)
+        self._execution_info = execution_info
+
+    def get_execution_info(self, poll_result):
+        if not self.tracking_url:
+            return ""
+        info_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/api/query/{poll_result['queryId']}"
+        login_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/login"
+        payload = {'username': self._user, 'password': self._password}
+        with requests.session() as s:
+            r = s.post(login_url, data=payload)
+            if r.status_code != 200:
+                return ""
+            r = s.get(info_url)
+            return r.text
