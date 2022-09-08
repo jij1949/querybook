@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.19.1...0.20.0) (2022-09-08)
+
+
+### Features
+
+* (experimental) add Query transpilation to Querybook (#988) ([cbf650a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/cbf650a7f0a5dbae16419b0c05f50adf043d3c0d))
+* Add a new API of syncing a table from metastore (#982) ([c0e1dec](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c0e1decfe69cd5919779d7b5504e6c9d516ad76e))
+* add icon for partition keys (#977) ([ca62466](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ca62466b853eb1b3d2523bcabb44d49eafc000e6))
+* add query validation to querybook (#984) ([7069dac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7069dac81169dacea27f884e770dce079e38d469))
+* add support of syncing table/column description from metastore (#980) ([b8a3eb5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b8a3eb576a0039b66e8838f20bd1b3ceeae0bd94))
+* improve table upload with managed/external (#979) ([156d020](https://github.expedia.biz/eg-analytics-platform/querybook/commit/156d02086d7363757a52b1b34db8199c6fe40c50))
+* Merge remote-tracking branch 'upstream/master' ([394f0da](https://github.expedia.biz/eg-analytics-platform/querybook/commit/394f0daf3e9805358026d591066e63b636e56041))
+
+
+### Bug Fixes
+
+* column icon css for partition keys (#987) ([6b08a88](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6b08a88d97fd515c2d74fde10d5b13f6a2a92bbf))
+* **DataDoc:** Use Previous Query Engine (#983) ([1ef498b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1ef498be2c1e4924c00bce652b0c21f2cea1058d))
+* docs website failed to build (#981) ([970628d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/970628df6ec51b0f907b8ce00ab9e073ff0222f9))
+* overflow in raw metastore info (#976) ([339b2ce](https://github.expedia.biz/eg-analytics-platform/querybook/commit/339b2cee4c7f9d1bc0ca2cafb414a9be40130325))
+* scatter/bubble charts were losing their labels after save (#985) ([0ae4659](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0ae46596480e158c4466e0fee531c4c290207fe4))
+
 ### [0.19.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.19.0...0.19.1) (2022-09-07)
 
 
