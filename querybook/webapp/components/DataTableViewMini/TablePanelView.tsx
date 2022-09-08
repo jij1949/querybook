@@ -6,8 +6,10 @@ import { DataTableTags } from 'components/DataTableTags/DataTableTags';
 import { useDataTable } from 'hooks/redux/useDataTable';
 import { generateFormattedDate } from 'lib/utils/datetime';
 import { getHumanReadableByteSize } from 'lib/utils/number';
+import { AllLucideIconNames } from 'ui/Icon/LucideIcons';
 import { Loader } from 'ui/Loader/Loader';
 
+import { ColumnIcon } from './ColumnIcon';
 import { PanelSection, SubPanelSection } from './PanelSection';
 
 interface ITablePanelViewProps {
@@ -28,6 +30,8 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
     const { table, schema, tableColumns, getTable } = useDataTable(tableId);
 
     const renderPanelView = () => {
+        const partitionKeyList = table.column_info?.partition_keys ?? [];
+
         const overviewSection = (
             <PanelSection title="table">
                 <SubPanelSection title="schema">{schema.name}</SubPanelSection>
@@ -49,6 +53,9 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
                         onClick={onColumnRowClick.bind(null, col.id)}
                         name={col.name}
                         type={col.type}
+                        icon={
+                            partitionKeyList.includes(col.name) ? 'Key' : null
+                        }
                         selected={col.id === columnId}
                     />
                 ))}
@@ -113,7 +120,7 @@ const StyledColumnRow = styled.div<IStyledColumnRowProps>`
     margin-bottom: 4px;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    align-items: center;
 
     .column-row-name {
         user-select: none;
@@ -128,6 +135,7 @@ const StyledColumnRow = styled.div<IStyledColumnRowProps>`
     }
 
     .column-row-type {
+        margin-left: auto;
         text-transform: uppercase;
         user-select: none;
 
@@ -155,9 +163,19 @@ const ColumnRow: React.FunctionComponent<{
     type: string;
     onClick: () => any;
     selected?: boolean;
-}> = ({ name, type, onClick, selected }) => (
+    icon?: AllLucideIconNames;
+}> = ({ name, type, onClick, selected, icon }) => (
     <StyledColumnRow onClick={onClick} selected={selected}>
         <span className="column-row-name">{name}</span>
+        <span>
+            {icon && (
+                <ColumnIcon
+                    name={icon}
+                    tooltip={'Partition key'}
+                    fill={false}
+                />
+            )}
+        </span>
         <span className="column-row-type">{type}</span>
     </StyledColumnRow>
 );

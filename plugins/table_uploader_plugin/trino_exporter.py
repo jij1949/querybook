@@ -1,4 +1,4 @@
-from .base_exporter import BaseTableUploadExporter
+from lib.table_upload.exporter.base_exporter import BaseTableUploadExporter
 from app.db import with_session
 from logic import user as logic
 from logic.admin import get_query_engine_by_id
