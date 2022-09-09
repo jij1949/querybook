@@ -2,7 +2,7 @@ SHELL := /bin/bash
 .PHONY: bundled_off prod_web prod_worker prod_scheduler docs remove_running_dev_image clean
 
 bundled: dev_image
-	docker-compose up
+	docker compose --profile all up
 
 bundled_off:
 	docker-compose down
