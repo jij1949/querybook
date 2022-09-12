@@ -30,8 +30,6 @@ ALL_EXECUTORS = (
 
 def get_executor_class(language: str, name: str):
     for executor in ALL_EXECUTORS:
-        print(f"Executor: {executor}")
-        print(f"Executor match: {language}, {name}")
         if executor.match(language, name):
             return executor
     raise ValueError(f"Unknown executor {name} with language {language}")
