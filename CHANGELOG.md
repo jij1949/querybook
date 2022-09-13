@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.20.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.20.1...0.20.2) (2022-09-13)
+
+
+### Bug Fixes
+
+* Manually fix alembic migration order ([e31a70a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e31a70a5c0166117d02d663e9f9ee77149eef154))
+
 ### [0.20.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.20.0...0.20.1) (2022-09-13)
 
 
