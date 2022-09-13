@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.20.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.20.0...0.20.1) (2022-09-13)
+
+
+### Bug Fixes
+
+* Create new executor for Starburst ([7839aa7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7839aa702b50c029664cdc4d0ca90648d3017341))
+* Remove prints ([5d372a1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5d372a16b827eef30de026fe45286ba835955fad))
+
 ## [0.20.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.19.1...0.20.0) (2022-09-08)
 
 
