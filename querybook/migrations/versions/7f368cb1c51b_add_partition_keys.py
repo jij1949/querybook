@@ -1,7 +1,7 @@
 """add partition keys
 
 Revision ID: 7f368cb1c51b
-Revises: 2f40b8318af4
+Revises: 111111111111
 Create Date: 2022-08-19 17:13:50.930313
 
 """
@@ -11,12 +11,12 @@ from sqlalchemy.dialects import mysql
 
 #
 # Resolved migration conflict manually
-# From f449a73c5838 to 2f40b8318af4
+# From f449a73c5838 to 111111111111
 #
 
 # revision identifiers, used by Alembic.
 revision = "7f368cb1c51b"
-down_revision = "2f40b8318af4"
+down_revision = "111111111111"
 branch_labels = None
 depends_on = None
 
