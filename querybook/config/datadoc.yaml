@@ -16,11 +16,13 @@ cell_types:
             engine: 0 # Engine Id
             collapsed: false
             query_collapsed: false
+            limit: 0
         meta_default:
             title: ''
             engine: null
             collapsed: false
             query_collapsed: false
+            limit: 0
     chart:
         key: 'chart'
         name: 'Chart'
@@ -44,6 +46,7 @@ cell_types:
                     col_idx: 0
                     label: ''
                     scale: ''
+                    format: ''
                     min: 0.0
                     max: 0.0
                     sort:
@@ -52,6 +55,7 @@ cell_types:
                 y_axis:
                     label: ''
                     scale: ''
+                    format: ''
                     min: 0.0
                     max: 0.0
                     stack: false
@@ -68,6 +72,7 @@ cell_types:
                 legend_display: true
                 connect_missing: false
                 values:
+                    source: 0 # Can be 0:'value' | 1:'series'
                     display: 0
                     position: 'center'
                     alignment: 'center'
