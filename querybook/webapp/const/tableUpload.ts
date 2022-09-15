@@ -9,7 +9,11 @@ export const UploadedTableColumnTypes = [
 ] as const;
 export type TUploadedTableColumnTypes = typeof UploadedTableColumnTypes[number];
 
-export const UploadedTableIfExistOptions = ['fail', 'append'] as const;
+export const UploadedTableIfExistOptions = [
+    'fail',
+    'replace',
+    'append',
+] as const;
 export type TUploadedTableIfExist = typeof UploadedTableIfExistOptions[number];
 
 export interface ICSVParseConfig {
