@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.21.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.21.0...0.21.1) (2022-09-15)
+
+
+### Bug Fixes
+
+* Table upload fixes ([4bf9563](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4bf9563fbec6aa9617c6447943e73255fbd4aa80))
+* Undo remove replace ([965973c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/965973c2fa41ef65ef349985065304cc8a9df0b6))
+
 ## [0.21.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.20.3...0.21.0) (2022-09-15)
 
 
