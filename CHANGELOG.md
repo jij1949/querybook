@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.20.3...0.21.0) (2022-09-15)
+
+
+### Features
+
+* Add a new function to sync table with metastore (#998) ([6ffe0ff](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6ffe0ff48d99045f0b73b1831978b0b752d8e940))
+* allow user to bypass LIMIT (#1000) ([e9d11ed](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e9d11edc8c8a96102ab2d7d9487f95c669c22a82))
+* improve charting axis and value display (#999) ([3b36df2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3b36df2bd9aaa4874715a3754824a458c08e9e6f))
+* improved query limit (#995) ([64f6e60](https://github.expedia.biz/eg-analytics-platform/querybook/commit/64f6e60ef0517a4c6f315882d94bc088bdaa4842))
+* Merge branch 'upstream/master' ([88abf71](https://github.expedia.biz/eg-analytics-platform/querybook/commit/88abf71f93301c09ea80af8412d95c3b877cfc8d))
+* pass execution type to executor client (#992) ([5f3a961](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5f3a9613aabbcc8f9eb47d5e197ff41f1dd55915))
+* show 404 page when table gets deleted (#1003) ([37a9434](https://github.expedia.biz/eg-analytics-platform/querybook/commit/37a94345884f934ab9c7d11a4ae088b4ecafdb63))
+
+
+### Bug Fixes
+
+* add acl check for metastore table sync (#1004) ([fdb5df0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fdb5df09480d9c0beb2f1ef38d755dae5c55ab96))
+* disable new features in read only mode (#1002) ([5fa45d7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5fa45d7e292ecf34dd3260f23bc468eed3fa7e83))
+* Hide export option on scheduler pop-up if there are no exporters available (#1001) ([d8a3112](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d8a31125e4700b1acb4d7f5349e202786db32f0f))
+* lint error doesn't disappear when switching to templating query (#994) ([a859d7a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a859d7a267e3ea7bb187d4c771b4aff81609a5c5))
+* raise rate limit for the sync api (#1007) ([0251ffd](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0251ffdd23cd25ab8ee5003f47926848d15a802e))
+* transfer schedule's ownership along with datadoc's ownership (#1005) ([8732d97](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8732d9793ad6d3dbdd809bb23dea9535c7842acf))
+
 ### [0.20.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.20.2...0.20.3) (2022-09-13)
 
 
