@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.21.1...0.22.0) (2022-09-20)
+
+
+### Features
+
+* add diff view when transpiling query (#1010) ([225b0ac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/225b0ac20717cd7bad2196387f34e891896003f5))
+
+
+### Bug Fixes
+
+* automatic serialize sqlalchemy Row (#1011) ([372ab25](https://github.expedia.biz/eg-analytics-platform/querybook/commit/372ab25436cd0dd7b0846d7545b3255dbe5876c9))
+* table validation for sync_table (#1008) ([760b6ec](https://github.expedia.biz/eg-analytics-platform/querybook/commit/760b6ec0dd3715058b138b528657cc62558d27a5))
+
 ### [0.21.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.21.0...0.21.1) (2022-09-15)
 
 
