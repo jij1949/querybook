@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.23.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.23.0...0.23.1) (2022-09-21)
+
+
+### Bug Fixes
+
+* Enable Flower container deployment for Celery (#37) ([790d03a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/790d03a6818a58fdbfaf4c0b23176b32ca2519d4))
+
 ## [0.23.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.22.0...0.23.0) (2022-09-21)
 
 
