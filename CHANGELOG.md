@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.22.0...0.23.0) (2022-09-21)
+
+
+### Features
+
+* Merge branch 'upstream' ([bee24ef](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bee24ef249b2833b97be207aed7aab97325a845c))
+
+
+### Bug Fixes
+
+* delete button stuck in spinning for cancel confirm (#1012) ([dfe0905](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dfe0905ddab12ef7075a6c280f9f56405576b5be))
+* url validation (#1013) ([65767f7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/65767f73fa1798fd2477d2fd78136363e182336a))
+
 ## [0.22.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.21.1...0.22.0) (2022-09-20)
 
 
