@@ -152,6 +152,23 @@ services:
             - all
             - infra
             - elasticsearch
+    flower:
+        container_name: querybook_flower
+        image: *querybook-image
+        tty: true
+        stdin_open: true
+        command: './querybook/scripts/runservice flower --port=5566'
+        env_file:
+            - ./.env.local
+        ports:
+            - '5566:5566'
+        expose:
+            - '5566'
+        restart: 'always'
+        volumes: *querybook-volumes
+        depends_on: *querybook-depends-on
+        profiles:
+            - flower
 
     # EMAIL SERVER EXAMPLE
     # If you need email to work use this
@@ -162,29 +179,6 @@ services:
     #     cap_add: ['NET_ADMIN', 'NET_RAW']
     #     mem_limit: 8M
     #     restart: on-failure
-    # CELERY FLOWER EXAMPLE
-    # If you want flower monitoring, use this
-    # Remember to put flower as part of local.txt
-    # flower:
-    #     image: querybook-dev:latest
-    #     tty: true
-    #     stdin_open: true
-    #     # network_mode: "host"
-    #     command: './querybook/scripts/runservice flower --port=5566'
-    #     ports:
-    #         - '5566:5566'
-    #     expose:
-    #         - '5566'
-    #     restart: 'always'
-    #     volumes:
-    #         # This is for code change via watcher
-    #         - $PWD:/opt/querybook
-    #         - $PWD/containers/bundled_querybook_config.yaml:/opt/querybook/querybook/config/querybook_config.yaml
-    #     depends_on:
-    #         mysql:
-    #             condition: service_healthy
-    #         redis:
-    #             condition: service_healthy
 
 volumes:
     my-db:

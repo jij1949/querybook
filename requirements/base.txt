@@ -22,6 +22,7 @@ Jinja2==3.1.2  # From Flask
 
 # Celery
 celery==5.2.7
+flower==1.2.0
 
 # Ops
 pyyaml==5.4.1
