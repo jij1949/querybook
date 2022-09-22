@@ -3,9 +3,23 @@ from executor_plugin.eg_trino.eg_trino_executor import EGTrinoQueryExecutor
 
 
 class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
-
-    def __init__(self, query_execution_id: int, celery_task, query: str, statement_ranges, client_setting):
-        super().__init__(query_execution_id, celery_task, query, statement_ranges, client_setting)
+    def __init__(
+        self,
+        query_execution_id: int,
+        celery_task,
+        query: str,
+        statement_ranges,
+        client_setting,
+        execution_type,
+    ):
+        super().__init__(
+            query_execution_id,
+            celery_task,
+            query,
+            statement_ranges,
+            client_setting,
+            execution_type,
+        )
         self._warning = ""
         self._json_csv_warning_checked = False
 
@@ -26,7 +40,9 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
             info += f"Trino Tracking Url: {self._cursor.tracking_url}\n"
         if self.warning != "":
             info += (
-                '<Message type="warning" title="Warning">' + self.warning + '</Message>\n'
+                '<Message type="warning" title="Warning">'
+                + self.warning
+                + "</Message>\n"
             )
             info += "---\nforce_show: true\n---"
         return info

@@ -18,9 +18,23 @@ def get_trino_error_dict(e):
 
 
 class EGTrinoQueryExecutor(TrinoQueryExecutor):
-
-    def __init__(self, query_execution_id: int, celery_task, query: str, statement_ranges, client_setting):
-        super().__init__(query_execution_id, celery_task, query, statement_ranges, client_setting)
+    def __init__(
+        self,
+        query_execution_id: int,
+        celery_task,
+        query: str,
+        statement_ranges,
+        client_setting,
+        execution_type,
+    ):
+        super().__init__(
+            query_execution_id,
+            celery_task,
+            query,
+            statement_ranges,
+            client_setting,
+            execution_type,
+        )
         self._warning = ""
         self._json_csv_warning_checked = False
 
@@ -39,7 +53,9 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
             info += f"Tracking Url: {self._cursor.tracking_url}\n"
         if self.warning != "":
             info += (
-                '<Message type="warning" title="Warning">' + self.warning + '</Message>\n'
+                '<Message type="warning" title="Warning">'
+                + self.warning
+                + "</Message>\n"
             )
             info += "---\nforce_show: true\n---"
         return info
@@ -78,23 +94,51 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
 
         warning = ""
         table_ids = []
-        if not json_info['referencedTables']:
+        if not json_info["referencedTables"]:
             return ""
-        for referenced_table in json_info['referencedTables']:
-            table = get_table_by_name(referenced_table["schema"],referenced_table["table"], metastore_id)
+        for referenced_table in json_info["referencedTables"]:
+            table = get_table_by_name(
+                referenced_table["schema"], referenced_table["table"], metastore_id
+            )
             if not table:
                 continue
             table_id = table.id
             if table_id not in table_ids:
                 table_ids.append(table_id)
-                meta_info = get_table_information_by_table_id(table_id).hive_metastore_description
+                meta_info = get_table_information_by_table_id(
+                    table_id
+                ).hive_metastore_description
                 meta_info_json = json.loads(meta_info)
-                if meta_info_json["sd"]["serdeInfo"]["serializationLib"] and "CSV" in meta_info_json["sd"]["serdeInfo"]["serializationLib"]:
-                    warning = warning + "Table `" + referenced_table["schema"] + "." + referenced_table["table"] + "` is using the unoptimized CSV file format.\n"
-                if meta_info_json["sd"]["serdeInfo"]["serializationLib"] and "json" in meta_info_json["sd"]["serdeInfo"]["serializationLib"]:
-                    warning = warning + "Table `" + referenced_table["schema"] + "." + referenced_table["table"] + "` is using the unoptimized JSON file format.\n"
+                if (
+                    meta_info_json["sd"]["serdeInfo"]["serializationLib"]
+                    and "CSV" in meta_info_json["sd"]["serdeInfo"]["serializationLib"]
+                ):
+                    warning = (
+                        warning
+                        + "Table `"
+                        + referenced_table["schema"]
+                        + "."
+                        + referenced_table["table"]
+                        + "` is using the unoptimized CSV file format.\n"
+                    )
+                if (
+                    meta_info_json["sd"]["serdeInfo"]["serializationLib"]
+                    and "json" in meta_info_json["sd"]["serdeInfo"]["serializationLib"]
+                ):
+                    warning = (
+                        warning
+                        + "Table `"
+                        + referenced_table["schema"]
+                        + "."
+                        + referenced_table["table"]
+                        + "` is using the unoptimized JSON file format.\n"
+                    )
         if warning != "":
-            warning = warning + "Use of non-optimized format can significantly slow down the query. \nMore information at: " f"https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format"
+            warning = (
+                warning
+                + "Use of non-optimized format can significantly slow down the query. \nMore information at: "
+                f"https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format"
+            )
         self._json_csv_warning_checked = True
         return warning
 
@@ -114,4 +158,4 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
             dummy = json.loads(info)
         except ValueError as e:
             return False
-        return True 
+        return True
