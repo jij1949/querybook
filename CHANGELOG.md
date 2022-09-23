@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.24.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.24.0...0.24.1) (2022-09-23)
+
+
+### Bug Fixes
+
+* Fix EG Trino/Starburst executors ([73cd375](https://github.expedia.biz/eg-analytics-platform/querybook/commit/73cd375f176fac67967fbc7e1d6f0002ce3316bd))
+
 ## [0.24.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.23.1...0.24.0) (2022-09-23)
 
 
