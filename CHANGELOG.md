@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.24.1...0.25.0) (2022-09-23)
+
+
+### Features
+
+* Disable UI access to create API tokens ([1fd56fb](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1fd56fb5feda059e8b86d12e49d58938c3564710))
+
 ### [0.24.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.24.0...0.24.1) (2022-09-23)
 
 
