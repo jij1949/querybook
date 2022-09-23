@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.23.1...0.24.0) (2022-09-23)
+
+
+### Features
+
+* display presto and trino nested structures (#991) ([c4ecff4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c4ecff42df93da58316852520b189ac2a744c0f4))
+* Merge branch 'upstream' ([dc09429](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dc0942938b28443cd05561427ba10aac88bd9a52))
+
 ### [0.23.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.23.0...0.23.1) (2022-09-21)
 
 
