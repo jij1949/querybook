@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.25.0...0.26.0) (2022-09-27)
+
+
+### Features
+
+* (experimental) make error suggestion pluggable (#1017) ([3a5eb97](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3a5eb97a26a7bcbb419144a34dda78a5b2c52cea))
+* Merge branch 'upstream' ([00ac4cf](https://github.expedia.biz/eg-analytics-platform/querybook/commit/00ac4cfc0875da8a4912fd63bb0d100b764b5ce0))
+* show deactivated user with different ui (#1014) ([3fd594f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3fd594fbfb0567f3adc29272a5c11ca38d9673b3))
+
+
+### Bug Fixes
+
+* do not transform presto map keys (#1021) ([bd73970](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bd73970e9f37d73584da7f37a123488d5ff849c8))
+* JSONView fix (#1019) ([0b810c2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0b810c2f0a991c7c896ed54672db1be1ba0f8cd6))
+* userInfo might be null (#1016) ([ca2f1bc](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ca2f1bc8ea32f14729d2f4c73980172c9a19ddc9))
+
 ## [0.25.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.24.1...0.25.0) (2022-09-23)
 
 
