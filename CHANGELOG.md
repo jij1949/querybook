@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.26.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.26.0...0.26.1) (2022-10-03)
+
+
+### Bug Fixes
+
+* Update Trino tracking url to go to query overview instead of query's plan ([0f42205](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0f42205eeec6ca1fad3e2fc5ef43b04325f31d9f))
+
 ## [0.26.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.25.0...0.26.0) (2022-09-27)
 
 
