@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.26.1...0.27.0) (2022-10-04)
+
+
+### Features
+
+* Merge branch 'upstream' ([1a87804](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1a87804d0ba46ce7b7578ce1de1f9fe09d793ef2))
+
+
+### Bug Fixes
+
+* Automatically enable JSON transformer ([060c661](https://github.expedia.biz/eg-analytics-platform/querybook/commit/060c6616db8eebeadda7139e577c21f5411d0263))
+* disable json parsing by default (#1025) ([d42ec00](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d42ec003727b538db9b24f441afc7a4494b0d78e))
+* Make Presto Explain Validator optional install (#1023) ([fab8d80](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fab8d804cdf8e787d553a6512d9335235d894c26))
+* schedule owner not update (#1027) ([06c7995](https://github.expedia.biz/eg-analytics-platform/querybook/commit/06c7995a2ddeee9cbd6608fd4b055f6825dfab37))
+
 ### [0.26.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.26.0...0.26.1) (2022-10-03)
 
 
