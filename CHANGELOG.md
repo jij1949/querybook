@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.28.0...0.29.0) (2022-10-05)
+
+
+### Features
+
+* Merge branch 'upstream' ([0abf791](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0abf791bd85a27533ddf5e58793231ff2313d93f))
+
+
+### Bug Fixes
+
+* disable autocomplete for exact matches (#1029) ([1952973](https://github.expedia.biz/eg-analytics-platform/querybook/commit/19529731d450a093fd909c52949fb7f2001d32e5))
+* Increase CodeMirror hint z-index above modals (#1030) ([96c44f9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/96c44f98ef17d51fabc188912cb4ac5a2c25db45))
+
 ## [0.28.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.27.0...0.28.0) (2022-10-05)
 
 
