@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.27.0...0.28.0) (2022-10-05)
+
+
+### Features
+
+* Merge branch 'upstream' ([2c832e1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2c832e15ef698080a25f57b45cfbff671c3dd650))
+
+
+### Bug Fixes
+
+* Replace cronjs-matcher with cron-parser (#1028) ([edefd6b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/edefd6b799e8c2c06b7bece97271f0a583d8f77b))
+
 ## [0.27.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.26.1...0.27.0) (2022-10-04)
 
 
