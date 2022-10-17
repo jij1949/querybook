@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.29.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.29.0...0.29.1) (2022-10-17)
+
+
+### Bug Fixes
+
+* Pin trino client to the latest working version ([fd39962](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fd399627d1a6750cc499e7f5cfdcc6b7a576c6b4))
+
 ## [0.29.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.28.0...0.29.0) (2022-10-05)
 
 
