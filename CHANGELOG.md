@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.30.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.29.1...0.30.0) (2022-10-18)
+
+
+### Features
+
+* add formatted transpile view (#1031) ([b5120ed](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b5120edb82250c71a9f1a2bf9ff0663da462d93a))
+* Add syntax highlight/copy to markdown code (#1039) ([c78fd7f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c78fd7f18d93ce753665426ec4e92fe149a2d147))
+* Merge branch 'upstream' ([c84b843](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c84b843d17103993c67b483be6a3a2cb4ecce7e1))
+* syntax highlighting for templated queries (#1040) ([12346ea](https://github.expedia.biz/eg-analytics-platform/querybook/commit/12346ea0ed93e5f9890ee5e453eacf9690f0eaa6))
+
+
+### Bug Fixes
+
+* codemirror starts with a wrong height (#1041) ([a2d7463](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a2d746364478016badc769be470da8d556fb8dd8))
+* ExecutedQueryCell auto scropll to top during execution (#1033) ([011bb92](https://github.expedia.biz/eg-analytics-platform/querybook/commit/011bb92435dd6d59a85afb57041fecbdd548f096))
+* formatQuery isn't using the latest ref (#1042) ([7f02f09](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7f02f0993cfba4756731e559d3b4fddd0204043f))
+* query editor issues after refactor (#1035) ([3faf4bb](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3faf4bb7e588b6ed76c5aa1eafaf9f81827859fd))
+* table column auto completion not work sometimes (#1026) ([72bd343](https://github.expedia.biz/eg-analytics-platform/querybook/commit/72bd343dd5b39fee8fa4d093069d839167539b9f))
+
 ### [0.29.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.29.0...0.29.1) (2022-10-17)
 
 
