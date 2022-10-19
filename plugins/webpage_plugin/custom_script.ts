@@ -50,5 +50,13 @@ declare global {
             string,
             Record<string, { key?: string; name?: string }>
         >;
+
+        ROW_LIMIT_SCALE?: number[];
+        DEFAULT_ROW_LIMIT?: number;
+        ALLOW_UNLIMITED_QUERY?: boolean;
     }
 }
+
+window.ROW_LIMIT_SCALE = [1, 2, 3, 4, 5, 6].map((v) => Math.pow(10, v));
+window.DEFAULT_ROW_LIMIT = window.ROW_LIMIT_SCALE[2];
+window.ALLOW_UNLIMITED_QUERY = true;
