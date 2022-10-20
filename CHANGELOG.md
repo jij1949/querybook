@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.30.1...0.31.0) (2022-10-20)
+
+
+### Features
+
+* Add Trino query error suggestions. ([ae36324](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ae363242897b05ff991cd6cad147603f75b31d12))
+
 ### [0.30.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.30.0...0.30.1) (2022-10-20)
 
 
