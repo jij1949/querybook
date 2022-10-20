@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.31.0...0.32.0) (2022-10-20)
+
+
+### Features
+
+* Merge branch 'upstream' ([858fb84](https://github.expedia.biz/eg-analytics-platform/querybook/commit/858fb84f593b47e0a53a0257dd0a521086e7db30))
+
+
+### Bug Fixes
+
+* QueryComposer additional buttons nested right (#1044) ([9f252e7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9f252e7c38741638e9fdd9c8b8c0aa92b9909794))
+
 ## [0.31.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.30.1...0.31.0) (2022-10-20)
 
 
