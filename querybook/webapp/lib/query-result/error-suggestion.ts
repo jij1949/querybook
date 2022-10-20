@@ -80,12 +80,78 @@ export function getQueryErrorSuggestion(
     statementExecutions: IStatementExecution[],
     queryEngine: IQueryEngine
 ): string {
-    const getSuggestions =
-        window.GET_QUERY_ERROR_SUGGESTION ?? getDefaultQueryErrorSuggestion;
-    return getSuggestions(
+    let suggestion = window.GET_QUERY_ERROR_SUGGESTION(
         queryError,
         queryExecution,
         statementExecutions,
         queryEngine
     );
+
+    if (suggestion === '') {
+        suggestion = getDefaultQueryErrorSuggestion(
+            queryError,
+            queryExecution,
+            statementExecutions,
+            queryEngine
+        );
+    }
+
+    return suggestion;
 }
+
+const getQueryEngineClusterType = (queryEngine: IQueryEngine): string => {
+    if (queryEngine.language === 'trino') {
+        // Match substring in query engine
+        const matches = queryEngine.name.match(/-(.*?)-trino \(/);
+        if (matches.length === 2) {
+            return matches[1];
+        }
+    }
+
+    return 'unknown';
+};
+
+window.GET_QUERY_ERROR_SUGGESTION = (
+    queryError: IQueryError,
+    queryExecution: IQueryExecution,
+    statementExecutions: IStatementExecution[],
+    queryEngine: IQueryEngine
+): string => {
+    console.log('QueryError', queryError);
+    console.log('Query Engine: ', queryEngine);
+
+    const queryEngineClusterType = getQueryEngineClusterType(queryEngine);
+    console.log('query engine type', queryEngineClusterType);
+
+    if (
+        queryEngine.language === 'trino' &&
+        queryEngineClusterType === 'etl' &&
+        /Access Denied.*hive\.sandbox/.test(queryError.error_message)
+    ) {
+        return `ETL clusters cannot access the \`sandbox\` schema.  Please use an Ad hoc cluster instead.
+
+For more details, please refer to https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DAPS&title=Cluster+Types`;
+    }
+    if (
+        queryEngine.language === 'trino' &&
+        queryEngineClusterType === 'adhoc' &&
+        /Access Denied: Cannot .*? table hive\.(?!sandbox)/.test(
+            queryError.error_message
+        )
+    ) {
+        return `Ad hoc clusters cannot write to persistent schemas.  Please use an ETL cluster instead.
+
+For more details, please refer to https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DAPS&title=Cluster+Types`;
+    }
+    if (
+        queryEngine.language === 'trino' &&
+        queryEngineClusterType === 'adhoc' &&
+        /Table 'hive\.sandbox.* does not exist/.test(queryError.error_message)
+    ) {
+        return `Sandbox schemas are configured with a time-to-live (TTL) of 10 days, after which they are automatically cleaned up.
+
+If you need to keep data for longer, please use a persistent schema instead.`;
+    }
+
+    return '';
+};

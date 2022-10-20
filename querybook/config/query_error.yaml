@@ -128,3 +128,47 @@ common:
         regex: 'Part number must be an integer between 1 and 10000, inclusive'
         message: >
             Your query result exceeded Querybook's maximum limit of 100GB, consider insert result to a table instead.
+
+# Trino errors
+trino:
+    access_denied_ranger:
+        regex: 'Access Denied: Cannot select from columns'
+        message: |
+            Ranger is restricting access to the queried data.
+
+            Please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7) for help identifying which policy is blocking access.
+
+    permission_denied_ranger:
+        regex: 'Permission denied: user \[.*?\] does not have \[.*?\] privilege on'
+        message: |
+            Ranger is restricting access to the queried data.
+
+            Please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7) for help identifying which policy is blocking access.
+
+    aws_s3_access_denied:
+        regex: 'Access Denied \(Service: Amazon S3;'
+        message: |
+            The Trino cluster does not have access to the underlying S3 bucket containing the data being queried.
+
+            Please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7) for help reconfiguring your cluster.
+
+    security_definer:
+        regex: 'View owner does not have sufficient privileges'
+        message: |
+            The query is attempting to query a View created with the `SECURITY DEFINER` option, which is not allowed.
+
+            For more information: https://confluence.expedia.biz/pages/viewpage.action?pageId=2531671955
+
+    legacy_json_serde:
+        regex: 'deserializer does not exist:.*jsonserde'
+        message: |
+            Support for JSON column type has been limited to legacy clusters only for performance reasons.  Please switch to a legacy cluster and rerun your query.
+
+            For more information: https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format.
+
+    legacy_csv_serde:
+        regex: 'deserializer does not exist: com.bizo.hive.serde.csv.CSVSerde'
+        message: |
+            Support for CSV column type has been limited to legacy clusters only for performance reasons.  Please switch to a legacy cluster and rerun your query.
+
+            For more information: https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format.
