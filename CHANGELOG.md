@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.30.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.30.0...0.30.1) (2022-10-20)
+
+
+### Bug Fixes
+
+* Allow row limit of 1,000,000 ([b52b35e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b52b35e5aec465e19edbfd8624af669ba8155c9e))
+
 ## [0.30.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.29.1...0.30.0) (2022-10-18)
 
 
