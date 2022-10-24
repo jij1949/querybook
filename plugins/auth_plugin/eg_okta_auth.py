@@ -7,6 +7,7 @@ from app.db import DBSession
 from env import QuerybookSettings
 from flask import request, session as flask_session, redirect
 from lib.logger import get_logger
+from lib.utils.decorators import in_mem_memoized
 
 LOG = get_logger(__file__)
 
@@ -14,6 +15,24 @@ LOG = get_logger(__file__)
 # Expedia-customized version of the OktaLoginManager
 #
 class EgOktaLoginManager(OktaLoginManager):
+
+    @property
+    @in_mem_memoized()
+    def oauth_config(self):
+        authorization_url, token_url, profile_url = self.get_okta_urls()
+
+        return {
+            "callback_url": "{}{}".format(
+                QuerybookSettings.PUBLIC_URL, OAUTH_CALLBACK_PATH
+            ),
+            "client_id": QuerybookSettings.OAUTH_CLIENT_ID,
+            "client_secret": QuerybookSettings.OAUTH_CLIENT_SECRET,
+            "authorization_url": authorization_url,
+            "token_url": token_url,
+            "profile_url": profile_url,
+            "scope": ["openid", "email", "profile"],
+            "cookies": {"secure": True, "samesite": "None"},
+        }
 
     # Override this method to customize the behavior of the login process
     def oauth_callback(self):
