@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.32.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.32.0...0.32.1) (2022-10-24)
+
+
+### Bug Fixes
+
+* Cookie SameSite=none ([e3edd82](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e3edd82298a35467161bf43ae21d22cff2b60fdf))
+
 ## [0.32.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.31.0...0.32.0) (2022-10-20)
 
 
