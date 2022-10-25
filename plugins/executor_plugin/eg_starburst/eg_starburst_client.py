@@ -23,15 +23,13 @@ class EGStarburstClient(EGTrinoClient):
 
 
 class EGStarburstCursor(EGTrinoCursor):
-    def __init__(self, cursor, username, password):
-        self._cursor = cursor
+    _starburst_tracking_url = None
+
+    def _init_query_state_vars(self) -> None:
         self.rows = []
-        self._init_query_state_vars()
-        self._request = cursor._request
-        self._execution_info = ""
+        self._tracking_url = None
         self._starburst_tracking_url = None
-        self._user = username
-        self._password = password
+        self._percent_complete = 0
 
     def poll(self):
         # this needs to be take care
