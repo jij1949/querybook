@@ -35,12 +35,15 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
     def meta_info(self):
         info = ""
         if self._cursor.starburst_tracking_url:
-            info += f"Starburst Tracking Url: {self._cursor.starburst_tracking_url}\n"
+            starburstImg = '<img src="/static/starburst.png" style="display: inline-block; width: 16px; padding: 0; margin: 0; margin-right: 0.25rem">'
+            info += f"<p>{starburstImg} <span> Starburst Tracking Url: {self._cursor.starburst_tracking_url}</span></p>\n"
+
         if self._cursor.tracking_url:
             info += f"Trino Tracking Url: {self._cursor.tracking_url}\n"
+
         if self.warning != "":
             info += (
-                '<Message type="warning" title="Warning">'
+                '\n\n<Message type="warning" title="Warning">'
                 + self.warning
                 + "</Message>\n"
             )
