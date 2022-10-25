@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.32.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.32.1...0.32.2) (2022-10-25)
+
+
+### Bug Fixes
+
+* Fix Starburst Tracking Url on multi statement query ([9aaf462](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9aaf462fb58f25c6681b03daba36742787928ca6))
+* Remove sync_ldap_task from jobs plugin ([946578f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/946578fe7c8f23210d968c5f2557db4d2385734e))
+
 ### [0.32.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.32.0...0.32.1) (2022-10-24)
 
 
