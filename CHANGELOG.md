@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.33.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.32.2...0.33.0) (2022-10-25)
+
+
+### Features
+
+* Add Starburst logo to the tracking URL ([b95cd9b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b95cd9b96db44636d52d2ee12458044757ccd43a))
+
 ### [0.32.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.32.1...0.32.2) (2022-10-25)
 
 
