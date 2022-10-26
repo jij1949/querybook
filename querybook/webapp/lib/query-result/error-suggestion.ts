@@ -103,7 +103,7 @@ const getQueryEngineClusterType = (queryEngine: IQueryEngine): string => {
     if (queryEngine.language === 'trino') {
         // Match substring in query engine
         const matches = queryEngine.name.match(/-(.*?)-trino \(/);
-        if (matches.length === 2) {
+        if (matches && matches.length === 2) {
             return matches[1];
         }
     }
