@@ -117,12 +117,8 @@ window.GET_QUERY_ERROR_SUGGESTION = (
     statementExecutions: IStatementExecution[],
     queryEngine: IQueryEngine
 ): string => {
-    console.log('QueryError', queryError);
-    console.log('Query Engine: ', queryEngine);
-
     const queryEngineClusterType = getQueryEngineClusterType(queryEngine);
-    console.log('query engine type', queryEngineClusterType);
-
+    
     if (
         queryEngine.language === 'trino' &&
         queryEngineClusterType === 'etl' &&
