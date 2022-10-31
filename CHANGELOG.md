@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.34.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.33.1...0.34.0) (2022-10-31)
+
+
+### Features
+
+* dag exporter v2 (#1058) ([6d034d6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6d034d6a104b85bd738181dbbd9896c16f7bfa22))
+* Merge branch 'upstream' ([87323e8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/87323e87e347fe91e7532aa2ef952f99ba92cf15))
+
+
+### Bug Fixes
+
+* [dag exporter] remove use vairables (#1065) ([2ba3372](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2ba3372304c33abe7ec2ce46fc43fda543ddcb2a))
+* Add sort_key and sort_order to table search (#1022) ([0be51ec](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0be51ec39a73728ba18c846f5bc10a1690be90cb))
+* only show supported query engines in the current env for dag exporter (#1063) ([27e03ea](https://github.expedia.biz/eg-analytics-platform/querybook/commit/27e03eaf49c3e1bcb4b162f4b8461a10d30f65b9))
+* refactored useLint pipeline to be more hooks based (#1066) ([0a0a53b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0a0a53b378bade5d38ec6dee14e9fb72471f4145))
+* SqlAutocompler setter not bind (#1062) ([fc521fe](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fc521fe9ad262ec2b7f547ac47c8be17ec5f55d7))
+* template variable type change and big numbers (#1046) ([657f2a7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/657f2a74fdd172a6d725ece3265d889b6cdb5ece))
+* Update Google OAuth Version (#1057) ([6c4011f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6c4011f606af27af8aca44cbb5c1ceec14a7f1c9))
+
 ### [0.33.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.33.0...0.33.1) (2022-10-26)
 
 
