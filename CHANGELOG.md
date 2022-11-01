@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.35.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.34.0...0.35.0) (2022-11-01)
+
+
+### Features
+
+* add schema filtering for table search (#996) ([022eaae](https://github.expedia.biz/eg-analytics-platform/querybook/commit/022eaaeb8affdc167fd4e0b80b3f86d378d97b20))
+* Merge branch 'upstream' ([859520f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/859520f08ac272278d2b0352dc528297dac816ef))
+
 ## [0.34.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.33.1...0.34.0) (2022-10-31)
 
 
