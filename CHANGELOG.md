@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.35.0...0.36.0) (2022-11-01)
+
+
+### Features
+
+* Enable SlackNotifier plugin ([4c93c4a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4c93c4adb74c2af5cb78de16113a46ff4ab037cc))
+
 ## [0.35.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.34.0...0.35.0) (2022-11-01)
 
 
