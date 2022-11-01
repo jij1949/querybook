@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.36.0...0.37.0) (2022-11-01)
+
+
+### Features
+
+* add customized notification for scheduled datadoc (#1061) ([301c551](https://github.expedia.biz/eg-analytics-platform/querybook/commit/301c551df7888f88d27c6ad71a68d848043feb89))
+* Merge branch 'upstream' ([6cd9823](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6cd9823b9f08de7a91c7c86013dce3dd84780a3d))
+
 ## [0.36.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.35.0...0.36.0) (2022-11-01)
 
 
