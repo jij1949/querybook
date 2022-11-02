@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.37.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.37.0...0.37.1) (2022-11-02)
+
+
+### Bug Fixes
+
+* schedule notification exception (#1067) ([281cc5e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/281cc5eb19e70a0db638f94414c13575b1b2bd7b))
+
 ## [0.37.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.36.0...0.37.0) (2022-11-01)
 
 
