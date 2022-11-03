@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.37.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.37.1...0.37.2) (2022-11-03)
+
+
+### Bug Fixes
+
+* Disable unused requirements ([f3e1998](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f3e199878d11899591cb3f29ebdba768535edbee))
+
 ### [0.37.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.37.0...0.37.1) (2022-11-02)
 
 
