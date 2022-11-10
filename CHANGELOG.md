@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.37.2...0.38.0) (2022-11-10)
+
+
+### Features
+
+* add event logging support (#1075) ([66ba1ac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/66ba1ac2dbd39b93a81eb6fc7fda5913b2f3b440))
+
+
+### Bug Fixes
+
+* Ensure DataDoc runs get tracked even if template rendering fails (#1073) ([9db0e08](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9db0e08f076e00c0179fd1058732936c828c1627))
+* Remove console.log (#1069) ([6827e3e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6827e3eca6f17180523cb34a0c84a066a32af7f3))
+* Wrap or truncate long column types (#1070) ([0cbbb42](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0cbbb42d3949166e2ef16c5dce2a49a4bc8ec740))
+
 ### [0.37.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.37.1...0.37.2) (2022-11-03)
 
 
