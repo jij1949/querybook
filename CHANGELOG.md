@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.38.1...0.39.0) (2022-11-16)
+
+
+### Features
+
+* Add custom trino engine status checker plugin (#57) ([1ec53c9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1ec53c92ccfd49a7529da24a7cfe201723c4184b))
+
 ### [0.38.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.38.0...0.38.1) (2022-11-16)
 
 
