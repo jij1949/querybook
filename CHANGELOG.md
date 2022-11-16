@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.38.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.38.0...0.38.1) (2022-11-16)
+
+
+### Bug Fixes
+
+* disable some api reqests from event logging (#1079) ([948830c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/948830c5bcf75abfa5320be9bb3bf268d895f11c))
+* package.json & yarn.lock to reduce vulnerabilities (#1020) ([37c9af1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/37c9af1e067cb92bfc56ccf9d6c37197b9b40f21))
+* relint on engine change + dont show lint when empty (#1077) ([a7d8171](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a7d8171be232b274a69cc9ab1f2d44a312aecb65))
+* requirements/dev.txt to reduce vulnerabilities (#1081) ([920ad90](https://github.expedia.biz/eg-analytics-platform/querybook/commit/920ad90615cf6831a4ba2e0cb6dc0d1cdf46fc68))
+
 ## [0.38.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.37.2...0.38.0) (2022-11-10)
 
 
