@@ -172,3 +172,31 @@ trino:
             Support for CSV column type has been limited to legacy clusters only for performance reasons.  Please switch to a legacy cluster and rerun your query.
 
             For more information: https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format.
+
+    system_session_property:
+        regex: 'Access Denied: Cannot set system session property'
+        message: |
+            This is a restricted session property and cannot be modified.
+
+            If you want to allow additional properties on the cluster, please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7).
+
+    expected_200_got_503:
+        regex: 'Expected response code to be 200, but was 503'
+        message: |
+            At times, clusters can get busy and scaling up/down of cluster may affect jobs sporadically. Please give a few minutes before re-trying.
+
+            If this issue is recurrent, please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7).
+
+    failed_connecting_to_hive:
+        regex: 'Failed connecting to Hive metastore'
+        message: |
+            At times, clusters can get busy and scaling up/down of cluster may affect jobs sporadically. Please give a few minutes before re-trying.
+
+            If this issue is recurrent, please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7).
+
+    schema_does_not_exist:
+        regex: 'Schema .*? does not exist'
+        message: |
+            If you are trying to access a federated schema, please check if you are using a prefix, e.g. egdp_prod, bexg_prod, vrbo_prod, etc.
+
+            Otherwise please ensure you are using the correct environment, and check if the schema exists in the cluster you are trying to access.
