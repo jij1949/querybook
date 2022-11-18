@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.40.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.39.1...0.40.0) (2022-11-18)
+
+
+### Features
+
+* add clock icon for scheduled datadocs in the sidebar ([306fec8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/306fec8d0d734c19ff00216bf50534a61f51823f))
+
+
+### Bug Fixes
+
+* Alias TaskSchedule in get_scheduled_data_docs_by_user() ([75b6479](https://github.expedia.biz/eg-analytics-platform/querybook/commit/75b64792e8b0ca0b3bd989e4f98f3d64c8df8d6d))
+
 ### [0.39.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.39.0...0.39.1) (2022-11-17)
 
 
