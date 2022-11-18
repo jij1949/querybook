@@ -136,3 +136,6 @@ class QuerybookSettings(object):
 
     # Event Logging
     EVENT_LOGGER_NAME = get_env_config("EVENT_LOGGER_NAME") or "null"
+
+    # Ranger
+    RANGER_URL = get_env_config("RANGER_URL")
