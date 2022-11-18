@@ -15,6 +15,7 @@ import {
 import { currentEnvironmentSelector } from 'redux/environment/selector';
 import { IStoreState } from 'redux/store/types';
 import { Column, Columns } from 'ui/Column/Column';
+import { Link } from 'ui/Link/Link';
 
 import './Landing.scss';
 
@@ -84,6 +85,37 @@ const DefaultLanding: React.FC = ({ children }) => {
 
     const LandingFooter = (
         <div className="Landing-bottom">
+            <Columns>
+                <Column>
+                    <div className="Landing-section-title">Documentation</div>
+                    <div className="Landing-list">
+                        <div>
+                            <Link
+                                to="https://confluence.expedia.biz/display/DSPKB/Querybook"
+                                newTab={true}
+                            >
+                                Querybook Knowledge Base (KB)
+                            </Link>
+                        </div>
+                        <div>
+                            <Link
+                                to="https://pages.github.expedia.biz/eg-data-platform/egdp-tf-app-egap-trino/"
+                                newTab={true}
+                            >
+                                BunnySafe: Trino Cluster Documentation
+                            </Link>
+                        </div>
+                        <div>
+                            <Link
+                                to="https://pages.github.expedia.biz/eg-data-platform/egdp-tf-app-egap-apiary/"
+                                newTab={true}
+                            >
+                                HoneySafe: EGAP Apiary Configuration
+                            </Link>
+                        </div>
+                    </div>
+                </Column>
+            </Columns>
             <Columns>
                 <Column>
                     <div className="Landing-section-title">Did you know?</div>

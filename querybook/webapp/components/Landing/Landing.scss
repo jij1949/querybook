@@ -54,6 +54,10 @@
                     color: var(--color-accent-dark);
                 }
             }
+
+            > div {
+                margin: 4px 0px;
+            }
         }
     }
 }
