@@ -7,6 +7,10 @@ from lib.table_upload.importer.base_importer import BaseTableUploadImporter
 from logic.admin import get_query_engine_by_id
 from lib.metastore import get_metastore_loader
 
+from lib.logger import get_logger
+
+LOG = get_logger(__file__)
+
 
 class BaseTableUploadExporter(ABC):
     def __init__(
@@ -72,5 +76,8 @@ class BaseTableUploadExporter(ABC):
         # the table config contains informations like name and types
         self._table_config = table_config
 
+        LOG.info("Uploading...")
         self._upload()
+        # TODO: Seems like this call is also an issue (doesn't complete)
+        LOG.info("Syncing table from metastore")
         return self._sync_table_from_metastore()
