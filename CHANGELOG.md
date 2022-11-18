@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.40.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.40.1...0.40.2) (2022-11-18)
+
+
+### Bug Fixes
+
+* Add table upload bulk insertion exporter (#56) ([1a4dbd9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1a4dbd9a6631dca29e4db833069dc76fde58ace8))
+
 ### [0.40.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.40.0...0.40.1) (2022-11-18)
 
 
