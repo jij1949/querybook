@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.40.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.40.0...0.40.1) (2022-11-18)
+
+
+### Bug Fixes
+
+* Add SQLGlot requirement to enable query transpiling ([a42312c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a42312c8c6ec2027245c001efad90aebad39c09f))
+
 ## [0.40.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.39.1...0.40.0) (2022-11-18)
 
 
