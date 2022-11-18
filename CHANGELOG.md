@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.41.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.40.2...0.41.0) (2022-11-18)
+
+
+### Features
+
+* add RangerConnectionChecker (#59) ([5d63eb7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5d63eb780dc6ec1bdfe1a3916fdac37c33a6f270))
+
 ### [0.40.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.40.1...0.40.2) (2022-11-18)
 
 
