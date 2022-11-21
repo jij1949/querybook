@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.41.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.41.1...0.41.2) (2022-11-21)
+
+
+### Bug Fixes
+
+* Trino bulk insert exporter configs (#61) ([290b6c5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/290b6c52513f907632be64ebac27e64c32b8e722))
+
 ### [0.41.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.41.0...0.41.1) (2022-11-18)
 
 
