@@ -39,7 +39,7 @@ class TrinoBulkInsert():
 
     def __init__(self) -> None:
         self.maxStringLength = 1000000
-        self.batchSize = 1000000
+        self.batchSize = 10000
         self.values = ""
         self.conn = None
         self.rowCounter = 0
@@ -55,7 +55,12 @@ class TrinoBulkInsert():
         self.remaining_create_retries = self.retries
 
     def setBatchSize(self, batchSize: int):
-        self.batchSize = batchSize
+        if batchSize is not None:
+            self.batchSize = batchSize
+
+    def setMaxStringLength(self, maxStringLength: int):
+        if maxStringLength is not None:
+            self.maxStringLength = maxStringLength
 
     def createTable(self, tableName: str, tableExists: bool, ifExists: str, createStatement: str):
         LOG.info('*** Creating Table ***')

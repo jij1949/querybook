@@ -31,6 +31,10 @@ class TrinoBulkExporter(BaseTableUploadExporter):
         if not isinstance(client, TrinoClient):
             raise ValueError(f"Client instance {client} is not Trino Based")
 
+        feature_params = engine.feature_params or {}
+        maxStringLength = feature_params.get('trino_bulk_exporter_maxStringLength', None)
+        batchSize = feature_params.get('trino_bulk_exporter_batchSize', None)
+
         client_settings = get_client_setting_from_engine(engine, None, session=session)
         trino_conf = get_trino_connection_conf(client_settings["connection_string"])
 
@@ -50,6 +54,8 @@ class TrinoBulkExporter(BaseTableUploadExporter):
             "schema": self._table_config.get("schema_name", None),
             "table": self._table_config["table_name"],
             "if_exists": self._table_config.get("if_exists", "fail"),
+            "batchSize": batchSize,
+            "maxStringLength": maxStringLength
         }
         return connection_config
 
@@ -62,10 +68,12 @@ class TrinoBulkExporter(BaseTableUploadExporter):
         df = update_pandas_df_column_name_type(
             self._importer.get_pandas_df(), column_name_types)
 
+        connection = self._get_trino_connection()
+
         bulk_insert = TrinoBulkInsert()
         bulk_insert.setVerbose(True)
-        bulk_insert.setBatchSize(batchSize=10000)
-        connection = self._get_trino_connection()
+        bulk_insert.setBatchSize(connection['batchSize'])
+        bulk_insert.setMaxStringLength(connection['maxStringLength'])
         bulk_insert.setConnection(
             host=connection["host"],
             port=connection["port"],
