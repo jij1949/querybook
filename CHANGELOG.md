@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.41.3...0.42.0) (2022-11-29)
+
+
+### Features
+
+* add filter support for api logging (#1084) ([9f1682f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9f1682f1f9983fa0fdbf7f226ce2f60d388d303b))
+* add helper task to auto disable unused workflows (#1082) ([a4ce07b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a4ce07b233f7c38dad876a9a3d0075820ab9831b))
+
+
+### Bug Fixes
+
+* load announcements only if the tab is active (#1085) ([e7779a5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e7779a5237e3f4ea200363d555428b4b789e5a55))
+* search and replace overlaps with lint status (#1088) ([1b91cb8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1b91cb8eef5e51ee1de7084a6e59d194c7978c07))
+
 ### [0.41.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.41.2...0.41.3) (2022-11-21)
 
 
