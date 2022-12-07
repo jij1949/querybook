@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.43.0...0.44.0) (2022-12-07)
+
+
+### Features
+
+* add datadoc retry with delay on failure (#66) ([5d8f87c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5d8f87c0c8deaa57715574695370fde1982c2860))
+
 ## [0.43.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.42.0...0.43.0) (2022-12-07)
 
 
