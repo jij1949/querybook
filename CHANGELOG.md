@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.42.0...0.43.0) (2022-12-07)
+
+
+### Features
+
+* Visualize complex Hive column types ([2a98416](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2a9841619050d9f6767a5181d9aed5a1990013fd))
+
+
+### Bug Fixes
+
+* Extend DataTableColumn type column length ([84b7b71](https://github.expedia.biz/eg-analytics-platform/querybook/commit/84b7b71bacb85f46369555fb55aac40838acdd38))
+
 ## [0.42.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.41.3...0.42.0) (2022-11-29)
 
 
