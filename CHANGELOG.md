@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.45.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.44.0...0.45.0) (2022-12-09)
+
+
+### Features
+
+* Add EGSlackNotifier with support for v- accounts ([081f8b8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/081f8b82ef8c603721015595dba4e33e462855be))
+
+
+### Bug Fixes
+
+* Upgrade SQLGlot to the latest version ([0542440](https://github.expedia.biz/eg-analytics-platform/querybook/commit/054244029ed2640fe9a2d0cc1d2e78d940ad7b54))
+
 ## [0.44.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.43.0...0.44.0) (2022-12-07)
 
 
