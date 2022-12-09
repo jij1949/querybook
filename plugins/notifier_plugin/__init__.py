@@ -1,4 +1,5 @@
 from lib.notify.notifier.email_notifier import EmailNotifier
-from lib.notify.notifier.slack_notifier import SlackNotifier
+from notifier_plugin.eg_slack.eg_slack_notifier import EGSlackNotifier
 
-ALL_PLUGIN_NOTIFIERS = [EmailNotifier(), SlackNotifier()]
+
+ALL_PLUGIN_NOTIFIERS = [EmailNotifier(), EGSlackNotifier()]
