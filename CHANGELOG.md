@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.45.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.45.0...0.45.1) (2022-12-09)
+
+
+### Bug Fixes
+
+* boost table score for exact match when searching table (#1097) ([d75c1d1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d75c1d1d7089843465f6ecb0a6eb26b67b43c241))
+* Keep table search default sort by name ([def3a0c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/def3a0c9562c992d69db00185c7438d77980ebd2))
+* notify_user need to accept user not uid (#1095) ([8b5b78f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8b5b78faa35bb2f6dfe7ebef7b3807af4befc3d3))
+* remove python-dev from dockerfile build (#1098) ([12520df](https://github.expedia.biz/eg-analytics-platform/querybook/commit/12520df94c9a1543d9a6e726da4c009874ea8e5f))
+* remove the edge when the node is deleted in dag exporter (#1089) ([d945a68](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d945a68c92269a8f72a7b3331c2b186e2fcdb378))
+* sidebar search should use relevance instead of alphabetical (#1096) ([a18cc93](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a18cc93b49674b0d923ee32b724942cf194ad629))
+
 ## [0.45.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.44.0...0.45.0) (2022-12-09)
 
 
