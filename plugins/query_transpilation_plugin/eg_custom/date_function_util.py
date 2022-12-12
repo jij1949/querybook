@@ -19,9 +19,9 @@ timestampRegex = r"[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[
 
 def _converttrunc(queryStr):
     try:
-        list = re.findall(dc.TRUNC_REGEX, queryStr)
+        list = re.findall(dc.TRUNC_REGEX, queryStr, flags=re.IGNORECASE)
         for x in list:
-            result = re.search(dc.TRUNC_REGEX, queryStr)
+            result = re.search(dc.TRUNC_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.TRUNC_REGEX,
@@ -32,6 +32,7 @@ def _converttrunc(queryStr):
                 + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -49,15 +50,16 @@ sourceQuery = (
 
 def _convertmonthsbetween(queryStr):
     try:
-        list = re.findall(dc.MONTHS_BETWEEN_REGEX, queryStr)
+        list = re.findall(dc.MONTHS_BETWEEN_REGEX, queryStr, flags=re.IGNORECASE)
         for x in list:
-            result = re.search(dc.MONTHS_BETWEEN_REGEX, queryStr)
+            result = re.search(dc.MONTHS_BETWEEN_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_string = re.sub(
                 dc.MONTHS_BETWEEN_REGEX,
                 "date_diff('month'," + result.group(4) + "," + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_string
     except:
@@ -81,11 +83,11 @@ extractParamDict = {
 
 def _convertextract(queryStr):
     try:
-        list = re.findall(dc.EXTRACT_REGEX, queryStr)
+        list = re.findall(dc.EXTRACT_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
             # two groups enclosed in separate ( and ) bracket
-            result = re.search(dc.EXTRACT_REGEX, queryStr)
+            result = re.search(dc.EXTRACT_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.EXTRACT_REGEX,
@@ -96,6 +98,7 @@ def _convertextract(queryStr):
                 + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -113,15 +116,16 @@ sourceQuery = (
 
 def _convertdatesub(queryStr):
     try:
-        list = re.findall(dc.DATE_SUB_REGEX, queryStr)
+        list = re.findall(dc.DATE_SUB_REGEX, queryStr, flags=re.IGNORECASE)
         for x in list:
-            result = re.search(dc.DATE_SUB_REGEX, queryStr)
+            result = re.search(dc.DATE_SUB_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.DATE_SUB_REGEX,
                 "date_add('day',-" + result.group(4) + "," + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -137,15 +141,16 @@ sourceQuery = (
 
 def _convertdatediff(queryStr):
     try:
-        list = re.findall(dc.DATE_DIFF_REGEX, queryStr)
+        list = re.findall(dc.DATE_DIFF_REGEX, queryStr, flags=re.IGNORECASE)
         for x in list:
-            result = re.search(dc.DATE_DIFF_REGEX, queryStr)
+            result = re.search(dc.DATE_DIFF_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_string = re.sub(
                 dc.DATE_DIFF_REGEX,
                 "date_diff('day'," + result.group(4) + "," + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_string
     except:
@@ -160,16 +165,17 @@ sourceQuery = "select * from table1 where date_add(to_date(localstartdt),15) > t
 
 def _convertdateadd(queryStr):
     try:
-        list = re.findall(dc.DATE_ADD_REGEX, queryStr)
+        list = re.findall(dc.DATE_ADD_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
-            result = re.search(dc.DATE_ADD_REGEX, queryStr)
+            result = re.search(dc.DATE_ADD_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.DATE_ADD_REGEX,
                 "date_add('day'," + result.group(4) + "," + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -184,17 +190,18 @@ sourceQuery = (
 
 def _convertaddmonths(queryStr):
     try:
-        list = re.findall(dc.ADD_MONTHS_REGEX, queryStr)
+        list = re.findall(dc.ADD_MONTHS_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
             # two groups enclosed in separate ( and ) bracket
-            result = re.search(dc.ADD_MONTHS_REGEX, queryStr)
+            result = re.search(dc.ADD_MONTHS_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.ADD_MONTHS_REGEX,
                 "date_add('month'," + result.group(4) + "," + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -209,13 +216,17 @@ sourceQuery = "select * from table1 where to_date(localstartdt) > to_date(locale
 
 def _converttodate(queryStr):
     try:
-        list = re.findall(dc.TO_DATE_REGEX, queryStr)
+        list = re.findall(dc.TO_DATE_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
-            result = re.search(dc.TO_DATE_REGEX, queryStr)
+            result = re.search(dc.TO_DATE_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
-                dc.TO_DATE_REGEX, "date(" + result.group(1) + ")", queryStr, 1
+                dc.TO_DATE_REGEX,
+                "date(" + result.group(1) + ")",
+                queryStr,
+                1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -230,16 +241,17 @@ sourceQuery = "select * from table1 where last_day(localstartdt) > to_date(local
 
 def _convertlastday(queryStr):
     try:
-        list = re.findall(dc.LAST_DAY_REGEX, queryStr)
+        list = re.findall(dc.LAST_DAY_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
-            result = re.search(dc.LAST_DAY_REGEX, queryStr)
+            result = re.search(dc.LAST_DAY_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.LAST_DAY_REGEX,
                 "last_day_of_month(" + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -256,16 +268,17 @@ sourceQuery = (
 
 def _convertdayofmonth(queryStr):
     try:
-        list = re.findall(dc.DAY_OF_MONTH_REGEX, queryStr)
+        list = re.findall(dc.DAY_OF_MONTH_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
-            result = re.search(dc.DAY_OF_MONTH_REGEX, queryStr)
+            result = re.search(dc.DAY_OF_MONTH_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.DAY_OF_MONTH_REGEX,
                 "day_of_month(" + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -280,16 +293,17 @@ sourceQuery = "select * from table1 where weekofyear(localstartdt) > 50"
 
 def _convertweekofyear(queryStr):
     try:
-        list = re.findall(dc.WEEK_OF_YEAR_REGEX, queryStr)
+        list = re.findall(dc.WEEK_OF_YEAR_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
-            result = re.search(dc.WEEK_OF_YEAR_REGEX, queryStr)
+            result = re.search(dc.WEEK_OF_YEAR_REGEX, queryStr, flags=re.IGNORECASE)
 
             new_String = re.sub(
                 dc.WEEK_OF_YEAR_REGEX,
                 "week_of_year(" + result.group(1) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -304,10 +318,12 @@ sourceQuery = "select * from table1 where current_date() > 50"
 
 def _convertcurrentdate(queryStr):
     try:
-        list = re.findall(dc.CURRENT_DATE_REGEX, queryStr)
+        list = re.findall(dc.CURRENT_DATE_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
-            new_String = re.sub(dc.CURRENT_DATE_REGEX, "current_date", queryStr, 1)
+            new_String = re.sub(
+                dc.CURRENT_DATE_REGEX, "current_date", queryStr, 1, flags=re.IGNORECASE
+            )
             queryStr = new_String
     except:
         queryStr = "Error while converting current_date"
@@ -321,11 +337,15 @@ sourceQuery = "select * from table1 where current_timestamp() > 50"
 
 def _convertcurrenttimestamp(queryStr):
     try:
-        list = re.findall(dc.CURRENT_TIMESTAMP_REGEX, queryStr)
+        list = re.findall(dc.CURRENT_TIMESTAMP_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
             new_String = re.sub(
-                dc.CURRENT_TIMESTAMP_REGEX, "current_timestamp", queryStr, 1
+                dc.CURRENT_TIMESTAMP_REGEX,
+                "current_timestamp",
+                queryStr,
+                1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -340,10 +360,10 @@ sourceQuery = "select cast(date1 as date), cast(date2 as timestamp), cast(abc  a
 
 def _convertcastdatetime(queryStr):
     try:
-        list = re.findall(dc.CAST_REGEX, queryStr)
+        list = re.findall(dc.CAST_REGEX, queryStr, flags=re.IGNORECASE)
 
         for x in list:
-            result = re.search(dc.CAST_REGEX, queryStr)
+            result = re.search(dc.CAST_REGEX, queryStr, flags=re.IGNORECASE)
             new_String = re.sub(
                 dc.CAST_REGEX,
                 "try_cast(" + result.group(2) + " as " + result.group(4) + ")",
