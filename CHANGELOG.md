@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.45.1...0.46.0) (2022-12-12)
+
+
+### Features
+
+* Custom transpiler ([51e5219](https://github.expedia.biz/eg-analytics-platform/querybook/commit/51e5219767dc7f7e1efa1eb366b066986e9aff7b))
+
+
+### Bug Fixes
+
+* Case-insensitive regexes in the custom transpiler ([2340320](https://github.expedia.biz/eg-analytics-platform/querybook/commit/234032093dcb65e23a65ec99f6984d63224d87ea))
+
 ### [0.45.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.45.0...0.45.1) (2022-12-09)
 
 
