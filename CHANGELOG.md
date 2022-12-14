@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.46.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.0...0.46.1) (2022-12-14)
+
+
+### Bug Fixes
+
+* Extend DataTableColumn type column length (again) ([f91f359](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f91f359d331817e2f78ef95226a0714c24a5240b))
+* Update custom transpiler and enable Presto ([910910c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/910910ccbcc8d48548c15ea97c05993cef5fa3d3))
+
 ## [0.46.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.45.1...0.46.0) (2022-12-12)
 
 
