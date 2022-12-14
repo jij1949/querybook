@@ -1,6 +1,7 @@
 import re
 import query_transpilation_plugin.eg_custom.constants.DateTimeRegexConstants as dc
 
+
 sourceQuery = (
     "select trunc(cast(process_date  as date),'YY') as truncated_process_date from table1 where trunc("
     "'2020-05-03','YY') = '2020-05-01' "
@@ -183,9 +184,7 @@ def _convertdateadd(queryStr):
     return queryStr
 
 
-sourceQuery = (
-    "select * from table1 where add_months('2022-01-23',2) > to_date(localenddt)"
-)
+sourceQuery = "select * from table1 where add_months('2022-01-23 11:11:11',2) > to_date(localenddt)"
 
 
 def _convertaddmonths(queryStr):
@@ -209,7 +208,66 @@ def _convertaddmonths(queryStr):
     return queryStr
 
 
+def _adddateparsefunction(result, groupnum):
+    dateparsestr = result.group(groupnum - 2)
+    if (
+        (result is not None)
+        and (result.group(groupnum) is not None)
+        and (len(result.group(groupnum)) > 12)
+    ):
+        dateparsestr = (
+            "date_parse("
+            + result.group(groupnum)
+            + ",'"
+            + dc.TRINO_TIMESTAMP_FORMAT
+            + "')"
+        )
+    elif (
+        (result is not None)
+        and (result.group(groupnum) is not None)
+        and (len(result.group(groupnum)) <= 12)
+    ):
+        dateparsestr = (
+            "date_parse(" + result.group(groupnum) + ",'" + dc.TRINO_DATE_FORMAT + "')"
+        )
+    return dateparsestr
+
+
 # _convertaddmonths(sourceQuery)
+
+sourceQuery = "select add_months('2017-12-31 14:15:16', 2, 'YYYY-MM-dd HH:mm:ss')"
+
+
+def _convertaddmonthswithformat(queryStr):
+    try:
+        list = re.findall(
+            dc.ADD_MONTHS_REGEX_WITH_FORMAT, queryStr, flags=re.IGNORECASE
+        )
+
+        for x in list:
+            # two groups enclosed in separate ( and ) bracket
+            result = re.search(
+                dc.ADD_MONTHS_REGEX_WITH_FORMAT, queryStr, flags=re.IGNORECASE
+            )
+
+            new_String = re.sub(
+                dc.ADD_MONTHS_REGEX_WITH_FORMAT,
+                "date_add('month',"
+                + result.group(4)
+                + ","
+                + _adddateparsefunction(result, 3)
+                + ")",
+                queryStr,
+                1,
+                flags=re.IGNORECASE,
+            )
+            queryStr = new_String
+    except:
+        queryStr = "Error while converting add_months with format"
+    return queryStr
+
+
+# _convertaddmonthswithformat(sourceQuery)
 
 sourceQuery = "select * from table1 where to_date(localstartdt) > to_date(localenddt)"
 
@@ -369,6 +427,7 @@ def _convertcastdatetime(queryStr):
                 "try_cast(" + result.group(2) + " as " + result.group(4) + ")",
                 queryStr,
                 1,
+                flags=re.IGNORECASE,
             )
             queryStr = new_String
     except:
@@ -378,6 +437,7 @@ def _convertcastdatetime(queryStr):
 
 
 # _convertcastdatetime(sourceQuery)
+
 
 function_list = [
     _convertdatediff,
@@ -394,4 +454,5 @@ function_list = [
     _converttrunc,
     _convertweekofyear,
     _convertcastdatetime,
+    _convertaddmonthswithformat,
 ]

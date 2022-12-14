@@ -19,22 +19,27 @@ def statements_to_query(statements: List[str]):
 
 
 #
-# Custom transpiler
+# Custom Presto transpiler converting various Hive functions
+# This is supported by BEX Qubole Presto
 #
-class EGCustomTrinoTranspiler(BaseQueryTranspiler):
+# Does not run through SQLGlot because it doesn't support Hive functions,
+# and Presto is almost identical to Trino.
+#
+class EGPrestoTrinoTranspiler(BaseQueryTranspiler):
     def name(self) -> str:
-        return "EGCustomTrinoTranspiler"
+        return "EGPrestoTrinoTranspiler"
 
     def from_languages(self) -> List[str]:
-        return ["custom"]
+        return ["presto"]
 
     def to_languages(self) -> List[str]:
         return ["trino"]
 
     def transpile(self, query: str, from_language: str, to_language: str):
-        LOG.info(f"Transpiling query: {query}")
+
         transpiledQuery = query
 
+        # Apply custom functions first
         for f in function_list:
             transpiledQuery = apply(f, transpiledQuery)
 
@@ -55,8 +60,6 @@ class EGHiveTrinoTranspiler(BaseQueryTranspiler):
         return ["trino"]
 
     def transpile(self, query: str, from_language: str, to_language: str):
-        LOG.info(f"Transpiling query: {query}")
-
         # Run through SQLGlot first
         transpiled_statements = sqlglot.transpile(
             query,
@@ -65,15 +68,7 @@ class EGHiveTrinoTranspiler(BaseQueryTranspiler):
             pretty=True,
         )
 
-        original_formatted_statements = sqlglot.transpile(
-            query,
-            read="hive",
-            write="hive",
-            pretty=True,
-        )
-
         transpiledQuery = statements_to_query(transpiled_statements)
-        originalQuery = statements_to_query(original_formatted_statements)
 
         # Apply custom functions
         for f in function_list:
