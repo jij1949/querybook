@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.46.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.1...0.46.2) (2023-01-09)
+
+
+### Bug Fixes
+
+* Configure Flask session cookie properties ([0eec570](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0eec57041265a4cd1721153dcea84cbfc4b610f6))
+
 ### [0.46.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.0...0.46.1) (2022-12-14)
 
 
