@@ -439,6 +439,81 @@ def _convertcastdatetime(queryStr):
 # _convertcastdatetime(sourceQuery)
 
 
+def checkexternaltableandreturn(queryStr):
+    try:
+        if (
+            re.search(dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE)
+            is not None
+        ):
+            return "external_location"
+        else:
+            return "location"
+    except:
+        queryStr = "Error while converting checkexternaltableandreturn"
+
+
+sourceQuery = (
+    "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe' "
+    "LOCATION 's3://ha-prod-analytics-datalake-datainsights-us-east-1/tier3_jpathak/welcomeguideamenities'"
+)
+
+
+def _convertrowformatpjsonroperties(queryStr):
+    try:
+
+        list = re.findall(dc.ROW_FORMAT_JSON_REGEX, queryStr, flags=re.IGNORECASE)
+        location_str = checkexternaltableandreturn(queryStr)
+        for x in list:
+            result = re.search(dc.ROW_FORMAT_JSON_REGEX, queryStr, flags=re.IGNORECASE)
+            new_String = re.sub(
+                dc.ROW_FORMAT_JSON_REGEX,
+                "WITH( \n"
+                + location_str
+                + " = "
+                + result.group(2)
+                + ", \nformat ='JSON'\n)",
+                queryStr,
+                1,
+                flags=re.IGNORECASE,
+            )
+            queryStr = new_String
+    except:
+        queryStr = "Error while converting convertrowformatproperties"
+
+    return queryStr
+
+
+def _convertexternaltable(queryStr):
+    try:
+        list = re.findall(dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE)
+        location_str = checkexternaltableandreturn(queryStr)
+        for x in list:
+            result = re.search(
+                dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE
+            )
+            new_String = re.sub(
+                dc.CREATE_EXTERNAL_TABLE_REGEX,
+                dc.CREATE_TABLE,
+                queryStr,
+                1,
+                flags=re.IGNORECASE,
+            )
+            queryStr = new_String
+    except:
+        queryStr = "Error while converting convertrowformatproperties"
+
+    return queryStr
+
+
+def _convertstring(queryStr):
+    try:
+        queryStr = re.sub(dc.STRING, dc.VARCHAR, queryStr, flags=re.IGNORECASE)
+    except:
+        queryStr = "Error while converting string type"
+
+    return queryStr
+
+
 function_list = [
     _convertdatediff,
     _convertdatesub,
@@ -455,4 +530,7 @@ function_list = [
     _convertweekofyear,
     _convertcastdatetime,
     _convertaddmonthswithformat,
+    _convertrowformatpjsonroperties,
+    _convertexternaltable,
+    _convertstring,
 ]

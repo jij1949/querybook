@@ -24,3 +24,9 @@ CAST_REGEX = r"\b(cast|CAST)\b\((\S+)\s*(AS|as)\s+(date|DATE|timestamp|TIMESTAMP
 
 TRINO_TIMESTAMP_FORMAT = "%Y-%c-%d %H:%i:%s"
 TRINO_DATE_FORMAT = "%Y-%c-%d"
+
+ROW_FORMAT_JSON_REGEX = "(ROW\s+FORMAT\s+SERDE\s+'org.openx.data.jsonserde.JsonSerDe')\n*\s*LOCATION\s+(['\w\:\/\-]*)"
+CREATE_EXTERNAL_TABLE_REGEX = "\s+CREATE\s+EXTERNAL\s+TABLE"
+CREATE_TABLE = "CREATE TABLE"
+STRING = "string"
+VARCHAR = "varchar"
