@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.46.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.2...0.46.3) (2023-01-12)
+
+
+### Bug Fixes
+
+* Transpile support for external table with JSON file format ([e79de8a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e79de8acab937b6aef6859ee9e06e7e39445f330))
+
 ### [0.46.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.1...0.46.2) (2023-01-09)
 
 
