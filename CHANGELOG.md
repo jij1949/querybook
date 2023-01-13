@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.47.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.3...0.47.0) (2023-01-13)
+
+
+### Features
+
+* add exact error from failed query execution (#73) ([64e6db0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/64e6db025379ad4fbebacd9894564af488c52641))
+
 ### [0.46.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.2...0.46.3) (2023-01-12)
 
 
