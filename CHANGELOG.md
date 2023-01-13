@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.48.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.47.0...0.48.0) (2023-01-13)
+
+
+### Features
+
+* Override HMS Loader to retrieve Cloverleaf-specific details ([b59396e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b59396e58b836a39fd7c00a3fe4a09cb20f74784))
+
 ## [0.47.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.46.3...0.47.0) (2023-01-13)
 
 
