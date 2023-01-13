@@ -96,7 +96,10 @@ def run_datadoc_with_config(
             tasks_to_run.append(
                 _run_datadoc_cell.si(
                     **start_query_execution_kwargs,
-                    previous_query_status=QueryExecutionStatus.DONE.value,
+                    previous_query_result={
+                        "query_run_status": QueryExecutionStatus.DONE.value,
+                        "query_execution_id": 0,
+                    },
                     execution_type=execution_type,
                     retry=retry,
                 )
@@ -118,11 +121,24 @@ def run_datadoc_with_config(
 
 @celery.task(bind=True, base=AbortableTask)
 def _run_datadoc_cell(
-    self, previous_query_status, cell_id, query_execution_params, execution_type, retry
+    self, previous_query_result, cell_id, query_execution_params, execution_type, retry
 ):
 
-    if previous_query_status != QueryExecutionStatus.DONE.value:
-        raise Exception(GENERIC_QUERY_FAILURE_MSG)
+    if previous_query_result.get("query_run_status") != QueryExecutionStatus.DONE.value:
+        with DBSession() as session:
+            previous_query_error_meta = get_query_error_meta_by_query_execution_id(
+                previous_query_result.get("query_execution_id"), session=session
+            )
+
+        raise Exception(
+            create_datadoc_error_message(
+                previous_query_error_meta.get("data_cell_name"),
+                previous_query_error_meta.get("query_execution_error_message")
+                if previous_query_error_meta.get("query_execution_error_message")
+                is not None
+                else GENERIC_QUERY_FAILURE_MSG,
+            )
+        )
 
     with DBSession() as session:
         query_execution_id = qe_logic.create_query_execution(
@@ -143,18 +159,56 @@ def _run_datadoc_cell(
         and retry["max_retries"] != 0
         and query_run_status == QueryExecutionStatus.ERROR.value
     ):
-        self.retry(countdown=retry["delay_sec"], max_retries=retry["max_retries"])
+        query_error_meta = get_query_error_meta_by_query_execution_id(
+            query_execution_id, session=session
+        )
+        self.retry(
+            countdown=retry["delay_sec"],
+            max_retries=retry["max_retries"],
+            exc=Exception(
+                "MaxRetriesExceededError:",
+                create_datadoc_error_message(
+                    query_error_meta.get("data_cell_name"),
+                    query_error_meta.get("query_execution_error_message"),
+                ),
+            ),
+        )
 
-    return query_run_status
+    return {
+        "query_run_status": query_run_status,
+        "query_execution_id": query_execution_id,
+    }
+
+
+def get_query_error_meta_by_query_execution_id(query_execution_id, session=None):
+    _, data_cell_id = qe_logic.get_datadoc_id_from_query_execution_id(
+        query_execution_id, session=session
+    )[0]
+    data_cell_name = datadoc_logic.get_data_cell_by_id(
+        data_cell_id, session=session
+    ).meta.get("title")
+    query_execution_error_message = qe_logic.get_query_execution_by_id(
+        query_execution_id, session=session
+    ).error.error_message
+    return {
+        "data_cell_name": data_cell_name,
+        "query_execution_error_message": query_execution_error_message,
+    }
+
+
+def create_datadoc_error_message(cell_name, error_msg):
+    return f'Failure in "{cell_name}": {error_msg}'
 
 
 @celery.task
 def on_datadoc_run_success(
-    last_query_status,
+    last_query_result,
     completion_params,
     **kwargs,
 ):
-    is_success = last_query_status == QueryExecutionStatus.DONE.value
+    is_success = (
+        last_query_result.get("query_run_status") == QueryExecutionStatus.DONE.value
+    )
     error_msg = None if is_success else GENERIC_QUERY_FAILURE_MSG
 
     return on_datadoc_completion(
