@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.49.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.48.0...0.49.0) (2023-01-17)
+
+
+### Features
+
+* a bunch of small ui fixes and improvements (#1114) ([0033314](https://github.expedia.biz/eg-analytics-platform/querybook/commit/003331485824bd6b503346890049674600d22f88))
+* add drag and drop for templated variables (#1112) ([24652a3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/24652a38260f4b68c114f0aed2f22bdca67853aa))
+* add frontend context logging (#1115) ([6a951f8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6a951f874013e9e949d27106acafb021b0273856))
+* add logout event hook (#1104) ([1527ff3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1527ff3e83799bf6b95d87718e13bae75b22df9d))
+* Add shortcut for toggle ToC, update datadoc short cuts (#1107) ([6bbbc8f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6bbbc8fbca44141afae2166d3af7f15accdb9887))
+* add support of running all cells of a data doc (#1102) ([b80b48c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b80b48c6d13fc763d723bd91c9466d1fbac170c6))
+* add websocket logging (#1110) ([b6eec5a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b6eec5a99618cd5ea20a7f66274e85509c7569c5))
+* auto add quotes for table/columns (#1109) ([d2c1f09](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d2c1f09218e62993fdc53c5e87d70e9b97eb35f4))
+* Make exact table search result auto show up (#1106) ([d543644](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d543644af31618b301a0919556051d20a636628d))
+* Merge branch 'upstream' ([386cc89](https://github.expedia.biz/eg-analytics-platform/querybook/commit/386cc89d92dae7820b137899df772d25b9ee64e4))
+* validation now works for templated query (#1119) ([155baca](https://github.expedia.biz/eg-analytics-platform/querybook/commit/155bacac23bec71ba0b5fafadd66724fd021092a))
+* Visualize complex Hive column types (#1091) ([05de0ca](https://github.expedia.biz/eg-analytics-platform/querybook/commit/05de0ca35b108789a25d2c5803ba2a5e93a5ba53))
+
+
+### Bug Fixes
+
+* Add disabled indicators to Schedules list (#1122) ([d059a7a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d059a7a0c98e1c2d46debae92b160595a91a3f13))
+* Chart date axis bug (#1108) ([d1633c0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d1633c0fd5e8ce5f1a9ecb66a844f46373aa007b))
+* Extend DataTableColumn type column length (#1121) ([e80a92a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e80a92ad52673020ac8f8069e6a0b7e4dac1d067))
+* hasOwnProperty is not a function issue from json-big (#1103) ([6435bc1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6435bc1c5f5d9a4c5a9f62d7d0c451292f9d5516))
+* package.json & yarn.lock to reduce vulnerabilities (#1092) ([047b4ac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/047b4aca5888790a8576526033c27328091cb238))
+* remove duplicate volume mount (#1126) ([0e52c98](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0e52c98ef5ad0c36806640c79830036f35496969))
+* requirements/base.txt to reduce vulnerabilities (#1113) ([200512e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/200512e34381bcdc443beb804a7255d08744a2f4))
+* scheduled docs with latest_partition fail to run (#1101) ([7b12960](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7b129608d87749525d6aa85cd715cf1a806ab9a7))
+* update event_log table schema (#1111) ([3ca3686](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3ca3686cb90ed8952ad154697dbcc5488d79338d))
+
 ## [0.48.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.47.0...0.48.0) (2023-01-13)
 
 
