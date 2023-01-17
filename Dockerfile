@@ -62,6 +62,9 @@ RUN yarn install --pure-lockfile
 # Copy everything else
 COPY . .
 
+# Copy change log images
+COPY docs_website/static/changelog/ querybook/static/changelog/
+
 # Webpack if prod
 RUN if [ "${PRODUCTION}" = "true" ] ; then ./node_modules/.bin/webpack --mode=production; fi
 

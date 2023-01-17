@@ -116,6 +116,7 @@ export const DataTableViewOverview: React.FC<
             value={table.description as DraftJs.ContentState}
             readonly={true}
             onSave={onDescriptionSave}
+            placeholder="No description for this table yet."
         />
     ) : null;
 

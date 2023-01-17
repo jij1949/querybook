@@ -26,7 +26,7 @@ import {
     AutoCompleteType,
     ExcludedTriggerKeys,
 } from 'lib/sql-helper/sql-autocompleter';
-import { format } from 'lib/sql-helper/sql-formatter';
+import { format, ISQLFormatOptions } from 'lib/sql-helper/sql-formatter';
 import {
     ILinterWarning,
     IRange,
@@ -130,7 +130,7 @@ export const QueryEditor: React.FC<
             language,
             query: value,
         });
-        const autoCompleter = useAutoComplete(
+        const autoCompleterRef = useAutoComplete(
             metastoreId,
             autoCompleteType,
             language,
@@ -232,20 +232,18 @@ export const QueryEditor: React.FC<
         );
 
         const formatQuery = useCallback(
-            (
-                options: {
-                    case?: 'lower' | 'upper';
-                    indent?: string;
-                } = {}
-            ) => {
+            (options: ISQLFormatOptions = {}) => {
                 if (editorRef.current) {
                     const indentWithTabs =
                         editorRef.current.getOption('indentWithTabs');
                     const indentUnit =
                         editorRef.current.getOption('indentUnit');
-                    options['indent'] = indentWithTabs
-                        ? '\t'
-                        : ' '.repeat(indentUnit);
+
+                    if (indentWithTabs) {
+                        options.useTabs = true;
+                    } else {
+                        options.tabWidth = indentUnit;
+                    }
                 }
 
                 const formattedQuery = format(
@@ -559,13 +557,16 @@ export const QueryEditor: React.FC<
 
         const handleOnFocus = useCallback(
             (editor: CodeMirror.Editor, event) => {
-                autoCompleter.registerHelper();
-
+                // This is needed because we could have multiple QueryEditor
+                // instances on the same page
+                // Note that we are using ref here because ReactCodeMirror doesn't
+                // use the new handleOnFocus - it only uses the one on mount
+                autoCompleterRef.current.registerHelper();
                 if (onFocus) {
                     onFocus(editor, event);
                 }
             },
-            [onFocus, autoCompleter]
+            [onFocus, autoCompleterRef]
         );
 
         const handleOnKeyUp = useCallback(

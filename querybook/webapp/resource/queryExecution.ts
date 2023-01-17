@@ -1,4 +1,5 @@
 import type { IAccessRequest } from 'const/accessRequest';
+import { TDataDocMetaVariables } from 'const/datadoc';
 import { IQueryTranspiler, ITranspiledQuery } from 'const/queryEngine';
 import {
     IQueryError,
@@ -149,22 +150,27 @@ export const TemplatedQueryResource = {
         }),
     renderTemplatedQuery: (
         query: string,
-        variables: Record<string, string>,
+        varConfig: TDataDocMetaVariables,
         engineId: number
     ) =>
         ds.save<string>(
             '/query_execution/templated_query/',
             {
                 query,
-                variables,
+                var_config: varConfig,
                 engine_id: engineId,
             },
             false
         ),
 
-    validateQuery: (query: string, engineId: number) =>
+    validateQuery: (
+        query: string,
+        engineId: number,
+        templatedVariables: TDataDocMetaVariables
+    ) =>
         ds.save<IQueryValidationResult[]>('/query/validate/', {
             query,
+            var_config: templatedVariables,
             engine_id: engineId,
         }),
 

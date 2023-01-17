@@ -1,3 +1,4 @@
+import queryErrorsByLanguage from 'config/query_error.yaml';
 import { IQueryEngine } from 'const/queryEngine';
 import {
     IQueryError,
@@ -5,16 +6,6 @@ import {
     IStatementExecution,
 } from 'const/queryExecution';
 
-const queryErrorsByLanguage: Record<
-    string,
-    Record<
-        string,
-        {
-            regex: string;
-            message: string;
-        }
-    >
-> = require('config/query_error.yaml');
 const SHARED_ERROR_SUGGESTION = 'common';
 
 // Merge all the common in
@@ -118,7 +109,7 @@ window.GET_QUERY_ERROR_SUGGESTION = (
     queryEngine: IQueryEngine
 ): string => {
     const queryEngineClusterType = getQueryEngineClusterType(queryEngine);
-    
+
     if (
         queryEngine.language === 'trino' &&
         queryEngineClusterType === 'etl' &&

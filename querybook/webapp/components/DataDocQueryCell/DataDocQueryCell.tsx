@@ -21,8 +21,10 @@ import { QuerySnippetInsertionModal } from 'components/QuerySnippetInsertionModa
 import { TemplatedQueryView } from 'components/TemplateQueryView/TemplatedQueryView';
 import { TranspileQueryModal } from 'components/TranspileQueryModal/TranspileQueryModal';
 import { UDFForm } from 'components/UDFForm/UDFForm';
-import { IDataQueryCellMeta } from 'const/datadoc';
+import { ComponentType, ElementType } from 'const/analytics';
+import { IDataQueryCellMeta, TDataDocMetaVariables } from 'const/datadoc';
 import type { IQueryEngine, IQueryTranspiler } from 'const/queryEngine';
+import { trackClick } from 'lib/analytics';
 import CodeMirror from 'lib/codemirror';
 import { createSQLLinter } from 'lib/codemirror/codemirror-lint';
 import {
@@ -73,7 +75,7 @@ interface IOwnProps {
     cellId: number;
 
     queryIndexInDoc: number;
-    templatedVariables: Record<string, string>;
+    templatedVariables: TDataDocMetaVariables;
 
     shouldFocus: boolean;
     isFullScreen: boolean;
@@ -88,7 +90,6 @@ interface IOwnProps {
     onBlur?: () => any;
     onUpKeyPressed?: () => any;
     onDownKeyPressed?: () => any;
-    onDeleteKeyPressed?: () => any;
     toggleFullScreen: () => any;
 }
 type IProps = IOwnProps & StateProps & DispatchProps;
@@ -103,6 +104,7 @@ interface IState {
     showQuerySnippetModal: boolean;
     showRenderedTemplateModal: boolean;
     showUDFModal: boolean;
+    hasLintError: boolean;
 
     transpilerConfig?: {
         toEngine: IQueryEngine;
@@ -126,6 +128,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             showQuerySnippetModal: false,
             showRenderedTemplateModal: false,
             showUDFModal: false,
+            hasLintError: false,
         };
     }
 
@@ -192,7 +195,6 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
     public _keyMapMemo(engines: IQueryEngine[]) {
         const keyMap = {
             [KeyMap.queryEditor.runQuery.key]: this.clickOnRunButton,
-            [KeyMap.queryEditor.deleteCell.key]: this.props.onDeleteKeyPressed,
         };
 
         for (const [index, engine] of engines.entries()) {
@@ -262,9 +264,19 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
         }
     }
 
+    @bind
+    public onLintCompletion(hasError: boolean) {
+        this.setState({
+            hasLintError: hasError,
+        });
+    }
+
     @decorate(memoizeOne)
-    public createGetLintAnnotations(engineId: number) {
-        return createSQLLinter(engineId);
+    public createGetLintAnnotations(
+        engineId: number,
+        templatedVariables: TDataDocMetaVariables
+    ) {
+        return createSQLLinter(engineId, templatedVariables);
     }
 
     @bind
@@ -366,7 +378,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
 
     @bind
     public async getTransformedQuery() {
-        const { templatedVariables = {} } = this.props;
+        const { templatedVariables = [] } = this.props;
         const { query } = this.state;
         const selectedRange =
             this.queryEditorRef.current &&
@@ -383,6 +395,13 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
 
     @bind
     public async onRunButtonClick() {
+        trackClick({
+            component: ComponentType.DATADOC_QUERY_CELL,
+            element: ElementType.RUN_QUERY_BUTTON,
+            aux: {
+                lintError: this.state.hasLintError,
+            },
+        });
         return runQuery(
             await this.getTransformedQuery(),
             this.engineId,
@@ -399,6 +418,11 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
 
     @bind
     public formatQuery(options = {}) {
+        trackClick({
+            component: ComponentType.DATADOC_QUERY_CELL,
+            element: ElementType.FORMAT_BUTTON,
+            aux: options,
+        });
         if (this.queryEditorRef.current) {
             this.queryEditorRef.current.formatQuery(options);
         }
@@ -722,9 +746,13 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                     onFullScreen={this.props.toggleFullScreen}
                     getLintErrors={
                         this.hasQueryValidators
-                            ? this.createGetLintAnnotations(this.engineId)
+                            ? this.createGetLintAnnotations(
+                                  this.engineId,
+                                  this.props.templatedVariables
+                              )
                             : null
                     }
+                    onLintCompletion={this.onLintCompletion}
                 />
                 {openSnippetDOM}
             </div>
@@ -747,6 +775,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                     templatedVariables={templatedVariables}
                     engineId={this.engineId}
                     onRunQueryClick={this.handleRunFromRenderedTemplateModal}
+                    hasValidator={this.hasQueryValidators}
                 />
             </Modal>
         ) : null;

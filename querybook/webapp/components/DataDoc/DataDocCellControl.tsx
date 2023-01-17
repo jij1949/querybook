@@ -2,8 +2,11 @@ import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import toast from 'react-hot-toast';
 
+import DatadocConfig from 'config/datadoc.yaml';
+import { ComponentType, ElementType } from 'const/analytics';
 import { IDataCellMeta } from 'const/datadoc';
 import { useBoundFunc } from 'hooks/useBoundFunction';
+import { trackClick } from 'lib/analytics';
 import { copy, sleep, titleize } from 'lib/utils';
 import { getShortcutSymbols, KeyMap } from 'lib/utils/keyboard';
 import { AsyncButton } from 'ui/AsyncButton/AsyncButton';
@@ -14,16 +17,7 @@ import { IListMenuItem, ListMenu } from 'ui/Menu/ListMenu';
 const COPY_CELL_SHORTCUT = getShortcutSymbols(KeyMap.dataDoc.copyCell.key);
 const PASTE_CELL_SHORTCUT = getShortcutSymbols(KeyMap.dataDoc.pasteCell.key);
 
-const cellTypes: Record<
-    string,
-    {
-        key: string;
-        icon: string;
-        name?: string;
-        meta: Record<string, unknown>;
-        meta_default: Record<string, unknown>;
-    }
-> = require('config/datadoc.yaml').cell_types;
+const cellTypes = DatadocConfig.cell_types;
 
 interface IProps {
     index?: number;
@@ -76,6 +70,10 @@ export const DataDocCellControl: React.FunctionComponent<IProps> = ({
         React.useState(false);
 
     const handleToggleDefaultCollapsed = React.useCallback(() => {
+        trackClick({
+            component: ComponentType.DATADOC_PAGE,
+            element: ElementType.COLLAPSE_CELL_BUTTON,
+        });
         setAnimateDefaultChange(true);
         Promise.all([sleep(500), toggleDefaultCollapsed()]).then(() =>
             setAnimateDefaultChange(false)
@@ -83,6 +81,10 @@ export const DataDocCellControl: React.FunctionComponent<IProps> = ({
     }, [toggleDefaultCollapsed]);
 
     const handleShare = useCallback(() => {
+        trackClick({
+            component: ComponentType.DATADOC_PAGE,
+            element: ElementType.SHARE_CELL_BUTTON,
+        });
         copy(shareUrl);
         toast('Url Copied!');
     }, [shareUrl]);
@@ -269,7 +271,16 @@ const InsertCellButtons: React.FC<{
     index: number;
 }> = React.memo(({ insertCellAt, index }) => {
     const handleInsertcell = useCallback(
-        (cellType: string) => insertCellAt(index, cellType, null, null),
+        (cellType: string) => {
+            trackClick({
+                component: ComponentType.DATADOC_PAGE,
+                element: ElementType.INSERT_CELL_BUTTON,
+                aux: {
+                    type: cellType,
+                },
+            });
+            return insertCellAt(index, cellType, null, null);
+        },
         [insertCellAt, index]
     );
 

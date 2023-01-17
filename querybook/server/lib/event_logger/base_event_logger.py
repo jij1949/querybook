@@ -75,13 +75,16 @@ class BaseEventLogger(ABC):
         return True
 
     @abstractmethod
-    def log(self, uid: int, event_type: EventType, event_data: dict) -> None:
+    def log(
+        self, uid: int, event_type: EventType, event_data: dict, timestamp: int = None
+    ) -> None:
         """Log an event to some data store
 
         Args:
             uid (int): id of the user who performed the action
             event_type (EventType): action event type, e.g. CLICK, VIEW
             event_data (dict): addtional info of the event in JSON format.
+            timestamp (int): timestamp in milliseconds
         """
         raise NotImplementedError()
 
@@ -89,6 +92,7 @@ class BaseEventLogger(ABC):
         """Log an API request.
 
         Args:
+            uid (int): id of the user who performed the action
             method (str): request method, e.g. GET, POST
             route (str): route of the api endpoint which serves the request
             params (dict): params of the request, includes path params,
@@ -100,6 +104,20 @@ class BaseEventLogger(ABC):
         params = self.__prune_api_request_params(params)
         event_data = {"method": method, "route": route, "params": params}
         self.log(uid=uid, event_type=EventType.API, event_data=event_data)
+
+    def log_websocket_event(
+        self, uid: int, route: str, args: list, kwargs: dict
+    ) -> None:
+        """Log websocket event.
+
+        Args:
+            uid (int): id of the user who performed the action
+            route (str): route is namespace joined with event name.
+            args (list):  non-keyworded arguments passed over from client.
+            params (dict): keyworded arguments passed over from client.
+        """
+        event_data = {"route": route, "args": args, "kwargs": kwargs}
+        self.log(uid=uid, event_type=EventType.WEBSOCKET, event_data=event_data)
 
     def __match_filter_rule(self, rule: ApiFilterRule, route: str, method: str) -> bool:
         route_matched = (

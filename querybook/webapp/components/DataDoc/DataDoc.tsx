@@ -16,26 +16,33 @@ import {
     ISearchAndReplaceHandles,
     SearchAndReplace,
 } from 'components/SearchAndReplace/SearchAndReplace';
+import { ComponentType, ElementType } from 'const/analytics';
 import {
     CELL_TYPE,
     DataCellUpdateFields,
     IDataCell,
     IDataCellMeta,
     IDataDoc,
+    IDataDocMeta,
     IDataQueryCell,
 } from 'const/datadoc';
 import { ISearchOptions, ISearchResult } from 'const/searchAndReplace';
 import { DataDocContext, IDataDocContextType } from 'context/DataDoc';
+import { trackClick, trackView } from 'lib/analytics';
 import {
     deserializeCopyCommand,
     serializeCopyCommand,
 } from 'lib/data-doc/copy';
-import { getShareUrl, scrollToCell } from 'lib/data-doc/data-doc-utils';
+import {
+    getShareUrl,
+    isCellEmpty,
+    scrollToCell,
+} from 'lib/data-doc/data-doc-utils';
 import { replaceDataDoc, searchDataDocCells } from 'lib/data-doc/search';
 import { sendConfirm, setBrowserTitle } from 'lib/querybookUI';
 import history from 'lib/router-history';
 import { copy, sanitizeUrlTitle } from 'lib/utils';
-import { formatError, isAxiosError } from 'lib/utils/error';
+import { formatError, isAxiosErrorWithMessage } from 'lib/utils/error';
 import { KeyMap, matchKeyMap } from 'lib/utils/keyboard';
 import { getQueryString } from 'lib/utils/query-string';
 import * as dataDocActions from 'redux/dataDoc/action';
@@ -334,6 +341,11 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
 
     @bind
     public async pasteCellAt(pasteIndex: number) {
+        trackClick({
+            component: ComponentType.DATADOC_PAGE,
+            element: ElementType.PASTE_CELL_BUTTON,
+        });
+
         let clipboardContent = null;
         try {
             if (navigator.clipboard.readText) {
@@ -373,6 +385,12 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
 
     @bind
     public copyCellAt(index: number, cut: boolean) {
+        trackClick({
+            component: ComponentType.DATADOC_PAGE,
+            element: cut
+                ? ElementType.CUT_CELL_BUTTON
+                : ElementType.COPY_CELL_BUTTON,
+        });
         copy(
             serializeCopyCommand({
                 cellId: this.props.dataDoc.cells[index],
@@ -380,6 +398,50 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
             })
         );
         toast('Copied.' + (cut ? ' Cell will be moved after paste. ' : ''));
+    }
+
+    @bind
+    public deleteCellAt(index: number) {
+        const { dataDoc, docId } = this.props;
+
+        const numberOfCells = dataDoc.dataDocCells.length;
+        const cell = dataDoc.dataDocCells[index];
+        const cellIsEmpty = isCellEmpty(cell);
+
+        return new Promise<void>((resolve) => {
+            if (numberOfCells > 0) {
+                const shouldConfirm = !cellIsEmpty;
+                const deleteCell = async () => {
+                    trackClick({
+                        component: ComponentType.DATADOC_PAGE,
+                        element: ElementType.DELETE_CELL_BUTTON,
+                    });
+                    try {
+                        await dataDocActions.deleteDataDocCell(docId, cell.id);
+                    } catch (e) {
+                        toast.error(
+                            `Delete cell failed, reason: ${formatError(e)}`
+                        );
+                    } finally {
+                        resolve();
+                    }
+                };
+                if (shouldConfirm) {
+                    sendConfirm({
+                        header: 'Delete Cell?',
+                        message: 'Deleted cells cannot be recovered',
+                        onConfirm: deleteCell,
+                        onHide: resolve,
+                        confirmColor: 'cancel',
+                        cancelColor: 'default',
+                    });
+                } else {
+                    deleteCell().finally(resolve);
+                }
+            } else {
+                resolve();
+            }
+        });
     }
 
     @bind
@@ -405,7 +467,11 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
             header: 'Clone DataDoc?',
             message:
                 'You will be redirected to the new Data Doc after cloning.',
-            onConfirm: () =>
+            onConfirm: () => {
+                trackClick({
+                    component: ComponentType.DATADOC_PAGE,
+                    element: ElementType.CLONE_DATADOC_BUTTON,
+                });
                 toast.promise(
                     cloneDataDoc(id).then((dataDoc) =>
                         history.push(
@@ -417,7 +483,8 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                         success: 'Clone Success!',
                         error: 'Cloning failed.',
                     }
-                ),
+                );
+            },
             cancelColor: 'default',
             confirmIcon: 'Copy',
         });
@@ -465,6 +532,8 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
             updateCell: this.updateCell,
             copyCellAt: this.copyCellAt,
             pasteCellAt: this.pasteCellAt,
+            deleteCellAt: this.deleteCellAt,
+
             fullScreenCellAt: this.fullScreenCellAt,
 
             defaultCollapse,
@@ -531,6 +600,12 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                 stopEvent = true;
                 this.pasteCellAt(this.state.focusedCellIndex);
             }
+        } else if (matchKeyMap(event, KeyMap.dataDoc.deleteCell)) {
+            const { focusedCellIndex } = this.state;
+            if (focusedCellIndex != null) {
+                stopEvent = true;
+                this.deleteCellAt(this.state.focusedCellIndex);
+            }
         }
 
         if (stopEvent) {
@@ -580,7 +655,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                     key={cell.id}
                     docId={dataDoc.id}
                     numberOfCells={dataDoc.dataDocCells.length}
-                    templatedVariables={dataDoc.meta}
+                    templatedVariables={dataDoc.meta.variables}
                     cell={cell}
                     index={index}
                     queryIndexInDoc={queryIndexInDoc}
@@ -730,6 +805,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
     }
 
     public componentDidMount() {
+        trackView(ComponentType.DATADOC_PAGE);
         this.autoFocusCell({}, this.props);
         this.openDataDoc(this.props.docId);
         this.publishDataDocTitle(this.props.dataDoc?.title);
@@ -779,7 +855,12 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
             // during this time we will focus the new inserted cell
             const cellLengthChanged = cells.length !== previousCells.length;
             if (cellLengthChanged && this.focusCellIndexAfterInsert != null) {
-                this.focusCellAt(this.focusCellIndexAfterInsert);
+                const cellIndexToFocus = this.focusCellIndexAfterInsert;
+                setImmediate(() => {
+                    // setting focus cell during componentDidUpdate would not
+                    // actually focus the cell, we need to do it in another event loop
+                    this.focusCellAt(cellIndexToFocus);
+                });
                 this.focusCellIndexAfterInsert = null;
             }
         }
@@ -801,7 +882,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
         const { dataDoc } = this.props;
         const { errorObj } = this.state;
 
-        if (isAxiosError(errorObj)) {
+        if (isAxiosErrorWithMessage(errorObj)) {
             return (
                 <DataDocError docId={this.props.docId} errorObj={errorObj} />
             );
@@ -855,7 +936,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
             );
         },
 
-        changeDataDocMeta: (docId: number, meta: IDataCellMeta) =>
+        changeDataDocMeta: (docId: number, meta: IDataDocMeta) =>
             dispatch(dataDocActions.updateDataDocField(docId, 'meta', meta)),
 
         cloneDataDoc: (docId: number) =>

@@ -1,5 +1,5 @@
 import { ContentState } from 'draft-js';
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { DataTableTags } from 'components/DataTableTags/DataTableTags';
@@ -181,17 +181,14 @@ const ColumnRow: React.FunctionComponent<{
     selected?: boolean;
     icon?: AllLucideIconNames;
     indent?: number;
-}> = ({
-    name,
-    type,
-    typeChildren = [],
-    onClick,
-    selected,
-    icon,
-    indent = 0,
-}) => {
-    const hasChildren = typeChildren.length > 0;
+}> = ({ name, type, typeChildren, onClick, selected, icon, indent = 0 }) => {
     const [expanded, setExpanded] = React.useState(false);
+    const effectiveTypeChildren = useMemo(
+        () =>
+            typeChildren ? typeChildren : parseType('', type).children ?? [],
+        [type, typeChildren]
+    );
+    const hasChildren = effectiveTypeChildren.length > 0;
 
     return (
         <>
@@ -228,7 +225,7 @@ const ColumnRow: React.FunctionComponent<{
             </StyledColumnRow>
             {hasChildren &&
                 expanded &&
-                typeChildren?.map((child) => (
+                effectiveTypeChildren?.map((child) => (
                     <ColumnRow
                         key={child.key}
                         name={child.key}

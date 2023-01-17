@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { DataDocTemplateInfoButton } from 'components/DataDocTemplateButton/DataDocTemplateInfoButton';
 import { DataDocTemplateVarForm } from 'components/DataDocTemplateButton/DataDocTemplateVarForm';
+import { detectVariableType } from 'components/DataDocTemplateButton/helpers';
 import { BoundQueryEditor } from 'components/QueryEditor/BoundQueryEditor';
 import { IQueryEditorHandles } from 'components/QueryEditor/QueryEditor';
 import {
@@ -26,11 +27,15 @@ import {
 import { TemplatedQueryView } from 'components/TemplateQueryView/TemplatedQueryView';
 import { TranspileQueryModal } from 'components/TranspileQueryModal/TranspileQueryModal';
 import { UDFForm } from 'components/UDFForm/UDFForm';
+import { ComponentType, ElementType } from 'const/analytics';
+import { IDataDocMetaVariable } from 'const/datadoc';
 import KeyMap from 'const/keyMap';
 import { IQueryEngine } from 'const/queryEngine';
 import { ISearchOptions, ISearchResult } from 'const/searchAndReplace';
 import { useDebounceState } from 'hooks/redux/useDebounceState';
 import { useBrowserTitle } from 'hooks/useBrowserTitle';
+import { useTrackView } from 'hooks/useTrackView';
+import { trackClick } from 'lib/analytics';
 import { createSQLLinter } from 'lib/codemirror/codemirror-lint';
 import { replaceStringIndices, searchText } from 'lib/data-doc/search';
 import { getSelectedQuery, IRange } from 'lib/sql-helper/sql-lexer';
@@ -155,12 +160,33 @@ const useRowLimit = (dispatch: Dispatch, environmentId: number) => {
 };
 
 const useTemplatedVariables = (dispatch: Dispatch, environmentId: number) => {
-    const templatedVariables = useSelector(
+    const reduxTemplatedVariables = useSelector(
         (state: IStoreState) =>
-            state.adhocQuery[environmentId]?.templatedVariables ?? {}
+            state.adhocQuery[environmentId]?.templatedVariables
     );
+    const templatedVariables = useMemo(() => {
+        const templatedVariablesInState = reduxTemplatedVariables ?? [];
+        if (!Array.isArray(templatedVariablesInState)) {
+            // This whole block is only here for legacy reason
+            // In the older version, we are storing it as a dictionary
+            // so we need to convert to the new format
+            const oldTemplatedVarConfig: Record<string, any> =
+                templatedVariablesInState;
+            const newConfig: IDataDocMetaVariable[] = [];
+            Object.entries(oldTemplatedVarConfig).forEach(([key, value]) => {
+                newConfig.push({
+                    name: key,
+                    value,
+                    type: detectVariableType(value),
+                });
+            });
+            return newConfig;
+        }
+        return templatedVariablesInState;
+    }, [reduxTemplatedVariables]);
+
     const setTemplatedVariables = useCallback(
-        (newVariables: Record<string, any>) =>
+        (newVariables: IDataDocMetaVariable[]) =>
             dispatch(
                 adhocQueryActions.receiveAdhocQuery(
                     { templatedVariables: newVariables },
@@ -221,6 +247,10 @@ const useQueryComposerSearchAndReplace = (
 function useQueryEditorHelpers() {
     const queryEditorRef = useRef<IQueryEditorHandles>(null);
     const handleFormatQuery = useCallback(() => {
+        trackClick({
+            component: ComponentType.ADHOC_QUERY,
+            element: ElementType.FORMAT_BUTTON,
+        });
         if (queryEditorRef.current) {
             queryEditorRef.current.formatQuery();
         }
@@ -266,7 +296,10 @@ function useKeyMap(
     }, [clickOnRunButton, queryEngines, setEngineId]);
 }
 
-function useQueryLint(queryEngine: IQueryEngine) {
+function useQueryLint(
+    queryEngine: IQueryEngine,
+    templatedVariables: IDataDocMetaVariable[]
+) {
     const hasQueryValidators = Boolean(queryEngine?.feature_params?.validator);
 
     const getLintAnnotations = useMemo(() => {
@@ -275,16 +308,16 @@ function useQueryLint(queryEngine: IQueryEngine) {
         }
 
         return (query: string, cm: CodeMirror.Editor) =>
-            createSQLLinter(queryEngine.id)(query, cm);
-    }, [hasQueryValidators, queryEngine?.id]);
+            createSQLLinter(queryEngine.id, templatedVariables)(query, cm);
+    }, [hasQueryValidators, queryEngine?.id, templatedVariables]);
 
     return {
+        hasQueryValidators,
         getLintAnnotations,
     };
 }
 
 function useTranspileQuery(
-    query: string,
     currentQueryEngine: IQueryEngine,
     queryEngines: IQueryEngine[],
     setEngineId: (engineId: number) => any,
@@ -341,6 +374,7 @@ function useTranspileQuery(
 }
 
 const QueryComposer: React.FC = () => {
+    useTrackView(ComponentType.ADHOC_QUERY);
     useBrowserTitle('Adhoc Query');
 
     const environmentId = useSelector(
@@ -373,8 +407,11 @@ const QueryComposer: React.FC = () => {
         dispatch,
         environmentId
     );
+
     const [showRenderedTemplateModal, setShowRenderedTemplateModal] =
         useState(false);
+
+    const [hasLintErrors, setHasLintErrors] = useState(false);
 
     const runButtonRef = useRef<IQueryRunButtonHandles>(null);
     const clickOnRunButton = useCallback(() => {
@@ -384,24 +421,32 @@ const QueryComposer: React.FC = () => {
     }, []);
 
     const { queryEditorRef, handleFormatQuery } = useQueryEditorHelpers();
-    const { getLintAnnotations } = useQueryLint(engine);
+    const { getLintAnnotations, hasQueryValidators } = useQueryLint(
+        engine,
+        templatedVariables
+    );
     const {
         transpilerConfig,
         startQueryTranspile,
         clearQueryTranspile,
         handleTranspileQuery,
         transpilerOptions,
-    } = useTranspileQuery(query, engine, queryEngines, setEngineId, setQuery);
+    } = useTranspileQuery(engine, queryEngines, setEngineId, setQuery);
 
     const handleCreateDataDoc = useCallback(async () => {
+        trackClick({
+            component: ComponentType.ADHOC_QUERY,
+            element: ElementType.CREATE_DATADOC_BUTTON,
+        });
         let dataDoc = null;
+        const meta = { variables: templatedVariables };
         if (executionId) {
             dataDoc = await dispatch(
                 dataDocActions.createDataDocFromAdhoc(
                     executionId,
                     engine.id,
                     query,
-                    templatedVariables
+                    meta
                 )
             );
         } else {
@@ -411,7 +456,7 @@ const QueryComposer: React.FC = () => {
                 meta: { engine: engine.id },
             };
             dataDoc = await dispatch(
-                dataDocActions.createDataDoc([cell], templatedVariables)
+                dataDocActions.createDataDoc([cell], meta)
             );
         }
         navigateWithinEnv(`/datadoc/${dataDoc.id}/`);
@@ -423,6 +468,13 @@ const QueryComposer: React.FC = () => {
     }, [query, queryEditorRef]);
 
     const handleRunQuery = React.useCallback(async () => {
+        trackClick({
+            component: ComponentType.ADHOC_QUERY,
+            element: ElementType.RUN_QUERY_BUTTON,
+            aux: {
+                lintError: hasLintErrors,
+            },
+        });
         // Throttle to prevent double run
         await sleep(250);
         const transformedQuery = await transformQuery(
@@ -453,6 +505,7 @@ const QueryComposer: React.FC = () => {
         dispatch,
         getCurrentSelectedQuery,
         setExecutionId,
+        hasLintErrors,
     ]);
 
     const keyMap = useKeyMap(clickOnRunButton, queryEngines, setEngineId);
@@ -489,6 +542,7 @@ const QueryComposer: React.FC = () => {
                 engine={engine}
                 onSelection={handleEditorSelection}
                 getLintErrors={getLintAnnotations}
+                onLintCompletion={setHasLintErrors}
             />
         </>
     );
@@ -597,9 +651,9 @@ const QueryComposer: React.FC = () => {
         >
             <DataDocTemplateVarForm
                 isEditable={true}
-                templatedVariables={templatedVariables}
-                onSave={(meta) => {
-                    setTemplatedVariables(meta);
+                variables={templatedVariables}
+                onSave={async (newVariables) => {
+                    setTemplatedVariables(newVariables);
                     setShowTemplateForm(false);
                     toast.success('Variables saved!');
                 }}
@@ -620,6 +674,7 @@ const QueryComposer: React.FC = () => {
                     setShowRenderedTemplateModal(false);
                     handleRunQuery();
                 }}
+                hasValidator={hasQueryValidators}
             />
         </Modal>
     );
@@ -628,14 +683,26 @@ const QueryComposer: React.FC = () => {
         const additionalButtons: IListMenuItem[] = [
             {
                 name: 'Template Config',
-                onClick: () => setShowTemplateForm(true),
+                onClick: () => {
+                    trackClick({
+                        component: ComponentType.ADHOC_QUERY,
+                        element: ElementType.TEMPLATE_CONFIG_BUTTON,
+                    });
+                    setShowTemplateForm(true);
+                },
                 icon: 'Code',
                 tooltip: 'Set Variables',
                 tooltipPos: 'right',
             },
             {
                 name: 'Render Template',
-                onClick: () => setShowRenderedTemplateModal(true),
+                onClick: () => {
+                    trackClick({
+                        component: ComponentType.ADHOC_QUERY,
+                        element: ElementType.RENDER_QUERY_BUTTON,
+                    });
+                    setShowRenderedTemplateModal(true);
+                },
                 icon: 'Eye',
                 tooltip: 'Show the rendered templated query',
                 tooltipPos: 'right',
@@ -701,6 +768,10 @@ const QueryComposer: React.FC = () => {
                             icon="Delete"
                             title="Clear"
                             onClick={() => {
+                                trackClick({
+                                    component: ComponentType.ADHOC_QUERY,
+                                    element: ElementType.CLEAR_BUTTON,
+                                });
                                 setQuery('');
                                 setExecutionId(null);
                             }}

@@ -1,13 +1,40 @@
 import { parseType, prettyPrintType } from 'lib/utils/complex-types';
 
-test('parseType', () => {
+test('simple type', () => {
     expect(parseType('column', 'string')).toEqual({
         key: 'column',
         type: 'string',
     });
+});
 
-    expect(parseType('', 'STRUCT<id:string>')).toEqual({
-        key: '',
+test('truncated type', () => {
+    expect(
+        parseType(
+            'column',
+            'struct<date:struct<year:int,month:int,day:int>,hour:int,minute:int,second:int,'
+        )
+    ).toEqual({
+        key: 'column',
+        type: 'struct<date:struct<year:int,month:int,day:int>,hour:int,minute:int,second:int,',
+    });
+
+    // Truncated, but coincidentally matches the regex
+    expect(parseType('column', 'struct<date:struct<hour:int>')).toEqual({
+        key: 'column',
+        type: 'struct<date:struct<hour:int>',
+    });
+});
+
+test('malformed struct type', () => {
+    expect(parseType('column', 'STRUCT <id:string>')).toEqual({
+        key: 'column',
+        type: 'STRUCT <id:string>',
+    });
+});
+
+test('complex type', () => {
+    expect(parseType('column', 'STRUCT<id:string>')).toEqual({
+        key: 'column',
         type: 'STRUCT<id:string>',
         children: [
             {
@@ -15,11 +42,6 @@ test('parseType', () => {
                 type: 'string',
             },
         ],
-    });
-
-    expect(parseType('', 'STRUCT <id:string>')).toEqual({
-        key: '',
-        type: 'STRUCT <id:string>',
     });
 
     expect(
@@ -183,10 +205,10 @@ test('prettyPrintType', () => {
             'struct<ids:array<string>,data:uniontype<int,float,string>>'
         )
     ).toEqual(`struct<
-  ids:array<
+  ids: array<
     string
   >,
-  data:uniontype<
+  data: uniontype<
     int,
     float,
     string
@@ -198,11 +220,11 @@ test('prettyPrintType', () => {
             'struct<ids:array<string>,comment:string,data:map<int,int>>'
         )
     ).toEqual(`struct<
-  ids:array<
+  ids: array<
     string
   >,
-  comment:string,
-  data:map<
+  comment: string,
+  data: map<
     int,
     int
   >
@@ -214,20 +236,20 @@ test('prettyPrintType', () => {
         )
     ).toEqual(`map<
   struct<
-    ids:array<
+    ids: array<
       string
     >,
-    comment:string,
-    data:map<
+    comment: string,
+    data: map<
       int,
       int
     >
   >,
   struct<
-    data:array<
+    data: array<
       string
     >,
-    event:map<
+    event: map<
       int,
       int
     >

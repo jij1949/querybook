@@ -2,7 +2,7 @@ from celery import chain
 from celery.contrib.abortable import AbortableTask
 
 from app.db import DBSession
-from app.flask_app import celery
+from app.flask_app import celery, socketio
 
 from const.query_execution import QueryExecutionStatus, QueryExecutionType
 from const.schedule import TaskRunStatus
@@ -57,8 +57,9 @@ def run_datadoc_with_config(
         runner_id = user_id if user_id is not None else data_doc.owner_uid
         query_cells = data_doc.get_query_cells()
 
-        # Create db entry record
-        record_id = create_task_run_record_for_celery_task(self, session=session)
+        # Create db entry record only for scheduled run
+        if execution_type == QueryExecutionType.SCHEDULED.value:
+            record_id = create_task_run_record_for_celery_task(self, session=session)
 
         completion_params = {
             "doc_id": doc_id,
@@ -74,7 +75,10 @@ def run_datadoc_with_config(
 
             try:
                 query = render_templated_query(
-                    query_cell.context, data_doc.meta, engine_id
+                    query_cell.context,
+                    data_doc.meta_variables,
+                    engine_id,
+                    session=session,
                 )
             except Exception as e:
                 on_datadoc_completion(
@@ -91,6 +95,7 @@ def run_datadoc_with_config(
                     "engine_id": engine_id,
                     "uid": runner_id,
                 },
+                "data_doc_id": doc_id,
             }
 
             tasks_to_run.append(
@@ -121,9 +126,14 @@ def run_datadoc_with_config(
 
 @celery.task(bind=True, base=AbortableTask)
 def _run_datadoc_cell(
-    self, previous_query_result, cell_id, query_execution_params, execution_type, retry
+    self,
+    previous_query_result,
+    cell_id,
+    query_execution_params,
+    data_doc_id,
+    execution_type,
+    retry,
 ):
-
     if previous_query_result.get("query_run_status") != QueryExecutionStatus.DONE.value:
         with DBSession() as session:
             previous_query_error_meta = get_query_error_meta_by_query_execution_id(
@@ -141,16 +151,30 @@ def _run_datadoc_cell(
         )
 
     with DBSession() as session:
-        query_execution_id = qe_logic.create_query_execution(
+        query_execution = qe_logic.create_query_execution(
             **query_execution_params, session=session
-        ).id
+        )
         datadoc_logic.append_query_executions_to_data_cell(
-            cell_id, [query_execution_id], session=session
+            cell_id,
+            [query_execution.id],
+            session=session,
+        )
+
+        socketio.emit(
+            "data_doc_query_execution",
+            (
+                None,
+                query_execution.to_dict(),
+                cell_id,
+            ),
+            namespace="/datadoc",
+            room=data_doc_id,
+            broadcast=True,
         )
 
     # Run synchronously
     query_run_status = run_query_task(
-        query_execution_id=query_execution_id,
+        query_execution_id=query_execution.id,
         execution_type=execution_type,
         celery_task=self,
     )
@@ -160,7 +184,7 @@ def _run_datadoc_cell(
         and query_run_status == QueryExecutionStatus.ERROR.value
     ):
         query_error_meta = get_query_error_meta_by_query_execution_id(
-            query_execution_id, session=session
+            query_execution.id, session=session
         )
         self.retry(
             countdown=retry["delay_sec"],
@@ -176,7 +200,7 @@ def _run_datadoc_cell(
 
     return {
         "query_run_status": query_run_status,
-        "query_execution_id": query_execution_id,
+        "query_execution_id": query_execution.id,
     }
 
 
@@ -262,10 +286,12 @@ def on_datadoc_completion(
         error_msg = str(e)
         LOG.error(e, exc_info=True)
     finally:
-        update_task_run_record(
-            id=record_id,
-            status=TaskRunStatus.SUCCESS if is_success else TaskRunStatus.FAILURE,
-            error_message=error_msg,
-        )
+        # when record_id is None, it's trigerred by adhoc datadoc run, no need to update the record.
+        if record_id:
+            update_task_run_record(
+                id=record_id,
+                status=TaskRunStatus.SUCCESS if is_success else TaskRunStatus.FAILURE,
+                error_message=error_msg,
+            )
 
     return is_success

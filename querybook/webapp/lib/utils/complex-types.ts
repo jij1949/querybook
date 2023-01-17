@@ -4,6 +4,8 @@ export interface ComplexType {
     children?: ComplexType[];
 }
 
+const INDENT = '  ';
+
 /**
  * Convert a complex Hive type string to a nested JSON object
  *
@@ -29,7 +31,7 @@ export interface ComplexType {
     }
  */
 export function parseType(key: string, type: string): ComplexType {
-    const regex = /(struct|array|map|uniontype)<(.*)>/i;
+    const regex = /^(struct|array|map|uniontype)<(.*)>$/i;
     const matches = type.match(regex);
 
     if (!matches || matches.length < 3) {
@@ -89,6 +91,11 @@ export function parseStructType(
         }
     }
 
+    if (depth > 0) {
+        // Truncated or malformed type, return as-is
+        return { key, type };
+    }
+
     children.push(parseType(currentKey, currentVal));
 
     const structType: ComplexType = {
@@ -129,6 +136,11 @@ export function parseMapType(
         }
     }
 
+    if (depth > 0) {
+        // Truncated or malformed type, return as-is
+        return { key, type };
+    }
+
     children.push(parseType('<key>', currentKey));
     children.push(parseType('<value>', currentVal));
 
@@ -167,6 +179,11 @@ export function parseUnionType(
         } else {
             currentVal += char;
         }
+    }
+
+    if (depth > 0) {
+        // Truncated or malformed type, return as-is
+        return { key, type };
     }
 
     children.push(parseType('<element>', currentVal));
@@ -210,15 +227,17 @@ export function prettyPrintType(type: string): string {
         if (char === '<') {
             prettyString += '<\n';
             depth += 1;
-            prettyString += '  '.repeat(depth);
+            prettyString += INDENT.repeat(depth);
         } else if (char === '>') {
             prettyString += '\n';
             depth -= 1;
-            prettyString += '  '.repeat(depth);
+            prettyString += INDENT.repeat(depth);
             prettyString += '>';
         } else if (char === ',') {
             prettyString += ',\n';
-            prettyString += '  '.repeat(depth);
+            prettyString += INDENT.repeat(depth);
+        } else if (char === ':') {
+            prettyString += ': ';
         } else {
             prettyString += char;
         }
