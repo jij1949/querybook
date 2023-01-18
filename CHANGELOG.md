@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.50.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.49.0...0.50.0) (2023-01-18)
+
+
+### Features
+
+* add search box to hide columns popup (#76) ([e2ccc27](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e2ccc27f44bf85d771fbdfe5aad342dbe99f841a))
+
 ## [0.49.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.48.0...0.49.0) (2023-01-17)
 
 
