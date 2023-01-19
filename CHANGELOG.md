@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.50.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.50.0...0.50.1) (2023-01-19)
+
+
+### Bug Fixes
+
+* json-bigint hasOwnProperty undefined issue (#1129) ([7cdb1db](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7cdb1dbd652cfcabdac5ed0b824548b374ab6889))
+* update /event_log api path (#1130) ([2962b58](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2962b587bdee1e0e88b03bfb6fc7a421130f411e))
+
 ## [0.50.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.49.0...0.50.0) (2023-01-18)
 
 
