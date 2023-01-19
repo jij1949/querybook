@@ -122,7 +122,7 @@ For more details, please refer to https://confluence.expedia.biz/pages/viewpage.
     if (
         queryEngine.language === 'trino' &&
         queryEngineClusterType === 'adhoc' &&
-        /Access Denied: Cannot .*? table hive\.(?!sandbox)/.test(
+        /Access Denied: Cannot .*? table (for )?hive\.(?!sandbox)/.test(
             queryError.error_message
         )
     ) {
