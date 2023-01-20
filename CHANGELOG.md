@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.50.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.50.1...0.50.2) (2023-01-20)
+
+
+### Bug Fixes
+
+* Extend error suggestion regex for SHOW CREATE TABLE from Adhoc ([541bb56](https://github.expedia.biz/eg-analytics-platform/querybook/commit/541bb56bdc067fbe5b303298e84a081531bb614e))
+
 ### [0.50.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.50.0...0.50.1) (2023-01-19)
 
 
