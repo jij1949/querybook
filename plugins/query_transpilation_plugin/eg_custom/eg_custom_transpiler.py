@@ -1,17 +1,13 @@
-import sqlglot
 from typing import List
+
+import sqlglot
 from lib.logger import get_logger
 from lib.query_analysis.transpilation.base_query_transpiler import BaseQueryTranspiler
-from query_transpilation_plugin.eg_custom.date_function_util import (
-    function_list,
-)
 
+from query_transpilation_plugin.eg_custom.date_function_util import apply, _splitqueries, \
+    _customtranspilehive, _customtranspilepresto
 
 LOG = get_logger(__file__)
-
-
-def apply(f, value):
-    return f(value)
 
 
 def statements_to_query(statements: List[str]):
@@ -37,11 +33,10 @@ class EGPrestoTrinoTranspiler(BaseQueryTranspiler):
 
     def transpile(self, query: str, from_language: str, to_language: str):
 
-        transpiledQuery = query
-
         # Apply custom functions first
-        for f in function_list:
-            transpiledQuery = apply(f, transpiledQuery)
+        sqlList = _splitqueries(query)
+        transpiled_statements = _customtranspilepresto(sqlList)
+        transpiledQuery = statements_to_query(transpiled_statements)
 
         return {"transpiled_query": transpiledQuery, "original_query": query}
 
@@ -61,6 +56,7 @@ class EGHiveTrinoTranspiler(BaseQueryTranspiler):
 
     def transpile(self, query: str, from_language: str, to_language: str):
         # Run through SQLGlot first
+        sqlList = _splitqueries(query)
         transpiled_statements = sqlglot.transpile(
             query,
             read="hive",
@@ -68,10 +64,7 @@ class EGHiveTrinoTranspiler(BaseQueryTranspiler):
             pretty=True,
         )
 
+        transpiled_statements = _customtranspilehive(transpiled_statements, sqlList)
         transpiledQuery = statements_to_query(transpiled_statements)
-
-        # Apply custom functions
-        for f in function_list:
-            transpiledQuery = apply(f, transpiledQuery)
 
         return {"transpiled_query": transpiledQuery, "original_query": query}

@@ -1,4 +1,6 @@
 import re
+from typing import List
+
 import query_transpilation_plugin.eg_custom.constants.DateTimeRegexConstants as dc
 
 
@@ -441,10 +443,7 @@ def _convertcastdatetime(queryStr):
 
 def checkexternaltableandreturn(queryStr):
     try:
-        if (
-            re.search(dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE)
-            is not None
-        ):
+        if re.search(dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE) is not None:
             return "external_location"
         else:
             return "location"
@@ -452,10 +451,8 @@ def checkexternaltableandreturn(queryStr):
         queryStr = "Error while converting checkexternaltableandreturn"
 
 
-sourceQuery = (
-    "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe' "
-    "LOCATION 's3://ha-prod-analytics-datalake-datainsights-us-east-1/tier3_jpathak/welcomeguideamenities'"
-)
+sourceQuery = "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe' " \
+              "LOCATION 's3://ha-prod-analytics-datalake-datainsights-us-east-1/tier3_jpathak/welcomeguideamenities'"
 
 
 def _convertrowformatpjsonroperties(queryStr):
@@ -465,17 +462,10 @@ def _convertrowformatpjsonroperties(queryStr):
         location_str = checkexternaltableandreturn(queryStr)
         for x in list:
             result = re.search(dc.ROW_FORMAT_JSON_REGEX, queryStr, flags=re.IGNORECASE)
-            new_String = re.sub(
-                dc.ROW_FORMAT_JSON_REGEX,
-                "WITH( \n"
-                + location_str
-                + " = "
-                + result.group(2)
-                + ", \nformat ='JSON'\n)",
-                queryStr,
-                1,
-                flags=re.IGNORECASE,
-            )
+            new_String = re.sub(dc.ROW_FORMAT_JSON_REGEX,
+                                "\nWITH\n( " + location_str + " = " + result.group(2) + ", \nformat ='JSON'\n)", queryStr,
+                                1,
+                                flags=re.IGNORECASE)
             queryStr = new_String
     except:
         queryStr = "Error while converting convertrowformatproperties"
@@ -488,16 +478,11 @@ def _convertexternaltable(queryStr):
         list = re.findall(dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE)
         location_str = checkexternaltableandreturn(queryStr)
         for x in list:
-            result = re.search(
-                dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE
-            )
-            new_String = re.sub(
-                dc.CREATE_EXTERNAL_TABLE_REGEX,
-                dc.CREATE_TABLE,
-                queryStr,
-                1,
-                flags=re.IGNORECASE,
-            )
+            result = re.search(dc.CREATE_EXTERNAL_TABLE_REGEX, queryStr, flags=re.IGNORECASE)
+            new_String = re.sub(dc.CREATE_EXTERNAL_TABLE_REGEX,
+                                dc.CREATE_TABLE, queryStr,
+                                1,
+                                flags=re.IGNORECASE)
             queryStr = new_String
     except:
         queryStr = "Error while converting convertrowformatproperties"
@@ -513,6 +498,55 @@ def _convertstring(queryStr):
 
     return queryStr
 
+
+def apply(f, value):
+    return f(value)
+
+
+def statements_to_query(statements: List[str]):
+    return "\n".join(statement + ";" for statement in statements)
+
+
+def _customtranspilehive(statements: List[str], rawSQLList: List[str]):
+    transpiledListwithRowFormatProperties = []
+    for index, statement in enumerate(statements):
+        if rawSQLList is not None and rawSQLList[index] is not None and re.search(dc.CREATE_EXTERNAL_TABLE_REGEX, statement, flags=re.IGNORECASE) and re.search(dc.CREATE_EXTERNAL_TABLE_REGEX, rawSQLList[index], flags=re.IGNORECASE)  \
+                    and re.search(dc.ROW_FORMAT_JSON_REGEX, rawSQLList[index], flags=re.IGNORECASE):
+            rowformatproperties = _getrowformatsubstring(rawSQLList[index])
+            transpiledListwithRowFormatProperties.append(_executecalls(statement + rowformatproperties))
+            # if "..."
+        else:
+            transpiledListwithRowFormatProperties.append(_executecalls(statement))
+    return transpiledListwithRowFormatProperties
+
+def _customtranspilepresto(rawSQLList: List[str]):
+    transpiledListwithRowFormatProperties = []
+    for index, statement in enumerate(rawSQLList):
+        transpiledListwithRowFormatProperties.append(_executecalls(statement))
+    return transpiledListwithRowFormatProperties
+
+def _splitqueries(sQueryStr):
+    sqlsplitlist : list[str] = []
+    for sql in str(sQueryStr).split(";"):
+        if(sql and sql.strip()):
+            sqlsplitlist.append(sql)
+    return sqlsplitlist
+
+def _executecalls(queryStr):
+    for f in function_list:
+        value = apply(f, queryStr)
+        queryStr = value
+    return queryStr
+
+
+def _getrowformatsubstring(queryStr):
+    resultantsql = queryStr
+    if re.search(dc.ROW_FORMAT_JSON_REGEX, queryStr, flags=re.IGNORECASE) is not None:
+        result = re.search(dc.ROW_FORMAT_JSON_REGEX, queryStr, flags=re.IGNORECASE)
+        resultantsql = queryStr[int(result.span()[0]):int(result.span()[1])]
+    else:
+        resultantsql = None
+    return resultantsql
 
 function_list = [
     _convertdatediff,
