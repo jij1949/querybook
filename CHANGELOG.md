@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.50.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.50.3...0.50.4) (2023-01-25)
+
+
+### Bug Fixes
+
+* axios error display (#1133) ([ba6d738](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ba6d73804594a5210e42cf0be3ec4f8664f59165))
+* react-table version (#1132) ([9e55937](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9e5593791e5f680a71093ddfb0bd5855a9e8430e))
+* remove timeout for presto explain (#1135) ([6f003ab](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6f003abdc1736497a3763af5bd381ddf7ffb8839))
+
 ### [0.50.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.50.2...0.50.3) (2023-01-25)
 
 
