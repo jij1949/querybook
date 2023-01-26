@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.52.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.51.0...0.52.0) (2023-01-26)
+
+
+### Features
+
+* query engine search scroll (#79) ([a37946a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a37946aedca869882a283344761bddac9ee1181f))
+
 ## [0.51.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.50.4...0.51.0) (2023-01-26)
 
 
