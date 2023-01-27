@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.52.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.52.0...0.52.1) (2023-01-27)
+
+
+### Bug Fixes
+
+* Removed hardcoded endpoint from transpiler ([18c2981](https://github.expedia.biz/eg-analytics-platform/querybook/commit/18c298121be17849ff316cab821a239f773a93fc))
+
 ## [0.52.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.51.0...0.52.0) (2023-01-26)
 
 
