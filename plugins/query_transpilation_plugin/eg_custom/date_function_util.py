@@ -451,9 +451,6 @@ def checkexternaltableandreturn(queryStr):
         queryStr = "Error while converting checkexternaltableandreturn"
 
 
-sourceQuery = "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe' " \
-              "LOCATION 's3://ha-prod-analytics-datalake-datainsights-us-east-1/tier3_jpathak/welcomeguideamenities'"
-
 
 def _convertrowformatpjsonroperties(queryStr):
     try:
