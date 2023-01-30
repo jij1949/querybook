@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.52.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.52.1...0.52.2) (2023-01-30)
+
+
+### Bug Fixes
+
+* stay on current env after deleting doc (#86) ([5228d12](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5228d12cb310d7409712382279f62ebc53f5f476))
+
 ### [0.52.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.52.0...0.52.1) (2023-01-27)
 
 
