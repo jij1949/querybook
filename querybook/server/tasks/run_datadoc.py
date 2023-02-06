@@ -230,10 +230,24 @@ def on_datadoc_run_success(
     completion_params,
     **kwargs,
 ):
+    with DBSession() as session:
+        last_query_result_meta = get_query_error_meta_by_query_execution_id(
+            last_query_result.get("query_execution_id"), session=session
+        )
+
     is_success = (
         last_query_result.get("query_run_status") == QueryExecutionStatus.DONE.value
     )
-    error_msg = None if is_success else GENERIC_QUERY_FAILURE_MSG
+    error_msg = (
+        None
+        if is_success
+        else create_datadoc_error_message(
+            last_query_result_meta.get("data_cell_name"),
+            last_query_result_meta.get("query_execution_error_message")
+            if last_query_result_meta.get("query_execution_error_message") is not None
+            else GENERIC_QUERY_FAILURE_MSG,
+        )
+    )
 
     return on_datadoc_completion(
         is_success=is_success, error_msg=error_msg, **completion_params
