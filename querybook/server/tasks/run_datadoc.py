@@ -190,11 +190,7 @@ def _run_datadoc_cell(
             countdown=retry["delay_sec"],
             max_retries=retry["max_retries"],
             exc=Exception(
-                "MaxRetriesExceededError:",
-                create_datadoc_error_message(
-                    query_error_meta.get("data_cell_name"),
-                    query_error_meta.get("query_execution_error_message"),
-                ),
+                f'MaxRetriesExceededError - {create_datadoc_error_message(query_error_meta.get("data_cell_name"), query_error_meta.get("query_execution_error_message"))}'
             ),
         )
 
