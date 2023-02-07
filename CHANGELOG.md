@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.53.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.52.2...0.53.0) (2023-02-07)
+
+
+### Features
+
+* add descriptive error msg run all datadoc ([d4b66b6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d4b66b65f86ad814796f29d02937753126ac2d97))
+
 ### [0.52.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.52.1...0.52.2) (2023-01-30)
 
 
