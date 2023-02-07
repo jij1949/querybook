@@ -101,10 +101,7 @@ def run_datadoc_with_config(
             tasks_to_run.append(
                 _run_datadoc_cell.si(
                     **start_query_execution_kwargs,
-                    previous_query_result={
-                        "query_run_status": QueryExecutionStatus.DONE.value,
-                        "query_execution_id": 0,
-                    },
+                    previous_query_result=(QueryExecutionStatus.DONE.value, 0),
                     execution_type=execution_type,
                     retry=retry,
                 )
@@ -134,10 +131,11 @@ def _run_datadoc_cell(
     execution_type,
     retry,
 ):
-    if previous_query_result.get("query_run_status") != QueryExecutionStatus.DONE.value:
+    previous_query_status, previous_query_execution_id = previous_query_result
+    if previous_query_status != QueryExecutionStatus.DONE.value:
         with DBSession() as session:
             previous_query_error_meta = get_query_error_meta_by_query_execution_id(
-                previous_query_result.get("query_execution_id"), session=session
+                previous_query_execution_id, session=session
             )
 
         raise Exception(
@@ -194,10 +192,7 @@ def _run_datadoc_cell(
             ),
         )
 
-    return {
-        "query_run_status": query_run_status,
-        "query_execution_id": query_execution.id,
-    }
+    return (query_run_status, query_execution.id)
 
 
 def get_query_error_meta_by_query_execution_id(query_execution_id, session=None):
@@ -226,14 +221,14 @@ def on_datadoc_run_success(
     completion_params,
     **kwargs,
 ):
+    last_query_status, last_query_execution_id = last_query_result
+
     with DBSession() as session:
         last_query_result_meta = get_query_error_meta_by_query_execution_id(
-            last_query_result.get("query_execution_id"), session=session
+            last_query_execution_id, session=session
         )
 
-    is_success = (
-        last_query_result.get("query_run_status") == QueryExecutionStatus.DONE.value
-    )
+    is_success = last_query_status == QueryExecutionStatus.DONE.value
     error_msg = (
         None
         if is_success
