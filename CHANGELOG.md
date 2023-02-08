@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.54.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.53.1...0.54.0) (2023-02-08)
+
+
+### Features
+
+* add metastore loader config (#1134) ([d0c0270](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d0c0270d26c1e5aaf61b248f52280322805234ee))
+* add search box to hide columns popup (#1128) ([0e050e8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0e050e8c163001925b1119713f498bce10f165bf))
+* add status and board filters for scheds page (#1076) ([772471b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/772471bcdb99c7a86ed138db0b3d9ab2a4a140c6))
+* query engine search scroll (#1136) ([b663b04](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b663b047103e866e475d6702ffcb07301ee97457))
+
+
+### Bug Fixes
+
+* add safe suppress to sqlformat error (#1141) ([0b85af3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0b85af33a5e8707d5cce138b0e6b6653df25c14f))
+* Fix Scheduled DataDocs Only toggle (#1149) ([8ab38b3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8ab38b3dcf94ee84cf75b017992917d8d0736a1d))
+* rich text editor crashes on clicking in readonly mode (#1148) ([7217403](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7217403c936a91f7c099c929f4a3489606c62f9c))
+* stay on current env after deleting doc (#1138) ([07a8b62](https://github.expedia.biz/eg-analytics-platform/querybook/commit/07a8b626f2dc034a5b96300a102210d5a3a34afa))
+
 ### [0.53.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.53.0...0.53.1) (2023-02-08)
 
 
