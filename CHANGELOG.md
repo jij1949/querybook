@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.55.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.54.1...0.55.0) (2023-02-13)
+
+
+### Features
+
+* toggle run all notifications (#91) ([823dc01](https://github.expedia.biz/eg-analytics-platform/querybook/commit/823dc01b5dbfd4033bce58f46b49bd1dc12fd64a))
+
+
+### Bug Fixes
+
+* filter null store values (#90) ([25616ae](https://github.expedia.biz/eg-analytics-platform/querybook/commit/25616ae6d19de684886d5885685bc68f3aa88143))
+
 ### [0.54.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.54.0...0.54.1) (2023-02-08)
 
 
