@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.56.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.55.0...0.56.0) (2023-02-17)
+
+
+### Features
+
+* Sync new user permissions on login for env/query engines (#92) ([58598b8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/58598b8608e4d6ccad735fe3a2413f577b346525))
+
 ## [0.55.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.54.1...0.55.0) (2023-02-13)
 
 
