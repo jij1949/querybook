@@ -3,11 +3,13 @@ import flask_login
 from app.auth.utils import AuthenticationError, abort_unauthorized, AuthUser
 from app.auth.oauth_auth import OAUTH_CALLBACK_PATH
 from app.auth.okta_auth import OktaLoginManager
-from app.db import DBSession
+from app.db import DBSession, with_session
 from env import QuerybookSettings
 from flask import request, session as flask_session, redirect
 from lib.logger import get_logger
 from lib.utils.decorators import in_mem_memoized
+from logic.user import create_user, get_user_by_name
+from tasks_plugin import sync_ldap_user_task
 
 LOG = get_logger(__file__)
 
@@ -15,7 +17,6 @@ LOG = get_logger(__file__)
 # Expedia-customized version of the OktaLoginManager
 #
 class EgOktaLoginManager(OktaLoginManager):
-
     @property
     @in_mem_memoized()
     def oauth_config(self):
@@ -53,11 +54,10 @@ class EgOktaLoginManager(OktaLoginManager):
             access_token = self._fetch_access_token(code)
             username, email, fullname = self._get_user_profile(access_token)
             with DBSession() as session:
-                flask_login.login_user(
-                    AuthUser(
-                        self.login_user(username, email, fullname, session=session)
-                    )
-                )
+                LOG.debug("Logging in user: %s", username)
+                user = self.login_user(username, email, fullname, session=session)
+
+                flask_login.login_user(AuthUser(user))
         except AuthenticationError as e:
             LOG.error("Failed authenticate oauth user", e)
             abort_unauthorized()
@@ -68,6 +68,25 @@ class EgOktaLoginManager(OktaLoginManager):
             del flask_session["next"]
 
         return redirect(next_url)
+
+    @with_session
+    def login_user(self, username, email, fullname, session=None):
+        if not username:
+            raise AuthenticationError("Username must not be empty!")
+
+        user = get_user_by_name(username, session=session)
+        if not user:
+            user = create_user(
+                username=username, fullname=fullname, email=email, session=session
+            )
+
+            # Sync the user's LDAP groups so they have the correct permissions
+            # This only happens the first time they login; changes to their permissions
+            # are handled by the sync_ldap_task on a recurring schedule
+            LOG.debug("Syncing first-time user's permissions: %s", username)
+            sync_ldap_user_task(username=username)
+
+        return user
 
     def _parse_user_profile(self, resp):
         user = resp.json()
