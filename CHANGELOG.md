@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.57.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.56.0...0.57.0) (2023-02-17)
+
+
+### Features
+
+* add ability to choose other hourly options (#93) ([dbe40a3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dbe40a33569012ee2f1f480d42e6240b7dadf47e))
+
 ## [0.56.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.55.0...0.56.0) (2023-02-17)
 
 
