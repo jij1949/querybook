@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.58.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.57.0...0.58.0) (2023-02-20)
+
+
+### Features
+
+* Add ability to cancel dead queries (#1159) ([51be7c6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/51be7c6e531622c600da2b09e2b4af8cbf8b76b8))
+* add estimated time for query execution (#1158) ([7a25679](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7a256797ffdbe6c2ba60376fd0f864c96fa236c5))
+* add message when linter failed to run (#1157) ([dd35c4e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dd35c4e580dce947d9949d254295df6a7728e97e))
+* add user group db schema support (#1144) ([4734e01](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4734e01295e1d734bda42d5554f3e8f7fbb9416a))
+* support for a general validation message in query editor (#1156) ([f3cff53](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f3cff53ef97c4a901e260fec1ed92190a4bcc37d))
+* toggle run all notifications (#1162) ([53a70e1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/53a70e11ce35d44cdd16ce0ec0ec3b9495c1091d))
+
+
+### Bug Fixes
+
+* event logger when current user is None (#1153) ([bb96eaf](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bb96eaf5fb34aa17a91598106fc00172e3cd7883))
+* filter null store values (#1163) ([5abedbe](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5abedbe3f90fc1c01b382a8e5af093641320d498))
+* number type variable with value 0 (#1154) ([15f084f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/15f084f0a9481b57352ae78ee6093765d5114f09))
+* sql-formatter (#1152) ([efdbd7b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/efdbd7b6ea8d7c84802b37c4bcdbcc12e4f78e95))
+* unify status code and move user error to 400 (#1161) ([118a8f5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/118a8f59de13511b6f804223a6427ebd6288c22e))
+
+
+### Reverts
+
+* Revert "feat: add estimated time for query execution (#1158)" (#1166) ([1f54e67](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1f54e6782017a5abeb5c17cf449c23cd667268e0))
+
 ## [0.57.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.56.0...0.57.0) (2023-02-17)
 
 
