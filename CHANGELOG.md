@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.59.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.59.0...0.59.1) (2023-02-23)
+
+
+### Bug Fixes
+
+* update runtime exec and jdbc missing err msgs (#97) ([577f736](https://github.expedia.biz/eg-analytics-platform/querybook/commit/577f7360599688253b4c07bc589792a05556887c))
+
 ## [0.59.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.58.1...0.59.0) (2023-02-23)
 
 
