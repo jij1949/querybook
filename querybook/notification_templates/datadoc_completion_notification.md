@@ -11,5 +11,5 @@ Failure: "{{ doc_title }}" (Doc ID: {{ doc_id }}) has failed!
     <{{ export_url }}>
     {% endfor %}
     {% elif is_success == False and error_msg != None %}
--   **The failure reason: {{ error_msg }}**
+-   **The failure reason:** `{{ error_msg }}`
     {% endif %}

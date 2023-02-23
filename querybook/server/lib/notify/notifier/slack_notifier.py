@@ -31,11 +31,7 @@ class SlackNotifier(BaseNotifier):
         url = "https://slack.com/api/chat.postMessage"
         headers = {"Authorization": "Bearer {}".format(self.token)}
         for recipient in recipients:
-            text = self._convert_markdown(message)
-            data = {
-                "text": text,
-                "channel": recipient,
-            }
+            data = {"text": message, "channel": recipient}
             requests.post(url, json=data, headers=headers, timeout=30)
 
     def notify(self, user, message):

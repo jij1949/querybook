@@ -1,3 +1,4 @@
+import os
 import jinja2
 from lib.notify.all_notifiers import get_notifier_class, DEFAULT_NOTIFIER
 from logic import user as user_logic
@@ -18,7 +19,7 @@ def get_user_preferred_notifier(user_id, session=None):
 
 def notify_recipients(recipients, template_name, template_params, notifier_name):
     notifier = get_notifier_class(notifier_name)
-    markdown_message = render_message(template_name, template_params)
+    markdown_message = render_message(template_name, notifier_name, template_params)
     notifier.notify_recipients(recipients=recipients, message=markdown_message)
 
 
@@ -29,11 +30,17 @@ def notify_user(user, template_name, template_params, notifier_name=None, sessio
         if notifier_name is None:
             return
     notifier = get_notifier_class(notifier_name)
-    markdown_message = render_message(template_name, template_params)
+    markdown_message = render_message(template_name, notifier_name, template_params)
     notifier.notify(user=user, message=markdown_message)
 
 
-def render_message(template_name, context):
+def render_message(template_name, notifier_name, context):
+    # Check for a notifier-specific template
+    # E.g. datadoc_completion_notification_slack.md
+    notifier_specific_template_path = f"./querybook/notification_templates/{template_name}_{notifier_name}.md"
+    if os.path.exists(notifier_specific_template_path):
+        template_name = f"{template_name}_{notifier_name}"
+
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader("./querybook/notification_templates/")
     )
