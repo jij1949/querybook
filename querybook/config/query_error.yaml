@@ -200,3 +200,13 @@ trino:
             If you are trying to access a federated schema, please check if you are using a prefix, e.g. egdp_prod, bexg_prod, vrbo_prod, etc.
 
             Otherwise please ensure you are using the correct environment, and check if the schema exists in the cluster you are trying to access.
+
+    java_lang_invocation:
+        regex: 'java.lang.reflect.InvocationTargetException'
+        message: |
+            Please refer to the Starburst tracking URL to get details about the error.
+
+    jdbc_does_not_exist:
+        regex: "Could not parse rfc1738 URL from string 'jdbc:does-not-exist-convert-only"
+        message: |
+            The selected Query Engine only supports transpiling queries and will not work for running queries; please select a different Query Engine.
