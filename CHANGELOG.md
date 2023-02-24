@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.60.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.60.1...0.60.2) (2023-02-24)
+
+
+### Bug Fixes
+
+* Enable mssql transpiling ([fae1675](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fae1675dba0fbc08cf13b21ce381de79aa94b254))
+
 ### [0.60.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.60.0...0.60.1) (2023-02-24)
 
 
