@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.60.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.60.0...0.60.1) (2023-02-24)
+
+
+### Bug Fixes
+
+* Merge branch 'upstream' ([db9ef13](https://github.expedia.biz/eg-analytics-platform/querybook/commit/db9ef138b390fc1c6a4aaf1253bfdc6147d28623))
+
 ## [0.60.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.59.1...0.60.0) (2023-02-24)
 
 
