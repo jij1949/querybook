@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.61.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.60.2...0.61.0) (2023-02-24)
+
+
+### Features
+
+* add button to sort columns in view table UI (#99) ([c0ca76a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c0ca76a0446aa4a90ba850f3f0165d696e55ee7d))
+
 ### [0.60.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.60.1...0.60.2) (2023-02-24)
 
 
