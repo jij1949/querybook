@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.60.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.59.1...0.60.0) (2023-02-24)
+
+
+### Features
+
+* Improve Slack notifications ([f29f3b4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f29f3b4381b0f32b25c7d250cd9196c9722f0d35))
+
 ### [0.59.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.59.0...0.59.1) (2023-02-23)
 
 
