@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.61.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.61.0...0.61.1) (2023-02-28)
+
+
+### Bug Fixes
+
+* Ignore deleted metastores in Table Upload ([44be8a7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/44be8a777b1de2bd38f1a072c094d6efbe8286a7))
+
 ## [0.61.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.60.2...0.61.0) (2023-02-24)
 
 
