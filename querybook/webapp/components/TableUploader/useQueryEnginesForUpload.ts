@@ -34,7 +34,9 @@ export function useMetastoresForUpload() {
     );
     return useMemo(
         () =>
-            [...availableForUploadMetaStoreIds].map((id) => metastoreById[id]),
+            [...availableForUploadMetaStoreIds]
+                .filter((id) => id in metastoreById)
+                .map((id) => metastoreById[id]),
         [availableForUploadMetaStoreIds, metastoreById]
     );
 }
