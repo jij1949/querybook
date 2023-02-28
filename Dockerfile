@@ -62,6 +62,9 @@ RUN yarn install --pure-lockfile
 # Copy everything else
 COPY . .
 
+# Install patches
+COPY patch/pyhive/hive.py /usr/local/lib/python3.9/site-packages/pyhive/hive.py
+
 # Copy change log images
 COPY docs_website/static/changelog/ querybook/static/changelog/
 

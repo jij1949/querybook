@@ -27,6 +27,11 @@ class HiveClient(ClientBaseClass):
             port = 10000 if not connection_conf.port else connection_conf.port
             configuration = dict(connection_conf.configuration)
             configuration["mapred.job.queue.name"] = "root.dev-test"
+
+            # This enables SSL, is not passed to Hive
+            # Uncomment to force SSL for all connections
+            #configuration["EXTRA_USE_SSL"] = "true"
+
             if proxy_user and impersonate:
                 configuration["hive.server2.proxy.user"] = proxy_user
                 configuration["mapred.job.queue.name"] = "root.users.%s" % proxy_user
