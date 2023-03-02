@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.62.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.61.2...0.62.0) (2023-03-02)
+
+
+### Features
+
+* disable run doc if doc is already running (#101) ([fceadbd](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fceadbda9f08bd869370dddc39aea4691e2a0845))
+
 ### [0.61.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.61.1...0.61.2) (2023-03-02)
 
 
