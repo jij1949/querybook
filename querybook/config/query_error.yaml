@@ -207,6 +207,6 @@ trino:
             Please refer to the Starburst tracking URL to get details about the error.
 
     jdbc_does_not_exist:
-        regex: "Could not parse rfc1738 URL from string 'jdbc:does-not-exist-convert-only"
+        regex: "Could not parse rfc1738 URL from string 'jdbc:does-not-exist-convert-only'"
         message: |
             The selected Query Engine only supports transpiling queries and will not work for running queries; please select a different Query Engine.
