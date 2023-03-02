@@ -15,6 +15,7 @@ from lib.scheduled_datadoc.notification import notifiy_on_datadoc_complete
 
 from logic import datadoc as datadoc_logic
 from logic import query_execution as qe_logic
+from logic import schedule as schedule_logic
 from logic.schedule import (
     create_task_run_record_for_celery_task,
     update_task_run_record,
@@ -43,6 +44,7 @@ def run_datadoc_with_config(
     # Exporting related settings
     exports=[],
     retry={"delay_sec": 0, "max_retries": 0, "enabled": False},
+    disable_if_running_doc=False,
     *args,
     **kwargs,
 ):
@@ -50,6 +52,14 @@ def run_datadoc_with_config(
     record_id = None
 
     with DBSession() as session:
+        if disable_if_running_doc:
+            runs, _ = schedule_logic.get_task_run_record_run_by_name(
+                name=schedule_logic.get_data_doc_schedule_name(doc_id), session=session
+            )
+            # Don't run datadoc if the most recent run is still in progress
+            if runs and runs[0].status == TaskRunStatus.RUNNING:
+                return
+
         data_doc = datadoc_logic.get_data_doc_by_id(doc_id, session=session)
         if not data_doc or data_doc.archived:
             return

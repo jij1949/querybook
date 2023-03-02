@@ -93,6 +93,7 @@ const scheduleFormSchema = Yup.object().shape({
             max_retries: Yup.number(),
             retry_delay: Yup.number(),
         }),
+        disable_if_running_doc: Yup.boolean().required(),
     }),
 });
 
@@ -118,6 +119,7 @@ interface IScheduleFormValues {
         notifications: IDataDocScheduleNotification[];
         exports: IDataDocScheduleKwargs['exports'];
         retry?: IDataDocScheduleRetry;
+        disable_if_running_doc?: boolean;
     };
 }
 
@@ -157,6 +159,7 @@ export const DataDocScheduleForm: React.FunctionComponent<
                       max_retries: 2,
                       delay_sec: 60,
                   },
+                  disable_if_running_doc: true,
               },
           }
         : {
@@ -185,6 +188,7 @@ export const DataDocScheduleForm: React.FunctionComponent<
                       max_retries: 2,
                       delay_sec: 60,
                   },
+                  disable_if_running_doc: kwargs.disable_if_running_doc,
               },
           };
 
@@ -234,6 +238,14 @@ export const DataDocScheduleForm: React.FunctionComponent<
                 isValid,
                 dirty,
             }) => {
+                const disableIfRunningDocField = (
+                    <SimpleField
+                        label="Prevent Overlapping Runs"
+                        name="kwargs.disable_if_running_doc"
+                        type="toggle"
+                    />
+                );
+
                 const enabledField = !isCreateForm && (
                     <SimpleField label="Enabled" name="enabled" type="toggle" />
                 );
@@ -306,6 +318,7 @@ export const DataDocScheduleForm: React.FunctionComponent<
                                             setFieldValue('recurrence', val)
                                         }
                                     />
+                                    {disableIfRunningDocField}
                                     {enabledField}
                                     {retryField}
                                     {notificationField}

@@ -90,6 +90,7 @@ export interface IDataDocScheduleKwargs {
         exporter_params?: Record<string, any>;
     }>;
     retry?: IDataDocScheduleRetry;
+    disable_if_running_doc?: boolean;
 }
 
 export interface IDataDocTaskSchedule extends ITaskSchedule {
