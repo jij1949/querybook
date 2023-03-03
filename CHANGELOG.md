@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.62.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.0...0.62.1) (2023-03-03)
+
+
+### Bug Fixes
+
+* change default step to 1 cron parsing (#104) ([a164635](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a16463510ce98a369eec40379427a801c9461973))
+
 ## [0.62.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.61.2...0.62.0) (2023-03-02)
 
 
