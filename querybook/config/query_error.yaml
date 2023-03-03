@@ -88,6 +88,11 @@ presto:
             May occur if using aux_data[‘key_string’].
             This was formerly supported.
             Try using element_at instead (link to the right for more info).
+    jdbc_does_not_exist:
+        regex: "Could not parse rfc1738 URL from string 'jdbc:does-not-exist-convert-only'"
+        message: |
+            The selected Query Engine only supports transpiling queries and will not work for running queries; please select a different Query Engine.
+
 hive:
     # Hive Errors
     tsocket_zerobyte_error:
@@ -122,6 +127,11 @@ hive:
         regex: 'org.apache.hadoop.fs.FileAlreadyExistsException'
         message: >
             Try to add set hive.exec.sink_operator.delete_target_if_exists=true or Keep speculative execution on, turn off directfileoutputcommitter.
+    jdbc_does_not_exist:
+        regex: "Could not parse rfc1738 URL from string 'jdbc:does-not-exist-convert-only'"
+        message: |
+            The selected Query Engine only supports transpiling queries and will not work for running queries; please select a different Query Engine.
+
 common:
     # Common Errors
     part_number_error:
@@ -205,8 +215,3 @@ trino:
         regex: 'java.lang.reflect.InvocationTargetException'
         message: |
             Please refer to the Starburst tracking URL to get details about the error.
-
-    jdbc_does_not_exist:
-        regex: "Could not parse rfc1738 URL from string 'jdbc:does-not-exist-convert-only'"
-        message: |
-            The selected Query Engine only supports transpiling queries and will not work for running queries; please select a different Query Engine.
