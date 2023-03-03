@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.62.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.2...0.62.3) (2023-03-03)
+
+
+### Bug Fixes
+
+* reset last_run_at on reenabled schedule (#105) ([111764c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/111764c0ab2a956364ed1c8f2ab4de10fe019f64))
+
 ### [0.62.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.1...0.62.2) (2023-03-03)
 
 
