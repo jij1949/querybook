@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.62.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.3...0.62.4) (2023-03-07)
+
+
+### Bug Fixes
+
+* add more retry delay options in minutes (#107) ([c95d860](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c95d8607e2e05e2250ad8669fcff806455150e0a))
+
 ### [0.62.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.2...0.62.3) (2023-03-03)
 
 
