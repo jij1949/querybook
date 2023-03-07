@@ -485,10 +485,12 @@ const ScheduleRetryForm: React.FC = () => {
         value: retryValue,
     }));
 
-    const delayCountOptions = [0, 15, 30, 60, 120, 300].map((delayValue) => ({
-        label: <span>{delayValue}</span>,
-        value: delayValue,
-    }));
+    const delayCountOptions = [0, 60, 120, 300, 600, 900, 1800, 3600].map(
+        (delayValue) => ({
+            label: <span>{delayValue / 60}</span>,
+            value: delayValue,
+        })
+    );
 
     return (
         <>
@@ -514,9 +516,9 @@ const ScheduleRetryForm: React.FC = () => {
                     />
                     <SimpleField
                         help={() => (
-                            <div>The delay between each retry, in seconds.</div>
+                            <div>The delay between each retry, in minutes.</div>
                         )}
-                        label="Retry Delay (sec)"
+                        label="Retry Delay (min)"
                         name="kwargs.retry.delay_sec"
                         type="react-select"
                         options={delayCountOptions}
