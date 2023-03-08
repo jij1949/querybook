@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.63.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.6...0.63.0) (2023-03-08)
+
+
+### Features
+
+* Patch PyHive to support TLS connections ([782ff72](https://github.expedia.biz/eg-analytics-platform/querybook/commit/782ff72b078c5083e3904e1436f9cb5ed961b3e6))
+
 ### [0.62.6](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.5...0.62.6) (2023-03-08)
 
 
