@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.62.5](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.4...0.62.5) (2023-03-08)
+
+
+### Bug Fixes
+
+* adjust ui max width (#109) ([88f5a64](https://github.expedia.biz/eg-analytics-platform/querybook/commit/88f5a644712bd5c3a1ae014b62173ce645f7271c))
+
 ### [0.62.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.3...0.62.4) (2023-03-07)
 
 
