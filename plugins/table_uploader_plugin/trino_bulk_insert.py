@@ -72,7 +72,8 @@ class TrinoBulkInsert():
             if tableExists:
                 if ifExists == "replace":
                     LOG.info(f'Replace - Dropping table {tableName}')
-                    cur.execute(f'drop table {tableName}')
+                    cur.execute(f'DROP TABLE IF EXISTS {tableName}')
+                    cur.fetchall()
                 elif ifExists == "fail":
                     raise Exception(f'Table {tableName} already exists')
                 elif ifExists == "append":
