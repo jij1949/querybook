@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.63.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.0...0.63.1) (2023-03-09)
+
+
+### Bug Fixes
+
+* Fix replace option for table upload ([293d109](https://github.expedia.biz/eg-analytics-platform/querybook/commit/293d10909cf579316e8abc14a7abfde059c3cc41))
+
 ## [0.63.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.62.6...0.63.0) (2023-03-08)
 
 
