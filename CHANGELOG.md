@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.63.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.1...0.63.2) (2023-03-16)
+
+
+### Bug Fixes
+
+* Extend DataTableColumn type length to 32768 ([0fadd6e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0fadd6e6eeb2d7524c55c89de4d5c7feb3d99343))
+* Truncate long types in DataTableColumnCard ([65094aa](https://github.expedia.biz/eg-analytics-platform/querybook/commit/65094aa121312b24e794a7aeba28fe63b4c3abcc))
+
 ### [0.63.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.0...0.63.1) (2023-03-09)
 
 
