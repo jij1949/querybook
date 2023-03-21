@@ -51,11 +51,9 @@ export function cronToRecurrence(cron: string): IRecurrence {
         on = { dayWeek: dayWeek.split(',').map((d) => Number(d)) };
     } else if (hour.startsWith('*/') || hour === '*') {
         recurrencePolicy = 'hourly';
-        if (hour.startsWith('*/')) {
-            step = { hour: Number(hour.split('*/')[1]) };
-        } else {
-            step = { hour: Number(1) };
-        }
+        step = hour.startsWith('*/')
+            ? { hour: Number(hour.split('*/')[1]) }
+            : { hour: Number(1) };
     }
 
     const recurrence: IRecurrence = {

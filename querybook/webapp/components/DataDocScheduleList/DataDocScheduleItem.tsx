@@ -1,10 +1,11 @@
 import moment from 'moment';
 import React from 'react';
 
+import { NextRun } from 'components/NextRun/NextRun';
 import { TaskStatusIcon } from 'components/Task/TaskStatusIcon';
+import { cronToRecurrence } from 'lib/utils/cron';
 import { formatDuration, generateFormattedDate } from 'lib/utils/datetime';
 import { getWithinEnvUrl } from 'lib/utils/query-string';
-import { cronToRecurrence } from 'lib/utils/cron';
 import { IScheduledDoc } from 'redux/scheduledDataDoc/types';
 import { Link } from 'ui/Link/Link';
 import { AccentText, StyledText, UntitledText } from 'ui/StyledText/StyledText';
@@ -14,7 +15,6 @@ import {
     DataDocScheduleActionHistory,
 } from './DataDocScheduleActionButtons';
 import { HumanReadableCronSchedule } from './HumanReadableCronSchedule';
-import { NextRun } from 'components/NextRun/NextRun';
 
 import './DataDocScheduleItem.scss';
 
@@ -37,7 +37,7 @@ export const DataDocScheduleItem: React.FC<IDataDocScheduleItemProps> = ({
                 <div>
                     <StyledText size="text">
                         Runs <HumanReadableCronSchedule cron={schedule.cron} />{' '}
-                        {cronToRecurrence(schedule.cron).recurrence == 'hourly'
+                        {cronToRecurrence(schedule.cron).recurrence === 'hourly'
                             ? ''
                             : ' (UTC time)'}
                     </StyledText>

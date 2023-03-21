@@ -3,6 +3,7 @@ import moment from 'moment';
 import * as React from 'react';
 import Select from 'react-select';
 
+import { NextRun } from 'components/NextRun/NextRun';
 import {
     getMonthdayOptions,
     getRecurrenceLocalTimeString,
@@ -10,16 +11,15 @@ import {
     getYearlyMonthOptions,
     IRecurrence,
     IRecurrenceOn,
+    recurrenceToCron,
     RecurrenceType,
     recurrenceTypes,
-    recurrenceToCron,
 } from 'lib/utils/cron';
 import { makeReactSelectStyle } from 'lib/utils/react-select';
 import { FormField } from 'ui/Form/FormField';
 import { overlayRoot } from 'ui/Overlay/Overlay';
 import { Tabs } from 'ui/Tabs/Tabs';
 import { TimePicker } from 'ui/TimePicker/TimePicker';
-import { NextRun } from 'components/NextRun/NextRun';
 
 import './RecurrenceEditor.scss';
 
@@ -51,15 +51,15 @@ export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
             !isDaily &&
             isWeekly &&
             (recurrence.on.dayWeek == null ||
-                Object.values(recurrence.on.dayWeek).length == 0)) ||
+                Object.values(recurrence.on.dayWeek).length === 0)) ||
         (isMonthly &&
             (recurrence.on.dayMonth == null ||
-                Object.values(recurrence.on.dayMonth).length == 0)) ||
+                Object.values(recurrence.on.dayMonth).length === 0)) ||
         (isYearly &&
             (recurrence.on.dayMonth == null ||
                 recurrence.on.month == null ||
-                Object.values(recurrence.on.dayMonth).length == 0 ||
-                Object.values(recurrence.on.month).length == 0));
+                Object.values(recurrence.on.dayMonth).length === 0 ||
+                Object.values(recurrence.on.month).length === 0));
 
     const schedulingInfoMsgField = (
         <div className="editor-text mr12">
@@ -71,33 +71,35 @@ export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
     const hourSecondField = (
         <FormField label={'Hour/Minute (UTC)'} error={recurrenceError?.hour}>
             <div className="flex-row">
-                {isHourly
-                    ? [
-                          <div className="editor-text mr12">
-                              {'Every day, every'}
-                          </div>,
-                          <TimePicker
-                              allowEmpty={false}
-                              value={moment().hour(recurrence.step.hour)}
-                              showHour={true}
-                              showMinute={false}
-                              showSecond={false}
-                              disabledHours={() => [0]}
-                              hideDisabledOptions
-                              format={'H'}
-                              onChange={(value) => {
-                                  const newRecurrence = {
-                                      ...recurrence,
-                                      step: { hour: value.hour() },
-                                  };
-                                  setRecurrence(newRecurrence);
-                              }}
-                          />,
-                          <div className="editor-text ml12 mr12">
-                              {'hours at minute'}
-                          </div>,
-                      ]
-                    : ''}
+                {isHourly ? (
+                    <>
+                        <div className="editor-text mr12">
+                            {'Every day, every'}
+                        </div>
+                        <TimePicker
+                            allowEmpty={false}
+                            value={moment().hour(recurrence.step.hour)}
+                            showHour={true}
+                            showMinute={false}
+                            showSecond={false}
+                            disabledHours={() => [0]}
+                            hideDisabledOptions
+                            format={'H'}
+                            onChange={(value) => {
+                                const newRecurrence = {
+                                    ...recurrence,
+                                    step: { hour: value.hour() },
+                                };
+                                setRecurrence(newRecurrence);
+                            }}
+                        />
+                        <div className="editor-text ml12 mr12">
+                            {'hours at minute'}
+                        </div>
+                    </>
+                ) : (
+                    ''
+                )}
 
                 <TimePicker
                     allowEmpty={false}
