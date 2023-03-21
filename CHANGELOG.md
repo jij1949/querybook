@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.63.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.2...0.63.3) (2023-03-21)
+
+
+### Bug Fixes
+
+* LIMIT ALL can now be used in Querybook (#112) ([ad8fe0a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ad8fe0a6bd40fae0ce4451cd8cb33a759e3f1a9d))
+
 ### [0.63.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.1...0.63.2) (2023-03-16)
 
 
