@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.63.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.3...0.63.4) (2023-03-21)
+
+
+### Bug Fixes
+
+* Fix lint errors related to Schedules ([74278de](https://github.expedia.biz/eg-analytics-platform/querybook/commit/74278de90818cd1e6b3be951695f124e0cd30287))
+* Remove unused function to fix build error ([4d24499](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4d2449961e23682b96a7dfd56a11166136bf925a))
+
 ### [0.63.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.2...0.63.3) (2023-03-21)
 
 
