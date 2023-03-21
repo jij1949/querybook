@@ -415,14 +415,6 @@ const ColumnToggleMenuButton: React.FC<{
         [columnNames, columnVisibility]
     );
 
-    const updateKeyword = (keyword: string) => {
-        const filtered = columnNames.filter((names) => {
-            return `${names.toLowerCase()}`.includes(keyword.toLowerCase());
-        });
-        setKeyword(keyword);
-        setFilteredColumnNames(filtered);
-    };
-
     const getPopoverContent = () => (
         <div className="StatementResult-column-toggle-menu">
             {columnNames.length >= MIN_COLUMN_TO_SHOW_FILTER && (
