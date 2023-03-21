@@ -164,7 +164,6 @@ def _run_datadoc_cell(
             ),
             namespace="/datadoc",
             room=data_doc_id,
-            broadcast=True,
         )
 
     # Run synchronously
