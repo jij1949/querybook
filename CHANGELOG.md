@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.63.5](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.4...0.63.5) (2023-03-21)
+
+
+### Bug Fixes
+
+* remove broadcast from socketio.emit (#1202) ([958cfb6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/958cfb65016864d4795c44cc61b80ccf902e63f9))
+
 ### [0.63.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.3...0.63.4) (2023-03-21)
 
 
