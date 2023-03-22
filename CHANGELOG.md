@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.63.6](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.5...0.63.6) (2023-03-22)
+
+
+### Bug Fixes
+
+* Notifications removing underscore and pound sign resolved with jinja2 escape filter (#115) ([162ddac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/162ddacc5b4c57c108828bfbf582bff3f9d72368))
+
 ### [0.63.5](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.4...0.63.5) (2023-03-21)
 
 
