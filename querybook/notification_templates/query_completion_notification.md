@@ -1,7 +1,7 @@
 {% if query_execution.status.value == 3 -%}
-Success: "{{ query_title }}" (Query ID: {{ query_execution.id }}) has completed.
+Success: "{{ query_title | escape }}" (Query ID: {{ query_execution.id }}) has completed.
 {% else -%}
-Failed: "{{query_title}}" (Query ID: {{ query_execution.id }}) has failed.
+Failed: "{{query_title | escape }}" (Query ID: {{ query_execution.id }}) has failed.
 {% endif %}
 
 {% if doc_id != None %}

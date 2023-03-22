@@ -4,7 +4,6 @@ from lib.notify.all_notifiers import get_notifier_class, DEFAULT_NOTIFIER
 from logic import user as user_logic
 from app.db import with_session
 
-
 @with_session
 def get_user_preferred_notifier(user_id, session=None):
     notification_preference = user_logic.get_user_settings(
@@ -44,5 +43,10 @@ def render_message(template_name, notifier_name, context):
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader("./querybook/notification_templates/")
     )
+
+    jinja_env.filters["escape"] = escape
     template = jinja_env.get_template(f"{template_name}.md")
     return template.render(context)
+
+def escape(s):
+    return s.replace("_", "\_").replace("#", "\#")

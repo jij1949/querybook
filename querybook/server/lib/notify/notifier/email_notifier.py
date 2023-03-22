@@ -24,11 +24,10 @@ class EmailNotifier(BaseNotifier):
 
     def notify_recipients(self, recipients, message):
         from_email = QuerybookSettings.QUERYBOOK_EMAIL_ADDRESS
-        subject = message.split("\n")[0]
         message = self._convert_markdown(message)
+        subject = message.split("\n")[0]
         try:
             date = datetime.now().strftime("%a, %d %b %Y")
-
             msg = MIMEMultipart()
             msg["Subject"] = subject
             msg["Date"] = date
