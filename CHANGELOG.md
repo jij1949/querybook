@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.64.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.6...0.64.0) (2023-03-27)
+
+
+### Features
+
+* Added All Shared Lists page (#116) ([de1ffb5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/de1ffb514596be45775d5d920eaa5bfb01bd513d))
+
 ### [0.63.6](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.5...0.63.6) (2023-03-22)
 
 
