@@ -207,6 +207,28 @@ def get_all_public_boards(environment_id, session=None):
 
 
 @with_session
+def get_all_shared_boards(environment_id, user_id, session=None):
+    return (
+        session.query(Board)
+        .filter(Board.public.is_(False))
+        .filter(user_has_access(Board.id, user_id, session))
+        .filter(Board.owner_uid != user_id)
+        .filter(Board.environment_id == environment_id)
+        .all()
+    )
+
+
+def user_has_access(board_id, user_id, session=None):
+    editor = (
+        session.query(BoardEditor)
+        .filter(BoardEditor.board_id == board_id)
+        .filter(BoardEditor.uid == user_id)
+        .first()
+    )
+    return editor is not None and (editor.read or editor.write)
+
+
+@with_session
 def update_board_item(id, session=None, **fields):
     board = BoardItem.update(
         id,

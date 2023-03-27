@@ -33,10 +33,21 @@ export const BoardExpandableHeader: React.FunctionComponent<IProps> = ({
 }) => {
     const selfRef = React.useRef<HTMLDivElement>();
 
-    const boardUrl = React.useMemo(
-        () => getWithinEnvUrl(boardId === 0 ? '/list/' : `/list/${boardId}/`),
-        [boardId]
-    );
+    const boardUrl = React.useMemo(() => {
+        switch (boardId) {
+            case 0: {
+                return getWithinEnvUrl('/list/');
+                break;
+            }
+            case -1: {
+                return getWithinEnvUrl('/sharedlist/');
+                break;
+            }
+            default: {
+                return getWithinEnvUrl(`/list/${boardId}/`);
+            }
+        }
+    }, [boardId]);
 
     const [, drag] = useDrag({
         type: BoardDraggableType,
@@ -82,7 +93,7 @@ export const BoardExpandableHeader: React.FunctionComponent<IProps> = ({
                             onClick={onEdit}
                             noPadding
                         />
-                    </span>
+            </span>
                 )}
                 {isCollapsable && (
                     <IconButton

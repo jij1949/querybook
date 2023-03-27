@@ -21,6 +21,12 @@ export const BoardResource = {
             environment_id: environmentId,
         }),
 
+    getShared: (environmentId: number, userId: number) =>
+        ds.fetch<IBoardRaw>(`/board/shared/`, {
+            environment_id: environmentId,
+            user_id: userId,
+        }),
+
     create: (
         name: string,
         environmentId: number,

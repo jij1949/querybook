@@ -62,6 +62,22 @@ def get_board_by_id(board_id, environment_id):
 
 
 @register(
+    "/board/shared/",
+    methods=["GET"],
+)
+def get_shared_boards(environment_id, user_id):
+    with DBSession() as session:
+        verify_environment_permission([environment_id])
+        shared_boards = logic.get_all_shared_boards(
+            environment_id=environment_id, user_id=user_id, session=session,
+        )
+        return {
+            "id": -1,
+            "boards": [shared_board.id for shared_board in shared_boards],
+        }
+
+
+@register(
     "/board/",
     methods=["POST"],
 )

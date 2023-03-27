@@ -181,6 +181,16 @@ export const DataDocNavigatorBoardSection: React.FC<
                     isCollapsable={false}
                 />
             </div>
+            <div className="BoardExpandableSection">
+                <BoardExpandableHeader
+                    boardId={-1}
+                    boardName="All Shared Lists"
+                    collapsed={false}
+                    toggleCollapsed={() => null}
+                    isEditable={false}
+                    isCollapsable={false}
+                />
+            </div>
             {boards.map((board) => (
                 <BoardExpandableSection
                     key={board.id}
