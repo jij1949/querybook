@@ -49,4 +49,4 @@ def render_message(template_name, notifier_name, context):
     return template.render(context)
 
 def escape(s):
-    return s.replace("_", "\_").replace("#", "\#")
+    return s.replace("\\", "\\\\").replace("_", "\_").replace("#", "\#")

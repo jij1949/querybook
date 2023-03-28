@@ -25,7 +25,7 @@ class EmailNotifier(BaseNotifier):
     def notify_recipients(self, recipients, message):
         from_email = QuerybookSettings.QUERYBOOK_EMAIL_ADDRESS
         message = self._convert_markdown(message)
-        subject = message.split("\n")[0]
+        subject = self.process_subject(message.split("\n")[0])
         try:
             date = datetime.now().strftime("%a, %d %b %Y")
             msg = MIMEMultipart()
@@ -42,3 +42,9 @@ class EmailNotifier(BaseNotifier):
 
     def notify(self, user, message):
         self.notify_recipients(recipients=[user.email], message=message)
+
+    def process_subject(self, subject):
+        if subject.startswith('<p>'):
+            subject = subject[3:]
+            subject = subject[:-4]
+        return subject
