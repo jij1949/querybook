@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.64.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.0...0.64.1) (2023-03-28)
+
+
+### Bug Fixes
+
+* Remove <p> </p> tag from email notification subject line (#117) ([4d15647](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4d156476358c352e43ed5c315de22791dfadebce))
+
 ## [0.64.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.63.6...0.64.0) (2023-03-27)
 
 
