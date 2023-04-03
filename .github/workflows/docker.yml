@@ -1,12 +1,13 @@
 name: Publish Docker
 on:
+    workflow_dispatch:
     release:
         types:
             - published
-    push:
-        branches-ignore:
-            - main
-            - master
+    # push:
+    #     branches-ignore:
+    #         - main
+    #         - master
 
 env:
     IMAGE_NAME: egdp-querybook
@@ -55,7 +56,7 @@ jobs:
                       type=semver,pattern={{version}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
                       type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
                       type=semver,pattern={{major}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
-                      type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short,enable=${{ github.event_name == 'push' }}
+                      type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short,enable=${{ github.event_name == 'workflow_dispatch' }}
 
             - name: Docker build
               uses: actions/docker-build-push-action@v2
