@@ -93,7 +93,7 @@ const scheduleFormSchema = Yup.object().shape({
             max_retries: Yup.number(),
             retry_delay: Yup.number(),
         }),
-        disable_if_running_doc: Yup.boolean().required(),
+        disable_if_running_doc: Yup.boolean().optional(),
     }),
 });
 
