@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.64.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.1...0.64.2) (2023-04-04)
+
+
+### Bug Fixes
+
+* Prevent overlapping runs should be optional ([42e548a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/42e548a072940b39480d5c0370d7131829dc8fc8))
+
 ### [0.64.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.0...0.64.1) (2023-03-28)
 
 
