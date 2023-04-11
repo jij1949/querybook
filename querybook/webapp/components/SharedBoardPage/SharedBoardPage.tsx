@@ -11,6 +11,7 @@ export const SharedBoardPage: React.FunctionComponent = () => {
     const dispatch: Dispatch = useDispatch();
 
     const board = useSelector((state: IStoreState) => state.board.boardById[-1]);
+
     React.useEffect(() => {
         dispatch(fetchSharedBoardIfNeeded(-1));
     }, [dispatch]);

@@ -7,6 +7,7 @@ from models.board import Board, BoardItem, BoardEditor
 from models.access_request import AccessRequest
 from lib.sqlalchemy import update_model_fields
 from tasks.sync_elasticsearch import sync_elasticsearch
+from sqlalchemy import and_, or_
 
 
 @with_session
@@ -208,24 +209,28 @@ def get_all_public_boards(environment_id, session=None):
 
 @with_session
 def get_all_shared_boards(environment_id, user_id, session=None):
-    return (
+    shared_boards = (
         session.query(Board)
-        .filter(Board.public.is_(False))
-        .filter(user_has_access(Board.id, user_id, session))
         .filter(Board.owner_uid != user_id)
         .filter(Board.environment_id == environment_id)
+        .join(BoardEditor)
+        .filter(BoardEditor is not None)
+        .filter(BoardEditor.uid == user_id)
+        .filter(
+            or_(
+                # User has write access to the board (public or private)
+                BoardEditor.write.is_(True),
+                # User has read access to the board (public)
+                and_(
+                    Board.public.is_(False),
+                    BoardEditor.read.is_(True),
+                ),
+            )
+        )
         .all()
     )
 
-
-def user_has_access(board_id, user_id, session=None):
-    editor = (
-        session.query(BoardEditor)
-        .filter(BoardEditor.board_id == board_id)
-        .filter(BoardEditor.uid == user_id)
-        .first()
-    )
-    return editor is not None and (editor.read or editor.write)
+    return shared_boards
 
 
 @with_session
