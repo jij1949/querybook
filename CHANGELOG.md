@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.64.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.2...0.64.3) (2023-04-12)
+
+
+### Bug Fixes
+
+* Disable Celery heartbeat/gossip/mingle features to fix reconnect errors ([c28f252](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c28f25234d9a46312d44f1af0079c729471972fa))
+* Fixed issue where shared lists page tries to fetch inaccessible boards and added public lists with write access to shared list page (#121) ([b2e490e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b2e490e97afa24eb0a5e16253f759f8a7272486e))
+
 ### [0.64.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.1...0.64.2) (2023-04-04)
 
 
