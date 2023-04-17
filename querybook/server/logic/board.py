@@ -234,6 +234,28 @@ def get_all_shared_boards(environment_id, user_id, session=None):
 
 
 @with_session
+def get_my_editable_boards(environment_id, user_id, session=None):
+    editable_boards_not_owned = (
+        session.query(Board)
+        .filter(Board.owner_uid != user_id)
+        .filter(Board.environment_id == environment_id)
+        .join(BoardEditor)
+        .filter(BoardEditor is not None)
+        .filter(BoardEditor.uid == user_id)
+        .filter(BoardEditor.write.is_(True))
+        .all()
+    )
+
+    editable_boards_owned = (
+        session.query(Board).filter(Board.owner_uid == user_id).all()
+    )
+
+    editable_boards = editable_boards_owned + editable_boards_not_owned
+
+    return editable_boards
+
+
+@with_session
 def update_board_item(id, session=None, **fields):
     board = BoardItem.update(
         id,

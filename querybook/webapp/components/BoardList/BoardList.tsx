@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { BoardCreateUpdateModal } from 'components/BoardCreateUpdateModal/BoardCreateUpdateModal';
 import { IBoard } from 'const/board';
-import { fetchBoards } from 'redux/board/action';
-import { myBoardsSelector } from 'redux/board/selector';
+import { editableBoardsSelector } from 'redux/board/selector';
+import { fetchEditableBoards } from 'redux/board/action';
 import { IconButton } from 'ui/Button/IconButton';
 import { InfinityScroll } from 'ui/InfinityScroll/InfinityScroll';
 import { ListLink } from 'ui/Link/ListLink';
@@ -28,9 +28,10 @@ export const BoardList: React.FunctionComponent<IProps> = ({
     const [showCreateModal, setCreateModal] = useState(false);
     const [filterStr, setFilterStr] = useState('');
     const dispatch = useDispatch();
-    const boards = useSelector(myBoardsSelector);
+    const boards = useSelector(editableBoardsSelector);
+
     useEffect(() => {
-        dispatch(fetchBoards());
+        dispatch(fetchEditableBoards());
     }, []);
 
     const filteredBoards = useMemo(() => {

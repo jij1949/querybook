@@ -18,6 +18,8 @@ export interface IBoardBase {
 
     environment_id: number;
     owner_uid: number;
+
+    editable?: boolean;
 }
 
 export interface IBoardWithItemIds extends IBoard {

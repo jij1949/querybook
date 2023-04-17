@@ -76,6 +76,15 @@ def get_shared_boards(environment_id, user_id):
             "boards": [shared_board.id for shared_board in shared_boards],
         }
 
+@register(
+    "/board/editable/",
+    methods=["GET"],
+)
+def get_my_editable_boards(environment_id, user_id):
+    with DBSession() as session:
+        verify_environment_permission([environment_id])
+        return logic.get_my_editable_boards(environment_id=environment_id, user_id=user_id, session=session)
+
 
 @register(
     "/board/",

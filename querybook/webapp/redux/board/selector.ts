@@ -180,3 +180,15 @@ export const currentBoardAccessRequestsByUidSelector = createSelector(
     (board, accessRequestsByBoardIdUserId) =>
         accessRequestsByBoardIdUserId[board?.id] ?? {}
 );
+
+export const editableBoardsSelector = createSelector(
+    boardByIdSelector,
+    currentEnvironmentSelector,
+    (boardById, environment) =>
+        Object.values(boardById)
+            .filter(
+                (board) =>
+                    board.environment_id === environment?.id && board.editable
+            )
+            .sort((a, b) => b.updated_at - a.updated_at)
+);

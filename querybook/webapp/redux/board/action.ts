@@ -137,6 +137,21 @@ export function fetchBoards(
     };
 }
 
+export function fetchEditableBoards(): ThunkResult<Promise<IBoardBase[]>> {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const rawBoards = (
+            await BoardResource.getAllEditable(
+                state.environment.currentEnvironmentId,
+                state.user.myUserInfo.uid,
+            )
+        ).data;
+        const editableBoards = rawBoards.map(board => ({...board, editable: true}))
+        dispatch(receiveBoards(editableBoards));
+        return editableBoards;
+    };
+}
+
 export function fetchBoard(id: number): ThunkResult<Promise<IBoardRaw>> {
     return (dispatch, getState) => {
         const state = getState();
@@ -356,6 +371,7 @@ export function getBoardEditors(
         return data;
     };
 }
+
 
 export function addBoardEditor(
     boardId: number,

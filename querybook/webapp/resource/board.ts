@@ -27,6 +27,12 @@ export const BoardResource = {
             user_id: userId,
         }),
 
+    getAllEditable: (environmentId: number, userId: number) =>
+        ds.fetch<IBoardBase[]>(`/board/editable/`, {
+            environment_id: environmentId,
+            user_id: userId,
+        }),
+
     create: (
         name: string,
         environmentId: number,
