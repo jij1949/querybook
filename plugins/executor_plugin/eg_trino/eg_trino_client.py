@@ -35,13 +35,17 @@ class EGTrinoClient(TrinoClient):
             auth=auth,
             user=proxy_user if proxy_user else username,
             http_scheme=trino_conf.protocol,
-            source='querybook',
+            source="querybook",
         )
         self._connection = connection
         super(TrinoClient, self).__init__()
 
     def cursor(self):
-        return EGTrinoCursor(cursor=self._connection.cursor(), username=self._username, password=self._password)
+        return EGTrinoCursor(
+            cursor=self._connection.cursor(),
+            username=self._username,
+            password=self._password,
+        )
 
 
 class EGTrinoCursor(TrinoCursor):
@@ -55,15 +59,22 @@ class EGTrinoCursor(TrinoCursor):
         self._password = password
 
     def poll(self):
-        # this needs to be take care
-        self.rows.extend(self._cursor._query.fetch())
-        self._cursor._iterator = iter(self.rows)
-        poll_result = self._cursor.stats
-        completed = self._cursor._query._finished
-        if poll_result:
-            self._update_percent_complete(poll_result)
+        try:
+            self.rows.extend(self._cursor._query.fetch())
+            self._cursor._iterator = iter(self.rows)
+            poll_result = self._cursor.stats
+            completed = self._cursor._query._finished
+            if poll_result:
+                self._update_percent_complete(poll_result)
+                self._update_execution_info(poll_result)
+                self._update_tracking_url(poll_result)
+
+        except TrinoUserError as e:
+            # Catch the error and update the tracking url
+            poll_result = {"queryId": e.query_id}
             self._update_tracking_url(poll_result)
-            self._update_execution_info(poll_result)
+
+            raise e
 
         return completed
 
@@ -80,7 +91,7 @@ class EGTrinoCursor(TrinoCursor):
             return ""
         info_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/api/query/{poll_result['queryId']}"
         login_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/login"
-        payload = {'username': self._user, 'password': self._password}
+        payload = {"username": self._user, "password": self._password}
         with requests.session() as s:
             r = s.post(login_url, data=payload)
             if r.status_code != 200:
