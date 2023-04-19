@@ -52,6 +52,7 @@ const templatedVarSchema = Yup.object().shape({
  */
 interface IDataDocMetaVariableWithId extends IDataDocMetaVariable {
     id: string;
+    isDeleted: boolean;
 }
 const templatedVarUniqueIdPrefix = 'tvar_';
 
@@ -61,6 +62,7 @@ const defaultTemplatedVariables: IDataDocMetaVariableWithId[] = [
         value: '',
         type: 'string',
         id: uniqueId(templatedVarUniqueIdPrefix),
+        isDeleted: false,
     },
 ];
 
@@ -73,6 +75,7 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                 ? variables.map((varConfig) => ({
                       ...varConfig,
                       id: uniqueId(templatedVarUniqueIdPrefix),
+                      isDeleted: false,
                   }))
                 : defaultTemplatedVariables,
         }),
@@ -104,7 +107,7 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                         render={(arrayHelpers) => {
                             const renderVariableConfigRow = (
                                 index: number,
-                                { type }: IDataDocMetaVariableWithId
+                                { name, value, type, id, isDeleted }: IDataDocMetaVariableWithId,
                             ) => (
                                 <div
                                     key={index}
@@ -161,12 +164,46 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                                             />
                                         )}
                                     </div>
-                                    {isEditable && (
+                                    {isEditable && (isDeleted === false) && (
                                         <IconButton
                                             icon="X"
                                             onClick={() =>
-                                                arrayHelpers.remove(index)
+                                                {
+                                                    arrayHelpers.replace(
+                                                        index,
+                                                        {
+                                                            name,
+                                                            value,
+                                                            type,
+                                                            id,
+                                                            isDeleted: true,
+                                                        }
+                                                    );
+                                                }
                                             }
+                                            tooltip="Delete"
+                                            tooltipPos="left"
+                                        />
+                                    )}
+                                    {isEditable && (isDeleted === true) && (
+                                        <IconButton
+                                            icon="Delete"
+                                            onClick={() =>
+                                                {
+                                                    arrayHelpers.replace(
+                                                        index,
+                                                        {
+                                                            name,
+                                                            value,
+                                                            type,
+                                                            id,
+                                                            isDeleted: false,
+                                                        }
+                                                    );
+                                                }
+                                            }
+                                            tooltip="Undo delete"
+                                            tooltipPos="left"
                                         />
                                     )}
                                 </div>
@@ -178,31 +215,58 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                                     renderItem={(index, varConfig) =>
                                         renderVariableConfigRow(
                                             index,
-                                            varConfig as IDataDocMetaVariableWithId
+                                            varConfig as IDataDocMetaVariableWithId,
                                         )
                                     }
                                     onMove={arrayHelpers.move}
                                 />
                             ) : null;
-
+                            const anyDeleted = values.variables.some(
+                                (variable) => variable.isDeleted
+                            );
                             const controlDOM = isEditable && (
                                 <div className="horizontal-space-between mt4">
                                     <TextButton
                                         icon="Plus"
                                         title="New Variable"
                                         onClick={() =>
-                                            arrayHelpers.push({
-                                                name: '',
-                                                type: 'string',
-                                                value: '',
-                                            })
+                                            {
+                                                arrayHelpers.push({
+                                                    name: '',
+                                                    type: 'string',
+                                                    value: '',
+                                                    isDeleted: false,
+                                                    id: uniqueId(templatedVarUniqueIdPrefix),
+                                                });
+                                            }
                                         }
                                     />
-                                    {dirty && (
+                                    {(dirty || anyDeleted) && (
                                         <Button
-                                            onClick={() => handleSubmit()}
+                                            onClick={() =>
+                                                {
+                                                    const originalLength = values.variables.length;
+                                                    [...values.variables]
+                                                        .reverse()
+                                                        .forEach(
+                                                            (
+                                                                variable: IDataDocMetaVariableWithId,
+                                                                reverseIndex
+                                                            ) => {
+                                                                if (
+                                                                    variable.isDeleted
+                                                                ) {
+                                                                    arrayHelpers.remove(
+                                                                        originalLength - reverseIndex - 1
+                                                                    );
+                                                                }
+                                                            }
+                                                        );
+                                                    handleSubmit();
+                                                }
+                                            }
                                             title="Save Changes"
-                                            disabled={isSubmitting || !isValid}
+                                            disabled={(isSubmitting || !isValid) && !anyDeleted}
                                         />
                                     )}
                                 </div>
