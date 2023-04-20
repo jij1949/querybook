@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.65.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.3...0.65.0) (2023-04-20)
+
+
+### Features
+
+* Added a marker to denote when a variable will be deleted in a datadoc (#124) ([0e469a6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0e469a6b432d6d9b6e8753caf2d0a964481c387a))
+* Added ability to add a datadoc to a list that is shared with th… (#122) ([2b7b40e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2b7b40e60a796c6b3acfe14f2370c37c3aa722af))
+
+
+### Bug Fixes
+
+* Ensure meta_info is updated when an exception occurs ([2a1622b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2a1622b1493c24129eb205e958830da3c324424d))
+
 ### [0.64.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.2...0.64.3) (2023-04-12)
 
 
