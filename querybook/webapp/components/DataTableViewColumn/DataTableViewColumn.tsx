@@ -93,12 +93,17 @@ export const DataTableViewColumn: React.FunctionComponent<
         </div>
     );
 
+    const partitionKeyList = table.column_info?.partition_keys ?? [];
+    const isPartitionKey = (columnName) => partitionKeyList.some((key) => key === columnName)
+
+
     const columnDOM = filteredColumns.map((col) => (
         <DataTableColumnCard
             column={col}
             updateDataColumnDescription={updateDataColumnDescription}
             key={col.id}
             onEditColumnDescriptionRedirect={onEditColumnDescriptionRedirect}
+            isPartitionKey={isPartitionKey(col.name)}
         />
     ));
 

@@ -23,12 +23,14 @@ interface IProps {
         columnId: number,
         description: ContentState
     ) => any;
+    isPartitionKey: boolean;
 }
 
 export const DataTableColumnCard: React.FunctionComponent<IProps> = ({
     column,
     onEditColumnDescriptionRedirect,
     updateDataColumnDescription,
+    isPartitionKey,
 }) => {
     const [expanded, , toggleExpanded] = useToggleState(false);
     const parsedType = useMemo(() => parseType('', column.type), [column.type]);
@@ -57,7 +59,7 @@ export const DataTableColumnCard: React.FunctionComponent<IProps> = ({
                         <StyledText color="light" className="column-type mr12">
                             {column.type}
                         </StyledText>
-                        <AccentText weight="extra">{column.name}</AccentText>
+                        <AccentText weight="extra">{column.name} {isPartitionKey && <Icon name={"Key"} size={16}/>}</AccentText>
                     </div>
                     <Icon name={expanded ? 'ChevronUp' : 'ChevronDown'} />
                 </div>
