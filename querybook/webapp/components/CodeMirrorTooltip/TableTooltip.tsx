@@ -6,6 +6,7 @@ import { IDataColumn, IDataSchema, IDataTable } from 'const/metastore';
 import { setSidebarTableId } from 'lib/querybookUI';
 import { IconButton } from 'ui/Button/IconButton';
 import { ShowMoreText } from 'ui/ShowMoreText/ShowMoreText';
+import {Icon} from "../../ui/Icon/Icon";
 
 interface IProps {
     table: IDataTable;
@@ -25,9 +26,7 @@ export const TableTooltip: React.FunctionComponent<IProps> = ({
     const description = table.description
         ? (table.description as ContentState).getPlainText()
         : '';
-    const columnNames = (columns || []).map(
-        (column) => `- ${column.name}: ${column.type}`
-    );
+
     const location = table.location;
 
     const lastPartitions = table.latest_partitions ?? '[]';
@@ -71,14 +70,23 @@ export const TableTooltip: React.FunctionComponent<IProps> = ({
             </div>
         </>
     );
+
+    const partitionKeyList = table.column_info?.partition_keys ?? [];
+    const isPartitionKey = (column) => partitionKeyList.some((key) => key === column.name);
+
     const columnsDOM = (
         <>
             <div className="tooltip-title">Column Names</div>
             <div className="tooltip-content">
-                <ShowMoreText text={columnNames} seeLess={true} />
+                {(columns || []).map((col) => (
+                    <div key={col.id}>
+                        {`- ${col.name}: ${col.type}`} {isPartitionKey(col) && <Icon name={"Key"} size={12}/>}
+                    </div>
+                ))}
             </div>
         </>
     );
+
     const locationDOM = location && (
         <>
             <div className="tooltip-title">Location</div>
