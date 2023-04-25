@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.66.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.65.0...0.66.0) (2023-04-25)
+
+
+### Features
+
+* Added key icon for partition keys in 'View Table' window (#126) ([7f62f6d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7f62f6d1a2b02e8577b88cfe8712f9b17cc90e2b))
+* Added key icon for partition keys in table hover window (#125) ([a648b83](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a648b835bfb75b3e2af4ede4a53d29517eb56cec))
+
+
+### Bug Fixes
+
+* Add Postgres driver to requirements ([aa92f61](https://github.expedia.biz/eg-analytics-platform/querybook/commit/aa92f61d2da658ab83e155256b3a11a3e9866d58))
+
 ## [0.65.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.64.3...0.65.0) (2023-04-20)
 
 
