@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.67.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.66.0...0.67.0) (2023-05-04)
+
+
+### Features
+
+* Added feature that can disable/enable datadoc cells to exclude/include them from run all or schedule runs (#128) ([defe9a3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/defe9a3e25c8561753536d2b6ae27b4d5e6d4cd5))
+* Added Note about file size limit in table upload window (#129) ([9f00c10](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9f00c104f31f5f4e5131f8d180fb0cfd1efb8c1f))
+
 ## [0.66.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.65.0...0.66.0) (2023-04-25)
 
 
