@@ -1,9 +1,12 @@
 from celery import chain
 from celery.contrib.abortable import AbortableTask
 
-from app.db import DBSession
+from app.db import with_session, DBSession
 from app.flask_app import celery, socketio
 
+from const.db import (
+    description_length,
+)
 from const.query_execution import QueryExecutionStatus, QueryExecutionType
 from const.schedule import TaskRunStatus
 
@@ -86,10 +89,15 @@ def run_datadoc_with_config(
                 continue
 
             engine_id = query_cell.meta["engine"]
+            raw_query = query_cell.context
+
+            # Skip empty cells
+            if not raw_query or raw_query.isspace():
+                continue
 
             try:
                 query = render_templated_query(
-                    query_cell.context,
+                    raw_query,
                     data_doc.meta_variables,
                     engine_id,
                     session=session,
@@ -213,6 +221,30 @@ def get_datadoc_error_message(query_execution_id):
         if query_execution_error_message is not None
         else GENERIC_QUERY_FAILURE_MSG
     )
+    return error_msg
+
+
+@with_session
+def get_datadoc_error_message(query_execution_id, session=None):
+    _, data_cell_id = qe_logic.get_datadoc_id_from_query_execution_id(
+        query_execution_id, session=session
+    )[0]
+    data_cell_name = datadoc_logic.get_data_cell_by_id(
+        data_cell_id, session=session
+    ).meta.get("title", f"Untitled Cell Id [{data_cell_id}]")
+    query_execution_error = qe_logic.get_query_execution_error(
+        query_execution_id, session=session
+    )
+    query_execution_error_message = (
+        query_execution_error.error_message_extracted
+        if query_execution_error.error_message_extracted
+        else query_execution_error.error_message
+    )
+    error_msg = (
+        f'Failure in "{data_cell_name}": {query_execution_error_message}'
+        if query_execution_error_message is not None
+        else GENERIC_QUERY_FAILURE_MSG
+    )[:description_length]
     return error_msg
 
 

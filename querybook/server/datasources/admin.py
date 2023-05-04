@@ -3,6 +3,7 @@ from flask_login import current_user
 from app.datasource import register, admin_only, api_assert
 from app.db import DBSession
 from const.admin import AdminOperation, AdminItemType
+from const.schedule import ScheduleTaskType
 from datasources.admin_audit_log import with_admin_audit_log
 from env import QuerybookSettings
 
@@ -628,7 +629,7 @@ def exec_demo_set_up():
                 "task": "tasks.update_metastore.update_metastore",
                 "cron": "0 0 * * *",
                 "args": [metastore_id],
-                "task_type": "prod",
+                "task_type": ScheduleTaskType.PROD,
                 "enabled": True,
             },
             # commit=False,
@@ -662,6 +663,9 @@ def exec_demo_set_up():
             demo_logic.create_demo_table_column_stats(
                 column_id=score_column.id, uid=current_user.id, session=session
             )
+
+        demo_logic.create_demo_data_elements(metastore_id, session=session)
+        demo_logic.create_demo_tags(metastore_id, session=session)
 
         schedule_logic.run_and_log_scheduled_task(
             scheduled_task_id=task_schedule_id, session=session
