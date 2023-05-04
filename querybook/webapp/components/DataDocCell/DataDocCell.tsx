@@ -72,6 +72,8 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                 pasteCellAt,
                 deleteCellAt,
                 fullScreenCellAt,
+                disableCellAt,
+                enableCellAt,
 
                 cellFocus,
                 defaultCollapse,
@@ -229,6 +231,8 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                         isEditable={isEditable}
                         showCollapsed={showCollapsed}
                         setShowCollapsed={setShowCollapsed}
+                        disableCellAt={cell.cell_type === 'query' && !cell.meta.disabled ? disableCellAt : null}
+                        enableCellAt={cell.cell_type === 'query' && cell.meta.disabled ? enableCellAt : null}
                         isCollapsedDefault={
                             Boolean(cell.meta.collapsed) === showCollapsed
                         }
@@ -241,9 +245,13 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
             const uidDOM = uids.map((uid) => (
                 <UserAvatar key={uid} uid={uid} tiny />
             ));
-            const dataDocCellClassName = showCollapsed
-                ? 'DataDocCell collapsed'
-                : 'DataDocCell';
+            const dataDocCellClassName = `DataDocCell${
+                showCollapsed ? ' collapsed' : ''
+            }${
+                cell.cell_type === 'query' && cell.meta.disabled
+                    ? ' disabled' + (isFullScreen ? '-fullscreen' : '') 
+                    : ''
+            }`;
             const innerCellClassName = clsx({
                 'highlight-cell': highlightCellIndex === index,
                 'data-doc-cell-container-pair': true,

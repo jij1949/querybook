@@ -17,6 +17,8 @@ export interface IDataDocContextType {
     pasteCellAt: (pasteIndex: number) => Promise<void>;
     deleteCellAt: (index: number) => Promise<void>;
     fullScreenCellAt: (index: number) => void;
+    enableCellAt: (index: number) => void;
+    disableCellAt: (index: number) => void;
 
     defaultCollapse: boolean;
     highlightCellIndex: number;

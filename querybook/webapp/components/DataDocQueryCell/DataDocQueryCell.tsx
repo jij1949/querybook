@@ -647,7 +647,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
         );
     }
 
-    public renderCellHeaderDOM() {
+    public renderCellHeaderDOM(disabled: boolean) {
         const {
             queryEngines,
             queryEngineById,
@@ -670,9 +670,16 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
 
         return (
             <div className="query-metadata">
-                <AccentText className="query-title" weight="bold" size="large">
-                    {queryTitleDOM}
-                </AccentText>
+                <div className="query-title">
+                    <AccentText
+                        className="query-title-contents"
+                        weight="bold"
+                        size="large"
+                    >
+                        {disabled && '[Disabled] '}
+                        {queryTitleDOM}
+                    </AccentText>
+                </div>
                 <div className="query-controls flex-row">
                     <QueryRunButton
                         ref={this.runButtonRef}
@@ -887,13 +894,13 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                 <div className="collapsed-query flex-row">
                     <Icon name="Terminal" className="mt4 mr8" />
                     <AccentText className="one-line-ellipsis pr16">
-                        {this.dataCellTitle}
+                        {this.state.meta.disabled && <span>[Disabled]</span>} {this.dataCellTitle}
                     </AccentText>
                 </div>
             </div>
         ) : isFullScreen ? (
             <div className={classes}>
-                {this.renderCellHeaderDOM()}
+                {this.renderCellHeaderDOM(this.state.meta.disabled)}
                 <div className="query-content">
                     {this.renderEditorDOM()}
                     <Resizable
@@ -910,8 +917,8 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             </div>
         ) : (
             <div className={classes}>
-                {this.renderCellHeaderDOM()}
-                <div className="query-content">
+                {this.renderCellHeaderDOM(this.state.meta.disabled)}
+                <div className={this.state.meta.disabled ? "disabled-query" : "query-content"}>
                     {this.renderEditorDOM()}
                     {this.renderExecutionsDOM()}
                 </div>

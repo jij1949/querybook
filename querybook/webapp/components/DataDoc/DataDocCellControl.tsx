@@ -36,6 +36,8 @@ interface IProps {
         meta: IDataCellMeta
     ) => any;
     deleteCellAt?: (index: number) => any;
+    disableCellAt?: (index: number) => any;
+    enableCellAt?: (index: number) => any;
 
     active?: boolean;
     isEditable: boolean;
@@ -57,6 +59,8 @@ export const DataDocCellControl: React.FunctionComponent<IProps> = ({
 
     copyCellAt,
     pasteCellAt,
+    disableCellAt,
+    enableCellAt,
 
     active,
     isEditable,
@@ -96,6 +100,8 @@ export const DataDocCellControl: React.FunctionComponent<IProps> = ({
         () => moveCellAt(index, isHeader ? index - 1 : index + 1),
         [moveCellAt, index, isHeader]
     );
+    const handleDisableCell = useBoundFunc(disableCellAt, index);
+    const handleEnableCell = useBoundFunc(enableCellAt, index);
 
     const rightButtons: JSX.Element[] = [];
     const centerButtons: JSX.Element[] = [];
@@ -143,6 +149,26 @@ export const DataDocCellControl: React.FunctionComponent<IProps> = ({
                 tooltipPos: 'right',
                 icon: 'Clipboard',
             });
+        }
+
+        if (isEditable && disableCellAt) {
+            leftMenuItems.push({
+                name: 'Disable',
+                onClick: handleDisableCell,
+                tooltip: 'Disable cell',
+                tooltipPos: 'right',
+                icon: 'EyeOff',
+            });
+        }
+
+        if (isEditable && enableCellAt) {
+            leftMenuItems.push({
+                name: 'Enable',
+                onClick: handleEnableCell,
+                tooltip: 'Enable cell',
+                tooltipPos: 'right',
+                icon: 'Eye',
+            })
         }
     }
 

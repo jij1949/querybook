@@ -59,8 +59,18 @@
         padding-top: 6px;
     }
 
+    .disabled-query {
+        font-size: var(--med-text-size);
+        font-weight: var(--bold-font);
+    }
+
     .query-title {
         flex: 1;
+    }
+
+    .query-title-contents {
+        display: inline-flex;
+        align-items: baseline;
     }
 
     .query-metadata {

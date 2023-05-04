@@ -5,6 +5,12 @@
         min-height: 0px;
         cursor: nesw-resize;
     }
+    &.disabled {
+        opacity: 0.5;
+    }
+    &.disabled-fullscreen {
+        opacity: 1;
+    }
     .chart-cell-controls {
         align-items: flex-start;
     }

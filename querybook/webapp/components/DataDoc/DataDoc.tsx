@@ -402,6 +402,41 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
     }
 
     @bind
+    public async disableCellAt(index: number) {
+        trackClick({
+            component: ComponentType.DATADOC_QUERY_CELL,
+            element: ElementType.DISABLE_CELL_BUTTON,
+        });
+        const cellId = this.props.dataDoc.cells[index];
+        const currCell = this.props.dataDoc.dataDocCells[index];
+        if(currCell.cell_type === 'query') {
+            const fields = {
+                context: currCell.context,
+                meta: {...currCell.meta, disabled: true}
+            }
+            await this.updateCell(cellId, fields);
+        }
+    }
+
+    @bind
+    public async enableCellAt(index: number) {
+        trackClick({
+            component: ComponentType.DATADOC_QUERY_CELL,
+            element: ElementType.ENABLE_CELL_BUTTON,
+        });
+        const cellId = this.props.dataDoc.cells[index];
+        const currCell = this.props.dataDoc.dataDocCells[index];
+        if(currCell.cell_type === 'query') {
+            const fields = {
+                context: currCell.context,
+                meta: {...currCell.meta, disabled: false}
+            }
+            await this.updateCell(cellId, fields);
+        }
+
+    }
+
+    @bind
     public deleteCellAt(index: number) {
         const { dataDoc, docId } = this.props;
 
@@ -543,6 +578,8 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
             copyCellAt: this.copyCellAt,
             pasteCellAt: this.pasteCellAt,
             deleteCellAt: this.deleteCellAt,
+            enableCellAt: this.enableCellAt,
+            disableCellAt: this.disableCellAt,
 
             fullScreenCellAt: this.fullScreenCellAt,
 

@@ -80,7 +80,11 @@ def run_datadoc_with_config(
         }
 
         # Prepping chain jobs each unit is a [make_qe_task, run_query_task] combo
-        for index, query_cell in enumerate(query_cells):
+        for _, query_cell in enumerate(query_cells):
+            # Skip disabled cells
+            if query_cell.meta.get("disabled", False):
+                continue
+
             engine_id = query_cell.meta["engine"]
 
             try:
@@ -115,7 +119,7 @@ def run_datadoc_with_config(
                     execution_type=execution_type,
                     retry=retry,
                 )
-                if index == 0
+                if len(tasks_to_run) == 0
                 else _run_datadoc_cell.s(
                     **start_query_execution_kwargs,
                     execution_type=execution_type,
