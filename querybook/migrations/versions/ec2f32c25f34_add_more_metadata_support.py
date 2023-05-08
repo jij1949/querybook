@@ -1,7 +1,7 @@
 """add more metadata support
 
 Revision ID: ec2f32c25f34
-Revises: 1b8aba201c94
+Revises: 27ed76f75108
 Create Date: 2023-02-24 23:46:29.304134
 
 """
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'ec2f32c25f34'
-down_revision = '1b8aba201c94'
+down_revision = '27ed76f75108'
 branch_labels = None
 depends_on = None
 
