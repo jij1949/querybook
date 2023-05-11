@@ -10,6 +10,7 @@ import { useResource } from 'hooks/useResource';
 import { Nullable } from 'lib/typescript';
 import { parseType } from 'lib/utils/complex-types';
 import { TableColumnResource } from 'resource/table';
+import { Icon } from "../../ui/Icon/Icon";
 import { Card } from 'ui/Card/Card';
 import { EditableTextField } from 'ui/EditableTextField/EditableTextField';
 import { KeyContentDisplay } from 'ui/KeyContentDisplay/KeyContentDisplay';

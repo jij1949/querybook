@@ -438,6 +438,7 @@ def datadocs_to_es(datadoc, fields=None, session=None):
         "title": datadoc.title,
         "public": datadoc.public,
         "readable_user_ids": lambda: _get_datadoc_editors(datadoc, session=session),
+        "scheduled": datadoc.scheduled,
     }
     return _get_dict_by_field(field_to_getter, fields=fields)
 

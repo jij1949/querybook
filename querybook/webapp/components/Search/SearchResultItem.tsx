@@ -302,6 +302,7 @@ export const DataDocItem: React.FunctionComponent<IDataDocItemProps> = ({
                             title={title}
                             searchString={searchString}
                         />
+                        {preview.scheduled && <Icon name="Clock"/>}
                     </div>
                     {descriptionDOM}
                     <Level className="result-items-bottom">

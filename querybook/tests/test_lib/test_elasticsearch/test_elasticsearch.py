@@ -245,6 +245,7 @@ class DataDocTestCase(TestCase):
     ENVIRONMENT_ID = 7
     OWNER_UID = "bob"
     DATADOC_TITLE = "Test DataDoc"
+    SCHEDULED = True
 
     def _get_datadoc_cells_mock(self):
         return [
@@ -273,6 +274,7 @@ class DataDocTestCase(TestCase):
             title=self.DATADOC_TITLE,
             public=False,
             cells=self._get_datadoc_cells_mock(),
+            scheduled=self.SCHEDULED,
         )
         return mock_doc
 
@@ -304,6 +306,7 @@ class DataDocTestCase(TestCase):
             "title": self.DATADOC_TITLE,
             "public": False,
             "readable_user_ids": ["alice", "charlie"],
+            "scheduled": self.SCHEDULED,
         }
         self.assertEqual(result, expected_result)
 

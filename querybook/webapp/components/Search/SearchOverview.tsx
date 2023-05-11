@@ -696,6 +696,17 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                     <span className="filter-title">Created At</span>
                     {dateFilterDOM}
                 </div>
+                <div className="search-filter">
+                    <span className="filter-title">Scheduled</span>
+                    <Checkbox
+                        value={!!searchFilters['scheduled']}
+                        onChange={updateSearchFilter.bind(
+                            null,
+                            'scheduled',
+                            searchFilters['scheduled'] ? null : true
+                        )}
+                    />
+                </div>
             </>
         ) : searchType === 'Table' ? (
             <>
