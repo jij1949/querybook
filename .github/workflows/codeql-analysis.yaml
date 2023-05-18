@@ -20,8 +20,8 @@ jobs:
       matrix:
         language:
           - python
-          - javascript
           - typescript
+          - javascript
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
