@@ -146,42 +146,42 @@ trino:
         message: |
             Ranger is restricting access to the queried data.
 
-            Please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7) for help identifying which policy is blocking access.
+            Please review the documentation for [Ranger Access Issues](https://confluence.expedia.biz/x/7Zh9q).
 
     permission_denied_ranger:
         regex: 'Permission denied: user \[.*?\] does not have \[.*?\] privilege on'
         message: |
             Ranger is restricting access to the queried data.
 
-            Please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7) for help identifying which policy is blocking access.
+            Please review the documentation for [Ranger Access Issues](https://confluence.expedia.biz/x/7Zh9q).
 
     aws_s3_access_denied:
         regex: 'Access Denied \(Service: Amazon S3;'
         message: |
             The Trino cluster does not have access to the underlying S3 bucket containing the data being queried.
 
-            Please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7) for help reconfiguring your cluster.
+            Please review the documentation for [S3 Access Issues](https://confluence.expedia.biz/x/A5l9q).
 
     security_definer:
         regex: 'View owner does not have sufficient privileges'
         message: |
             The query is attempting to query a View created with the `SECURITY DEFINER` option, which is not allowed.
 
-            For more information: https://confluence.expedia.biz/pages/viewpage.action?pageId=2531671955
+            For more information: [Access Denied: View owner does not have sufficient privileges](https://confluence.expedia.biz/x/kz-mlg)
 
     legacy_json_serde:
         regex: 'deserializer does not exist:.*jsonserde'
         message: |
             Support for JSON column type has been limited to legacy clusters only for performance reasons.  Please switch to a legacy cluster and rerun your query.
 
-            For more information: https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format.
+            For more information: [Parquet vs Json format](https://confluence.expedia.biz/x/fxaekg).
 
     legacy_csv_serde:
         regex: 'deserializer does not exist: com.bizo.hive.serde.csv.CSVSerde'
         message: |
             Support for CSV column type has been limited to legacy clusters only for performance reasons.  Please switch to a legacy cluster and rerun your query.
 
-            For more information: https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format.
+            For more information: [Parquet vs Json format](https://confluence.expedia.biz/x/fxaekg).
 
     system_session_property:
         regex: 'Access Denied: Cannot set system session property'
@@ -215,3 +215,10 @@ trino:
         regex: 'java.lang.reflect.InvocationTargetException'
         message: |
             Please refer to the Starburst tracking URL to get details about the error.
+
+    partition_required:
+        regex: 'Filter required on (.*?) for at least one partition column:'
+        message: |
+            Please filter on partition keys to optimize your query.
+
+            For more information on using partitions: [Trino Filter required on table for at least one partition column](https://confluence.expedia.biz/x/RPe_pw)
