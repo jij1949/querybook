@@ -2,6 +2,54 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.68.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.67.0...0.68.0) (2023-05-25)
+
+
+### Features
+
+* add button to sort columns in view table UI (#1187) ([c14babb](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c14babb8727ef876c3263b51c8dc2b5bcc787906))
+* add configurable timeout to querybook (#1207) ([4e234d6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4e234d6d4bbb2a2b174d7d7712fd9c1bbbb06bfb))
+* add data element on the sidebar, show descriptions (#1233) ([0e79d74](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0e79d74a4ade776a462ceb5e664807f0e905fa30))
+* add data elements to demo (#1232) ([8b8fcc9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8b8fcc92c355a35b64beec473217fa0c703ff8e3))
+* add data elements to ES index (#1213) ([3759cf7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3759cf7e9336575c3eafc0abcd485c785794721b))
+* add descriptive error msgs (#1150) ([8ab460f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8ab460f038c09caeafc3cbcd1267ac05ac980655))
+* add more metadata support (#1182) ([2bc6052](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2bc605282c9e6f0385934d034022a38f96ae5c58))
+* add new metadata type - data element (#1191) ([2742cdc](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2742cdca0e22cf3f864b84b4195f37eb95a2f1c6))
+* add stats logging (#1204) ([354b08d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/354b08d3c4846076dd09725624d8700647b5e8bf))
+* Added 'Scheduled' filter for datadoc search and clock icon (#131) ([6a156cd](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6a156cdb96b7e14d8c3ca3523895e78999e10c5d))
+* create data element along with syncing table (#1193) ([0113ba3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0113ba39795f3e2b86c7836c22d03b60073ea7c5))
+* display data element description as column description (#1195) ([7ec024b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7ec024b15d9bc0f2c1ec3f5d357871d89ba331d6))
+* find the closed color in ColorPalette (#1184) ([5ec6a4d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5ec6a4da8cc77b3c9afeb17bf1033d2e5bfca6a2))
+* make datadoc table of contents sidebar resizable (#1218) ([e95927b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e95927b2861081988f10d9cba0aa1b33ab35f746))
+* make struct form fields ordered (#1181) ([4a7c8da](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4a7c8da3a430643a77db0fa441a2a4913ae80ae8))
+* update some stats metrics names and add tags (#1208) ([8ca4322](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8ca4322891920104b95db3ab5cf0e497ee53df61))
+
+
+### Bug Fixes
+
+* add get_schema_location to metastore loader (#1214) ([6500610](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6500610e9995de34cb609a7dd43f347f6502e916))
+* add tooltip length (#1192) ([25b1895](https://github.expedia.biz/eg-analytics-platform/querybook/commit/25b189501ff834503110cc64c883614b95e154a7))
+* check nullish of table property value (#1197) ([c500823](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c500823f7ad74519fe939e46592080801b60bdfc))
+* column name overlaps with type (#1203) ([dc7ceaf](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dc7ceafe6714c11b972179c80b2156b81c4ef977))
+* docs_website/package.json & docs_website/yarn.lock to reduce vulnerabilities (#1143) ([423410d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/423410db85af8cf75fad5c1ce2301fc8e66e39c4))
+* dup table description in table search (#1216) ([fa35faa](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fa35faa231341f5f47b0fb706ae85a430fea7731))
+* Enable mssql transpiling (#1178) ([d89187d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d89187d4cee35de67d77c537d9823f3f64bad875))
+* Ensure meta_info is updated when an exception occurs (#1230) ([d902232](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d90223231e7e7bd37d9125f879e495be6bc91558))
+* EntitySelect (#1215) ([c141948](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c141948cf4088a9b4d14d8e487a5ba668fd8582a))
+* find nearest color (#1185) ([65eb774](https://github.expedia.biz/eg-analytics-platform/querybook/commit/65eb7749caca66cc81ed515273991c93ddfec9b9))
+* make entity select creatble be false by default (#1227) ([8a3a775](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8a3a7758a40b781b37aba9e5cc8d17abd9064b6c))
+* metastoreId can be ill defined (#1235) ([06cd2f9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/06cd2f90791a8b72b47c42377b514320d5a2bcba))
+* remove broadcast from socketio.emit (#1202) ([cf96f9a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/cf96f9ab3205b3a75340f633d817f9fe3dd50377))
+* remove decr stats logging events (#1223) ([92d507d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/92d507d3f812eee1619edfb0cd10a7a3c282fddc))
+* Remove postgres requirement from base to fix automated test build ([7a74e57](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7a74e57eb906ca5cc55489115ab93f10065493b0))
+* requirements/base.txt to reduce vulnerabilities (#1167) ([fb1b4e5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fb1b4e59c35f98c4b042c77cd0a75cad14c434b4))
+* requirements/base.txt to reduce vulnerabilities (#1205) ([f59f4ca](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f59f4cac366e4682ffddc74d1dbfe12daa24bfd2))
+* skip empty query cells when run datadoc (#1217) ([c508f2b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c508f2b178365cfbce8dad5f7b76409369e84626))
+* some bug fix related to tag and data element (#1199) ([2bb8873](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2bb887356a234920d83e1018bdf47c4d54062d68))
+* title format check for Snyk (#1219) ([d3aa06a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d3aa06a2764a4f33b560707c7e3a8332265eccde))
+* update data_element table charset to utf8 (#1209) ([5994a9d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5994a9d9b461d2dbfdd9fb9daca03b574f348e03))
+* Update error suggestions ([fcb56c2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fcb56c2d1079a90cdad5fa192541ececab494fd7))
+
 ## [0.67.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.66.0...0.67.0) (2023-05-04)
 
 
