@@ -140,5 +140,17 @@ For more details, please refer to https://confluence.expedia.biz/pages/viewpage.
 If you need to keep data for longer, please use a persistent schema instead.`;
     }
 
+    if (
+        queryEngine.language === 'trino' &&
+        /Exceeded CPU limit of 10\.00d/.test(queryError.error_message) &&
+        queryExecution.query.includes('click_eg_business_event_v2')
+    ) {
+        console.log('Exceeded CPU limit of 10.00d');
+        console.log(JSON.stringify(queryExecution, null, 2));
+        return `Clickstream data is very large and your query has exceeded the query limits.
+
+Please refer to the following article to tune your query and reduce the amount of data you are querying: [Tips & Tricks to query Clickstream Data](https://confluence.expedia.biz/x/eT2vqQ)`;
+    }
+
     return '';
 };
