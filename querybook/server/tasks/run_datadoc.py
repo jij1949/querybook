@@ -179,7 +179,7 @@ def _run_datadoc_cell(
         )
 
     # Run synchronously
-    query_run_status = run_query_task(
+    query_run_status, query_execution_id = run_query_task(
         query_execution_id=query_execution.id,
         execution_type=execution_type,
         celery_task=self,
@@ -198,30 +198,7 @@ def _run_datadoc_cell(
             ),
         )
 
-    return (query_run_status, query_execution.id)
-
-
-def get_datadoc_error_message(query_execution_id):
-    with DBSession() as session:
-        _, data_cell_id = qe_logic.get_datadoc_id_from_query_execution_id(
-            query_execution_id, session=session
-        )[0]
-        data_cell_name = datadoc_logic.get_data_cell_by_id(
-            data_cell_id, session=session
-        ).meta.get("title")
-        query_execution_error = qe_logic.get_query_execution_by_id(
-            query_execution_id, session=session
-        ).error
-        query_execution_error_message = (
-            query_execution_error.error_message if query_execution_error else None
-        )
-
-    error_msg = (
-        f'Failure in "{data_cell_name}": {query_execution_error_message}'
-        if query_execution_error_message is not None
-        else GENERIC_QUERY_FAILURE_MSG
-    )
-    return error_msg
+    return (query_run_status, query_execution_id)
 
 
 @with_session
