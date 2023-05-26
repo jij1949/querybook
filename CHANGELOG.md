@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.68.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.68.0...0.68.1) (2023-05-26)
+
+
+### Bug Fixes
+
+* Add `Exceeded CPU limit of 10.00d` error message ([32f5381](https://github.expedia.biz/eg-analytics-platform/querybook/commit/32f5381def282817a98c435f642c2daeca45249c))
+* Fix incorrectly merged upstream changes re: run_datadoc.py ([48bfb27](https://github.expedia.biz/eg-analytics-platform/querybook/commit/48bfb27f46a4023acdb8e76dfdc02022770678e6))
+
 ## [0.68.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.67.0...0.68.0) (2023-05-25)
 
 
