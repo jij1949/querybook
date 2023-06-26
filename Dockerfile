@@ -1,4 +1,4 @@
-FROM hub-docker-remote.artylab.expedia.biz/python:3.9
+FROM hub-docker-remote.artylab.expedia.biz/python:3.9.16
 # Cannot upgrade to Python 3.10 until the following uWSGI release a new version:
 # https://github.com/unbit/uwsgi/pull/2363
 # This caused websocket to fail
