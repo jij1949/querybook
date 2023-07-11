@@ -699,6 +699,8 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                                 ? this.handleMetaRowLimitChange
                                 : null
                         }
+                        docId={this.props.docId}
+                        index={this.props.queryIndexInDoc}
                     />
                     {this.getAdditionalDropDownButtonDOM()}
                 </div>
@@ -894,7 +896,8 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                 <div className="collapsed-query flex-row">
                     <Icon name="Terminal" className="mt4 mr8" />
                     <AccentText className="one-line-ellipsis pr16">
-                        {this.state.meta.disabled && <span>[Disabled]</span>} {this.dataCellTitle}
+                        {this.state.meta.disabled && <span>[Disabled]</span>}{' '}
+                        {this.dataCellTitle}
                     </AccentText>
                 </div>
             </div>
@@ -918,7 +921,13 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
         ) : (
             <div className={classes}>
                 {this.renderCellHeaderDOM(this.state.meta.disabled)}
-                <div className={this.state.meta.disabled ? "disabled-query" : "query-content"}>
+                <div
+                    className={
+                        this.state.meta.disabled
+                            ? 'disabled-query'
+                            : 'query-content'
+                    }
+                >
                     {this.renderEditorDOM()}
                     {this.renderExecutionsDOM()}
                 </div>

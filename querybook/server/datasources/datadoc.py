@@ -383,7 +383,7 @@ def run_data_doc(id):
 
 
 @register("/datadoc/<int:id>/run/", methods=["POST"])
-def adhoc_run_data_doc(id, send_notification=False):
+def adhoc_run_data_doc(id, start_index=0, send_notification=False):
     assert_can_write(id)
     verify_data_doc_permission(id)
 
@@ -406,6 +406,7 @@ def adhoc_run_data_doc(id, send_notification=False):
         args=[],
         kwargs={
             "doc_id": id,
+            "start_index": start_index,
             "user_id": current_user.id,
             "execution_type": QueryExecutionType.ADHOC.value,
             "notifications": notifications,
