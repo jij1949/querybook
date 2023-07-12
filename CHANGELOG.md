@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.69.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.68.1...0.69.0) (2023-07-12)
+
+
+### Features
+
+* Added button to execute all query cells in a datadoc after the current cell (#139) ([898b854](https://github.expedia.biz/eg-analytics-platform/querybook/commit/898b8543fa2b17345791c1fff279bcb01e4350ec))
+
+
+### Bug Fixes
+
+* **deps:** Update sqlglot version (#140) ([f0ec788](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f0ec788fda046cfbde971fd3eb80e2a01fd872b8))
+* Specify python version to fix npm issue ([3ac25b4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3ac25b40494eec272e99721ba61fff94ffc55c2a))
+
 ### [0.68.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.68.0...0.68.1) (2023-05-26)
 
 
