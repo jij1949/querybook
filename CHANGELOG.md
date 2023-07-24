@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.69.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.69.0...0.69.1) (2023-07-24)
+
+
+### Bug Fixes
+
+* fixed transfer of board ownership not working (#141) ([772e3e3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/772e3e3e20f626cc46e276ef3aab5a1c82d3aba6))
+
 ## [0.69.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.68.1...0.69.0) (2023-07-12)
 
 
