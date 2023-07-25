@@ -109,23 +109,23 @@ const DefaultLanding: React.FC = ({ children }) => {
                                 to="https://confluence.expedia.biz/display/DSPKB/Querybook"
                                 newTab={true}
                             >
-                                Querybook Knowledge Base (KB)
+                                Querybook Knowledge Base (KB) 📖
                             </Link>
                         </div>
                         <div>
                             <Link
-                                to="https://pages.github.expedia.biz/eg-data-platform/egdp-tf-app-egap-trino/"
+                                to="https://analytics.expedia.biz/trino"
                                 newTab={true}
                             >
-                                BunnySafe: Trino Cluster Documentation
+                                Trino Clusters in Analytics Workbench 🎉
                             </Link>
                         </div>
                         <div>
                             <Link
-                                to="https://pages.github.expedia.biz/eg-data-platform/egdp-tf-app-egap-apiary/"
+                                to="https://analytics.expedia.biz/apiary"
                                 newTab={true}
                             >
-                                HoneySafe: EGAP Apiary Configuration
+                                Apiary Configuration in Analytics Workbench 🎉
                             </Link>
                         </div>
                     </div>
