@@ -72,6 +72,11 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             )
         )
 
+        # If the table is owned by "hadoop" and the schema_name starts with eps-prod,
+        # then reassign the owner as e4b-bedrock. This fixes an issue where it displays Unknown (hadoop) as owner
+        if description.owner == "hadoop" and schema_name.startswith("eps_prod"):
+            table = table._replace(owner="e4b-bedrock")
+
         # If the table is owned by the "cloverleaf" user, then we can
         # extract the table description and owner from the table
         if description.owner == "cloverleaf":
