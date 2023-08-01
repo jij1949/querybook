@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.69.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.69.1...0.69.2) (2023-08-01)
+
+
+### Bug Fixes
+
+* replace hadoop table owner with e4b-bedrock when schema starts with eps_prod (#143) ([2199ad0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2199ad0a0264699a0aed9ee8f994d54d3b2967dc))
+* Update Landing Page documentation links ([140dbd1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/140dbd1a48a7754f7f4511308266ab7ac8dcc0e6))
+
 ### [0.69.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.69.0...0.69.1) (2023-07-24)
 
 
