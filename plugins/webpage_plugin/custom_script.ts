@@ -60,3 +60,30 @@ declare global {
 window.ROW_LIMIT_SCALE = [1, 2, 3, 4, 5, 6].map((v) => Math.pow(10, v));
 window.DEFAULT_ROW_LIMIT = window.ROW_LIMIT_SCALE[2];
 window.ALLOW_UNLIMITED_QUERY = true;
+
+// Analytics
+function setupAnalytics() {
+    var scriptTag = document.createElement('script');
+    scriptTag.async = true;
+    scriptTag.src =
+        'https://egap-umami.rcp.us-west-2.data.test.exp-aws.net/custom.js';
+
+    var domain = window.location.hostname;
+    if (domain === 'querybook.expedia.biz') {
+        scriptTag.setAttribute(
+            'data-website-id',
+            'cd9789ee-fe74-4ea1-9164-14cbd608186c'
+        );
+    } else if (domain === 'querybook-test.expedia.biz') {
+        scriptTag.setAttribute(
+            'data-website-id',
+            'd98152cf-992d-4d2d-8a4d-a4b7cf98a393'
+        );
+    } else {
+        // Do not load analytics for other domains (e.g. localhost)
+        return;
+    }
+
+    document.head.appendChild(scriptTag);
+}
+setupAnalytics();
