@@ -545,6 +545,33 @@ def _getrowformatsubstring(queryStr):
         resultantsql = None
     return resultantsql
 
+def _convertcoalesce(queryStr):
+    try:
+        intlist = re.findall(dc.COALESCE_INT_REGEX, queryStr, flags=re.IGNORECASE)
+        varcharlist = re.findall(dc.COALESCE_VARCHAR_REGEX, queryStr, flags=re.IGNORECASE)
+
+        if (len(intlist) != 0 ):
+            for x in intlist:
+                result = re.search(dc.COALESCE_INT_REGEX, queryStr, flags=re.IGNORECASE)
+                new_String = re.sub(dc.COALESCE_INT_REGEX,
+                                    "coalesce(" + result.group(1) + ",cast(" + result.group(2) + " as int))", queryStr, 1,
+                                    flags=re.IGNORECASE)
+                queryStr = new_String
+        elif (len(intlist) == 0 and len(varcharlist) !=0):
+            for x in varcharlist:
+                result = re.search(dc.COALESCE_VARCHAR_REGEX, queryStr, flags=re.IGNORECASE)
+                new_String = re.sub(dc.COALESCE_VARCHAR_REGEX,
+                                     "coalesce(" + result.group(1) + ",cast(" + result.group(4) + " as varchar))",
+                                     queryStr, 1,
+                                     flags=re.IGNORECASE)
+                queryStr = new_String
+    except BaseException as e:
+        #print("EXCEption in extract: "+str(e))
+        queryStr = "Error while converting convert coalesce"
+    return queryStr
+
+
+
 function_list = [
     _convertdatediff,
     _convertdatesub,
@@ -564,4 +591,5 @@ function_list = [
     _convertrowformatpjsonroperties,
     _convertexternaltable,
     _convertstring,
+    _convertcoalesce
 ]
