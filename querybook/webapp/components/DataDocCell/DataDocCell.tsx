@@ -221,6 +221,7 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                 <div className={'data-doc-cell-divider-container'}>
                     <DataDocCellControl
                         index={idx}
+                        cellId={cell.id}
                         numberOfCells={numberOfCells}
                         moveCellAt={handleMoveCell}
                         pasteCellAt={pasteCellAt}
@@ -231,8 +232,16 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                         isEditable={isEditable}
                         showCollapsed={showCollapsed}
                         setShowCollapsed={setShowCollapsed}
-                        disableCellAt={cell.cell_type === 'query' && !cell.meta.disabled ? disableCellAt : null}
-                        enableCellAt={cell.cell_type === 'query' && cell.meta.disabled ? enableCellAt : null}
+                        disableCellAt={
+                            cell.cell_type === 'query' && !cell.meta.disabled
+                                ? disableCellAt
+                                : null
+                        }
+                        enableCellAt={
+                            cell.cell_type === 'query' && cell.meta.disabled
+                                ? enableCellAt
+                                : null
+                        }
                         isCollapsedDefault={
                             Boolean(cell.meta.collapsed) === showCollapsed
                         }
@@ -249,7 +258,7 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                 showCollapsed ? ' collapsed' : ''
             }${
                 cell.cell_type === 'query' && cell.meta.disabled
-                    ? ' disabled' + (isFullScreen ? '-fullscreen' : '') 
+                    ? ' disabled' + (isFullScreen ? '-fullscreen' : '')
                     : ''
             }`;
             const innerCellClassName = clsx({

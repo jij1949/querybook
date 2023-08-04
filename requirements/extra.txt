@@ -29,3 +29,6 @@
 
 # Parser
 -r parser/sqlglot.txt
+
+# AI Assistant
+-r ai/langchain.txt

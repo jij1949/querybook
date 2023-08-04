@@ -143,6 +143,10 @@ class QuerybookSettings(object):
 
     # Stats Logging
     STATS_LOGGER_NAME = get_env_config("STATS_LOGGER_NAME") or "null"
-    
+
+    # AI Assistant
+    AI_ASSISTANT_PROVIDER = get_env_config("AI_ASSISTANT_PROVIDER")
+    AI_ASSISTANT_CONFIG = get_env_config("AI_ASSISTANT_CONFIG") or {}
+
     # Ranger
     RANGER_URL = get_env_config("RANGER_URL")

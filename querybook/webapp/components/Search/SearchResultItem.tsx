@@ -302,7 +302,7 @@ export const DataDocItem: React.FunctionComponent<IDataDocItemProps> = ({
                             title={title}
                             searchString={searchString}
                         />
-                        {preview.scheduled && <Icon name="Clock"/>}
+                        {preview.scheduled && <Icon name="Clock" />}
                     </div>
                     {descriptionDOM}
                     <Level className="result-items-bottom">
@@ -415,7 +415,11 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
                             />
                             {goldenIcon}
                         </div>
-                        <StyledText size="small" color="lightest">
+                        <StyledText
+                            size="small"
+                            color="lightest"
+                            className="result-item-timestamp ml8"
+                        >
                             {generateFormattedDate(createdAt, 'X')}
                         </StyledText>
                     </div>
