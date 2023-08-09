@@ -12,6 +12,9 @@ from lib.metastore.loaders.hive_metastore_loader import (
 )
 from lib.utils import json as ujson
 
+from const.metastore import DataTag, MetastoreLoaderConfig, MetadataType, MetadataMode
+
+from const.data_element import DataElementAssociationTuple, DataElementTuple, DataElementAssociationType, DataElementMap
 
 LOG = get_logger(__file__)
 
@@ -19,6 +22,12 @@ LOG = get_logger(__file__)
 # Expedia-customized version of the HMSMetastoreLoader
 #
 class EgHMSMetastoreLoader(HMSMetastoreLoader):
+    loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig(
+        {
+            MetadataType.TAG: MetadataMode.WRITE_BACK,
+            MetadataType.DATA_ELEMENT: MetadataMode.WRITE_BACK,
+        }
+    )
     # # Can override this to test a limited set of tables
     # def get_all_schema_names(self) -> List[str]:
     #     # dbs = self.hmc.get_all_databases()
@@ -88,4 +97,39 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             if parameters.get("comment") is not None:
                 table = table._replace(description=parameters.get("comment"))
 
-        return table, columns
+        new_columns = columns
+
+        if any(p.startswith("eg-sensitivity.") for p in parameters):
+            table = table._replace(
+                tags=table.tags + [
+                    DataTag(
+                        name="Sensitivity", description="This table contains sensitivity tags"
+                    )
+                ]
+            )
+
+            new_columns = [
+                (
+                    apply_sensitivity_tag_and_data_element(col)
+                    if parameters.get("eg-sensitivity." + col.name)
+                    else col
+                ) for col in columns
+            ]
+
+        return table, new_columns
+
+
+def apply_sensitivity_tag_and_data_element(col):
+    col = col._replace(
+        tags=col.tags + [
+            DataTag(
+                name=col.name, type="Sensitivity"
+            )
+        ],
+        data_element=DataElementAssociationTuple(
+            type=DataElementAssociationType.REF,
+            value_data_element=DataElementMap.get_de_tuple(col.name.lower())
+        )
+    )
+
+    return col
