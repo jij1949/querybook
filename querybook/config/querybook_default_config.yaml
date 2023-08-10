@@ -87,10 +87,8 @@ STATS_LOGGER_NAME: ~
 
 # --------------- AI Assistant ---------------
 # Example config for OpenAI
-# AI_ASSISTANT_PROVIDER: openai
-# AI_ASSISTANT_CONFIG:
-#     model_name: gpt-3.5-turbo
-#     temperature: 0
-AI_ASSISTANT_PROVIDER: ~
+AI_ASSISTANT_PROVIDER: openai
 AI_ASSISTANT_CONFIG:
-    model_name: ~
+    model_name: gpt-3.5-turbo
+    max_retries: 3
+    temperature: 0.2
