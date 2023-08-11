@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.70.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.69.2...0.70.0) (2023-08-11)
+
+
+### Features
+
+* Add analytics ([7a29760](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7a2976096bf34a313003c6717a0001fc82378811))
+* add context logging for AI features (#1277) ([803ae8b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/803ae8ba2ec86fd03b5cd01efb273317c30807d6))
+* add error handling and use EventSource for AI assistant (#1265) ([4d7bb1b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4d7bb1bb89cedda49db5212a53e3fdb54f41f991))
+* add LLM powered text2sql support (#1276) ([8659fb7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8659fb7f3cf9af76a4dff3f08a01fc41c5fcdf21))
+* add query auto fix in AI assistant (#1270) ([6c9b809](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6c9b809ffaa4227c30c9927a86af41209c30b491))
+* adopt data element in text2sql prompt (#1301) ([4cec5c1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4cec5c16bd1a6b60c6459c530ec9f637c1bd8670))
+* data cell + table comments (#1279) ([ccb032c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ccb032cdc97997befdd966ddd3e809236f73a594))
+* Generate query title by using LLM (#1255) ([467e581](https://github.expedia.biz/eg-analytics-platform/querybook/commit/467e58118f7265cc15813212fa4d8508d19d4ad2))
+* Injectable Secrets into the Helm Chart (#1260) ([d7a7ff0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d7a7ff0ae34aca9962feafdc97e355b0555dd62d))
+* pass proxy user to sqlalchemy executor (#1303) ([18e15b7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/18e15b7bc4eec88fa5541d30525dc4766be83e25))
+* tune table search ranking (#1248) ([1d50874](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1d50874a3877f55b18c77a0cc22a88c6ffff7438))
+
+
+### Bug Fixes
+
+* add post processing to ai generated content (#1291) ([148d96b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/148d96b67367a62a6dbbc5de195e80366baaa3b2))
+* delta stream  parser (#1280) ([b4da637](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b4da637d22ec127bd3407818403947afa4f0cc5e))
+* fix warning displaying on wrong table (#146) ([a76c981](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a76c981bcbed52c514fc6d033c1b3f3a425e5801))
+* getting .y from a null value (#1256) ([2c5520a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2c5520a2a9108ad0bdf8aace0877293e55e7c039))
+* IO Exception on closed file (#1237) ([dada0e9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dada0e9c530687e92934c78588bbbcaf6ec8fc80))
+* only handle the query generation keydown event when not streaming (#1287) ([9eb197f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9eb197f4f3fb4ef9f2bd0050bfbcd3672191af1c))
+* query title disappears when opening a datadoc (#1286) ([32baf49](https://github.expedia.biz/eg-analytics-platform/querybook/commit/32baf49af5ae0026dbcad4919ffe59ae54f8bcbf))
+* some small changes of ai assistant (#1290) ([3f61155](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3f61155818c304c0d464414784df4aeb177fdb50))
+* UI Tutorial 8-11 now focuses on page components (#148) ([5d67175](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5d67175bfd270180b1d48cc0f7051dba5acb93c2))
+* undefined result from stream parser (#1281) ([1424995](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1424995e589606100d00d69b68b7b51e8e48e9f3))
+* Update EG custom transpiler functions (#145) ([bd52ac7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bd52ac755e1a0272932cbe8c5081aa5d93a2a95d))
+
 ### [0.69.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.69.1...0.69.2) (2023-08-01)
 
 
