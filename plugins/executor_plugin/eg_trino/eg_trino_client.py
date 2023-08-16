@@ -1,5 +1,6 @@
 import requests
 import trino
+from trino.exceptions import TrinoUserError
 
 from os import environ
 from lib.query_executor.clients.trino import TrinoClient, TrinoCursor
