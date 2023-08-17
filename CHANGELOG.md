@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.70.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.70.0...0.70.1) (2023-08-17)
+
+
+### Bug Fixes
+
+* Add missing import for TrinoUserError on eg_trino_client ([23bc92d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/23bc92d4b125470c6a54a6a22d1cc8ecda3a87d6))
+
 ## [0.70.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.69.2...0.70.0) (2023-08-11)
 
 
