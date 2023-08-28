@@ -50,6 +50,18 @@ show_full_view:
         - disabled
     helper: Instead of modal, show full view when opening table/execution/snippet
 
+rows_in_query_results:
+    default: 20 rows
+    tab: general
+    options:
+        - 5 rows
+        - 10 rows
+        - 20 rows
+        - 25 rows
+        - 50 rows
+        - 100 rows
+    helper: Number of rows displayed by default for query results
+
 editor_font_size:
     default: medium
     tab: editor

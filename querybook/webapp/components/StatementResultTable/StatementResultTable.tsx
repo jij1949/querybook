@@ -89,7 +89,7 @@ interface IStatementResultTableProps {
 export const StatementResultTable = React.forwardRef<
     IStatementResultTableHandles,
     IStatementResultTableProps
->(({ data, paginate, maxNumberOfRowsToShow = 20, isPreview = false }, ref) => {
+>(({ data, paginate, maxNumberOfRowsToShow, isPreview = false }, ref) => {
     const [expandedColumn, toggleExpandedColumn, setExpandedColumn] =
         useExpandedColumn();
 

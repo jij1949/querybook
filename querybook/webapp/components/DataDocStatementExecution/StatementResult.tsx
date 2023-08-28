@@ -29,6 +29,7 @@ import { ShowMoreText } from 'ui/ShowMoreText/ShowMoreText';
 import { AccentText } from 'ui/StyledText/StyledText';
 
 import './StatementResult.scss';
+import { useShallowSelector } from '../../hooks/redux/useShallowSelector';
 
 interface IProps {
     statementResult: IStatementResult;
@@ -140,11 +141,17 @@ const StatementResultWithResult: React.FC<IProps> = ({
             isFetchingStatementResult={isFetchingStatementResult}
         />
     );
+    const rowValue = useShallowSelector(
+        (state: IStoreState) =>
+            state.user.computedSettings.rows_in_query_results
+    );
+    const maxNumberOfRowsToShow = Number(rowValue.split(' ')[0]);
     const visualizationDOM = data.length ? (
         <StatementResultTable
             data={data}
             paginate={!isFullscreen}
             isPreview={!fetchedAllRows}
+            maxNumberOfRowsToShow={maxNumberOfRowsToShow}
             ref={tableRef}
         />
     ) : null;
