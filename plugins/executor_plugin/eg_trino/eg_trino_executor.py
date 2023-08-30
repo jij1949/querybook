@@ -50,7 +50,7 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
     def meta_info(self):
         info = ""
         if self._cursor.tracking_url:
-            info += f"Tracking Url: {self._cursor.tracking_url}\n"
+            info += f"Trino Tracking Url: {self._cursor.tracking_url}\n"
         if self.warning != "":
             info += (
                 '<Message type="warning" title="Warning">'
