@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.71.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.71.0...0.71.1) (2023-08-30)
+
+
+### Bug Fixes
+
+* Migrate to new Nodesource repository ([a209479](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a209479886f4fdc29ab788541549668a3187b157))
+
 ## [0.71.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.70.1...0.71.0) (2023-08-30)
 
 
