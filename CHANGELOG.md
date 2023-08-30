@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.71.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.70.1...0.71.0) (2023-08-30)
+
+
+### Features
+
+* added ability to select number of default rows displayed in query results for adhoc queries and datadoc queries ([86bbce5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/86bbce54450bd1a3d09d235b302285c911385949))
+
 ### [0.70.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.70.0...0.70.1) (2023-08-17)
 
 
