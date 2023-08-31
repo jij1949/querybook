@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.71.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.71.2...0.71.3) (2023-08-31)
+
+
+### Bug Fixes
+
+* Add Analytics Bootcamp's Querybook 101 link ([e48e7a4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e48e7a46491b4942915152fec69da8ef8977f498))
+
 ### [0.71.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.71.1...0.71.2) (2023-08-31)
 
 
