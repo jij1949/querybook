@@ -114,6 +114,14 @@ const DefaultLanding: React.FC = ({ children }) => {
                         </div>
                         <div>
                             <Link
+                                to="https://pages.github.expedia.biz/analytics-learning/analytics-bootcamp/docs/Querybook/querybook"
+                                newTab={true}
+                            >
+                                Querybook 101 in Analytics Bootcamp 🎓
+                            </Link>
+                        </div>
+                        <div>
+                            <Link
                                 to="https://analytics.expedia.biz/trino"
                                 newTab={true}
                             >
