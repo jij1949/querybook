@@ -62,7 +62,9 @@ class TrinoClient(ClientBaseClass):
         host = trino_conf.host
         port = 8080 if not trino_conf.port else trino_conf.port
 
-        auth = trino.auth.BasicAuthentication(username, password)
+        auth = trino.constants.DEFAULT_AUTH
+        if username is not None and password is not None:
+            auth = trino.auth.BasicAuthentication(username, password)
 
         connection = trino.dbapi.connect(
             host=host,
