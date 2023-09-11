@@ -59,27 +59,3 @@ class DataElementAssociationTuple(NamedTuple):
     key_data_element: Optional[Union[DataElementTuple, str]] = None
     # for map association, key can either be a data element or a primitive type, e.g. i32
     key_primitive_type: Optional[str] = None
-
-
-class DataElementMap:
-    def __init__(self):
-        self.data_elements = dict()
-
-        self.data_elements["name"] = DataElementTuple(
-            name="Name",
-            type="String",
-            description="",
-        )
-        self.data_elements["email"] = DataElementTuple(
-            name="Email",
-            type="String",
-            description="Email address of the form [address]@[domain].[tld]",
-        )
-        self.data_elements["address"] = DataElementTuple(
-            name="Address",
-            type="String",
-            description="Email address of the form [address]@[domain].[tld]",
-        )
-
-    def get_de_tuple(self, key):
-        return self.data_elements[key]

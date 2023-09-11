@@ -14,7 +14,15 @@ from lib.utils import json as ujson
 
 from const.metastore import DataTag, MetastoreLoaderConfig, MetadataType, MetadataMode
 
-from const.data_element import DataElementAssociationTuple, DataElementTuple, DataElementAssociationType, DataElementMap
+from metastore_plugin.eg_hive_metastore.data_elements import (
+    data_elements,
+    find_data_element,
+)
+
+from const.data_element import (
+    DataElementAssociationTuple,
+    DataElementAssociationType,
+)
 
 LOG = get_logger(__file__)
 
@@ -100,36 +108,62 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         new_columns = columns
 
         if any(p.startswith("eg-sensitivity.") for p in parameters):
+
+            # Map of eg-sensitivity tags: eg-sensitivity.<column_name> = <sensitivity_tag>
+            # Map contains <column_name in lower-case>: <sensitivity_tag> pairs
+            sensitivity_tags = {
+                key.lower().replace("eg-sensitivity.", ""): value.lower()
+                for key, value in parameters.items()
+                if key.lower().startswith("eg-sensitivity.")
+            }
+
             table = table._replace(
-                tags=table.tags + [
+                tags=table.tags
+                + [
                     DataTag(
-                        name="Sensitivity", description="This table contains sensitivity tags"
+                        name="Sensitivity",
+                        description="This table contains sensitivity tags",
+                        color="#85d0ce",
                     )
                 ]
             )
 
             new_columns = [
                 (
-                    apply_sensitivity_tag_and_data_element(col)
-                    if parameters.get("eg-sensitivity." + col.name)
+                    apply_sensitivity_tag_and_data_element(
+                        col, sensitivity_tags[col.name.lower()]
+                    )
+                    if col.name.lower() in sensitivity_tags
                     else col
-                ) for col in columns
+                )
+                for col in columns
             ]
 
         return table, new_columns
 
 
-def apply_sensitivity_tag_and_data_element(col):
+def apply_sensitivity_tag_and_data_element(col, value):
+    """
+    Apply the sensitivity tag and optional data element to the column
+    @param col: The column to apply the sensitivity tag and data element to
+    @param value: The value of the sensitivity tag
+    @return: The column with the sensitivity tag and optional data element applied
+    """
+
+    # Always add the sensitivity tag with the value in lower-case
     col = col._replace(
-        tags=col.tags + [
-            DataTag(
-                name=col.name, type="Sensitivity"
-            )
-        ],
-        data_element=DataElementAssociationTuple(
-            type=DataElementAssociationType.REF,
-            value_data_element=DataElementMap.get_de_tuple(col.name.lower())
-        )
+        tags=col.tags + [DataTag(name=value.lower(), type="Sensitivity")],
     )
+
+    # Look for a data element by sensitivity tag value
+    # Not all sensitivity tags will match a data element, usually because the tag is incorrect
+    data_element = find_data_element(value)
+    if data_element is not None:
+        col = col._replace(
+            data_element=DataElementAssociationTuple(
+                type=DataElementAssociationType.REF,
+                value_data_element=data_element,
+            ),
+        )
 
     return col
