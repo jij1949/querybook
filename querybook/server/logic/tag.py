@@ -113,8 +113,10 @@ def create_table_tags(
     session=None,
 ):
     """This function is used for loading table tags from metastore."""
-    # delete all tags from the table
-    session.query(TagItem).filter_by(table_id=table_id).delete()
+    # ~delete all tags from the table~
+    # EG-specific change: don't delete tags that are associated with a user
+    # This allows us to support both user-provided tags as well as tags from the metastore
+    session.query(TagItem).filter_by(table_id=table_id, uid=None).delete()
 
     for tag in tags:
         tag_color_name = (

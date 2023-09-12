@@ -226,13 +226,8 @@ export const DataTableHeader: React.FunctionComponent<IDataTableHeader> = ({
             >
                 Tags
             </AccentText>
-            <DataTableTags
-                tableId={table.id}
-                readonly={
-                    metastore.config[MetadataType.TAG] !==
-                    MetadataMode.WRITE_LOCAL
-                }
-            />
+            {/* EG-specific change: Always allow editing tags, even when syncing from metastore */}
+            <DataTableTags tableId={table.id} readonly={false} />
         </div>
     );
 
