@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.72.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.71.3...0.72.0) (2023-09-13)
+
+
+### Features
+
+* added sensitivity tags in metadata sync ([a277b3d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a277b3d306003725d83479a6c3ae479407cac04c))
+* Enable and configure AI Assistant ([50ad6a1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/50ad6a131e07eef41a00a9f2f88ab8dca0f00069))
+* load table warnings from metastore (#1317) ([b39d358](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b39d35811a96c961091d5a6836514355bb3e3601))
+
+
+### Bug Fixes
+
+* Allow Metastore tag sync and user-managed tags ([5850aff](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5850afff22ba70c83e24f5c2f2b836f7f55a4d98))
+* Board Ownership Transfer did not reassign owner (#1299) ([47ca744](https://github.expedia.biz/eg-analytics-platform/querybook/commit/47ca7448cda2bc197dd722f457582e453677935d))
+* Case-insensitive tagging and expanded list of data elements ([e2f0ecd](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e2f0ecd4abaa1a6a53e90b5120c412f95e025828))
+* fix warning displaying on wrong table (#1307) ([21ea259](https://github.expedia.biz/eg-analytics-platform/querybook/commit/21ea2594e431113cf597a66d66bea8030c779db7))
+* init_es.py script not completing due to TypeError (#1309) ([2625209](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2625209d700c1e887b6e0e2eefac8d2658a42947))
+* Migrate to new Nodesource repository (#1318) ([f770e80](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f770e807fe43d8f98a7e0ea8bd62980842ecaad7))
+* UI Tutorial 8-11 now focuses on page components (#148) (#1310) ([416f48a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/416f48a0e3b2f6d3437cdd523f7194c72ca01043))
+
 ### [0.71.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.71.2...0.71.3) (2023-08-31)
 
 
