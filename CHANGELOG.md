@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.72.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.72.0...0.72.1) (2023-09-14)
+
+
+### Bug Fixes
+
+* added new format list to display show create results on separate lines (#157) ([60ad49b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/60ad49b0d8261a170a729fa3bb5b16f4bd61d7ab))
+
 ## [0.72.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.71.3...0.72.0) (2023-09-13)
 
 
