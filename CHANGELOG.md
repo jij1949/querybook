@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.72.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.72.1...0.72.2) (2023-09-14)
+
+
+### Bug Fixes
+
+* Load OPENAI_API_KEY/BASE from config to environment variable ([0573e10](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0573e1000d47d85e54a1bc8a9e4f2590121a6c2f))
+
 ### [0.72.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.72.0...0.72.1) (2023-09-14)
 
 
