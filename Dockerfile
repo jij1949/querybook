@@ -8,7 +8,7 @@ ARG EXTRA_PIP_INSTALLS=""
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     ca-certificates \
-    curl gnupg nano openssl telnet dnsutils \
+    curl gnupg jq nano openssl telnet dnsutils \
     && rm -rf /var/lib/apt/lists/*
 COPY certs/* /usr/local/share/ca-certificates/
 RUN update-ca-certificates
@@ -77,3 +77,5 @@ RUN if [ "${PRODUCTION}" = "true" ] ; then ./node_modules/.bin/webpack --mode=pr
 ENV QUERYBOOK_PLUGIN=/opt/querybook/plugins
 ENV PYTHONPATH=/opt/querybook/querybook/server:/opt/querybook/plugins
 ENV production=${PRODUCTION}
+
+ENTRYPOINT ["/opt/querybook/containers/start-with-vault.sh"]
