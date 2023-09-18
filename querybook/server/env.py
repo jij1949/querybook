@@ -6,7 +6,6 @@ from lib.config import get_config_value
 
 
 in_test = hasattr(sys, "_called_from_test")
-additional_config = get_config_value("additional", {})
 querybook_config = get_config_value("querybook_config", {})
 querybook_default_config = get_config_value("querybook_default_config", {})
 
@@ -21,8 +20,6 @@ def get_env_config(name, optional=True):
 
     if name in os.environ:
         val = os.environ.get(name)
-    elif name in additional_config:
-        val = additional_config.get(name)
     elif name in querybook_config:
         val = querybook_config.get(name)
     elif name in querybook_default_config:
@@ -44,8 +41,6 @@ class QuerybookSettings(object):
     PUBLIC_URL = get_env_config("PUBLIC_URL")
     FLASK_SECRET_KEY = get_env_config("FLASK_SECRET_KEY", optional=False)
     FLASK_CACHE_CONFIG = json.loads(get_env_config("FLASK_CACHE_CONFIG"))
-    ADDITIONAL_CONFIG_FILE = get_env_config("ADDITIONAL_CONFIG_FILE")
-
     # Celery
     REDIS_URL = get_env_config("REDIS_URL", optional=False)
 
