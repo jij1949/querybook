@@ -15,13 +15,15 @@ class EGStarburstClient(EGTrinoClient):
         username=None,
         password=None,
         proxy_user=None,
+        execution_type=None,
+        query_execution_id=None,
         *args,
         **kwargs,
     ):
         self._username = username
         self._password = password
         super(EGStarburstClient, self).__init__(
-            connection_string, username, password, proxy_user, args, kwargs
+            connection_string, username, password, proxy_user, execution_type, query_execution_id, args, kwargs
         )
 
     def cursor(self):

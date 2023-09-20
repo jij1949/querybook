@@ -15,6 +15,8 @@ class EGTrinoClient(TrinoClient):
         username=None,
         password=None,
         proxy_user=None,
+        execution_type=None,
+        query_execution_id=None,
         *args,
         **kwargs,
     ):
@@ -36,6 +38,8 @@ class EGTrinoClient(TrinoClient):
             auth=auth,
             user=proxy_user if proxy_user else username,
             http_scheme=trino_conf.protocol,
+            client_tags=[execution_type],
+            http_headers={"X-Trino-Trace-Token": "querybookExecutionId:" + str(query_execution_id)},
             source="querybook",
         )
         self._connection = connection

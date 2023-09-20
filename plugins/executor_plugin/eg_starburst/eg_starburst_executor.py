@@ -22,6 +22,8 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
         )
         self._warning = ""
         self._json_csv_warning_checked = False
+        self._client_setting = client_setting | \
+                               {'execution_type': execution_type, 'query_execution_id': query_execution_id}
 
     @classmethod
     def _get_client(cls, client_setting):
@@ -48,4 +50,5 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
                 + "</Message>\n"
             )
             info += "---\nforce_show: true\n---"
+
         return info
