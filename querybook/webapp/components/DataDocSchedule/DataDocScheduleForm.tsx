@@ -159,7 +159,7 @@ export const DataDocScheduleForm: React.FunctionComponent<
                       max_retries: 2,
                       delay_sec: 60,
                   },
-                  disable_if_running_doc: true,
+                  disable_if_running_doc: false,
               },
           }
         : {
