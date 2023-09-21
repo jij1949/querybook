@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.73.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.73.0...0.73.1) (2023-09-21)
+
+
+### Bug Fixes
+
+* Fix lazy-loaded DataDoc cells ([856b4be](https://github.expedia.biz/eg-analytics-platform/querybook/commit/856b4be7747a3e0845a1f1bd93e851a03bdd6a6c))
+
 ## [0.73.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.72.2...0.73.0) (2023-09-21)
 
 
