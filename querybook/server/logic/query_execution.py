@@ -488,11 +488,17 @@ def get_active_celery_query_executions():
 
 @with_session
 def clean_up_query_execution(dry_run=False, session=None):
+
+    LOG.info("Cleaning up query executions")
+
     now = datetime.now()
     should_commit = False
 
     active_query_executions = get_active_query_executions(session=session)
     active_celery_task_ids = get_active_celery_query_executions()
+
+    LOG.info(f"Found {len(active_query_executions)} active query executions")
+    LOG.info(f"Found {len(active_celery_task_ids)} active celery tasks")
 
     for query_execution in active_query_executions:
         # We skip looking at query executions that are too young
@@ -532,6 +538,8 @@ def clean_up_query_execution(dry_run=False, session=None):
                     LOG.info("Updating statement: {}".format(statement_execution.id))
     if should_commit and not dry_run:
         session.commit()
+
+    LOG.info("Finished cleaning up query executions")
 
 
 """

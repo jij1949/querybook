@@ -51,9 +51,9 @@ def configure_workers(sender=None, conf=None, **kwargs):
     if QuerybookSettings.PRODUCTION:
         LOG.info(f"Starting PROD Celery worker: {sender}")
 
-        from logic.query_execution import clean_up_query_execution
+        # from logic.query_execution import clean_up_query_execution
 
-        clean_up_query_execution()
+        # clean_up_query_execution()
     else:
         LOG.info(f"Starting DEV Celery worker: {sender}")
 

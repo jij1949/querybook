@@ -3,3 +3,4 @@
 
 from tasks_plugin.sync_ldap_task import sync_ldap_task
 from tasks_plugin.sync_ldap_user_task import sync_ldap_user_task
+from tasks_plugin.clean_up_query_execution_task import clean_up_query_execution_task
