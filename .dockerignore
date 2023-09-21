@@ -1,3 +1,14 @@
+# EG additions
+.dockerignore
+.env*
+.gitignore
+.github
+.pytest_cache
+.storybook
+.vscode
+helm
+k8s
+
 # ignore .git change history.
 .git
 
