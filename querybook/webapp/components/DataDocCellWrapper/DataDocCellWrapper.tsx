@@ -29,9 +29,9 @@ export const DataDocCellWrapper: React.FunctionComponent<IProps> = ({
             // The height is just a placeholder
             // we use the minimum height of a cell
             // to estimate
+            scrollContainer=".EnvironmentAppRouter-content"
             height={placeholderHeight}
             offset={300}
-            overflow
             placeholder={<Loading height={placeholderHeight} />}
             throttle={500}
         >
