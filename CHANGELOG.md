@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.73.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.72.2...0.73.0) (2023-09-21)
+
+
+### Features
+
+* Add query execution id and execution type to trino query tags (#161) ([620d02b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/620d02bc1ff6e6f5eb5e296ac70937b6ea73cf08))
+* Disable Prevent Overlapping Runs by default for new schedules ([184cb52](https://github.expedia.biz/eg-analytics-platform/querybook/commit/184cb52f06c1e3ec54e501468237eff21d656084))
+
+
+### Bug Fixes
+
+* Fix DataDoc contents overflow in non-Chrome browsers ([9e09128](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9e091280119f4a7008866fea5780092789be5ea7))
+* Initialize environment variables from Vault ([56a5e25](https://github.expedia.biz/eg-analytics-platform/querybook/commit/56a5e25fa1cd201cb8fda3d16d06bbb91a41099e))
+* Revert "feat: Add additional config file" ([7e9558b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7e9558b77ef941c14675ce586e0abb0f1dc8dcb7))
+
 ### [0.72.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.72.1...0.72.2) (2023-09-14)
 
 
