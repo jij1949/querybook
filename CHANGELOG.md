@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.74.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.73.1...0.74.0) (2023-09-22)
+
+
+### Features
+
+* Disable clean_up_query_execution on worker start, move to task ([4783c30](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4783c300f3084fed6c16c31f1e9b2fe63f226bc3))
+
 ### [0.73.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.73.0...0.73.1) (2023-09-21)
 
 
