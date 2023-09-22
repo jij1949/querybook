@@ -505,6 +505,30 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
     }
 
     @bind
+    public getDisabledIconDOM(collapsed = false) {
+        const iconDOM = (
+            <Icon
+                name="EyeOff"
+                color="accent"
+                {...(collapsed ? { className: 'mr8' } : {})}
+            />
+        );
+
+        if (collapsed) {
+            return iconDOM;
+        } else {
+            return (
+                <span
+                    data-balloon-pos="right"
+                    aria-label="Cell is disabled and will not run automatically"
+                >
+                    {iconDOM}
+                </span>
+            );
+        }
+    }
+
+    @bind
     public getAdditionalDropDownButtonDOM() {
         const { isEditable, queryEngines, queryTranspilers } = this.props;
         const queryEngine = this.queryEngine;
@@ -686,13 +710,13 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
 
         return (
             <div className="query-metadata">
-                <div className="query-title">
+                <div className="query-title-container">
+                    {disabled && this.getDisabledIconDOM()}
                     <AccentText
-                        className="query-title-contents"
+                        className="query-title"
                         weight="bold"
                         size="large"
                     >
-                        {disabled && '[Disabled] '}
                         {queryTitleDOM}
                     </AccentText>
                 </div>
@@ -922,9 +946,9 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
         return showCollapsed ? (
             <div className={classes}>
                 <div className="collapsed-query flex-row">
+                    {this.state.meta.disabled && this.getDisabledIconDOM(true)}
                     <Icon name="Terminal" className="mt4 mr8" />
                     <AccentText className="one-line-ellipsis pr16">
-                        {this.state.meta.disabled && <span>[Disabled]</span>}{' '}
                         {this.dataCellTitle}
                     </AccentText>
                 </div>

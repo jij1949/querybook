@@ -64,17 +64,19 @@
         font-weight: var(--bold-font);
     }
 
+    .query-title-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+
     .query-title {
         flex: 1;
     }
 
-    .query-title-contents {
-        display: inline-flex;
-        align-items: baseline;
-    }
-
     .query-metadata {
         display: flex;
+        align-items: center;
 
         .query-controls {
             align-self: flex-end;
