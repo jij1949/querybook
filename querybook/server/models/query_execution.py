@@ -25,7 +25,9 @@ class QueryExecution(Base):
     id = sql.Column(sql.Integer, primary_key=True)
     task_id = sql.Column(sql.String(length=name_length))
     status = sql.Column(
-        sql.Enum(QueryExecutionStatus), default=QueryExecutionStatus.INITIALIZED
+        sql.Enum(QueryExecutionStatus),
+        default=QueryExecutionStatus.INITIALIZED,
+        index=True,
     )
 
     created_at = sql.Column(sql.DateTime, default=now)
