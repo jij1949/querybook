@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.75.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.74.0...0.75.0) (2023-09-26)
+
+
+### Features
+
+* Add index on query_execution.status column ([bac411f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bac411f0b09e46f571914eba9fbcc2bb07e4ce37))
+
+
+### Bug Fixes
+
+* Container query to wrap DataDoc cell header at small sizes ([2cae969](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2cae969bac1ffd794527436e49068daaf370843c))
+* Revisit disabled DataDoc cells, fix cell title scrunch ([31d7049](https://github.expedia.biz/eg-analytics-platform/querybook/commit/31d7049c2790906f64d6b26f144a2f381aa0a349))
+
 ## [0.74.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.73.1...0.74.0) (2023-09-22)
 
 
