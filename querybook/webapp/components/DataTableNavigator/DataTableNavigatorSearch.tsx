@@ -74,8 +74,11 @@ export const DataTableNavigatorSearch: React.FC<{
     );
 
     const dispatch = useDispatch();
-    const queryMetastoreHasDataElements =
-        !!queryMetastore.flags?.has_data_element;
+
+    // Hardcoding to true to always show data elements filter
+    // Since Data Elements are stored per-metastore, the default behavior doesn't work
+    // if the same Data Elements are used across metastores
+    const queryMetastoreHasDataElements = true; // !!queryMetastore.flags?.has_data_element;
 
     const searchFiltersPickerDOM = showSearchFilter && (
         <Popover
