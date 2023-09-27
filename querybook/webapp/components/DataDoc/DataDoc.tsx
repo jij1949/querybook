@@ -409,11 +409,11 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
         });
         const cellId = this.props.dataDoc.cells[index];
         const currCell = this.props.dataDoc.dataDocCells[index];
-        if(currCell.cell_type === 'query') {
+        if (currCell.cell_type === 'query') {
             const fields = {
                 context: currCell.context,
-                meta: {...currCell.meta, disabled: true}
-            }
+                meta: { ...currCell.meta, disabled: true },
+            };
             await this.updateCell(cellId, fields);
         }
     }
@@ -426,14 +426,13 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
         });
         const cellId = this.props.dataDoc.cells[index];
         const currCell = this.props.dataDoc.dataDocCells[index];
-        if(currCell.cell_type === 'query') {
+        if (currCell.cell_type === 'query') {
             const fields = {
                 context: currCell.context,
-                meta: {...currCell.meta, disabled: false}
-            }
+                meta: { ...currCell.meta, disabled: false },
+            };
             await this.updateCell(cellId, fields);
         }
-
     }
 
     @bind
@@ -708,6 +707,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                     queryIndexInDoc={queryIndexInDoc}
                     lastQueryCellId={lastQueryCellId}
                     isFocused={focusedCellIndex === index}
+                    isScheduled={dataDoc.scheduled}
                 />
             );
         }

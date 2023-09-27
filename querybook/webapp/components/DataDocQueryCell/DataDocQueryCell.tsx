@@ -34,7 +34,10 @@ import {
     getSelectedQuery,
     IRange,
 } from 'lib/sql-helper/sql-lexer';
-import { DEFAULT_ROW_LIMIT } from 'lib/sql-helper/sql-limiter';
+import {
+    DEFAULT_ROW_LIMIT,
+    hasQueryContainUnlimitedSelect,
+} from 'lib/sql-helper/sql-limiter';
 import { getPossibleTranspilers } from 'lib/templated-query/transpile';
 import { enableResizable } from 'lib/utils';
 import { getShortcutSymbols, KeyMap, matchKeyPress } from 'lib/utils/keyboard';
@@ -93,6 +96,8 @@ interface IOwnProps {
     onUpKeyPressed?: () => any;
     onDownKeyPressed?: () => any;
     toggleFullScreen: () => any;
+
+    isScheduled: boolean;
 }
 type IProps = IOwnProps & StateProps & DispatchProps;
 
@@ -112,6 +117,8 @@ interface IState {
         toEngine: IQueryEngine;
         transpilerName: string;
     };
+
+    isScheduled: boolean;
 }
 
 class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
@@ -131,6 +138,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             showRenderedTemplateModal: false,
             showUDFModal: false,
             hasLintError: false,
+            isScheduled: props.isScheduled,
         };
     }
 
@@ -529,6 +537,43 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
     }
 
     @bind
+    public getUnlimitedIconDOM() {
+        const { isEditable, isScheduled, meta, query, showCollapsed } =
+            this.props;
+        const disabled = meta?.disabled ?? false;
+
+        if (
+            !isScheduled ||
+            disabled ||
+            !isEditable ||
+            !hasQueryContainUnlimitedSelect(query)
+        ) {
+            return null;
+        }
+
+        const iconDOM = (
+            <Icon
+                name="AlertTriangle"
+                color="warning"
+                {...(showCollapsed ? { className: 'mr8' } : {})}
+            />
+        );
+
+        if (showCollapsed) {
+            return iconDOM;
+        } else {
+            return (
+                <span
+                    data-balloon-pos="right"
+                    aria-label="Cell contains SELECT statement without LIMIT"
+                >
+                    {iconDOM}
+                </span>
+            );
+        }
+    }
+
+    @bind
     public getAdditionalDropDownButtonDOM() {
         const { isEditable, queryEngines, queryTranspilers } = this.props;
         const queryEngine = this.queryEngine;
@@ -712,6 +757,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             <div className="query-metadata">
                 <div className="query-title-container">
                     {disabled && this.getDisabledIconDOM()}
+                    {this.getUnlimitedIconDOM()}
                     <AccentText
                         className="query-title"
                         weight="bold"
@@ -947,6 +993,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             <div className={classes}>
                 <div className="collapsed-query flex-row">
                     {this.state.meta.disabled && this.getDisabledIconDOM(true)}
+                    {this.getUnlimitedIconDOM()}
                     <Icon name="Terminal" className="mt4 mr8" />
                     <AccentText className="one-line-ellipsis pr16">
                         {this.dataCellTitle}
