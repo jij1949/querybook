@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.76.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.75.0...0.76.0) (2023-09-27)
+
+
+### Features
+
+* added warning at top of doc and at each cell with select statement and no limit (#160) ([68f44de](https://github.expedia.biz/eg-analytics-platform/querybook/commit/68f44ded926f214ab72d21015061bd7fa622e8f0))
+
+
+### Bug Fixes
+
+* Always show data elements in table filters ([7f3fd14](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7f3fd14305135f2582e322d0d834347da685e283))
+
 ## [0.75.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.74.0...0.75.0) (2023-09-26)
 
 
