@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.76.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.1...0.76.2) (2023-09-28)
+
+
+### Bug Fixes
+
+* Fix optional Trino client tagging ([3ed0b30](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3ed0b30d71b02718ad6dcd90a3c5c5c9e174a975))
+
 ### [0.76.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.0...0.76.1) (2023-09-28)
 
 
