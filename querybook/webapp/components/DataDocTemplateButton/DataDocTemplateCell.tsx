@@ -7,23 +7,10 @@ import { AccentText } from 'ui/StyledText/StyledText';
 
 import { DataDocTemplateInfoButton } from './DataDocTemplateInfoButton';
 
-import './WarningBanner.scss';
-import { Icon } from 'ui/Icon/Icon';
-import { hasQueryContainUnlimitedSelect } from '../../lib/sql-helper/sql-limiter';
-
 interface IProps {
     changeDataDocMeta: (docId: number, meta: IDataDocMeta) => Promise<void>;
     dataDoc: IDataDoc;
     isEditable?: boolean;
-}
-
-function checkCellsForSelectWithoutLimit(cells) {
-    for (const cell of cells) {
-        if (hasQueryContainUnlimitedSelect(cells[0].context) !== undefined) {
-            return true;
-        }
-    }
-    return false;
 }
 
 export const DataDocTemplateCell: React.FunctionComponent<IProps> = ({
@@ -61,14 +48,6 @@ export const DataDocTemplateCell: React.FunctionComponent<IProps> = ({
     } else {
         contentDOM = (
             <>
-                {checkCellsForSelectWithoutLimit(dataDoc.dataDocCells) ? (
-                    <div className="banner">
-                        This doc contains query cells with <code>select</code>{' '}
-                        but no <code>limit</code>, denoted by{' '}
-                        <Icon name="AlertTriangle" />. This affects scheduled or
-                        multi-cell executions.
-                    </div>
-                ) : null}
                 <div className=" flex-row ph8">
                     <AccentText
                         className="mr12"
