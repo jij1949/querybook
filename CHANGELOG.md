@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.76.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.0...0.76.1) (2023-09-28)
+
+
+### Bug Fixes
+
+* Add OpenAINoStreamAssistant to workaround GenAI Proxy limitation ([d79ff69](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d79ff692fcc58bc03eed76cc428a7821590a8018))
+* removing old code from merge issue (#169) ([0c5d737](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0c5d73756487cf35e40880775c8be5c4e10a8252))
+
 ## [0.76.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.75.0...0.76.0) (2023-09-27)
 
 
