@@ -27,6 +27,10 @@ export function getSelectStatementLimit(
     const tokens = tokenize(statement, { language });
     const parsedStatement = simpleParse(tokens)[0];
 
+    if (parsedStatement == null) {
+        return 0;
+    }
+
     // Strip nested statements out of the query
     const outerStatement: IToken[] = [];
 
@@ -117,7 +121,11 @@ export function getLimitedQuery(
     const updatedQuery = statements
         .map((statement) => {
             const existingLimit = getSelectStatementLimit(statement, language);
-            if (existingLimit == null || existingLimit >= 0 || existingLimit === -2) {
+            if (
+                existingLimit == null ||
+                existingLimit >= 0 ||
+                existingLimit === -2
+            ) {
                 return statement + ';';
             }
 
