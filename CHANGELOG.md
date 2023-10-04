@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.76.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.2...0.76.3) (2023-10-04)
+
+
+### Bug Fixes
+
+* fixed bug where datadoc page would go blank if template blocks were used in query cells (#172) ([0211d24](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0211d240a85e499318d0f1ee5790fe539dd6ffdf))
+* Update worker startup script ([2f3b206](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2f3b2064048f331421288d6104cbf11a5c5f4e50))
+
 ### [0.76.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.1...0.76.2) (2023-09-28)
 
 
