@@ -10,7 +10,7 @@ import { useResource } from 'hooks/useResource';
 import { Nullable } from 'lib/typescript';
 import { parseType } from 'lib/utils/complex-types';
 import { TableColumnResource } from 'resource/table';
-import { Icon } from "../../ui/Icon/Icon";
+import { Icon } from '../../ui/Icon/Icon';
 import { Card } from 'ui/Card/Card';
 import { EditableTextField } from 'ui/EditableTextField/EditableTextField';
 import { KeyContentDisplay } from 'ui/KeyContentDisplay/KeyContentDisplay';
@@ -57,7 +57,7 @@ export const DataTableColumnCard: React.FunctionComponent<IProps> = ({
                 )}
             <EditableTextField
                 value={column.description as ContentState}
-                readonly={true}
+                readonly={false}
                 onSave={updateDataColumnDescription.bind(null, column.id)}
                 placeholder="add column description"
                 onEditRedirect={onEditColumnDescriptionRedirect}
@@ -69,7 +69,8 @@ export const DataTableColumnCard: React.FunctionComponent<IProps> = ({
             <Card key={column.id} alignLeft>
                 <div className="DataTableColumnCard-header">
                     <AccentText weight="extra" className="column-name">
-                        {column.name} {isPartitionKey && <Icon name={"Key"} size={16}/>}
+                        {column.name}{' '}
+                        {isPartitionKey && <Icon name={'Key'} size={16} />}
                     </AccentText>
                     <StyledText color="light" className="column-type">
                         {column.type}
