@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.76.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.3...0.76.4) (2023-10-09)
+
+
+### Bug Fixes
+
+* change column descriptions to readonly=false and write_back (#174) ([5766659](https://github.expedia.biz/eg-analytics-platform/querybook/commit/57666595f81919691f82b67192ecb4a670c98c3e))
+
 ### [0.76.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.2...0.76.3) (2023-10-04)
 
 
