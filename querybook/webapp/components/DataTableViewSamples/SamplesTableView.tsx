@@ -6,12 +6,13 @@ import { downloadString } from 'lib/utils';
 import { tableToCSV, tableToTSV } from 'lib/utils/table-export';
 import { TextButton } from 'ui/Button/Button';
 import { CopyButton } from 'ui/CopyButton/CopyButton';
+import { useShallowSelector } from '../../hooks/redux/useShallowSelector';
+import { IStoreState } from '../../redux/store/types';
 
 export const SamplesTableView: React.FunctionComponent<{
     samples: IDataTableSamples;
     tableName: string;
-    numberOfRows?: number;
-}> = ({ samples, numberOfRows, tableName }) => {
+}> = ({ samples, tableName }) => {
     const processedData: string[][] = useMemo(
         () =>
             samples?.value.map((row) =>
@@ -27,11 +28,18 @@ export const SamplesTableView: React.FunctionComponent<{
         [samples?.value]
     );
 
+    const rowValue = useShallowSelector(
+        (state: IStoreState) =>
+            state.user.computedSettings.rows_in_query_results
+    );
+
+    const maxNumberOfRowsToShow = Number(rowValue.split(' ')[0]);
+
     const tableDOM = (
         <StatementResultTable
             data={processedData}
             paginate={true}
-            maxNumberOfRowsToShow={numberOfRows}
+            maxNumberOfRowsToShow={maxNumberOfRowsToShow}
         />
     );
 
