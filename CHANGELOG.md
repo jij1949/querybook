@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.77.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.4...0.77.0) (2023-10-23)
+
+
+### Features
+
+* Load managed database credentials ([d60bfa4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d60bfa4afbb21785913b0abe883f9260d78d05a6))
+
+
+### Bug Fixes
+
+* Add scroll bar to Query Engine Status popover ([2e64017](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2e64017345368627ea8be5c3ff4bcc4f492f6f3f))
+* Change prod_worker's celery log level to INFO (from default WARN) ([581f3ca](https://github.expedia.biz/eg-analytics-platform/querybook/commit/581f3ca3b076d6b0923cd8510e23e343c853b972))
+* GenerateSample not displaying fixed (#177) ([2fdd587](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2fdd587b83014dca2cc2e0c22dd3d99afc7e43be))
+
 ### [0.76.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.3...0.76.4) (2023-10-09)
 
 
