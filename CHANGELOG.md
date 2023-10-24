@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.77.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.77.0...0.77.1) (2023-10-24)
+
+
+### Bug Fixes
+
+* Remove DataDoc container query to fix z-index problems ([f65e4aa](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f65e4aa5e25a3ebfd65356b53bb6b0aa13c4e97b))
+
 ## [0.77.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.76.4...0.77.0) (2023-10-23)
 
 
