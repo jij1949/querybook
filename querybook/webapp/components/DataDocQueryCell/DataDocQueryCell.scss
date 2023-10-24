@@ -1,9 +1,6 @@
 @import './../../scss_variables.scss';
 
 .DataDocQueryCell {
-    container-name: datadoc-query-cell;
-    container-type: inline-size;
-
     &.fullScreen {
         @include full-screen(39);
         margin: 0;
@@ -63,14 +60,9 @@
     }
 
     .disabled-query {
-        font-size: var(--med-text-size);
-        font-weight: var(--bold-font);
-    }
-
-    .query-title-container {
-        flex: 1;
-        display: flex;
-        align-items: center;
+        .QueryEditor {
+            opacity: 0.5;
+        }
     }
 
     .query-title {
@@ -80,6 +72,14 @@
     .query-metadata {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+
+        .query-title-container {
+            flex: 1 1 65%;
+            display: flex;
+            align-items: center;
+        }
 
         .query-controls {
             align-self: flex-end;
@@ -159,23 +159,4 @@
             white-space: nowrap;
         }
     }
-
-    @container datadoc-query-cell (max-width: 65em) {
-        .query-metadata {
-           flex-direction: column;
-           align-items: stretch;
-        }
-    }
-    @container datadoc-query-cell (min-width: 65em) {
-        .query-controls {
-            max-width: 50%;
-            align-items: flex-end;
-            height: unset !important;
-        }
-        .QueryRunButton {
-            flex-wrap: wrap;
-            row-gap: 8px;
-            justify-content: flex-end;
-        }
-      }
 }
