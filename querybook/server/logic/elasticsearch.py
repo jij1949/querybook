@@ -721,6 +721,9 @@ def _bulk_insert_users():
     index_name = ES_CONFIG["users"]["index_name"]
 
     for user in get_users_iter():
+        if user.properties.get("auto", False):
+            # Skip auto users
+            continue
         # skip indexing user groups before having the correct permission setup for it.
         if not user.is_group:
             expanded_user = user_to_es(user, fields=None)
@@ -731,6 +734,10 @@ def _bulk_update_users(fields: Set[str] = None):
     index_name = ES_CONFIG["users"]["index_name"]
 
     for user in get_users_iter():
+        if user.properties.get("auto", False):
+            # Skip auto users
+            continue
+
         expanded_user = user_to_es(user, fields=fields)
         updated_body = {"doc": expanded_user, "doc_as_upsert": True}
         _update(index_name, expanded_user["id"], updated_body)

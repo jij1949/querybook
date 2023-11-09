@@ -5,7 +5,7 @@ from const.elasticsearch import ElasticsearchItem
 from const.metastore import DataOwner, DataTableWarningSeverity
 from lib.logger import get_logger
 from lib.sqlalchemy import update_model_fields
-from logic.user import get_user_by_name
+from logic.user import create_user, get_user_by_name
 from models.admin import QueryEngineEnvironment
 from models.metastore import (
     DataJobMetadata,
@@ -444,10 +444,14 @@ def create_table_ownerships(
     for owner in owners:
         user = get_user_by_name(owner.username, session=session)
         if not user:
-            LOG.error(
-                f"Failed to find user or group: {owner} when loading table owners."
+            user = get_user_by_name(f"auto_{owner.username}", session=session)
+        if not user:
+            user = create_user(
+                f"auto_{owner.username}",
+                fullname=owner.username,
+                session=session,
+                properties={"auto": True},
             )
-            continue
         # add table ownership
         table_ownership = DataTableOwnership(
             data_table_id=table_id, uid=user.id, type=owner.type

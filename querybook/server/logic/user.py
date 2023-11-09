@@ -73,7 +73,12 @@ def create_user(
         session=session,
     )
 
-    update_es_users_by_id(user.id)
+    LOG.debug(f"User properties: {properties}, auto: {properties.get('auto', False)}")
+
+    # Don't update ES if auto is true
+    if properties.get("auto", False) is False:
+        update_es_users_by_id(user.id)
+
     create_admin_when_no_admin(user, commit=commit, session=session)
     return user
 
