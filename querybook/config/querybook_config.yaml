@@ -1,2 +1,5 @@
 # Please override by supply your own config here
 # See docs/configurations/infra_config.md see how
+
+# 5 MB table + 800 bytes of headers
+# TABLE_MAX_UPLOAD_SIZE= 5 * 1000 * 1000 + 800 

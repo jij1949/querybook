@@ -42,7 +42,7 @@ def make_flask_app():
         )
 
     if QuerybookSettings.TABLE_MAX_UPLOAD_SIZE is not None:
-        app.config["MAX_CONTENT_LENGTH"] = QuerybookSettings.TABLE_MAX_UPLOAD_SIZE
+        app.config["MAX_CONTENT_LENGTH"] = eval(QuerybookSettings.TABLE_MAX_UPLOAD_SIZE)
 
     # Configure session cookie to allow use in iframes
     app.config["SESSION_COOKIE_SAMESITE"] = "None"
