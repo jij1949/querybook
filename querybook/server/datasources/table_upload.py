@@ -45,10 +45,10 @@ def perform_table_upload():
     engine_id = int(request.form["engine_id"])
     verify_query_engine_permission(engine_id)
 
-    LOG.info(f"User {current_user.id} is uploading table 
+    LOG.info(f"""User {current_user.id} is uploading table 
              {table_config['schema_name']}.{table_config['table_name']} 
              of size {request.content_length} 
-             to engine {engine_id}\nThe max upload size is {QuerybookSettings.TABLE_MAX_UPLOAD_SIZE}")
+             to engine {engine_id}\nThe max upload size is {QuerybookSettings.TABLE_MAX_UPLOAD_SIZE}""")
 
     importer = get_table_upload_importer(import_config, file_uploaded)
     exporter = get_table_upload_exporter(engine_id)
