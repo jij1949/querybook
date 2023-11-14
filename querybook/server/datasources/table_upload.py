@@ -13,11 +13,6 @@ from lib.table_upload.importer.importer_factory import get_table_upload_importer
 from lib.table_upload.exporter.exporter_factory import get_table_upload_exporter
 from lib.logger import get_logger
 
-from env import QuerybookSettings
-
-# from app.db import DBSession
-# from models.user import User
-
 LOG = get_logger(__file__)
 
 
@@ -37,18 +32,10 @@ def perform_table_upload():
     file_uploaded = request.files.get("file")
     verify_import_config_permissions(import_config)
 
-    # why does this not work? 
-    # uploader = User.get(current_user.id, session=DBSession())
-    # LOG.info(f"The user performing an upload is {uploader.username}")
-
     table_config = json.loads(request.form["table_config"])
     engine_id = int(request.form["engine_id"])
     verify_query_engine_permission(engine_id)
-
-    LOG.info(f"""User {current_user.id} is uploading table 
-             {table_config['schema_name']}.{table_config['table_name']} 
-             of size {request.content_length} 
-             to engine {engine_id}\nThe max upload size is {QuerybookSettings.TABLE_MAX_UPLOAD_SIZE}""")
+    table_config["content_length"] = request.content_length
 
     importer = get_table_upload_importer(import_config, file_uploaded)
     exporter = get_table_upload_exporter(engine_id)

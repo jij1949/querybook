@@ -132,6 +132,7 @@ class QuerybookSettings(object):
 
     # Table Upload (Experimental)
     TABLE_MAX_UPLOAD_SIZE = get_env_config("TABLE_MAX_UPLOAD_SIZE")
+    TABLE_MAX_UPLOAD_ROWS = get_env_config("TABLE_MAX_UPLOAD_ROWS")
 
     # Event Logging
     EVENT_LOGGER_NAME = get_env_config("EVENT_LOGGER_NAME") or "null"

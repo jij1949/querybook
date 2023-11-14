@@ -6,6 +6,7 @@ from app.db import with_session
 from lib.table_upload.importer.base_importer import BaseTableUploadImporter
 from logic.admin import get_query_engine_by_id
 from lib.metastore import get_metastore_loader
+from models.user import User
 
 from lib.logger import get_logger
 
@@ -60,12 +61,14 @@ class BaseTableUploadExporter(ABC):
             return loader.check_if_table_exists(schema_name, table_name)
         return False
 
+    @with_session
     def upload(
         self,
         uid: int,
         engine_id: int,
         importer: BaseTableUploadImporter,
         table_config: Dict,
+        session=None,
     ) -> Optional[int]:
         # Who is doing the table upload
         self._uid = uid
@@ -76,7 +79,12 @@ class BaseTableUploadExporter(ABC):
         # the table config contains informations like name and types
         self._table_config = table_config
 
-        LOG.info("Uploading...")
+        # Log upload attempt
+        uploader = User.get(id=uid, session=session)
+        LOG.info(
+            f"Table upload started by {uploader.username}, engine {engine_id}, table {table_config['schema_name']}.{table_config['table_name']}, size {table_config['content_length']} bytes"
+        )
+
         self._upload()
         # TODO: Seems like this call is also an issue (doesn't complete)
         LOG.info("Syncing table from metastore")

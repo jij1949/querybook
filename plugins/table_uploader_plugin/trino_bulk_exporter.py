@@ -14,6 +14,8 @@ from table_uploader_plugin.trino_bulk_insert import TrinoBulkInsert
 from typing import Tuple
 from sqlalchemy import create_engine
 
+from env import QuerybookSettings
+
 LOG = get_logger(__file__)
 
 
@@ -67,6 +69,14 @@ class TrinoBulkExporter(BaseTableUploadExporter):
         column_name_types = self._table_config["column_name_types"]
         df = update_pandas_df_column_name_type(
             self._importer.get_pandas_df(), column_name_types)
+
+        # Throw error if table has more than 500 rows
+        if QuerybookSettings.TABLE_MAX_UPLOAD_ROWS:
+            max_rows = int(QuerybookSettings.TABLE_MAX_UPLOAD_ROWS)
+            LOG.info(f'Row Count: {len(df.index)}')
+            if len(df.index) > max_rows:
+                raise ValueError(
+                    f"Table has more than {max_rows} rows. Please limit to {max_rows} rows or less. Current row count: {len(df.index)}")
 
         connection = self._get_trino_connection()
 
