@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.78.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.77.1...0.78.0) (2023-11-14)
+
+
+### Features
+
+* Auto-create user accounts for Metastore-syncs table owners ([7be9d61](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7be9d61468672b7fd891d0310323e1e32fa74da0))
+* Improve EG's metastore sync with owners, tags ([b87e190](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b87e190525623a6c9054102a6d4eb3cc444297bb))
+
 ### [0.77.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.77.0...0.77.1) (2023-10-24)
 
 
