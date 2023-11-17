@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.78.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.78.0...0.78.1) (2023-11-17)
+
+
+### Bug Fixes
+
+* eval table max size, basic table upload log ([c39a66b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c39a66b4a36543ce8ea41df8f52502cb1944dc5e))
+* eval unsafe, log fixed ([8169bba](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8169bba1406b7ab0eb4b1ed5ad06936a315ce93e))
+* Move upload logs to base_exporter, add row limit ([8386f4d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8386f4d00db2628e1b7856d8fce374d868d59c32))
+
 ## [0.78.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.77.1...0.78.0) (2023-11-14)
 
 
