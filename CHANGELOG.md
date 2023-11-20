@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.79.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.78.1...0.79.0) (2023-11-20)
+
+
+### Features
+
+* Update clean_up_query_execution_task to cancel stuck Schedules ([9cd8d43](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9cd8d43bcd9ffcf03038d90fd97a1291bd7e1e5d))
+
 ### [0.78.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.78.0...0.78.1) (2023-11-17)
 
 
