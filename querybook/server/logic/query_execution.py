@@ -488,8 +488,7 @@ def get_active_celery_query_executions():
 
 @with_session
 def clean_up_query_execution(dry_run=False, session=None):
-
-    LOG.info("Cleaning up query executions")
+    LOG.info("Cleaning up stuck query executions")
 
     now = datetime.now()
     should_commit = False
