@@ -1,21 +1,18 @@
 from datetime import datetime
 from functools import wraps
-from sqlalchemy import text
 from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import func, and_, select
+from sqlalchemy.sql.expression import func, and_
 
 from app.flask_app import celery
 from app.db import with_session
-from const.query_execution import QueryExecutionStatus
 from const.schedule import TaskRunStatus, ScheduleTaskType, UserTaskNames
 from lib.logger import get_logger
 from lib.sqlalchemy import update_model_fields
-from models.query_execution import QueryExecution
 from models.schedule import (
     TaskSchedule,
     TaskRunRecord,
 )
-from models.datadoc import DataCell, DataCellQueryExecution, DataDoc, DataDocDataCell
+from models.datadoc import DataDoc
 from models.board import BoardItem
 
 DATADOC_SCHEDULE_PREFIX = "run_data_doc_"
@@ -365,70 +362,3 @@ def get_all_task_schedule(enabled=None, session=None):
         query = query.filter_by(enabled=enabled)
 
     return query.all()
-
-
-@with_session
-def clean_up_stuck_task_run_records(dry_run=False, session=None):
-    trr = aliased(TaskRunRecord)
-
-    # Subquery to count running query executions for each task run record
-    running_query_executions_subquery = (
-        select(func.count())
-        .select_from(trr)
-        .join(DataDoc, trr.name == func.concat(DATADOC_SCHEDULE_PREFIX, DataDoc.id))
-        .join(DataDocDataCell, DataDoc.id == DataDocDataCell.data_doc_id)
-        .join(DataCell, DataDocDataCell.data_cell_id == DataCell.id)
-        .outerjoin(
-            DataCellQueryExecution, DataCell.id == DataCellQueryExecution.data_cell_id
-        )
-        .outerjoin(
-            QueryExecution,
-            QueryExecution.id == DataCellQueryExecution.query_execution_id,
-        )
-        .filter(
-            trr.name == func.concat(DATADOC_SCHEDULE_PREFIX, DataDoc.id),
-            QueryExecution.status == QueryExecutionStatus.RUNNING,
-            QueryExecution.id.isnot(None),
-        )
-        .scalar_subquery()
-    )
-
-    # Select running TaskRunRecords which have no running query executions
-    # Ignore system tasks and tasks that are less than an hour old
-    matching_records = (
-        session.query(
-            trr,
-            running_query_executions_subquery.label("running_query_executions_count"),
-        )
-        .filter(
-            and_(
-                trr.status == TaskRunStatus.RUNNING,
-                trr.name.like(f"{DATADOC_SCHEDULE_PREFIX}%"),
-                trr.created_at < (func.now() - text("INTERVAL 1 HOUR")),
-                running_query_executions_subquery == 0,
-            )
-        )
-        .all()
-    )
-
-    LOG.info(f"Found {len(matching_records)} stuck TaskRunRecords to update")
-
-    # Print or process the matching records as needed
-    for record, count in matching_records:
-        LOG.debug(
-            f"!> Record ID: {record.id}, Record Name: {record.name}, Record Created At: {record.created_at}, Running Query Executions Count: {count}"
-        )
-
-        if not dry_run:
-            # Set the status to FAILURE and update the error message
-            session.query(TaskRunRecord).filter(TaskRunRecord.id == record.id).update(
-                {
-                    TaskRunRecord.status: "FAILURE",
-                    TaskRunRecord.error_message: "Task marked failed automatically: no running query executions found.",
-                    TaskRunRecord.updated_at: func.now(),
-                },
-                synchronize_session=False,
-            )
-
-    # Commit the changes
-    session.commit()
