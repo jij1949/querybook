@@ -87,7 +87,6 @@ def create_task_schedule(
 
 @with_session
 def update_task_schedule(id, commit=True, session=None, no_changes=False, **kwargs):
-
     task_schedule = get_task_schedule_by_id(id, session=session)
 
     if not task_schedule:
@@ -376,7 +375,7 @@ def clean_up_stuck_task_run_records(dry_run=False, session=None):
     running_query_executions_subquery = (
         select(func.count())
         .select_from(trr)
-        .join(DataDoc, trr.name == func.concat("run_data_doc_", DataDoc.id))
+        .join(DataDoc, trr.name == func.concat(DATADOC_SCHEDULE_PREFIX, DataDoc.id))
         .join(DataDocDataCell, DataDoc.id == DataDocDataCell.data_doc_id)
         .join(DataCell, DataDocDataCell.data_cell_id == DataCell.id)
         .outerjoin(
@@ -387,7 +386,7 @@ def clean_up_stuck_task_run_records(dry_run=False, session=None):
             QueryExecution.id == DataCellQueryExecution.query_execution_id,
         )
         .filter(
-            trr.name == func.concat("run_data_doc_", DataDoc.id),
+            trr.name == func.concat(DATADOC_SCHEDULE_PREFIX, DataDoc.id),
             QueryExecution.status == QueryExecutionStatus.RUNNING,
             QueryExecution.id.isnot(None),
         )
@@ -404,7 +403,7 @@ def clean_up_stuck_task_run_records(dry_run=False, session=None):
         .filter(
             and_(
                 trr.status == TaskRunStatus.RUNNING,
-                trr.name.like("run_data_doc_%"),
+                trr.name.like(f"{DATADOC_SCHEDULE_PREFIX}%"),
                 trr.created_at < (func.now() - text("INTERVAL 1 HOUR")),
                 running_query_executions_subquery == 0,
             )
@@ -412,7 +411,7 @@ def clean_up_stuck_task_run_records(dry_run=False, session=None):
         .all()
     )
 
-    LOG.debug(f"!> Found {len(matching_records)} matching TaskRunRecords to update")
+    LOG.info(f"Found {len(matching_records)} stuck TaskRunRecords to update")
 
     # Print or process the matching records as needed
     for record, count in matching_records:
@@ -424,8 +423,9 @@ def clean_up_stuck_task_run_records(dry_run=False, session=None):
             # Set the status to FAILURE and update the error message
             session.query(TaskRunRecord).filter(TaskRunRecord.id == record.id).update(
                 {
-                    "status": "FAILURE",
-                    "error_message": "Task marked failed automatically: no running query executions found.",
+                    TaskRunRecord.status: "FAILURE",
+                    TaskRunRecord.error_message: "Task marked failed automatically: no running query executions found.",
+                    TaskRunRecord.updated_at: func.now(),
                 },
                 synchronize_session=False,
             )
