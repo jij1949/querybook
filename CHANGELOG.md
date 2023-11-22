@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.79.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.79.0...0.79.1) (2023-11-22)
+
+
+### Bug Fixes
+
+* Fix clean_up_stuck_task_run_records ([1627957](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1627957290caa9868eea1868844c0daf09129de7))
+* Update clean_up_stuck_task_run_records to use on_datadoc_completion ([de9dbae](https://github.expedia.biz/eg-analytics-platform/querybook/commit/de9dbaebbf6e137e19d57cd66d523852c990dfec))
+
 ## [0.79.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.78.1...0.79.0) (2023-11-20)
 
 
