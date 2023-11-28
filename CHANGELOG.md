@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.79.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.79.1...0.79.2) (2023-11-28)
+
+
+### Bug Fixes
+
+* moved ai tool tip to right position (#187) ([06750ea](https://github.expedia.biz/eg-analytics-platform/querybook/commit/06750eab1c85a264875298441d3fad710563e651))
+
 ### [0.79.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.79.0...0.79.1) (2023-11-22)
 
 
