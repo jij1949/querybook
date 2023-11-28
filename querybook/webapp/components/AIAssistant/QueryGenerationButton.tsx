@@ -40,6 +40,7 @@ export const QueryGenerationButton = ({
                         icon="Stars"
                         size={18}
                         tooltip="AI: generate/edit query"
+                        tooltipPos="right"
                         color={!query ? 'accent' : undefined}
                         onClick={() => {
                             setShow(true);
