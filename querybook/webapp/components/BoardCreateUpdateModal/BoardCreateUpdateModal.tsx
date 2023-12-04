@@ -13,10 +13,13 @@ import { FormWrapper } from 'ui/Form/FormWrapper';
 import { SimpleField } from 'ui/FormikField/SimpleField';
 import { Modal } from 'ui/Modal/Modal';
 import { IStandardModalProps } from 'ui/Modal/types';
+import { ContentState } from 'draft-js';
 
 const boardFormSchema = Yup.object().shape({
     name: Yup.string().max(255).min(1).required(),
-    description: Yup.string().max(5000),
+    description: Yup.mixed<ContentState>().test(
+        (value) => value.getPlainText().length < 5000
+    ),
     public: Yup.boolean(),
 });
 
