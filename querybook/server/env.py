@@ -146,3 +146,10 @@ class QuerybookSettings(object):
 
     # Ranger
     RANGER_URL = get_env_config("RANGER_URL")
+
+    # Datadog
+    DD_AGENT_HOST = get_env_config("DD_AGENT_HOST", optional=True)
+    DD_DOGSTATSD_PORT = int(get_env_config("DD_DOGSTATSD_PORT", optional=True) or 8125)
+    DD_PREFIX = get_env_config("DD_PREFIX", optional=True)
+    DD_SERVICE = get_env_config("DD_SERVICE", optional=True) or "querybook"
+    DD_TAGS = get_env_config("DD_TAGS", optional=True) or []
