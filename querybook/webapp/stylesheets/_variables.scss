@@ -99,6 +99,8 @@ body {
 
     --text-terminal: var(--color-invert-3);
 
+    --text-disabled: var(--text-lightest);
+
     // Colors:  Content
     --icon: var(--color-invert-4);
     --icon-hover: var(--color-primary-5);
@@ -265,6 +267,8 @@ body.dark-theme {
 
     --text-highlight: rgba(52, 101, 127, 0.5);
 
+    --text-disabled: var(--text-lightest);
+
     font-weight: 500;
     --light-bold-font: 600;
     --bold-font: 700;
@@ -317,6 +321,8 @@ body.lush-theme {
     --color-accent-transp-lightest-0: var(--color-yellow-transp-lightest-0);
 
     --text-hover: #f9bb78;
+
+    --text-disabled: var(--text-lightest-0);
 
     --bg-invert: var(--color-primary-1);
     --bg-text-select: var(--color-transparent-dark);
