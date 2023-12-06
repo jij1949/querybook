@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.80.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.79.2...0.80.0) (2023-12-06)
+
+
+### Features
+
+* Data Dog Monitoring for Querybook (#179) ([f54f3a8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f54f3a86766077697831d15da2adbc0db57a62a5))
+
+
+### Bug Fixes
+
+* Update disabled datadoc cell styling ([97e8622](https://github.expedia.biz/eg-analytics-platform/querybook/commit/97e86224379124510659eb445b1e2c0bcb70b14f))
+
 ### [0.79.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.79.1...0.79.2) (2023-11-28)
 
 
