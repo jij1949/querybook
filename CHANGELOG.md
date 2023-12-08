@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.81.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.80.0...0.81.0) (2023-12-08)
+
+
+### Features
+
+* reset permissions to 'read only' and disable schedule on datadoc ownership change (#181) ([15f6f11](https://github.expedia.biz/eg-analytics-platform/querybook/commit/15f6f113aa60e21e5c1feb1522d4754645e84f78))
+
 ## [0.80.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.79.2...0.80.0) (2023-12-06)
 
 
