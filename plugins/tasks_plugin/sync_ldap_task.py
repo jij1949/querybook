@@ -5,8 +5,9 @@ import time
 
 from app.db import DBSession, with_session
 from app.flask_app import celery
+from const.user import UserGroup
 from lib.logger import get_logger
-from logic.user import get_user_by_name
+from logic.user import create_or_update_user_group, get_user_by_name
 from logic.schedule import with_task_logging
 from env import QuerybookSettings
 from logic.admin import (
@@ -21,6 +22,7 @@ from logic.environment import (
     remove_user_to_environment,
     get_all_environment,
 )
+from models.user import User
 
 LOG = get_logger(__file__)
 
@@ -62,11 +64,11 @@ def ad_connect(args, ad_server, ad_bind_user, ad_bind_password):
     return conn
 
 
-def ad_query_group_existence(args, conn, ad_group):
+def ad_query_group(args, conn, ad_group):
     """
     :param conn: ldap connection object
     :param ad_group: string of security group
-    :return: if group does not exists, will return false else would return the searched group
+    :return: if group does not exists, will return None else would return the searched group
     """
     search_base = "CN={0},OU=Security Groups,{1}".format(ad_group, bind_domain)
 
@@ -79,13 +81,15 @@ def ad_query_group_existence(args, conn, ad_group):
             attributes=[ldap3.ALL_ATTRIBUTES, ldap3.ALL_OPERATIONAL_ATTRIBUTES],
             size_limit=0,
         )
+
+        if success and len(conn.entries) > 0:
+            return conn.entries[0]
     except Exception as e:
         LOG.warning(
             f"Unable to query AD for existence of group {ad_group}: {e.message}"
         )
-        success = False
 
-    return success
+    return None
 
 
 def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
@@ -135,7 +139,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                                 not in visited_groups
                             ):
                                 if args.tracead:
-                                    LOG.info(
+                                    LOG.debug(
                                         "Found member group {0}".format(
                                             entry["attributes"]["sAMAccountName"]
                                         )
@@ -151,7 +155,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                                     ad_group_members.extend(sub_members)
                             else:
                                 if args.tracead:
-                                    LOG.info(
+                                    LOG.debug(
                                         f"Already queried group {entry['attributes']['sAMAccountName']}, skipping."
                                     )
                         # Filter users with no email or
@@ -160,7 +164,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                             not entry["attributes"]["sAMAccountName"].startswith("s-")
                         ):
                             if args.tracead:
-                                LOG.info(
+                                LOG.debug(
                                     f"Found user {entry['attributes']['sAMAccountName']}"
                                 )
                             ad_group_members.append(
@@ -229,9 +233,9 @@ def update_user_environments_with_groups(environment, user_groups, session=None)
         environment.id, user_groups, session=session
     )
 
-    LOG.info(f"Total users: {len(user_groups)}")
-    LOG.info(f"Users to add: {len(users_to_add)}")
-    LOG.info(f"Users to remove: {len(users_to_remove)}")
+    LOG.debug(f"Total users: {len(user_groups)}")
+    LOG.debug(f"Users to add: {len(users_to_add)}")
+    LOG.debug(f"Users to remove: {len(users_to_remove)}")
 
     for username in users_to_add:
         user = get_user_by_name(username, session=session)
@@ -285,9 +289,9 @@ def update_user_query_engines_with_groups(query_engine, user_groups, session=Non
         query_engine.id, user_groups, session=session
     )
 
-    LOG.info(f"Total users: {len(user_groups)}")
-    LOG.info(f"Users to add: {len(users_to_add)}")
-    LOG.info(f"Users to remove: {len(users_to_remove)}")
+    LOG.debug(f"Total users: {len(user_groups)}")
+    LOG.debug(f"Users to add: {len(users_to_add)}")
+    LOG.debug(f"Users to remove: {len(users_to_remove)}")
 
     for username in users_to_add:
         user = get_user_by_name(username, session=session)
@@ -309,8 +313,21 @@ def update_user_query_engines_with_groups(query_engine, user_groups, session=Non
     session.commit()
 
 
+def get_groups_members_list(args, groups, conn):
+    groups_members = []
+    for security_group in groups:
+        group_info = ad_query_group(args, conn, security_group)
+        if group_info:
+            membership = ad_query_group_membership(args, conn, security_group)
+            groups_members.extend(membership[1])
+            LOG.debug(f"Found {len(membership[1])} members for {security_group}")
+        else:
+            LOG.warning(f'Group "{security_group}" does not exist')
+    return groups_members
+
+
 #####################################
-# ------- Running task ------- #
+# ------- Tasks ------- #
 #####################################
 
 
@@ -354,13 +371,13 @@ def sync_ldap_task(self):
                 if group
             ]
 
-            LOG.info(f"Access control groups: {access_control_groups}")
+            LOG.debug(f"Access control groups: {access_control_groups}")
 
             if enable_ad_sync:
                 try:
-                    LOG.info(f"Syncing Environment: {env.name} ({env.id})")
+                    LOG.debug(f"Syncing Environment: {env.name} ({env.id})")
                     LOG.debug(f"Feature Params: {env.feature_params}")
-                    LOG.info(f"Access control groups: {access_control_groups}")
+                    LOG.debug(f"Access control groups: {access_control_groups}")
 
                     members_list = []
 
@@ -378,7 +395,7 @@ def sync_ldap_task(self):
                     LOG.error(e, exc_info=True)
                     raise e
             else:
-                LOG.info(f"Skipping Environment: {env.name} ({env.id})")
+                LOG.debug(f"Skipping Environment: {env.name} ({env.id})")
 
         ### Sync Query Engines ###
 
@@ -403,11 +420,11 @@ def sync_ldap_task(self):
 
             if enable_ad_sync:
                 try:
-                    LOG.info(
+                    LOG.debug(
                         f"Syncing Query Engine: {query_engine.name} ({query_engine.id})"
                     )
                     LOG.debug(f"Feature Params: {query_engine.feature_params}")
-                    LOG.info(f"Access control groups: {access_control_groups}")
+                    LOG.debug(f"Access control groups: {access_control_groups}")
 
                     members_list = []
 
@@ -428,19 +445,73 @@ def sync_ldap_task(self):
                     raise e
 
             else:
-                LOG.info(
+                LOG.debug(
                     f"Skipping Query Engine: {query_engine.name} ({query_engine.id})"
                 )
 
 
-def get_groups_members_list(args, groups, conn):
-    groups_members = []
-    for security_group in groups:
-        group_info = ad_query_group_existence(args, conn, security_group)
-        if group_info:
-            membership = ad_query_group_membership(args, conn, security_group)
-            groups_members.extend(membership[1])
-            LOG.info(f"Found {len(membership[1])} members for {security_group}")
-        else:
-            LOG.warning(f'Group "{security_group}" does not exist')
-    return groups_members
+@celery.task(bind=True)
+@with_task_logging()
+def sync_ldap_groups(self):
+    """
+    This task refreshes the group membership of all current groups in Querybook.
+    All rows in the `user` table where `is_group` is True are synced
+    Group membership is retrieved from LDAP and matched against the `user` table.
+    No new users are created, only existing users are matched to existing groups.
+
+    During the sync, the following happens:
+    - If the group exists in LDAP, it is updated
+    - All users in the group are added as members of the group
+    - If the group does not exist in LDAP, it is ignored (TODO: delete the group?)
+    """
+    LOG.info("Starting LDAP Sync Groups Task...")
+
+    args = Object()
+    args.dryrun = False
+    args.tracead = False
+    ad_connection = ad_connect(args, ad_server, ad_bind_user, ad_bind_password)
+
+    with DBSession() as session:
+        # Get all groups in Querybook
+        groups = session.query(User).filter(User.is_group == True).all()
+
+        for group in groups:
+            sync_ldap_group(args, group, ad_connection, session=session)
+
+        session.commit()
+
+
+def sync_ldap_group(args, group, ad_connection, session=None):
+    """
+    Syncs a single group from LDAP.
+    """
+    LOG.info(f"Syncing group: {group.username} ({group.id})")
+    if not group or not group.is_group:
+        LOG.error(f"Invalid group: {group}")
+        return
+
+    ad_group = ad_query_group(args, ad_connection, group.username)
+
+    if not ad_group:
+        LOG.warning(f'Group "{group.username}" does not exist')
+        return
+
+    descriptions = ad_group.entry_attributes_as_dict.get("description", "")
+    description = descriptions[0] if isinstance(descriptions, list) else descriptions
+
+    # Get group members
+    group_members = get_groups_members_list(args, [group.username], ad_connection)
+
+    LOG.debug(f"Group {group.username} has {len(group_members)} members")
+
+    # Update group with updated members
+    create_or_update_user_group(
+        UserGroup(
+            name=group.username,
+            display_name=group.fullname,
+            description=description,
+            email=group.email,
+            members=group_members,
+        ),
+        session=session,
+    )
