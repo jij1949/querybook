@@ -34,6 +34,8 @@ from logic.schedule import (
 )
 from models.environment import Environment
 
+from logic.datadoc import get_data_doc_writers_by_doc_id, update_data_doc_editor
+
 LOG = get_logger(__file__)
 
 
@@ -630,7 +632,7 @@ def update_datadoc_owner(doc_id, next_owner_id, originator=None):
             data_doc_id=doc_id,
             uid=current_user.id,
             read=True,
-            write=True,
+            write=False,
             commit=False,
             session=session,
         )
@@ -653,24 +655,19 @@ def update_datadoc_owner(doc_id, next_owner_id, originator=None):
             doc_id=doc_id, owner_id=next_owner_uid, commit=False, session=session
         )
 
+        reset_datadoc_permissions_on_ownership_change(doc_id, session=session)
+        disable_schedule_on_ownership_change(doc_id, session=session)
+
         doc_dict = doc.to_dict()
         session.commit()
+
+        editors = logic.get_data_doc_editors_by_doc_id(doc_id, session=session)
+        editor_dicts = [editor.to_dict() for editor in editors]
         socketio.emit(
-            "data_doc_editor",
-            (originator, doc_id, current_user.id, current_owner_editor_dict),
+            "data_doc_editors",
+            (doc_id, editor_dicts),
             namespace="/datadoc",
             room=doc_id,
-        )
-        socketio.emit(
-            "data_doc_editor",
-            (
-                originator,
-                next_owner_editor_dict["data_doc_id"],
-                next_owner_editor_dict["uid"],
-                None,
-            ),
-            namespace="/datadoc",
-            room=next_owner_editor_dict["data_doc_id"],
         )
         socketio.emit(
             "data_doc_updated",
@@ -681,12 +678,39 @@ def update_datadoc_owner(doc_id, next_owner_id, originator=None):
             namespace="/datadoc",
             room=next_owner_editor_dict["data_doc_id"],
         )
+
         logic.update_es_data_doc_by_id(doc_id)
         # Update queries in elasticsearch to reflect new permissions
         logic.update_es_queries_by_datadoc_id(doc_id)
 
         send_datadoc_transfer_notification(doc_id, next_owner_uid, session)
         return current_owner_editor_dict
+
+
+@with_session
+def disable_schedule_on_ownership_change(doc_id, session=None):
+    schedule_name = schedule_logic.get_data_doc_schedule_name(doc_id)
+    schedule = schedule_logic.get_task_schedule_by_name(schedule_name, session=session)
+
+    if schedule is None:
+        return
+
+    updated_fields = {"enabled": False}
+    schedule_logic.update_task_schedule(
+        schedule.id,
+        session=session,
+        **updated_fields,
+    )
+
+
+@with_session
+def reset_datadoc_permissions_on_ownership_change(doc_id, session=None):
+    writers = get_data_doc_writers_by_doc_id(doc_id, session=session)
+
+    for writer in writers:
+        update_data_doc_editor(
+            writer.id, read=writer.read, write=False, commit=True, session=session
+        )
 
 
 def send_datadoc_transfer_notification(doc_id, next_owner_id, session=None):
