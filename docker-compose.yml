@@ -40,6 +40,8 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
             - /proc/:/host/proc/:ro
             - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+        profiles:
+            - datadog
     web:
         container_name: querybook_web
         image: *querybook-image
