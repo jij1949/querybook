@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.82.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.81.0...0.82.0) (2023-12-12)
+
+
+### Features
+
+* added datadoc id and title to trino tags (#191) ([4e97e86](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4e97e86d91fe29becfe9a9403a238d0487d7f7c4))
+
+
+### Bug Fixes
+
+* Move Datadog container to a separate profile ([685943d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/685943dc36a6dd3ecf5e77c8a2381905b00401a0))
+* Rewrite clean_up_stuck_task_run_records to remove subquery ([c0cb7ba](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c0cb7ba68228a45e42f3a87224190cf259b2b5c3))
+
 ## [0.81.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.80.0...0.81.0) (2023-12-08)
 
 
