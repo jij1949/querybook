@@ -9,8 +9,7 @@ from logic.schedule import (
 )
 
 from sqlalchemy import text
-from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import func, and_, select
+from sqlalchemy.sql.expression import func, and_
 
 from app.flask_app import celery
 from app.db import with_session
@@ -40,57 +39,57 @@ def clean_up_query_execution_task(self):
 
 @with_session
 def clean_up_stuck_task_run_records(dry_run=False, session=None):
-    trr = aliased(TaskRunRecord)
-
-    # Subquery to count running query executions for each task run record
-    running_query_executions_subquery = (
-        select(func.count())
-        .select_from(trr)
-        .join(DataDoc, trr.name == func.concat(DATADOC_SCHEDULE_PREFIX, DataDoc.id))
-        .join(DataDocDataCell, DataDoc.id == DataDocDataCell.data_doc_id)
-        .join(DataCell, DataDocDataCell.data_cell_id == DataCell.id)
-        .outerjoin(
-            DataCellQueryExecution, DataCell.id == DataCellQueryExecution.data_cell_id
-        )
-        .outerjoin(
-            QueryExecution,
-            QueryExecution.id == DataCellQueryExecution.query_execution_id,
-        )
-        .filter(
-            trr.name == func.concat(DATADOC_SCHEDULE_PREFIX, DataDoc.id),
-            QueryExecution.status == QueryExecutionStatus.RUNNING,
-            QueryExecution.id.isnot(None),
-        )
-        .scalar_subquery()
-    )
-
-    # Select running TaskRunRecords which have no running query executions
+    # Select running TaskRunRecords
     # Ignore system tasks and tasks that are less than an hour old
-    matching_records = (
-        session.query(
-            trr,
-            running_query_executions_subquery.label("running_query_executions_count"),
-        )
+    running_task_run_records = (
+        session.query(TaskRunRecord)
         .filter(
             and_(
-                trr.status == TaskRunStatus.RUNNING,
-                trr.name.like(f"{DATADOC_SCHEDULE_PREFIX}%"),
-                trr.created_at < (func.now() - text("INTERVAL 1 HOUR")),
-                running_query_executions_subquery == 0,
+                TaskRunRecord.status == TaskRunStatus.RUNNING,
+                TaskRunRecord.name.like(f"{DATADOC_SCHEDULE_PREFIX}%"),
+                TaskRunRecord.created_at < (func.now() - text("INTERVAL 1 HOUR")),
             )
         )
         .all()
     )
 
-    LOG.info(f"Found {len(matching_records)} stuck TaskRunRecords to update")
+    LOG.info(
+        f"Found {len(running_task_run_records)} running TaskRunRecords, checking for stuck records"
+    )
 
-    # Print or process the matching records as needed
-    for record, count in matching_records:
+    # Map comprehension to filter out any TaskRunRecords that have running query executions
+    stuck_task_run_records = [
+        record.id
+        for record in running_task_run_records
+        if (
+            session.query(QueryExecution)
+            .join(DataCellQueryExecution)
+            .join(DataCell)
+            .join(DataDocDataCell)
+            .join(DataDoc)
+            .filter(
+                QueryExecution.status == QueryExecutionStatus.RUNNING,
+                DataDoc.id == int(record.name[len(DATADOC_SCHEDULE_PREFIX) :]),
+            )
+            .count()
+            == 0
+        )
+    ]
+
+    LOG.info(f"Found {len(stuck_task_run_records)} stuck TaskRunRecords to update")
+
+    # Check if there are any running query executions for each task run record
+    for record_id in stuck_task_run_records:
+        # Note: on_datadoc_completion commits the session, so we need to re-query the record
+        # to avoid an error when accessing the previously-retrieved records
+        # That's why we're looping through record_ids instead of records
+
+        record = session.query(TaskRunRecord).get(record_id)
         doc_id = int(record.name[len(DATADOC_SCHEDULE_PREFIX) :])
         task_schedule = get_task_schedule_by_name(record.name, session=session)
 
         LOG.debug(
-            f"!> Record ID: {record.id}, Record Name: {record.name}, Record Created At: {record.created_at}, Running Query Executions Count: {count}"
+            f"!> Stuck Record ID: {record.id}, Record Name: {record.name}, Record Created At: {record.created_at}"
         )
 
         if not dry_run:
