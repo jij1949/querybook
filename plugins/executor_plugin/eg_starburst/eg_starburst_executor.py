@@ -1,6 +1,9 @@
 from executor_plugin.eg_starburst.eg_starburst_client import EGStarburstClient
 from executor_plugin.eg_trino.eg_trino_executor import EGTrinoQueryExecutor
 
+from app.db import DBSession
+from logic.query_execution import get_datadoc_id_and_title_from_query_execution_id
+
 
 class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
     def __init__(
@@ -23,7 +26,10 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
         self._warning = ""
         self._json_csv_warning_checked = False
         self._client_setting = client_setting | \
-                               {'execution_type': execution_type, 'query_execution_id': query_execution_id}
+                               {'execution_type': 'execution_type:' + execution_type,
+                                'query_execution_id': query_execution_id}
+
+        self._get_datadoc_info(query_execution_id)
 
     @classmethod
     def _get_client(cls, client_setting):

@@ -17,6 +17,8 @@ class EGTrinoClient(TrinoClient):
         proxy_user=None,
         execution_type=None,
         query_execution_id=None,
+        datadoc_id=None,
+        datadoc_title=None,
         *args,
         **kwargs,
     ):
@@ -30,6 +32,14 @@ class EGTrinoClient(TrinoClient):
 
         auth = trino.auth.BasicAuthentication(username, password)
 
+        client_tags = []
+        if execution_type:
+            client_tags.append(execution_type)
+        if datadoc_id:
+            client_tags.append(datadoc_id)
+        if datadoc_title:
+            client_tags.append(datadoc_title)
+
         connection = trino.dbapi.connect(
             host=host,
             port=port,
@@ -38,7 +48,7 @@ class EGTrinoClient(TrinoClient):
             auth=auth,
             user=proxy_user if proxy_user else username,
             http_scheme=trino_conf.protocol,
-            client_tags=[execution_type] if execution_type else None,
+            client_tags=client_tags,
             http_headers={
                 "X-Trino-Trace-Token": f"querybookExecutionId:{query_execution_id}"
             }

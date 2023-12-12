@@ -8,6 +8,8 @@ from logic import (
 )
 from logic.metastore import get_table_information_by_table_id, get_table_by_name
 
+from app.db import DBSession
+
 
 def get_trino_error_dict(e):
     if hasattr(e, "args") and e.args[0] is not None:
@@ -38,7 +40,10 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
         self._warning = ""
         self._json_csv_warning_checked = False
         self._client_setting = client_setting | \
-                               {'execution_type': execution_type, 'query_execution_id': query_execution_id}
+                               {'execution_type': 'execution_type:' + execution_type,
+                                'query_execution_id': query_execution_id}
+
+        self._get_datadoc_info(query_execution_id)
 
     @classmethod
     def _get_client(cls, client_setting):
@@ -154,6 +159,18 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
             return metastore_id
         except:
             return -1
+
+    def _get_datadoc_info(self, query_execution_id):
+        with DBSession() as session:
+            datadoc_info = qe_logic.get_datadoc_id_and_title_from_query_execution_id(query_execution_id,
+                                                                                     session=session)
+        if datadoc_info:
+            self._datadoc_id, _, self._datadoc_title = datadoc_info
+            self._client_setting = self._client_setting | \
+                                   {'datadoc_id': 'datadoc_id:' + str(self._datadoc_id),
+                                    'datadoc_title': 'datadoc_title:' + self._datadoc_title}
+        else:
+            return
 
     def is_json(self, info):
         try:
