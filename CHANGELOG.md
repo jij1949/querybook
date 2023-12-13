@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.82.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.82.0...0.82.1) (2023-12-13)
+
+
+### Bug Fixes
+
+* fixed active_workers monitor ([5258f25](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5258f255179c2e2b7dd7a7493b5e9216ed9ad054))
+
 ## [0.82.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.81.0...0.82.0) (2023-12-12)
 
 
