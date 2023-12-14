@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.82.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.82.1...0.82.2) (2023-12-14)
+
+
+### Bug Fixes
+
+* remove all unicode characters, leading and trailing whitespace, and newlines and return characters (#196) ([2eabab8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2eabab807686d2bda46f9191417d4ddcce9fea38))
+
 ### [0.82.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.82.0...0.82.1) (2023-12-13)
 
 
