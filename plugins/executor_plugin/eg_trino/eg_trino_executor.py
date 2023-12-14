@@ -7,9 +7,8 @@ from logic import (
     query_execution as qe_logic,
 )
 from logic.metastore import get_table_information_by_table_id, get_table_by_name
-
 from app.db import DBSession
-
+import re
 
 def get_trino_error_dict(e):
     if hasattr(e, "args") and e.args[0] is not None:
@@ -166,6 +165,8 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
                                                                                      session=session)
         if datadoc_info:
             self._datadoc_id, _, self._datadoc_title = datadoc_info
+            self._datadoc_title = re.sub(r'[^\x00-\x7F]', '', self._datadoc_title)
+            self._datadoc_title = self._datadoc_title.strip().replace('\n', '').replace('\r', '')
             self._client_setting = self._client_setting | \
                                    {'datadoc_id': 'datadoc_id:' + str(self._datadoc_id),
                                     'datadoc_title': 'datadoc_title:' + self._datadoc_title}
