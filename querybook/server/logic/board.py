@@ -6,7 +6,10 @@ from models.board import Board, BoardItem, BoardEditor
 from models.access_request import AccessRequest
 from lib.sqlalchemy import update_model_fields
 from tasks.sync_elasticsearch import sync_elasticsearch
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, select
+
+from models import User, UserGroupMember
+from logic.generic_permission import get_all_groups_and_group_members_with_access
 
 
 @with_session
@@ -229,7 +232,45 @@ def get_all_shared_boards(environment_id, user_id, session=None):
         .all()
     )
 
+    extra_shared_boards = get_boards_from_user_group_access(
+        eid=environment_id, uid=user_id, session=session
+    )
+
+    for board in extra_shared_boards:
+        if board.id not in [shared_board.id for shared_board in shared_boards]:
+            shared_boards.append(board)
+
     return shared_boards
+
+
+@with_session
+def get_boards_from_user_group_access(eid, uid, session=None):
+    topq = (
+        session.query(Board)
+        .filter(Board.public == 0)
+        .filter(Board.owner_uid != uid)
+        .filter(Board.environment_id == eid)
+        .join(BoardEditor, Board.id == BoardEditor.board_id)
+        .join(User, User.id == BoardEditor.uid)
+        .join(UserGroupMember, User.id == UserGroupMember.gid)
+    )
+
+    topq = topq.cte("cte", recursive=True)
+
+    bottomq = (
+        select(Board)
+        .select_from(topq)
+        .join(BoardEditor, topq.c.id == BoardEditor.board_id)
+        .filter(Board.public == 0)
+        .filter(Board.owner_uid != uid)
+        .filter(Board.environment_id == eid)
+        .join(User, User.id == BoardEditor.uid)
+        .join(UserGroupMember, User.id == UserGroupMember.gid)
+    )
+
+    recursive_q = topq.union(bottomq)
+
+    return session.query(recursive_q).all()
 
 
 @with_session
@@ -280,13 +321,35 @@ def get_board_editor_by_id(id, session=None):
 
 @with_session
 def get_board_editors_by_board_id(board_id, session=None):
-    return session.query(BoardEditor).filter_by(board_id=board_id).all()
+    editors = get_all_groups_and_group_members_with_access(
+        doc_or_board_id=board_id,
+        editor_type=BoardEditor,
+        session=session,
+    )
+
+    return [
+        BoardEditor(
+            # [0] is id, [1] is uid, [2] is read, [3] is write
+            board_id=board_id,
+            id=editor[0],
+            uid=editor[1],
+            read=editor[2],
+            write=editor[3],
+        )
+        for editor in editors
+    ]
 
 
 @with_session
 def create_board_editor(
     board_id, uid, read=False, write=False, commit=True, session=None
 ):
+    existing_editor = (
+        session.query(BoardEditor).filter_by(board_id=board_id, uid=uid).first()
+    )
+    if existing_editor is not None:
+        return existing_editor
+
     editor = BoardEditor(board_id=board_id, uid=uid, read=read, write=write)
 
     session.add(editor)
