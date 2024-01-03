@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.83.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.82.2...0.83.0) (2024-01-03)
+
+
+### Features
+
+* Added user group permissions for lists and datadocs (#137) ([48ba132](https://github.expedia.biz/eg-analytics-platform/querybook/commit/48ba132ad4cfb53867466021aaff21acca129e7a))
+* fixed up clean_up_archived_data_doc and added the option to pass in -1 for run_all_db_clean_up_jobs ([fb1aa32](https://github.expedia.biz/eg-analytics-platform/querybook/commit/fb1aa32cf4253728243469cdcafc41d7f8cffb91))
+* Sync LDAP Groups task, syncs group membership from LDAP ([c5007e0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c5007e009265bba659a11e17d459c03fa5600673))
+
+
+### Bug Fixes
+
+* fixed active_tasks only displaying 1 tasks per worker (#198) ([ab5f2be](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ab5f2be533785e21c28816dae8d26ff13a6ff863))
+
 ### [0.82.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.82.1...0.82.2) (2023-12-14)
 
 
