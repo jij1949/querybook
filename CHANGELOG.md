@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.83.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.83.0...0.83.1) (2024-01-04)
+
+
+### Bug Fixes
+
+* fixed inherited permissions not converting to proper read/write values (#200) ([064664e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/064664ec8eb80d537c375beb59070b4454eb3125))
+
 ## [0.83.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.82.2...0.83.0) (2024-01-03)
 
 
