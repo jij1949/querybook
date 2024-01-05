@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.83.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.83.1...0.83.2) (2024-01-05)
+
+
+### Bug Fixes
+
+* Don't unfurl nested groups in sync_ldap_group ([5979368](https://github.expedia.biz/eg-analytics-platform/querybook/commit/59793687a1b481e485d1597e54f84feeaaa650fd))
+
 ### [0.83.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.83.0...0.83.1) (2024-01-04)
 
 
