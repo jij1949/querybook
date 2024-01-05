@@ -133,7 +133,12 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
             for entry in entries:
                 if "attributes" in entry:
                     if "sAMAccountType" in entry["attributes"]:
-                        if entry["attributes"]["sAMAccountType"] == SAM_GROUP_OBJECT:
+                        # If the entry is a group, recursively query its members unless unfurlGroups is False
+                        if (
+                            entry["attributes"]["sAMAccountType"] == SAM_GROUP_OBJECT
+                            and args.unfurlGroups == True
+                        ):
+                            # Check if we've already queried this group
                             if (
                                 entry["attributes"]["sAMAccountName"]
                                 not in visited_groups
@@ -158,11 +163,14 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                                     LOG.debug(
                                         f"Already queried group {entry['attributes']['sAMAccountName']}, skipping."
                                     )
-                        # Filter users with no email or
-                        #  is a Service account
-                        elif entry["attributes"]["sAMAccountName"] is not None and (
-                            not entry["attributes"]["sAMAccountName"].startswith("s-")
+                        # Filter out service accounts (s-*)
+                        elif entry["attributes"]["sAMAccountName"] is None or (
+                            entry["attributes"]["sAMAccountName"].startswith("s-")
                         ):
+                            LOG.debug(
+                                f"Warning - user {entry['attributes']['sAMAccountName']} is a service account, skipping."
+                            )
+                        else:
                             if args.tracead:
                                 LOG.debug(
                                     f"Found user {entry['attributes']['sAMAccountName']}"
@@ -170,11 +178,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                             ad_group_members.append(
                                 entry["attributes"]["sAMAccountName"]
                             )
-                        else:
-                            LOG.debug(
-                                f"Warning - user {entry['attributes']['sAMAccountName']} has no email address or service account (not following naming standard)"
-                                ", not syncing to querybook"
-                            )
+
                         total_entries += 1
         end = time.time()
         LOG.debug(
@@ -186,7 +190,8 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
             f"Unable to query AD for members of {ad_group}: {e.message}", exc_info=True
         )
         success = False
-        # return members, but remove duplicates in case querying members of sub-groups added dupes.
+
+    # Unfurling groups might result in duplicates, so we need to dedupe
     return success, list(set(ad_group_members))
 
 
@@ -343,6 +348,7 @@ def sync_ldap_task(self):
         args = Object()
         args.dryrun = False
         args.tracead = False
+        args.unfurlGroups = True
 
         conn = ad_connect(args, ad_server, ad_bind_user, ad_bind_password)
 
@@ -469,6 +475,10 @@ def sync_ldap_groups(self):
     args = Object()
     args.dryrun = False
     args.tracead = False
+
+    # Don't unfurl nested groups, just return the group name(s)
+    args.unfurlGroups = False
+
     ad_connection = ad_connect(args, ad_server, ad_bind_user, ad_bind_password)
 
     with DBSession() as session:
