@@ -9,11 +9,16 @@ export const NextRun: React.FunctionComponent<{ cron?: string }> = ({
 }) => {
     const formattedDate = useMemo(() => {
         if (!cron) {
-            console.log(`FOUND NULL`);
             return null;
         }
-        const nextDate = parseExpression(cron, { utc: true }).next().toDate();
-        return generateFormattedDate(moment(nextDate).unix());
+        try {
+            const nextDate = parseExpression(cron, { utc: true })
+                .next()
+                .toDate();
+            return generateFormattedDate(moment(nextDate).unix());
+        } catch (e) {
+            return null;
+        }
     }, [cron]);
 
     return <>{formattedDate}</>;

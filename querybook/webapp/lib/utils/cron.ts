@@ -8,6 +8,8 @@ export interface IRecurrence {
     recurrence: RecurrenceType;
     on: IRecurrenceOn;
     step: IRecurrenceStep;
+
+    cron?: string;
 }
 
 export interface IRecurrenceOn {
@@ -26,6 +28,7 @@ export const recurrenceTypes = [
     'weekly',
     'monthly',
     'yearly',
+    'cron',
 ];
 
 export type RecurrenceType = typeof recurrenceTypes[number];
@@ -37,7 +40,10 @@ export function cronToRecurrence(cron: string): IRecurrence {
     let on = {};
     let step = {};
 
-    if (dayMonth !== '*' && month !== '*') {
+    // If cron is not supported via the Recurrence editor, then we default to cron type
+    if (!validateCronForRecurrrence(cron)) {
+        recurrencePolicy = 'cron';
+    } else if (dayMonth !== '*' && month !== '*') {
         recurrencePolicy = 'yearly';
         on = {
             month: month.split(',').map((d) => Number(d)),
@@ -56,6 +62,17 @@ export function cronToRecurrence(cron: string): IRecurrence {
             : { hour: Number(1) };
     }
 
+    if (recurrencePolicy === 'cron') {
+        return {
+            recurrence: 'cron',
+            cron,
+            hour: 0,
+            minute: 0,
+            on,
+            step,
+        };
+    }
+
     const recurrence: IRecurrence = {
         hour: recurrencePolicy === 'hourly' ? 0 : Number(hour),
         minute: Number(minute),
@@ -63,12 +80,17 @@ export function cronToRecurrence(cron: string): IRecurrence {
         recurrence: recurrencePolicy,
         on,
         step,
+        cron,
     };
 
     return recurrence;
 }
 
 export function recurrenceToCron(recurrence: IRecurrence): string {
+    if (recurrence.recurrence === 'cron') {
+        return recurrence.cron;
+    }
+
     const { minute } = recurrence;
 
     let hour = recurrence.hour.toString();
@@ -160,6 +182,12 @@ export function getRecurrenceUtcTimeString(
         .format(format);
 }
 
+/**
+ * Determines whether a cron string is supported by the recurrence editor.
+ *
+ * @param cron Cron string to validate
+ * @returns true if cron string is supported by recurrence editor, false otherwise
+ */
 export function validateCronForRecurrrence(cron: string) {
     const cronValArr = cron.split(' ');
     if (cronValArr.length < 5) {
@@ -174,6 +202,27 @@ export function validateCronForRecurrrence(cron: string) {
         return false;
     }
 
+    const [minuteRange, hourRange, monthRange, monthDayRange, weekDayRange] =
+        cronValArr.map((s) => s.includes('-'));
+
+    // Recurrence does not support ranges
+    if (
+        minuteRange ||
+        hourRange ||
+        monthRange ||
+        monthDayRange ||
+        weekDayRange
+    ) {
+        return false;
+    }
+
+    const [minuteList, hourList] = cronValArr.map((s) => s.includes(','));
+
+    // Recurrence does not support lists for minute and hour
+    if (minuteList || hourList) {
+        return false;
+    }
+
     const [minute, hour, month, monthDay, weekDay] = cronValArr.map(
         (s) => s !== '*'
     );
@@ -181,7 +230,7 @@ export function validateCronForRecurrrence(cron: string) {
     if (!(minute && hour)) {
         return false;
     }
-    // Recurrence don't current support having both monthday and weekday
+    // Recurrence doesn't current support having both monthday and weekday
     if ((monthDay || month) && weekDay) {
         return false;
     }

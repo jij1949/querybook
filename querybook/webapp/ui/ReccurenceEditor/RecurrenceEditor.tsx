@@ -3,6 +3,7 @@ import moment from 'moment';
 import * as React from 'react';
 import Select from 'react-select';
 
+import { DescribeCron } from 'components/DescribeCron/DescribeCron';
 import { NextRun } from 'components/NextRun/NextRun';
 import {
     getMonthdayOptions,
@@ -28,12 +29,14 @@ const recurrenceReactSelectStyle = makeReactSelectStyle(true);
 interface IProps {
     recurrence: IRecurrence;
     recurrenceError?: FormikErrors<IRecurrence>;
+    allowCron?: boolean;
     setRecurrence: (val: IRecurrence) => void;
 }
 
 export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
     recurrence,
     recurrenceError,
+    allowCron = false,
     setRecurrence,
 }) => {
     const localTime = React.useMemo(
@@ -41,6 +44,7 @@ export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
         [recurrence]
     );
 
+    const isCron = recurrence.recurrence === 'cron';
     const isHourly = recurrence.recurrence === 'hourly';
     const isDaily = recurrence.recurrence === 'daily';
     const isWeekly = recurrence.recurrence === 'weekly';
@@ -68,87 +72,9 @@ export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
         </div>
     );
 
-    const hourSecondField = (
-        <FormField label={'Hour/Minute (UTC)'} error={recurrenceError?.hour}>
-            <div className="flex-row">
-                {isHourly ? (
-                    <>
-                        <div className="editor-text mr12">
-                            {'Every day, every'}
-                        </div>
-                        <TimePicker
-                            allowEmpty={false}
-                            value={moment().hour(recurrence.step.hour)}
-                            showHour={true}
-                            showMinute={false}
-                            showSecond={false}
-                            disabledHours={() => [0]}
-                            hideDisabledOptions
-                            format={'H'}
-                            onChange={(value) => {
-                                const newRecurrence = {
-                                    ...recurrence,
-                                    step: { hour: value.hour() },
-                                };
-                                setRecurrence(newRecurrence);
-                            }}
-                        />
-                        <div className="editor-text ml12 mr12">
-                            {'hours at minute'}
-                        </div>
-                    </>
-                ) : (
-                    ''
-                )}
-
-                <TimePicker
-                    allowEmpty={false}
-                    value={
-                        isHourly
-                            ? moment().minute(recurrence.minute)
-                            : moment()
-                                  .hour(recurrence.hour)
-                                  .minute(recurrence.minute)
-                    }
-                    minuteStep={15}
-                    showHour={!isHourly}
-                    showSecond={false}
-                    format={isHourly ? 'mm' : 'H:mm'}
-                    onChange={(value) => {
-                        if (isHourly) {
-                            const newRecurrence = {
-                                ...recurrence,
-                                minute: value.minute(),
-                            };
-                            setRecurrence(newRecurrence);
-                        } else {
-                            const newRecurrence = {
-                                ...recurrence,
-                                hour: value.hour(),
-                                minute: value.minute(),
-                            };
-                            setRecurrence(newRecurrence);
-                        }
-                    }}
-                />
-                <div className="editor-text ml12">
-                    {isHourly ? `` : `Local Time: ${localTime}`}
-                </div>
-                <div className="editor-text ml12">
-                    <div>
-                        {reccurenceValuesNotSet ? (
-                            'Next Run: Run Options not Set'
-                        ) : (
-                            <div>
-                                {'Next Run: '}
-                                <NextRun cron={recurrenceToCron(recurrence)} />
-                                {' (Local Time)'}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </FormField>
+    // Filter out cron if not allowed
+    const filteredRecurrenceTypes = recurrenceTypes.filter(
+        (type) => allowCron || type !== 'cron'
     );
 
     const recurrenceTypeField = (
@@ -156,13 +82,17 @@ export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
             <Field name="recurrence.recurrence">
                 {({ field }) => (
                     <Tabs
-                        items={recurrenceTypes}
+                        items={filteredRecurrenceTypes}
                         selectedTabKey={field.value}
                         onSelect={(key: RecurrenceType) => {
                             const newRecurrence = {
                                 ...recurrence,
                                 recurrence: key,
                             };
+                            if (key === 'cron') {
+                                newRecurrence.cron =
+                                    recurrenceToCron(recurrence);
+                            }
                             if (field.value !== key) {
                                 newRecurrence.on = {};
                             }
@@ -178,18 +108,143 @@ export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
         </FormField>
     );
 
-    let datePickerField: React.ReactNode;
-    if (isYearly) {
-        datePickerField = (
+    let recurrenceOptionsField: React.ReactNode;
+    if (isCron) {
+        recurrenceOptionsField = (
             <>
-                <RecurrenceEditorDatePicker
-                    label="Months"
-                    onKey="month"
-                    options={getYearlyMonthOptions()}
-                    error={recurrenceError?.on}
-                    recurrence={recurrence}
-                    setRecurrence={setRecurrence}
-                />
+                {recurrenceTypeField}
+                <FormField label="Cron Expression">
+                    <Field
+                        name="recurrence.cron"
+                        render={({ field }) => (
+                            <>
+                                <input
+                                    {...field}
+                                    className="editor-input"
+                                    placeholder="* * * * *"
+                                />
+                                <div className="editor-text mt12">
+                                    <DescribeCron cron={recurrence.cron} />
+                                </div>
+                            </>
+                        )}
+                    />
+                </FormField>
+            </>
+        );
+    } else {
+        const hourSecondField = (
+            <FormField
+                label={'Hour/Minute (UTC)'}
+                error={recurrenceError?.hour}
+            >
+                <div className="flex-row">
+                    {isHourly ? (
+                        <>
+                            <div className="editor-text mr12">
+                                {'Every day, every'}
+                            </div>
+                            <TimePicker
+                                allowEmpty={false}
+                                value={moment().hour(recurrence.step.hour)}
+                                showHour={true}
+                                showMinute={false}
+                                showSecond={false}
+                                disabledHours={() => [0]}
+                                hideDisabledOptions
+                                format={'H'}
+                                onChange={(value) => {
+                                    const newRecurrence = {
+                                        ...recurrence,
+                                        step: { hour: value.hour() },
+                                    };
+                                    setRecurrence(newRecurrence);
+                                }}
+                            />
+                            <div className="editor-text ml12 mr12">
+                                {'hours at minute'}
+                            </div>
+                        </>
+                    ) : (
+                        ''
+                    )}
+
+                    <TimePicker
+                        allowEmpty={false}
+                        value={
+                            isHourly
+                                ? moment().minute(recurrence.minute)
+                                : moment()
+                                      .hour(recurrence.hour)
+                                      .minute(recurrence.minute)
+                        }
+                        minuteStep={15}
+                        showHour={!isHourly}
+                        showSecond={false}
+                        format={isHourly ? 'mm' : 'H:mm'}
+                        onChange={(value) => {
+                            if (isHourly) {
+                                const newRecurrence = {
+                                    ...recurrence,
+                                    minute: value.minute(),
+                                };
+                                setRecurrence(newRecurrence);
+                            } else {
+                                const newRecurrence = {
+                                    ...recurrence,
+                                    hour: value.hour(),
+                                    minute: value.minute(),
+                                };
+                                setRecurrence(newRecurrence);
+                            }
+                        }}
+                    />
+                    <div className="editor-text ml12">
+                        {isHourly ? `` : `Local Time: ${localTime}`}
+                    </div>
+                    <div className="editor-text ml12">
+                        <div>
+                            {reccurenceValuesNotSet ? (
+                                'Next Run: Run Options not Set'
+                            ) : (
+                                <div>
+                                    {'Next Run: '}
+                                    <NextRun
+                                        cron={recurrenceToCron(recurrence)}
+                                    />
+                                    {' (Local Time)'}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </FormField>
+        );
+
+        let datePickerField: React.ReactNode;
+        if (isYearly) {
+            datePickerField = (
+                <>
+                    <RecurrenceEditorDatePicker
+                        label="Months"
+                        onKey="month"
+                        options={getYearlyMonthOptions()}
+                        error={recurrenceError?.on}
+                        recurrence={recurrence}
+                        setRecurrence={setRecurrence}
+                    />
+                    <RecurrenceEditorDatePicker
+                        label="Month Days"
+                        onKey="dayMonth"
+                        options={getMonthdayOptions()}
+                        error={recurrenceError?.on}
+                        recurrence={recurrence}
+                        setRecurrence={setRecurrence}
+                    />
+                </>
+            );
+        } else if (isMonthly) {
+            datePickerField = (
                 <RecurrenceEditorDatePicker
                     label="Month Days"
                     onKey="dayMonth"
@@ -198,38 +253,33 @@ export const RecurrenceEditor: React.FunctionComponent<IProps> = ({
                     recurrence={recurrence}
                     setRecurrence={setRecurrence}
                 />
+            );
+        } else if (isWeekly) {
+            datePickerField = (
+                <RecurrenceEditorDatePicker
+                    label="Week Days"
+                    onKey="dayWeek"
+                    options={getWeekdayOptions()}
+                    error={recurrenceError?.on}
+                    recurrence={recurrence}
+                    setRecurrence={setRecurrence}
+                />
+            );
+        }
+
+        recurrenceOptionsField = (
+            <>
+                {hourSecondField}
+                {recurrenceTypeField}
+                {datePickerField}
             </>
-        );
-    } else if (isMonthly) {
-        datePickerField = (
-            <RecurrenceEditorDatePicker
-                label="Month Days"
-                onKey="dayMonth"
-                options={getMonthdayOptions()}
-                error={recurrenceError?.on}
-                recurrence={recurrence}
-                setRecurrence={setRecurrence}
-            />
-        );
-    } else if (isWeekly) {
-        datePickerField = (
-            <RecurrenceEditorDatePicker
-                label="Week Days"
-                onKey="dayWeek"
-                options={getWeekdayOptions()}
-                error={recurrenceError?.on}
-                recurrence={recurrence}
-                setRecurrence={setRecurrence}
-            />
         );
     }
 
     return (
         <div className="RecurrenceEditor">
             {schedulingInfoMsgField}
-            {hourSecondField}
-            {recurrenceTypeField}
-            {datePickerField}
+            {recurrenceOptionsField}
         </div>
     );
 };

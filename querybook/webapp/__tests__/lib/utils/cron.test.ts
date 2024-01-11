@@ -1,4 +1,8 @@
-import { cronToRecurrence, recurrenceToCron } from 'lib/utils/cron';
+import {
+    cronToRecurrence,
+    recurrenceToCron,
+    validateCronForRecurrrence,
+} from 'lib/utils/cron';
 
 test('basic recurrence to cron', () => {
     expect(
@@ -73,6 +77,7 @@ test('basic cron to recurrence', () => {
         recurrence: 'daily',
         on: {},
         step: {},
+        cron: '1 1 * * *',
     });
 });
 
@@ -84,6 +89,7 @@ test('yearly cron to recurrence', () => {
         recurrence: 'yearly',
         on: { dayMonth: [1, 2, 3], month: [3, 6, 9, 12] },
         step: {},
+        cron: '1 1 1,2,3 3,6,9,12 *',
     });
 });
 
@@ -95,6 +101,7 @@ test('monthly cron to recurrence', () => {
         recurrence: 'monthly',
         on: { dayMonth: [1, 2, 3] },
         step: {},
+        cron: '1 1 1,2,3 * *',
     });
 });
 
@@ -106,6 +113,7 @@ test('weekly cron to recurrence', () => {
         recurrence: 'weekly',
         on: { dayWeek: [1, 2, 3] },
         step: {},
+        cron: '1 1 * * 1,2,3',
     });
 });
 
@@ -117,5 +125,58 @@ test('hourly cron to recurrence', () => {
         recurrence: 'hourly',
         on: {},
         step: { hour: 2 },
+        cron: '1 */2 * * *',
     });
+});
+
+test('every 5 minutes cron to recurrence', () => {
+    expect(cronToRecurrence('*/5 * * * *')).toStrictEqual({
+        hour: 0,
+        minute: 0,
+
+        recurrence: 'cron',
+        on: {},
+        step: {},
+        cron: '*/5 * * * *',
+    });
+});
+
+test('at 22:00 on every day-of-week from Monday through Friday cron to recurrence', () => {
+    expect(cronToRecurrence('0 22 * * 1-5')).toStrictEqual({
+        hour: 0,
+        minute: 0,
+
+        recurrence: 'cron',
+        on: {},
+        step: {},
+        cron: '0 22 * * 1-5',
+    });
+});
+
+test('at minute 0 past hour 0 and 12 on day-of-month 1 and 15 in January and July cron to recurrence', () => {
+    expect(cronToRecurrence('0 0,12 1,15 1,7 *')).toStrictEqual({
+        hour: 0,
+        minute: 0,
+
+        recurrence: 'cron',
+        on: {},
+        step: {},
+        cron: '0 0,12 1,15 1,7 *',
+    });
+});
+
+test('validate basic cron to recurrence', () => {
+    expect(validateCronForRecurrrence('1 1 * * *')).toBe(true);
+});
+test('validate hourly step cron to recurrence', () => {
+    expect(validateCronForRecurrrence('30 */2 * * *')).toBe(true);
+});
+test('validate minute step cron to recurrence', () => {
+    expect(validateCronForRecurrrence('*/30 0 * * *')).toBe(false);
+});
+test('validate range cron to recurrence', () => {
+    expect(validateCronForRecurrrence('0 22 * * 1-5')).toBe(false);
+});
+test('validate complex yearly cron to recurrence', () => {
+    expect(validateCronForRecurrrence('0 0,12 1,15 1,7 *')).toBe(false);
 });
