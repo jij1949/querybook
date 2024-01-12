@@ -97,7 +97,7 @@ const queryResultTransformers: IColumnTransformer[] = [
         priority: 0,
         auto: true,
         transform: (v: string): React.ReactNode => (
-            <Link to={v} naturalLink>
+            <Link to={v} naturalLink newTab>
                 {v}
             </Link>
         ),
