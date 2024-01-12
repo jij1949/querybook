@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.84.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.83.2...0.84.0) (2024-01-12)
+
+
+### Features
+
+* Create an updated TrinoConnectionChecker2 with HMS and Ranger ([bb7b6f0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bb7b6f00afba3b70715ae3e66fd28a25736675b2))
+* Cron schedule support ([0464f29](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0464f295a7006bdfc19bccc93c53bc3521272594))
+
+
+### Bug Fixes
+
+* added [inherited] to board permissions ([903dd4b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/903dd4b82274ad777a8d673d62f27684d3bdb79f))
+* Url Links transformer open in a new tab ([14cfbf7](https://github.expedia.biz/eg-analytics-platform/querybook/commit/14cfbf730d79da5d529e8c7681aab2816a380dcd))
+
 ### [0.83.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.83.1...0.83.2) (2024-01-05)
 
 
