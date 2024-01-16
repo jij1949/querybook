@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Dict
 
 import requests
-import os
 import socket
 from pathlib import Path
 from env import QuerybookSettings
@@ -14,6 +13,7 @@ from lib.query_executor.base_executor import QueryExecutorBaseClass
 from lib.utils.utils import Timeout
 from logic.admin import get_query_metastore_by_id
 from models.admin import QueryMetastore
+from urllib.parse import urljoin
 
 LOG = get_logger(__name__)
 
@@ -66,9 +66,7 @@ def check_trino_connection(client_settings: Dict) -> Dict:
     try:
         with Timeout(20, "Connection check took too long"):
             trino_conn_str = Path(client_settings["connection_string"])
-            trino_url = os.path.join(
-                "https://", trino_conn_str.parts[1], "v1/info/state"
-            )
+            trino_url = urljoin("https://" + trino_conn_str.parts[1], "v1/info/state")
             trino_response = requests.get(url=trino_url, timeout=10)
             trino_response_data = trino_response.json()
 
