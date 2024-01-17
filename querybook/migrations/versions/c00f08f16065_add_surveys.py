@@ -1,7 +1,7 @@
 """Add surveys
 
 Revision ID: c00f08f16065
-Revises: 4c70dae378f2
+Revises: c50cef3b4a00
 Create Date: 2023-11-20 22:40:36.139101
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = "c00f08f16065"
-down_revision = "4c70dae378f2"
+down_revision = "c50cef3b4a00"
 branch_labels = None
 depends_on = None
 
