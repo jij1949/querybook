@@ -112,6 +112,12 @@ function getDistinctExporters(
         .filter((exporter) => exporter);
 }
 
+function getDefaultCron() {
+    const minutes = Math.floor(Math.random() * 4) * 15;
+    const hours = Math.floor(Math.random() * 24);
+    return minutes.toString() + ' ' + hours.toString() + ' * * *';
+}
+
 interface IScheduleFormValues {
     recurrence: IRecurrence;
     enabled?: boolean;
@@ -147,7 +153,7 @@ export const DataDocScheduleForm: React.FunctionComponent<
     );
     const notifiers = useSelector(notificationServiceSelector);
     const isCreateForm = !Boolean(cron);
-    const recurrence = cronToRecurrence(cron || '0 0 * * *');
+    const recurrence = cronToRecurrence(cron || getDefaultCron());
     const formValues: IScheduleFormValues = isCreateForm
         ? {
               recurrence,
