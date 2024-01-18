@@ -173,7 +173,11 @@ const StatementResultWithResult: React.FC<IProps> = ({
 };
 
 const StatementResultWithError: React.FC<{ error: any }> = ({ error }) => {
-    const stringfiedError = useMemo(() => String(error), [error]);
+    let stringfiedError = useMemo(() => String(error), [error]);
+    if (stringfiedError.includes('does not exist')) {
+        stringfiedError =
+            'Results older than 15 days are automatically deleted';
+    }
     return (
         <Message
             title="Cannot Load Statement Result"
