@@ -32,9 +32,11 @@ export enum SurveySurfaceType {
 
 export const SurveyTypeToQuestion: Record<SurveySurfaceType, string> = {
     [SurveySurfaceType.TABLE_SEARCH]:
-        'Did this search help you find the right table?',
-    [SurveySurfaceType.TABLE_TRUST]: 'Do you trust {table_name}?',
-    [SurveySurfaceType.TEXT_TO_SQL]: 'Was Text2SQL helpful with your task?',
+        'How effective was this search in finding the right table?',
+    [SurveySurfaceType.TABLE_TRUST]:
+        'How confident are you in the reliability of {table_name}?',
+    [SurveySurfaceType.TEXT_TO_SQL]:
+        'How useful was the AI Assistant in accomplishing your task?',
     [SurveySurfaceType.QUERY_AUTHORING]:
-        'Were you able to write this query efficiently?',
+        'How would you describe your overall experience using Querybook?',
 };
