@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.85.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.84.0...0.85.0) (2024-01-19)
+
+
+### Features
+
+* ask users to confirm tables before query generation (#1339) ([becf905](https://github.expedia.biz/eg-analytics-platform/querybook/commit/becf905db483ae446ea3b972326988e28b673cc4))
+* Enable and configure Surveys ([c277ede](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c277edeca132790826d41725a04ad5ab881c4d14))
+* fixed up clean_up_archived_data_doc and added the option to pass in -1 for run_all_db_clean_up_jobs (#1387) ([900d2d6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/900d2d671e4b358954587db0a7b6e509c5198183))
+* refactor ai-assistant plugin and add vector search support (#1325) ([f3ce910](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f3ce9100a2b761628bb17a9b147d71f87c929872))
+* update column stats ui, add sort by usage to columns (#1389) ([370948f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/370948f8e3bd9476637d00e0cf4e4121bc27ef8c))
+
+
+### Bug Fixes
+
+* Add scroll bar to Query Engine Status popover (#1353) ([f8d8dd4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f8d8dd439af0018ba528c8435d3c280d1841ef04))
+* cast table max upload size to int (#1374) ([e2efe8e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e2efe8e2764759854f158a2703c6d3f8932bdb4a))
+* Fix DataDoc contents overflow in non-Chrome browsers (#1332) ([18c86a6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/18c86a6010fbc9d4fa8e708f8ca3343718915a6a))
+* Fix URL joining in TrinoConnectionChecker2 ([b63b691](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b63b691932447a29abc66d0b06372e4a2103b17f))
+* possible unauthenticated SQL injection when login (#1383) ([7214963](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7214963fef91098b28d9a0306fb3440015a0f32f))
+* randomized default schedule time (#209) ([7534222](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7534222b3048aef588d76089c04ae44621f568a0))
+* Refactor AI Assistant to support non-streaming mode ([91d0942](https://github.expedia.biz/eg-analytics-platform/querybook/commit/91d094231239b49b84f4d5c99fb45150a2881afc))
+* replaced 'does not exist' errors with custom error message (#210) ([3f1e0ad](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3f1e0adff007b6d6685c6cd617ad3c34c174a2d8))
+* s3 table upload location (#1376) ([0b5699a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0b5699a111da452be762f55e2844dc74f400a48d))
+* some small changes and fixes for AI assistant (#1333) ([21c3fd4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/21c3fd4aa75ef7437792fa735fbdce3641620333))
+* Store group description in `public_info` (#1384) ([3686d0d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3686d0ddc4ae5fe590cb8f6b6a3a099afd104f19))
+* store the task type value rather than enum when creating a task (#1329) ([9f8c001](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9f8c0017cdad555255dc7a3a99e392b44262f722))
+* Update runservice worker scripts to disable unneeded features (#1371) ([09ffc40](https://github.expedia.biz/eg-analytics-platform/querybook/commit/09ffc408176c15ebcbca7267820c92152a156a71))
+
+
+### Reverts
+
+* Revert "fix: Fix DataDoc contents overflow in non-Chrome browsers (#1332)" (#1336) ([5d0ed1d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5d0ed1de375f162a995f614685101e89a1d6500e))
+
 ## [0.84.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.83.2...0.84.0) (2024-01-12)
 
 
