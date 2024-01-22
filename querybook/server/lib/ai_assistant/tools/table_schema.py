@@ -154,7 +154,7 @@ def get_slimmed_table_schemas(table_schemas: list[dict]) -> list[dict]:
         {
             "table_name": schema["table_name"],
             "columns": [
-                {k: c[k] for k in column_keys_to_keep if k in c}
+                {k: c[k][:100] for k in column_keys_to_keep if k in c}
                 for c in schema["columns"]
             ],
         }
