@@ -4,6 +4,7 @@ moto==2.2.4
 
 -r auth/ldap.txt
 -r engine/hive.txt
+-r engine/trino.txt
 -r metastore/glue.txt
 -r exporter/gspread.txt
 -r parser/sqlglot.txt

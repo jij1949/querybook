@@ -8,6 +8,7 @@ from lib.query_analysis.validation.base_query_validator import (
 from lib.utils.execute_query import ExecuteQuery
 from lib.query_executor.executors.presto import get_presto_error_dict
 from lib.query_analysis.statements import split_query_to_statements_with_start_location
+from trino.exceptions import TrinoUserError
 
 
 class PrestoExplainValidator(BaseQueryValidator):
@@ -86,7 +87,7 @@ class PrestoExplainValidator(BaseQueryValidator):
                 self._run_validation_statement(
                     validation_statements[statement_idx], engine_id, uid
                 )
-            except PyHiveError as exc:
+            except (PyHiveError, TrinoUserError) as exc:
                 presto_syntax_error = self._get_semantic_error_from_exc(exc)
                 if presto_syntax_error:
                     error_line, error_ch, error_msg = presto_syntax_error

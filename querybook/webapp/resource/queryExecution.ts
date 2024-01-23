@@ -179,7 +179,7 @@ export const TemplatedQueryResource = {
             },
             {
                 notifyOnError: false,
-                timeout: 5000, // timeouts in 5s
+                timeout: 10000, // timeouts in 10s
             }
         ),
 
