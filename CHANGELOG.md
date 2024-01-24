@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.86.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.85.0...0.86.0) (2024-01-24)
+
+
+### Features
+
+* Support for Azure OpenAI Models ([b4a2dfe](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b4a2dfe8c69c8bb553b33e02ea3113f3869d2ace))
+
+
+### Bug Fixes
+
+* Add a 100-char field limit for column metadata in the slim prompt ([dd83bc0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dd83bc061affbe93f50fc0283ad1885a9ecec9cf))
+* Trino linting improvements ([68c29ec](https://github.expedia.biz/eg-analytics-platform/querybook/commit/68c29ec1662115a07e660ec1f0231145a522bdf6))
+
 ## [0.85.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.84.0...0.85.0) (2024-01-19)
 
 
