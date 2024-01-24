@@ -86,11 +86,11 @@ EVENT_LOGGER_NAME: ~
 STATS_LOGGER_NAME: ~
 
 # --------------- AI Assistant ---------------
-AI_ASSISTANT_PROVIDER: openai
+AI_ASSISTANT_PROVIDER: ~
 AI_ASSISTANT_CONFIG:
     default:
         model_args:
-            model_name: gpt-3.5-turbo
+            model_name: gpt-35-turbo
             temperature: 0.2
             streaming: False
         reserved_tokens: 1024

@@ -56,7 +56,7 @@ RUN pip install -r requirements/base.txt \
     pip install -r requirements/${PACKAGE}; \
     done \
     fi \
-    && pip install -r requirements/local.txt || true
+    && pip install -r requirements/local.txt
 
 COPY package.json yarn.lock ./
 RUN yarn install --pure-lockfile
