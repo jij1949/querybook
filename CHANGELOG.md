@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.86.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.86.1...0.86.2) (2024-01-26)
+
+
+### Bug Fixes
+
+* add a clear_sheet parameter for google sheet exporter (#1401) ([0e1917c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0e1917cb591582cd8fd261679ad44e40fe9bb015))
+* modify trigger for query_authoring survey (#1400) ([8c87e3e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8c87e3e98a8bf6c0cb4e658b66d78acadcdefe4f))
+* Update metastore error message suggestion ([33e140e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/33e140e079db9dcb4d9ace92c1e36bc532368917))
+
 ### [0.86.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.86.0...0.86.1) (2024-01-25)
 
 
