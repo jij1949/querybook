@@ -197,12 +197,12 @@ trino:
 
             If this issue is recurrent, please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7).
 
-    failed_connecting_to_hive:
-        regex: 'Failed connecting to Hive metastore'
+    metastore_error:
+        regex: '(48869.*(?:java\.net\.SocketTimeoutException|java\.net\.ConnectException|Socket is closed by peer)|Failed connecting to Hive metastore)'
         message: |
-            At times, clusters can get busy and scaling up/down of cluster may affect jobs sporadically. Please give a few minutes before re-trying.
+            This is a [Data Lake](https://confluence.expedia.biz/display/DAPS/EG+Data+Lake+Domain) error. Please wait briefly before re-trying and consider using partition column(s) to reduce the load on Data Lake scanning.
 
-            If this issue is recurrent, please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7).
+            If the issue persists, please contact [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7).
 
     schema_does_not_exist:
         regex: 'Schema .*? does not exist'
