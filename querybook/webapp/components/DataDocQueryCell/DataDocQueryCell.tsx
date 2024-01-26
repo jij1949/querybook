@@ -107,6 +107,7 @@ interface IState {
     query: string;
     meta: IDataQueryCellMeta;
 
+    modifiedAt: number;
     focused: boolean;
     selectedRange: ISelectedRange;
     queryCollapsedOverride: boolean;
@@ -133,6 +134,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
         this.state = {
             query: props.query,
             meta: props.meta,
+            modifiedAt: 0,
             focused: false,
             selectedRange: null,
             queryCollapsedOverride: null,
@@ -355,6 +357,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
         this.setState(
             {
                 query,
+                modifiedAt: Date.now(),
             },
             () => {
                 this.onChangeDebounced({ context: query });
@@ -437,10 +440,13 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                     )
                 ).id;
 
-                triggerSurvey(SurveySurfaceType.QUERY_AUTHORING, {
-                    query_execution_id: queryId,
-                    cell_id: this.props.cellId,
-                });
+                // Only trigger survey if the query is modified within 5 minutes
+                if (Date.now() - this.state.modifiedAt < 5 * 60 * 1000) {
+                    triggerSurvey(SurveySurfaceType.QUERY_AUTHORING, {
+                        query_execution_id: queryId,
+                        cell_id: this.props.cellId,
+                    });
+                }
 
                 return queryId;
             }
