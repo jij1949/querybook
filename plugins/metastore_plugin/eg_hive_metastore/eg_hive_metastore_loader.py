@@ -35,11 +35,16 @@ from const.data_element import (
 LOG = get_logger(__file__)
 
 
+# Map of data elements and their colors
 class EgTagColors(Enum):
     SENSITIVITY: str = "#85d0ce"  # icy blue
     CLOVERLEAF: str = "#ffca00"  # gold
     GOVERNANCE: str = "#35b5bb"  # blue
     ICEBERG: str = "#529dce"  # picton blue
+
+
+# Max length of a tag name in the database (tag.name)
+TAG_NAME_LIMIT = 255
 
 
 # See: https://confluence.expedia.biz/display/EDMG/EDMG+-+Tags+for+Data+Governance
@@ -300,6 +305,17 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
         # Update the table with the tags if any
         if tags:
+            # Shorten tags if any names are too long (TAG_NAME_LIMIT)
+            tags = [
+                (
+                    tag._replace(name=tag.name[: TAG_NAME_LIMIT - 3] + "...")
+                    if len(tag.name) > TAG_NAME_LIMIT
+                    else tag
+                )
+                for tag in tags
+            ]
+
+            # Add to the table
             table = table._replace(tags=tags)
 
         return table, new_columns
