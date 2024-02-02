@@ -686,13 +686,16 @@ def process_names_for_suggestion(*args):
     Returns:
         [List[str]] -- a list of words
     """
-    words = []
+    words = [arg.lower() for arg in args]
     for name in args:
         name_processed = re.sub(r"[\(\)\\\/0-9]+", "", name or "").strip().lower()
         name_words = name_processed.split()
         words.append(name_processed)
         words += name_words
-    return words
+
+    # deduplicate in order
+    seen = set()
+    return [x for x in words if not (x in seen or seen.add(x))]
 
 
 @with_session

@@ -453,7 +453,14 @@ class UserTestCase(TestCase):
                 "id": 7,
                 "username": "john",
                 "fullname": "John Smith 123",
-                "suggest": {"input": ["john", "john", "john smith", "john", "smith"]},
+                "suggest": {
+                    "input": [
+                        "john",
+                        "john smith 123",
+                        "john smith",
+                        "smith",
+                    ]
+                },
             },
         )
 
@@ -469,7 +476,7 @@ class UserTestCase(TestCase):
         # Should not impact search
         self.assertEqual(
             user_dict["suggest"],
-            {"input": ["john", "john", "john smith", "john", "smith"]},
+            {"input": ["john", "john smith 123", "john smith", "smith"]},
         )
 
     def test_partial_dict(self):
