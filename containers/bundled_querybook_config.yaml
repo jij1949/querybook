@@ -38,3 +38,30 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 #     embeddings_arg_name: 'embedding_function'
 #     opensearch_url: http://elasticsearch:9200
 #     index_name: 'vector_index_v1'
+
+#############
+# EG Custom #
+#############
+
+# #
+# # AI Assistant: Ollama
+# #
+# AI_ASSISTANT_PROVIDER: ollama
+# OLLAMA_BASE_URL: http://ollama:11434
+# AI_ASSISTANT_CONFIG:
+#     default:
+#         model_args:
+#             model_name: tinydolphin:latest
+#             temperature: 0.1
+#             streaming: False
+#         reserved_tokens: 1024
+# #
+# # AI Assistant: Azure OpenAI
+# #
+# AI_ASSISTANT_PROVIDER: azure_openai
+# AI_ASSISTANT_CONFIG:
+#     default:
+#         model_args:
+#             model_name: gpt-35-turbo
+#             temperature: 0.2
+#             streaming: False

@@ -194,6 +194,26 @@ services:
         profiles:
             - flower
 
+    #
+    # Ollama - AI Assistant
+    #
+    ollama:
+        container_name: querybook_ollama
+        image: ollama/ollama:latest
+        healthcheck:
+            test: ollama --version || exit 1
+            interval: 60s
+        ports:
+            - '11434:11434'
+        expose:
+            - '11434'
+        env_file:
+            - ./.env.local
+        volumes:
+            - ollama-data:/root/.ollama
+        profiles:
+            - ollama
+
     # EMAIL SERVER EXAMPLE
     # If you need email to work use this
     # dockerhostforward:
@@ -207,6 +227,8 @@ services:
 volumes:
     my-db:
     osdata1:
+        driver: local
+    ollama-data:
         driver: local
     # file:
     #     driver: local
