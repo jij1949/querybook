@@ -45,6 +45,9 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 
 # #
 # # AI Assistant: Ollama
+# # This is a local LLM server
+# # Start using `docker compose run --service-ports ollama`
+# # https://ollama.ai/
 # #
 # AI_ASSISTANT_PROVIDER: ollama
 # OLLAMA_BASE_URL: http://ollama:11434
@@ -55,6 +58,7 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 #             temperature: 0.1
 #             streaming: False
 #         reserved_tokens: 1024
+
 # #
 # # AI Assistant: Azure OpenAI
 # #
@@ -65,3 +69,25 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 #             model_name: gpt-35-turbo
 #             temperature: 0.2
 #             streaming: False
+
+# #
+# # Vector Store Embeddings: Sentence Transformers
+# # This is a tiny 80MB model
+# # Requires `sentence-transformers` and `langchain-community` to be installed
+# # https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
+# #
+# EMBEDDINGS_PROVIDER: sentence_transformers
+# EMBEDDINGS_CONFIG:
+#     model_name: all-MiniLM-L6-v2
+
+# #
+# # Vector Store Embeddings: BGE
+# # This is a tiny 134MB model
+# # Requires `sentence-transformers` and `langchain-community` to be installed
+# # https://huggingface.co/BAAI/bge-small-en-v1.5
+# #
+# EMBEDDINGS_PROVIDER: bge
+# EMBEDDINGS_CONFIG:
+#     model_name: BAAI/bge-small-en-v1.5
+#     model_kwargs: { 'device': 'cpu' }
+#     encode_kwargs: { 'normalize_embeddings': true }
