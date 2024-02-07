@@ -1,7 +1,9 @@
+from datetime import datetime
 from langchain.docstore.document import Document
 from langchain.vectorstores import ElasticsearchStore
 from lib.logger import get_logger
 from lib.vector_store.base_vector_store import VectorStoreBase
+from models.metastore import DataTable
 from typing import (
     Any,
     List,
@@ -10,7 +12,9 @@ from typing import (
 
 LOG = get_logger(__file__)
 
-REPROCESS_TABLES_AFTER_MINUTES = 5
+# Minimum interval between reprocessing tables in minutes
+# This is to avoid reprocessing tables too frequently
+REPROCESS_TABLES_AFTER_MINUTES = 60 * 24 * 30  # 30 days
 
 
 class ElasticsearchVectorStore(ElasticsearchStore, VectorStoreBase):
@@ -44,3 +48,29 @@ class ElasticsearchVectorStore(ElasticsearchStore, VectorStoreBase):
         filter = [kwargs.pop("boolean_filter", None)]
 
         return super().similarity_search_with_score(*args, filter=filter, **kwargs)
+
+    def should_skip_table(self, table: DataTable) -> bool:
+        """Whether to skip logging the table to the vector store.
+
+        Override this method to implement custom logic for your vector store."""
+
+        # Avoid circular import
+        from logic.vector_store import _get_table_doc_id
+
+        # Check if the table is already in the vector store
+        existing_doc = self.get_doc_by_id(_get_table_doc_id(table.id))
+
+        # Skip if the table is already in the vector store
+        # and it was updated within the last REPROCESS_TABLES_AFTER_MINUTES
+        if existing_doc:
+            if "updated_at" in existing_doc.metadata:
+                updated_at = datetime.fromisoformat(existing_doc.metadata["updated_at"])
+                if (
+                    datetime.now() - updated_at
+                ).total_seconds() / 60 < REPROCESS_TABLES_AFTER_MINUTES:
+                    LOG.debug(
+                        f"Table {table.id} is already in the vector store, skipping"
+                    )
+                    return True
+
+        return False

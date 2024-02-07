@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.db import with_session
 from const.ai_assistant import (
     DEFAUTL_TABLE_SEARCH_LIMIT,
@@ -128,6 +129,7 @@ def record_table(
             "tables": [full_table_name],
             "table_ids": [table.id],
             "metastore_id": metastore_id,
+            "updated_at": datetime.now(),
         }
         doc_id = _get_table_doc_id(table.id)
         create_and_store_document(summary, metadata, doc_id)
