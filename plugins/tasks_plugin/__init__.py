@@ -1,6 +1,7 @@
 # from tasks.delete_mysql_cache import delete_mysql_cache
 # delete_mysql_cache
 
+from tasks_plugin.ingest_vector_index import ingest_vector_index
 from tasks_plugin.sync_ldap_task import sync_ldap_task
 from tasks_plugin.sync_ldap_user_task import sync_ldap_user_task
 from tasks_plugin.create_user_group_task import create_user_group_task
