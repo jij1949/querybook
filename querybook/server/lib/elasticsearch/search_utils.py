@@ -1,6 +1,6 @@
 from typing import Dict, Union
 
-from elasticsearch import Elasticsearch, RequestsHttpConnection
+from elasticsearch7 import Elasticsearch, RequestsHttpConnection
 
 from env import QuerybookSettings
 from lib.config import get_config_value
