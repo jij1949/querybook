@@ -13,7 +13,7 @@ ai_assistant:
         enabled: true
 
     table_vector_search:
-        enabled: false
+        enabled: true
 
 survey:
     global_response_cooldown: 432000 # 5 days

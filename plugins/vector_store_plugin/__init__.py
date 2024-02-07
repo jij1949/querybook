@@ -1,8 +1,3 @@
-# ALL_PLUGIN_VECTOR_STORES = {}
-# ALL_PLUGIN_EMBEDDINGS = {}
-
-# Example to add vector store
-
 from lib.vector_store.stores.opensearch import OpenSearchVectorStore
 from langchain.embeddings import OpenAIEmbeddings
 from langchain_community.embeddings import (
@@ -10,7 +5,12 @@ from langchain_community.embeddings import (
     HuggingFaceBgeEmbeddings,
 )
 
-ALL_PLUGIN_VECTOR_STORES = {"opensearch": OpenSearchVectorStore}
+from vector_store_plugin.elasticsearch import ElasticsearchVectorStore
+
+ALL_PLUGIN_VECTOR_STORES = {
+    "elasticsearch": ElasticsearchVectorStore,
+    "opensearch": OpenSearchVectorStore,
+}
 
 ALL_PLUGIN_EMBEDDINGS = {
     "openai": OpenAIEmbeddings,

@@ -20,28 +20,6 @@ x-querybook-volumes: &querybook-volumes
     # - file:/opt/store/
 
 services:
-    datadog:
-        image: gcr.io/datadoghq/agent:latest
-        ports:
-            - 8125:8125/udp
-        expose:
-            - 8125/udp
-        environment:
-            DD_DOGSTATSD_NON_LOCAL_TRAFFIC: true
-            DD_USE_DOGSTATSD: true
-            DD_APM_ENABLED: false
-            DD_AC_EXCLUDE: '.*'
-            DD_ENV: 'dev'
-            DD_SERVICE: 'federated-querybook'
-            DD_VERSION: 'latest'
-        env_file:
-            - ./.env.local
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-            - /proc/:/host/proc/:ro
-            - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
-        profiles:
-            - datadog
     web:
         container_name: querybook_web
         image: *querybook-image
@@ -145,13 +123,13 @@ services:
             - mysql
     elasticsearch:
         container_name: querybook_elasticsearch
-        image: opensearchproject/opensearch:2.9.0
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3 # EG QB version
         environment:
             cluster.name: docker-cluster
             bootstrap.memory_lock: 'true'
             discovery.type: single-node
-            plugins.security.disabled: 'true'
-            OPENSEARCH_JAVA_OPTS: -Xms750m -Xmx750m
+            xpack.security.enabled: false
+            ES_JAVA_OPTS: -Xms750m -Xmx750m
         ulimits:
             memlock:
                 soft: -1
@@ -160,7 +138,7 @@ services:
                 soft: 65536
                 hard: 65536
         volumes:
-            - osdata1:/usr/share/opensearch/data
+            - esdata1:/usr/share/elasticsearch/data
         ports:
             - 9200:9200
         healthcheck:
@@ -176,6 +154,31 @@ services:
             - all
             - infra
             - elasticsearch
+
+    #
+    # Kibana - Elasticsearch visualization
+    #
+    kibana:
+        container_name: querybook_kibana
+        image: docker.elastic.co/kibana/kibana:7.16.3 # EG QB version
+        environment:
+            SERVER_NAME: kibana
+            ELASTICSEARCH_HOSTS: 'http://elasticsearch:9200'
+        ports:
+            - '5601:5601'
+        expose:
+            - '5601'
+        depends_on:
+            - elasticsearch
+        volumes:
+            - kibana-data:/usr/share/kibana/data
+        profiles:
+            - extras
+            - kibana
+
+    #
+    # Flower - Celery monitoring
+    #
     flower:
         container_name: querybook_flower
         image: *querybook-image
@@ -193,6 +196,32 @@ services:
         depends_on: *querybook-depends-on
         profiles:
             - flower
+
+    #
+    # Datadog Agent - for testing purposes
+    #
+    datadog:
+        image: gcr.io/datadoghq/agent:latest
+        ports:
+            - 8125:8125/udp
+        expose:
+            - 8125/udp
+        environment:
+            DD_DOGSTATSD_NON_LOCAL_TRAFFIC: true
+            DD_USE_DOGSTATSD: true
+            DD_APM_ENABLED: false
+            DD_AC_EXCLUDE: '.*'
+            DD_ENV: 'dev'
+            DD_SERVICE: 'federated-querybook'
+            DD_VERSION: 'latest'
+        env_file:
+            - ./.env.local
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /proc/:/host/proc/:ro
+            - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+        profiles:
+            - datadog
 
     #
     # Ollama - AI Assistant
@@ -214,6 +243,57 @@ services:
         profiles:
             - ollama
 
+    #
+    # Vector Store - Elasticsearch 8
+    #
+    vectorstore:
+        container_name: querybook_vectorstore
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.8.2
+        environment:
+            cluster.name: docker-cluster
+            bootstrap.memory_lock: 'true'
+            discovery.type: single-node
+            xpack.security.enabled: false
+            ES_JAVA_OPTS: -Xms750m -Xmx750m
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        volumes:
+            - vectorstore-data:/usr/share/elasticsearch/data
+        ports:
+            - 9201:9200
+        healthcheck:
+            test:
+                [
+                    'CMD-SHELL',
+                    'curl --silent --fail localhost:9200/_cluster/health || exit 1',
+                ]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        profiles:
+            - vectorstore
+    vectorstore_kibana:
+        container_name: querybook_vectorstore_kibana
+        image: docker.elastic.co/kibana/kibana:8.8.2
+        environment:
+            SERVER_NAME: kibana
+            ELASTICSEARCH_HOSTS: 'http://vectorstore:9200'
+        ports:
+            - '5602:5601'
+        expose:
+            - '5602'
+        depends_on:
+            - vectorstore
+        volumes:
+            - vectorstore-kibana-data:/usr/share/kibana/data
+        profiles:
+            - vectorstore
+
     # EMAIL SERVER EXAMPLE
     # If you need email to work use this
     # dockerhostforward:
@@ -226,13 +306,13 @@ services:
 
 volumes:
     my-db:
-    osdata1:
+    esdata1:
+        driver: local
+    kibana-data:
+        driver: local
+    vectorstore-data:
+        driver: local
+    vectorstore-kibana-data:
         driver: local
     ollama-data:
         driver: local
-    # file:
-    #     driver: local
-    #     driver_opts:
-    #         type: 'none'
-    #         o: 'bind'
-    #         device: '/mnt/querybook-store/'

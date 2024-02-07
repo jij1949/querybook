@@ -62,14 +62,22 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 # #
 # # AI Assistant: Azure OpenAI
 # #
-# AI_ASSISTANT_PROVIDER: azure_openai
-# AI_ASSISTANT_CONFIG:
-#     default:
-#         model_args:
-#             model_name: gpt-35-turbo
-#             temperature: 0.2
-#             streaming: False
+AI_ASSISTANT_PROVIDER: azure_openai
+AI_ASSISTANT_CONFIG:
+    default:
+        model_args:
+            model_name: gpt-35-turbo
+            temperature: 0.2
+            streaming: False
 
+#
+# Vector Store: Elasticsearch 8.x
+#
+VECTOR_STORE_PROVIDER: elasticsearch
+VECTOR_STORE_CONFIG:
+    embeddings_arg_name: 'embedding'
+    es_url: http://vectorstore:9200
+    index_name: 'vector_index_v1'
 # #
 # # Vector Store Embeddings: Sentence Transformers
 # # This is a tiny 80MB model
