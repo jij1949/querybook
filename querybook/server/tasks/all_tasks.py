@@ -60,6 +60,12 @@ LOG = get_task_logger(__name__)
 
 @celeryd_init.connect
 def configure_workers(sender=None, conf=None, **kwargs):
+    # Apply monkey patches when worker starts
+    try:
+        import monkey_patch_plugin  # noqa: F401
+    except ImportError:
+        pass  # No monkey_patch_plugin found
+
     if QuerybookSettings.PRODUCTION:
         LOG.info(f"Starting PROD Celery worker: {sender}")
 
