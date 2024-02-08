@@ -44,22 +44,6 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 #############
 
 # #
-# # AI Assistant: Ollama
-# # This is a local LLM server
-# # Start using `docker compose run --service-ports ollama`
-# # https://ollama.ai/
-# #
-# AI_ASSISTANT_PROVIDER: ollama
-# OLLAMA_BASE_URL: http://ollama:11434
-# AI_ASSISTANT_CONFIG:
-#     default:
-#         model_args:
-#             model_name: tinydolphin:latest
-#             temperature: 0.1
-#             streaming: False
-#         reserved_tokens: 1024
-
-# #
 # # AI Assistant: Azure OpenAI
 # #
 AI_ASSISTANT_PROVIDER: azure_openai
@@ -78,6 +62,17 @@ VECTOR_STORE_CONFIG:
     embeddings_arg_name: 'embedding'
     es_url: http://vectorstore:9200
     index_name: 'vector_index_v1'
+
+#
+# Vector Store Embeddings: Azure OpenAI
+# Note: use `openai` provider for Azure OpenAI due to proxy shenanigans
+# eg_openai is an override that only sends text content to the model
+#
+EMBEDDINGS_PROVIDER: eg_openai
+EMBEDDINGS_CONFIG:
+    model: text-embedding-ada-002
+    temperature: 0.2
+    chunk_size: 4096
 # #
 # # Vector Store Embeddings: Sentence Transformers
 # # This is a tiny 80MB model
@@ -99,3 +94,19 @@ VECTOR_STORE_CONFIG:
 #     model_name: BAAI/bge-small-en-v1.5
 #     model_kwargs: { 'device': 'cpu' }
 #     encode_kwargs: { 'normalize_embeddings': true }
+
+# #
+# # AI Assistant: Ollama
+# # This is a local LLM server
+# # Start using `docker compose run --service-ports ollama`
+# # https://ollama.ai/
+# #
+# AI_ASSISTANT_PROVIDER: ollama
+# OLLAMA_BASE_URL: http://ollama:11434
+# AI_ASSISTANT_CONFIG:
+#     default:
+#         model_args:
+#             model_name: tinydolphin:latest
+#             temperature: 0.1
+#             streaming: False
+#         reserved_tokens: 1024

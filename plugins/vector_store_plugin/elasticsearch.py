@@ -18,7 +18,7 @@ REPROCESS_TABLES_AFTER_MINUTES = 60 * 24 * 30  # 30 days
 
 
 class ElasticsearchVectorStore(ElasticsearchStore, VectorStoreBase):
-    def get_doc_by_id(self, doc_id: str):
+    def get_doc_by_id(self, doc_id: str, silent: bool = False) -> Document:
         try:
             doc = self.client.get(index=self.index_name, id=doc_id)
             return Document(
@@ -27,7 +27,8 @@ class ElasticsearchVectorStore(ElasticsearchStore, VectorStoreBase):
             )
         except Exception as e:
             # return None for not found or any error occurs
-            LOG.error(f"Failed to get document {doc_id} from vector store: {e}")
+            if not silent:
+                LOG.error(f"Failed to get document {doc_id} from vector store: {e}")
             return None
 
     def delete_doc_by_id(self, doc_id: str):
@@ -58,7 +59,7 @@ class ElasticsearchVectorStore(ElasticsearchStore, VectorStoreBase):
         from logic.vector_store import _get_table_doc_id
 
         # Check if the table is already in the vector store
-        existing_doc = self.get_doc_by_id(_get_table_doc_id(table.id))
+        existing_doc = self.get_doc_by_id(_get_table_doc_id(table.id), silent=True)
 
         # Skip if the table is already in the vector store
         # and it was updated within the last REPROCESS_TABLES_AFTER_MINUTES
