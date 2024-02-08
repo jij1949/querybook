@@ -1,11 +1,8 @@
-import requests
 from typing import Any, Dict
 
 from executor_plugin.eg_trino.eg_trino_client import EGTrinoClient, EGTrinoCursor
 from lib.logger import get_logger
 from trino.exceptions import TrinoUserError
-
-LOG = get_logger(__file__)
 
 
 class EGStarburstClient(EGTrinoClient):
@@ -55,14 +52,18 @@ class EGStarburstCursor(EGTrinoCursor):
             if poll_result:
                 self._update_percent_complete(poll_result)
                 self._update_execution_info(poll_result)
-                self._update_tracking_url(poll_result)
-                self._update_starburst_tracking_url(poll_result)
+                self._update_tracking_url(poll_result, info_uri=self._cursor.info_uri)
+                self._update_starburst_tracking_url(
+                    poll_result, info_uri=self._cursor.info_uri
+                )
 
         except TrinoUserError as e:
             # Catch the error and update the tracking url
             poll_result = {"queryId": e.query_id}
-            self._update_tracking_url(poll_result)
-            self._update_starburst_tracking_url(poll_result)
+            self._update_tracking_url(poll_result, info_uri=self._cursor.info_uri)
+            self._update_starburst_tracking_url(
+                poll_result, info_uri=self._cursor.info_uri
+            )
 
             raise e
 
@@ -72,6 +73,15 @@ class EGStarburstCursor(EGTrinoCursor):
     def starburst_tracking_url(self):
         return self._starburst_tracking_url
 
-    def _update_starburst_tracking_url(self, poll_result: Dict[str, Any]):
+    def _update_starburst_tracking_url(
+        self, poll_result: Dict[str, Any], info_uri=None
+    ):
         if self._starburst_tracking_url is None:
-            self._starburst_tracking_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/insights/query/{poll_result['queryId']}"
+            # Use the info_uri if it is available
+            if info_uri:
+                # Rewrite from /ui/query.html? to /ui/insights/query/
+                self._starburst_tracking_url = info_uri.replace(
+                    "/ui/query.html?", "/ui/insights/query/"
+                )
+            else:
+                self._starburst_tracking_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/insights/query/{poll_result['queryId']}"

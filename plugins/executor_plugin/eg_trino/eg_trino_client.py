@@ -2,10 +2,10 @@ import requests
 import trino
 from trino.exceptions import TrinoUserError
 
-from os import environ
+from typing import Any, Dict
+
 from lib.query_executor.clients.trino import TrinoClient, TrinoCursor
 from lib.query_executor.connection_string.trino import get_trino_connection_conf
-from logic.user import get_user_by_name
 
 
 class EGTrinoClient(TrinoClient):
@@ -86,7 +86,7 @@ class EGTrinoCursor(TrinoCursor):
             if poll_result:
                 self._update_percent_complete(poll_result)
                 self._update_execution_info(poll_result)
-                self._update_tracking_url(poll_result)
+                self._update_tracking_url(poll_result, info_uri=self._cursor.info_uri)
 
         except TrinoUserError as e:
             # Catch the error and update the tracking url
@@ -104,6 +104,14 @@ class EGTrinoCursor(TrinoCursor):
     def _update_execution_info(self, poll_result):
         execution_info = self.get_execution_info(poll_result)
         self._execution_info = execution_info
+
+    def _update_tracking_url(self, poll_result: Dict[str, Any], info_uri=None) -> None:
+        # Use the info_uri if it is available
+        if self._tracking_url is None:
+            if info_uri:
+                self._tracking_url = info_uri
+            else:
+                self._tracking_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/query.html?{poll_result['queryId']}"
 
     def get_execution_info(self, poll_result):
         if not self.tracking_url:
