@@ -1,7 +1,7 @@
 langchain==0.1.6
 langchain-openai==0.0.5
 opensearch-py==2.3.0
-langchain-community==0.0.15
+langchain-community==0.0.18
 
 # Elasticsearch 8
 elasticsearch==8.8.2

@@ -1,8 +1,6 @@
 import os
 import requests
 
-from langchain.llms import Ollama
-
 from const.ai_assistant import AICommandType
 from lib.ai_assistant.ai_socket import with_ai_socket
 from lib.ai_assistant.base_ai_assistant import BaseAIAssistant
@@ -11,6 +9,8 @@ from lib.ai_assistant.prompts.text_to_sql_prompt import TEXT_TO_SQL_PROMPT
 from lib.ai_assistant.tools.table_schema import get_slimmed_table_schemas
 from lib.logger import get_logger
 import tiktoken
+
+from langchain_community.llms import Ollama
 
 from app.db import with_session
 

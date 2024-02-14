@@ -1,7 +1,7 @@
-from lib.ai_assistant.assistants.openai_assistant import OpenAIAssistant
 import tiktoken
 
 from lib.logger import get_logger
+from ai_assistant_plugin.eg_openai_assistant import EgOpenAIAssistant
 
 LOG = get_logger(__file__)
 
@@ -23,7 +23,7 @@ AZURE_MODEL_TO_OPENAI_MODEL = {
 }
 
 
-class AzureOpenAIAssistant(OpenAIAssistant):
+class AzureOpenAIAssistant(EgOpenAIAssistant):
     """
     EG-specific variation that works with the GenAI Proxy's Azure OpenAI API. This
     is only needed due to an issue with the version of tiktoken that Langchain uses.

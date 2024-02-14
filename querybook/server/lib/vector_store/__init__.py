@@ -1,3 +1,6 @@
+import os
+import httpx
+
 from env import QuerybookSettings
 
 from .all_embeddings import get_embeddings_class
@@ -5,6 +8,10 @@ from .all_vector_stores import get_vector_store_class
 
 __embeddings = None
 __vector_store = None
+
+REQUESTS_CA_BUNDLE = os.environ.get("REQUESTS_CA_BUNDLE")
+
+httpx_client = httpx.Client(verify=REQUESTS_CA_BUNDLE)
 
 
 def get_embeddings():
@@ -20,7 +27,7 @@ def get_embeddings():
     embeddings_config = QuerybookSettings.EMBEDDINGS_CONFIG
 
     embeddings_class = get_embeddings_class(embeddings_provider)
-    __embeddings = embeddings_class(**embeddings_config)
+    __embeddings = embeddings_class(**embeddings_config, http_client=httpx_client)
     return __embeddings
 
 

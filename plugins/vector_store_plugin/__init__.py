@@ -1,9 +1,10 @@
 from lib.vector_store.stores.opensearch import OpenSearchVectorStore
-from langchain.embeddings import OpenAIEmbeddings
+
 from langchain_community.embeddings import (
     AzureOpenAIEmbeddings,
     HuggingFaceEmbeddings,
     HuggingFaceBgeEmbeddings,
+    OpenAIEmbeddings,
 )
 
 from vector_store_plugin.elasticsearch import ElasticsearchVectorStore

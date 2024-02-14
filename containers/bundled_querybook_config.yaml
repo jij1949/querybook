@@ -53,6 +53,16 @@ AI_ASSISTANT_CONFIG:
             model_name: gpt-35-turbo
             temperature: 0.2
             streaming: False
+    sql_fix:
+        model_args:
+            model_name: gpt-4
+            temperature: 0.2
+            streaming: False
+    text_to_sql:
+        model_args:
+            model_name: gpt-4
+            temperature: 0.2
+            streaming: False
 
 #
 # Vector Store: Elasticsearch 8.x
@@ -71,7 +81,6 @@ VECTOR_STORE_CONFIG:
 EMBEDDINGS_PROVIDER: eg_openai
 EMBEDDINGS_CONFIG:
     model: text-embedding-ada-002
-    temperature: 0.2
     chunk_size: 4096
 # #
 # # Vector Store Embeddings: Sentence Transformers
