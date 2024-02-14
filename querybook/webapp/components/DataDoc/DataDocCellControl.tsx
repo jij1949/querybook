@@ -101,7 +101,11 @@ export const DataDocCellControl: React.FunctionComponent<IProps> = ({
     const handlePasteCell = useBoundFunc(pasteCellAt, index);
     const handleDeleteCell = useBoundFunc(deleteCellAt, index);
     const handleMoveCellClick = useCallback(
-        () => moveCellAt(index, isHeader ? index - 1 : index + 1),
+        () =>
+            moveCellAt(
+                isHeader ? index : index - 1,
+                isHeader ? index - 1 : index
+            ),
         [moveCellAt, index, isHeader]
     );
     const handleDisableCell = useBoundFunc(disableCellAt, index);
@@ -288,6 +292,8 @@ export const DataDocCellControl: React.FunctionComponent<IProps> = ({
             className={clsx({
                 'block-crud-buttons': true,
                 'flex-center': true,
+                // Exclude the first header to prevent layout shift when it is hidden
+                'is-header': isHeader && index !== 0,
                 active,
             })}
         >
