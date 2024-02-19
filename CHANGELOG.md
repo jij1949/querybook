@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.87.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.86.2...0.87.0) (2024-02-19)
+
+
+### Features
+
+* Add local embedding configurations ([00378fa](https://github.expedia.biz/eg-analytics-platform/querybook/commit/00378fa8778445870f46573388b1d9b934d4b5f8))
+* Add Ollama AI Assistant ([cd4df1e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/cd4df1e20b2ef83fd0a209c1151d705d955019ef))
+* Add rate-limiting patch for `create_and_store_document()` ([713ffac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/713ffacc4a65e79824d450cb4864a5cee6d703e3))
+* Elasticsearch 8 vector store implementation ([4ea0357](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4ea0357827302b16fa82e2129419c9371409a001))
+* Store `updated_at` field in vector store ([75bb23e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/75bb23e33db71200cd98110e7bcbf2569418997e))
+* Task to ingest tables into vector store ([d6af0a4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d6af0a4565567e3ba87bd8f997d9525fe4478202))
+* Text embeddings configuration for GenAI Proxy ([c5f4171](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c5f4171b06c7ef3a2fda7e5eac335a0703d8768c))
+
+
+### Bug Fixes
+
+* added check for is_group is null so that older users can be assigned as owners (#228) ([37e0523](https://github.expedia.biz/eg-analytics-platform/querybook/commit/37e05235e0fefa39f643841608916a82de723e95))
+* Fix create task schedule task_type ([3efc54f](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3efc54f6bb1bd1ac26df2e0594d4b758352d429d))
+* Fix DataDoc cell move down button ([9773d0d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9773d0d8b69d882d834615ac08b81afa6f9ea61a))
+* Fix langchain dependencies ([c5ddf7d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c5ddf7d16cef4f03a47bf8aefe1a275c73a4d479))
+* Improve suggestions for user names in Elasticsearch ([e70c473](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e70c47306b51c10fe627e4f6d3afdf47b6781e48))
+* Shorten table tags automatically to fit within the database limit ([314bdb4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/314bdb42ebe8280715b4d5ca2365003d550b8a04))
+* Update `unique_table_ownership` constraint to allow owner per type ([315249b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/315249be9f4b486fdbfa5246cd2d9a9517262ee2))
+* Update tracking URLs to use `info_uri` field ([8cf1450](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8cf1450c53b805c38f33db50947bc8ba3f01c3ec))
+
 ### [0.86.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.86.1...0.86.2) (2024-01-26)
 
 
