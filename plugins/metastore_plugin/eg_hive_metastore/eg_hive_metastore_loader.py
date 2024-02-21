@@ -9,7 +9,6 @@ from lib.metastore.base_metastore_loader import (
 from lib.metastore.loaders.hive_metastore_loader import (
     HMSMetastoreLoader,
     get_hive_metastore_table_description,
-    get_partition_keys,
 )
 from lib.utils import json as ujson
 
@@ -182,7 +181,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             location=sd.location,
             partitions=partitions,
             raw_description=ujson.pdumps(description, default=lambda o: o.__dict__),
-            partition_keys=get_partition_keys(description),
+            partition_keys=self.get_partition_keys(description),
         )
 
         columns = list(
@@ -319,6 +318,47 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             table = table._replace(tags=tags)
 
         return table, new_columns
+
+    def get_partition_keys(self, hive_metastore_description):
+        """
+        Modified version from the base class to handle Iceberg tables
+        """
+        try:
+            # Normal Hive tables
+            if hive_metastore_description.partitionKeys:
+                return [
+                    partition_key.name
+                    for partition_key in hive_metastore_description.partitionKeys
+                ]
+
+            # Iceberg tables
+            elif hive_metastore_description.parameters.get("default-partition-spec"):
+                default_partition_spec = ujson.loads(
+                    hive_metastore_description.parameters.get("default-partition-spec")
+                )
+                current_schema = ujson.loads(
+                    hive_metastore_description.parameters.get("current-schema")
+                )
+                current_schema_fields = {
+                    field["id"]: field for field in current_schema["fields"]
+                }
+
+                # Get a list of source-ids for the partition fields
+                partition_source_ids = [
+                    field["source-id"] for field in default_partition_spec["fields"]
+                ]
+
+                # Convert the source-ids to column names
+                return [
+                    current_schema_fields[source_id]["name"]
+                    for source_id in partition_source_ids
+                ]
+
+            else:
+                return []
+
+        except Exception:
+            return []
 
 
 def apply_sensitivity_tag_and_data_element(col, value):
