@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.88.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.87.0...0.88.0) (2024-02-23)
+
+
+### Features
+
+* Support `default-partition-spec` on Iceberg tables ([66f7032](https://github.expedia.biz/eg-analytics-platform/querybook/commit/66f7032a744d2e19afd14d7125c1a39a02d011d8))
+
+
+### Bug Fixes
+
+* Support serialized JSON environment variables ([8da7e30](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8da7e302b886d93b7deadc333b7678e4222ffdba))
+* update disabler task with kwargs (#230) ([4c764f8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4c764f89ae3914cc4aaf9a44011d0b94480821bf))
+
 ## [0.87.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.86.2...0.87.0) (2024-02-19)
 
 
