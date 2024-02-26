@@ -16,6 +16,7 @@ import {
     useMetastoresForUpload,
     useQueryEnginesForUpload,
 } from './useQueryEnginesForUpload';
+import { Message } from '../../ui/Message/Message';
 
 export const TableUploaderSpecForm: React.FC = ({}) => {
     const { values, setFieldValue } =
@@ -60,6 +61,10 @@ export const TableUploaderSpecForm: React.FC = ({}) => {
     return (
         <div>
             <div>
+                <Message type="warning">
+                    Note: Select ad hoc engines for uploading to sandbox schemas
+                    and etl clusters for persistent schemas
+                </Message>
                 <StyledText color="light" size="smedium" weight="bold">
                     Required Fields
                 </StyledText>

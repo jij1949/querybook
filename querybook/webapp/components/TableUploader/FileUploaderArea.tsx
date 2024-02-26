@@ -96,7 +96,9 @@ export const FileUploaderArea: React.FC<IFileUploaderAreaProps> = ({
                     <StyledText untitled>
                         Drag a file here to upload (Allowed types:{' '}
                         {AllowedFileTypes})
-                        <div>Note: Files should be under 200MB</div>
+                        <div>
+                            Note: Files should be under 200MB and 200K rows
+                        </div>
                     </StyledText>
                 </div>
 
