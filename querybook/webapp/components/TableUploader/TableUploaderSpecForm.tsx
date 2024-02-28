@@ -62,8 +62,8 @@ export const TableUploaderSpecForm: React.FC = ({}) => {
         <div>
             <div>
                 <Message type="warning">
-                    Note: Select ad hoc engines for uploading to sandbox schemas
-                    and etl clusters for persistent schemas
+                    Note: Select ad hoc query engines for uploading to sandbox schemas
+                    and ETL query engines for persistent schemas
                 </Message>
                 <StyledText color="light" size="smedium" weight="bold">
                     Required Fields
