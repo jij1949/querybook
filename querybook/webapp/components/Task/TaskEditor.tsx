@@ -62,7 +62,11 @@ function stringToTypedVal(stringVal: boolean | number | string) {
         return false;
     } else if (!isNaN(Number(stringVal))) {
         return Number(stringVal);
-    } else if ( stringVal === 'null' || stringVal === 'undefined' || stringVal === 'None') {
+    } else if (
+        stringVal === 'null' ||
+        stringVal === 'undefined' ||
+        stringVal === 'None'
+    ) {
         return null;
     } else {
         return stringVal;
@@ -229,7 +233,8 @@ export const TaskEditor: React.FunctionComponent<IProps> = ({
         );
 
         const getKwargPlaceholder = (param: string) =>
-            (registeredTaskParamList?.[values.task]?.[param]) ?? 'Insert value';
+            String(registeredTaskParamList?.[values.task]?.[param]) ??
+            'Insert value';
 
         const kwargsDOM = (
             <div className="TaskEditor-kwargs mt12">
