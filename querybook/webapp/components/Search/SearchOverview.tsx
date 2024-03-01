@@ -786,6 +786,7 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                     <SearchSchemaSelect
                         updateSearchFilter={updateSearchFilter}
                         schema={searchFilters?.schema}
+                        metastoreId={metastoreId}
                     />
                 </div>
                 {queryMetastoreHasDataElements && (

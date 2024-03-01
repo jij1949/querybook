@@ -24,8 +24,6 @@ def upgrade():
     )
 
     for constraint in ownership_table.foreign_key_constraints:
-        # The only foreign key constraint should be the constraint of
-        # data_table_id to "data_table.id"
         op.drop_constraint(constraint.name, "data_table_ownership", type_="foreignkey")
 
     op.drop_constraint("unique_table_ownership", "data_table_ownership", type_="unique")
