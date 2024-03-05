@@ -1,9 +1,6 @@
 from executor_plugin.eg_starburst.eg_starburst_client import EGStarburstClient
 from executor_plugin.eg_trino.eg_trino_executor import EGTrinoQueryExecutor
 
-from app.db import DBSession
-from logic.query_execution import get_datadoc_id_and_title_from_query_execution_id
-
 
 class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
     def __init__(

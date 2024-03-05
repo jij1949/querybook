@@ -16,6 +16,8 @@ class EGStarburstClient(EGTrinoClient):
         query_execution_id=None,
         datadoc_id=None,
         datadoc_title=None,
+        data_cell_id=None,
+        data_cell_title=None,
         *args,
         **kwargs,
     ):
@@ -23,7 +25,7 @@ class EGStarburstClient(EGTrinoClient):
         self._password = password
         super(EGStarburstClient, self).__init__(
             connection_string, username, password, proxy_user, execution_type, query_execution_id, datadoc_id,
-            datadoc_title, args, kwargs
+            datadoc_title, data_cell_id, data_cell_title, args, kwargs
         )
 
     def cursor(self):

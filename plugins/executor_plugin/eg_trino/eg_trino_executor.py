@@ -10,6 +10,7 @@ from logic.metastore import get_table_information_by_table_id, get_table_by_name
 from app.db import DBSession
 import re
 
+
 def get_trino_error_dict(e):
     if hasattr(e, "args") and e.args[0] is not None:
         error_arg = e.args[0]
@@ -161,17 +162,24 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
 
     def _get_datadoc_info(self, query_execution_id):
         with DBSession() as session:
-            datadoc_info = qe_logic.get_datadoc_id_and_title_from_query_execution_id(query_execution_id,
+            datadoc_info = qe_logic.get_datadoc_info_from_query_execution_id(query_execution_id,
                                                                                      session=session)
         if datadoc_info:
-            self._datadoc_id, _, self._datadoc_title = datadoc_info
-            self._datadoc_title = re.sub(r'[^\x00-\x7F]', '', self._datadoc_title)
-            self._datadoc_title = self._datadoc_title.strip().replace('\n', '').replace('\r', '')
+            self._datadoc_id, self._data_cell_id, self._data_cell_meta, self._datadoc_title = datadoc_info
+            self._datadoc_title = self.simplify_string(self._datadoc_title)
+            self._data_cell_title = self.simplify_string(self._data_cell_meta.get('title', ''))
             self._client_setting = self._client_setting | \
                                    {'datadoc_id': 'datadoc_id:' + str(self._datadoc_id),
-                                    'datadoc_title': 'datadoc_title:' + self._datadoc_title}
+                                    'datadoc_title': 'datadoc_title:' + self._datadoc_title,
+                                    'data_cell_id': 'data_cell_id:' + str(self._data_cell_id),
+                                    'data_cell_title': 'data_cell_title:' + self._data_cell_title}
         else:
             return
+
+    def simplify_string(self, title_input):
+        # Remove non-ASCII characters and trailing/leading whitespace, newlines, and carriage returns
+        title_output = re.sub(r'[^\x00-\x7F]', '', title_input).strip().replace('\n', '').replace('\r', '')
+        return title_output
 
     def is_json(self, info):
         try:

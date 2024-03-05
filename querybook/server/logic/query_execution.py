@@ -17,8 +17,9 @@ from models.query_execution import (
 from models.datadoc import DataCellQueryExecution, DataDocDataCell
 from models.admin import QueryEngine, QueryEngineEnvironment
 from models.environment import Environment
-from models.datadoc import DataDoc
+from models.datadoc import DataDoc, DataCell
 from tasks.sync_elasticsearch import sync_elasticsearch
+
 
 CLEAN_UP_TIME_THRESHOLD = 20 * 60  # 20 mins
 LOG = get_logger(__file__)
@@ -45,14 +46,21 @@ def get_datadoc_id_from_query_execution_id(query_execution_id, session=None):
 
 
 @with_session
-def get_datadoc_id_and_title_from_query_execution_id(query_execution_id, session=None):
+def get_datadoc_info_from_query_execution_id(query_execution_id, session=None):
     return (
         session.query(
-            DataDocDataCell.data_doc_id, DataDocDataCell.data_cell_id, DataDoc.title
+            DataDocDataCell.data_doc_id,
+            DataDocDataCell.data_cell_id,
+            DataCell.meta,
+            DataDoc.title,
         )
         .join(
             DataCellQueryExecution,
             DataDocDataCell.data_cell_id == DataCellQueryExecution.data_cell_id,
+        )
+        .join(
+            DataCell,
+            DataDocDataCell.data_cell_id == DataCell.id,
         )
         .join(QueryExecution)
         .filter(QueryExecution.id == query_execution_id)

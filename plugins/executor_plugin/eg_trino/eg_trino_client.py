@@ -19,6 +19,8 @@ class EGTrinoClient(TrinoClient):
         query_execution_id=None,
         datadoc_id=None,
         datadoc_title=None,
+        data_cell_id=None,
+        data_cell_title=None,
         *args,
         **kwargs,
     ):
@@ -39,6 +41,10 @@ class EGTrinoClient(TrinoClient):
             client_tags.append(datadoc_id)
         if datadoc_title:
             client_tags.append(datadoc_title)
+        if data_cell_id:
+            client_tags.append(data_cell_id)
+        if data_cell_title and data_cell_title != "data_cell_title:":
+            client_tags.append(data_cell_title)
 
         connection = trino.dbapi.connect(
             host=host,
