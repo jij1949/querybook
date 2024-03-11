@@ -21,6 +21,7 @@
 
     .cm-searching {
         background-color: var(--text-highlight);
+        color: var(--text-highlight-text) !important;
     }
 
     // For some reason, monokai assign same color for
