@@ -1,3 +1,6 @@
+import base64
+import re
+
 from enum import Enum
 from typing import List, Tuple
 
@@ -40,6 +43,7 @@ class EgTagColors(Enum):
     CLOVERLEAF: str = "#ffca00"  # gold
     GOVERNANCE: str = "#35b5bb"  # blue
     ICEBERG: str = "#529dce"  # picton blue
+    VIEW: str = "#f5a623"  # orange
 
 
 # Max length of a tag name in the database (tag.name)
@@ -89,6 +93,7 @@ DATASET_TAGS = [
         "tag": True,
     },
 ]
+
 
 #
 # Expedia-customized version of the HMSMetastoreLoader
@@ -266,6 +271,54 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         # ):
         #     table = table._replace(golden=True)
 
+        # Check if the table is a view
+        # Note: There's also `tableType` which can be `VIRTUAL_VIEW` or `MATERIALIZED_VIEW`
+        # but we're using `viewOriginalText` to determine if it's a view
+        if description.viewOriginalText:
+            tags.append(
+                DataTag(
+                    name="View",
+                    description="This is a view",
+                    color=EgTagColors.VIEW.value,
+                )
+            )
+
+            # Support for Presto Views, which store base64 encoded data
+            if parameters.get("presto_view") == "true":
+                # Parse out the base64 encoded data from the viewOriginalText
+                # Format: "/* Presto View: <BASE64 DATA> */"
+                base64_data = extract_base64_data(description.viewOriginalText)
+                if base64_data:
+                    # Decode and deserialize the Base64 JSON data
+                    view_data = base64.b64decode(base64_data).decode("utf-8")
+                    view_data = ujson.loads(view_data)
+
+                    # Add the original SQL to custom properties
+                    table = table._replace(
+                        custom_properties={
+                            "original_sql": view_data["originalSql"],
+                        }
+                    )
+
+                    # Replace the columns with the view data columns
+                    columns = [
+                        DataColumn(name=col["name"], type=col["type"])
+                        for col in view_data["columns"]
+                    ]
+
+                    # Get view comment (if any) and replace the generated "Presto view" description
+                    if view_data.get("comment"):
+                        table = table._replace(description=view_data["comment"])
+
+            else:
+                # Some views have `viewOriginalText` containing the SQL in plain text
+                # (I assume these are Hive views)
+                table = table._replace(
+                    custom_properties={
+                        "original_sql": description.viewOriginalText,
+                    }
+                )
+
         # If the table is owned by "hadoop" and the schema_name starts with eps-prod,
         # then reassign the owner as e4b-bedrock. This fixes an issue where it displays Unknown (hadoop) as owner
         if description.owner == "hadoop" and schema_name.startswith("eps_prod"):
@@ -394,3 +447,21 @@ def apply_sensitivity_tag_and_data_element(col, value):
         )
 
     return col
+
+
+def extract_base64_data(view_text):
+    """
+    Extracts base64 data from a given view text.
+
+    Args:
+        view_text (str): The text of the view.
+
+    Returns:
+        str or None: The extracted base64 data if found, None otherwise.
+    """
+    pattern = r"/\* Presto View: (.*) \*/"
+    match = re.search(pattern, view_text)
+    if match:
+        return match.group(1)  # group(1) refers to the first parenthesized subgroup
+    else:
+        return None

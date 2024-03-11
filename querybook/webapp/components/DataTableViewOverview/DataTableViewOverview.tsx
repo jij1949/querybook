@@ -32,6 +32,7 @@ import { getHumanReadableByteSize } from 'lib/utils/number';
 import { navigateWithinEnv } from 'lib/utils/query-string';
 import { refreshDataTableInMetastore } from 'redux/dataSources/action';
 import { SoftButton, TextButton } from 'ui/Button/Button';
+import { ThemedCodeHighlight } from 'ui/CodeHighlight/ThemedCodeHighlight';
 import { EditableTextField } from 'ui/EditableTextField/EditableTextField';
 import { KeyContentDisplay } from 'ui/KeyContentDisplay/KeyContentDisplay';
 import { Link } from 'ui/Link/Link';
@@ -160,6 +161,8 @@ export const DataTableViewOverview: React.FC<
                 <Link to={value} newTab>
                     {value}
                 </Link>
+            ) : key === 'original_sql' ? (
+                <ThemedCodeHighlight value={value} />
             ) : (
                 value
             )}
