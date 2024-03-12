@@ -34,6 +34,8 @@ from const.data_element import (
     DataElementAssociationType,
 )
 
+from metastore_plugin.eg_hive_metastore.file_formats import detect_file_format
+
 LOG = get_logger(__file__)
 
 
@@ -43,7 +45,9 @@ class EgTagColors(Enum):
     CLOVERLEAF: str = "#ffca00"  # gold
     GOVERNANCE: str = "#35b5bb"  # blue
     ICEBERG: str = "#529dce"  # picton blue
+    DELTA: str = "#b7652b"  # choco
     VIEW: str = "#f5a623"  # orange
+    FILE_FORMAT: str = "#6ba097"  # creamy forest green
 
 
 # Max length of a tag name in the database (tag.name)
@@ -225,16 +229,6 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 )
             )
 
-        # Iceberg!
-        if parameters.get("table_type") == "ICEBERG":
-            tags.append(
-                DataTag(
-                    name="Iceberg",
-                    description="This is an Iceberg table",
-                    color=EgTagColors.ICEBERG.value,
-                )
-            )
-
         if parameters.get("comment") is not None:
             # If the table has a comment, then use it as the description
             table = table._replace(description=parameters.get("comment"))
@@ -274,7 +268,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         # Check if the table is a view
         # Note: There's also `tableType` which can be `VIRTUAL_VIEW` or `MATERIALIZED_VIEW`
         # but we're using `viewOriginalText` to determine if it's a view
-        if description.viewOriginalText:
+        if description.viewOriginalText is not None:
             tags.append(
                 DataTag(
                     name="View",
@@ -317,6 +311,53 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     custom_properties={
                         "original_sql": description.viewOriginalText,
                     }
+                )
+
+        # Detect and tag table / file formats
+        # Skip views
+        else:
+            file_format = detect_file_format(sd, parameters)
+            if file_format:
+                # Add to existing custom_properties
+                table = table._replace(
+                    custom_properties={
+                        **(
+                            table.custom_properties
+                            if table.custom_properties is not None
+                            else {}
+                        ),
+                        "file_format": file_format,
+                    }
+                )
+
+                tags.append(
+                    DataTag(
+                        name=file_format,
+                        type="File Format",
+                        description=f"This table is stored in {file_format} format",
+                        color=EgTagColors.FILE_FORMAT.value,
+                    )
+                )
+
+            # Iceberg!
+            if parameters.get("table_type") == "ICEBERG":
+                tags.append(
+                    DataTag(
+                        name="Iceberg",
+                        type="Table Format",
+                        description="This is an Iceberg table",
+                        color=EgTagColors.ICEBERG.value,
+                    )
+                )
+            # Delta Lake!
+            elif parameters.get("spark.sql.sources.provider") == "delta":
+                tags.append(
+                    DataTag(
+                        name="Delta",
+                        type="Table Format",
+                        description="This is a Delta Lake table",
+                        color=EgTagColors.DELTA.value,
+                    )
                 )
 
         # If the table is owned by "hadoop" and the schema_name starts with eps-prod,
