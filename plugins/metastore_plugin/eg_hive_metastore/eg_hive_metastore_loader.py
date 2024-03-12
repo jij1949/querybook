@@ -241,20 +241,36 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
         # Iterate through the list of dataset tags, filtered to tag: True
         for tag in [tag for tag in DATASET_TAGS if tag["tag"]]:
-            tagName = tag["name"]
-            if parameters.get(tagName) is not None:
-                tags.append(
-                    DataTag(
-                        name=(
-                            tag["concat"] + ": " + parameters.get(tagName)
-                            if tag.get("concat")
-                            else parameters.get(tagName)
-                        ),
-                        type=tag["label"],
-                        description=f"This table is tagged with `{tagName}`",
-                        color=EgTagColors.GOVERNANCE.value,
+            tag_name = tag["name"]
+            if parameters.get(tag_name) is not None:
+                if tag_name == "eg-partner-data":
+                    # Special case for partner data, which is either true / false
+                    tags.append(
+                        # either "No Partner Data" or "Partner Data"
+                        DataTag(
+                            name=(
+                                "Partner Data"
+                                if parameters.get(tag_name) == "true"
+                                else "No Partner Data"
+                            ),
+                            type=tag["label"],
+                            description=f"This table is tagged with `{tag_name}`",
+                            color=EgTagColors.GOVERNANCE.value,
+                        )
                     )
-                )
+                else:
+                    tags.append(
+                        DataTag(
+                            name=(
+                                tag["concat"] + ": " + parameters.get(tag_name)
+                                if tag.get("concat")
+                                else parameters.get(tag_name)
+                            ),
+                            type=tag["label"],
+                            description=f"This table is tagged with `{tag_name}`",
+                            color=EgTagColors.GOVERNANCE.value,
+                        )
+                    )
 
         # # Disabled top tier for now
         # # If parameters contains all 5 mandatory tags, then set Top Tier
