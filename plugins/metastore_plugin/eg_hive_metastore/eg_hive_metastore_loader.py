@@ -18,6 +18,7 @@ from lib.utils import json as ujson
 from const.metastore import (
     DataOwner,
     DataOwnerType,
+    DataTableWarningSeverity,
     DataTag,
     MetastoreLoaderConfig,
     MetadataType,
@@ -353,6 +354,19 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                         description=f"This table is stored in {file_format} format",
                         color=EgTagColors.FILE_FORMAT.value,
                     )
+                )
+
+            # Avro warning for tables with an external Avro schema
+            # The Hive Metastore may not report the correct column list in this case, and it's not
+            # practical to load the schema directly from S3. So we just add a warning to the table.
+            if file_format == "Avro" and parameters.get("avro.schema.url"):
+                table = table._replace(
+                    warnings=[
+                        (
+                            DataTableWarningSeverity.WARNING,
+                            "This is an Avro table with an external schema file, so the columns shown in Querybook may not be correct.",
+                        )
+                    ]
                 )
 
             # Iceberg!
