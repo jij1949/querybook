@@ -3,6 +3,10 @@ langchain-openai==0.0.5
 opensearch-py==2.3.0
 langchain-community==0.0.18
 
+# Pin openai to fix this issue:
+# https://github.com/langchain-ai/langchain/issues/19116
+openai==1.13.3
+
 # Elasticsearch 8
 elasticsearch==8.8.2
 
