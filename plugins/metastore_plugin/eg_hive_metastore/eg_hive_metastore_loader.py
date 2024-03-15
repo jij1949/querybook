@@ -172,7 +172,9 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             self.get_partitions(schema_name, table_name) if self.load_partitions else []
         )
 
-        last_modified_time = parameters.get("last_modified_time")
+        last_modified_time = parameters.get("last_modified_time") or parameters.get(
+            "transient_lastDdlTime"
+        )
         last_modified_time = (
             int(last_modified_time) if last_modified_time is not None else None
         )
