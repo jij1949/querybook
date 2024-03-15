@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.90.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.89.0...0.90.0) (2024-03-15)
+
+
+### Features
+
+* Add a warning to Avro tables with external schema files ([12327b8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/12327b83971794f251f7e22983b7a48733a35d62))
+* added data_cell_id and data_cell_title to trino tags (#238) ([dd7b6d0](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dd7b6d0d29d423f73fc6a32b2f7623f9a09b7d33))
+* Clone DataDocs into other Environments ([ffb6602](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ffb66023bb657f41e9b1d625fd67de3ac41f3851))
+* Detect table file format ([791d7f1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/791d7f1464d76d6da4d4dc5fd201b46de858ba92))
+* enable impression logging of survey events (#1411) ([34cb6d3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/34cb6d342d8513e46075efa0914850a2ed0d4b39))
+* Improve metastore sync for views ([a42bad3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a42bad3217b1d6172da1d7e91c19159579745edc))
+* Staggered refresh for Hive Metastore ([dd19c32](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dd19c320990a156d8ea8095334478f6a830768a9))
+* upgrade langchain version (#1406) ([7208c05](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7208c05aba1ae04c80be1f6e86170a5a9d73b7e7))
+
+
+### Bug Fixes
+
+* add support for a sum column analyzer (#1418) ([e313560](https://github.expedia.biz/eg-analytics-platform/querybook/commit/e313560cfe9e7d45766766616c247254f94969c6))
+* added sort key when more data tables are loaded in a search (#239) ([888a409](https://github.expedia.biz/eg-analytics-platform/querybook/commit/888a40916646f851050516f5c486f6e977a18f83))
+* Fix create task schedule task_type (#1408) ([4e1c721](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4e1c72186f894f151d66871260dd16db5c9e8920))
+* Fix DataDoc cell move down button (#1410) ([dd185bf](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dd185bfb0a42b067c54b5caa5fd6f6a619d33681))
+* Fix table_updated_at ([976b539](https://github.expedia.biz/eg-analytics-platform/querybook/commit/976b53941074cbd3ce10ec1d58e9236bdc2cd055))
+* Improve Partner Data tagging ([957e626](https://github.expedia.biz/eg-analytics-platform/querybook/commit/957e6264e48d5f78f48c5ca1346d9011bc7c0b56))
+* Langchain-upgrade related changes ([7206c21](https://github.expedia.biz/eg-analytics-platform/querybook/commit/7206c2149cd2ef8e967e19ea8cef26a3a4b74574))
+* Metastore ACL support for wildcard prefix match ([aad82b1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/aad82b16138155441061ab7dff3d8ca9ae54cb24))
+* requirements/base.txt to reduce vulnerabilities (#1394) ([8190652](https://github.expedia.biz/eg-analytics-platform/querybook/commit/81906520cf7f967622e013835ca082cd3a75a5b3))
+* schema filtering in table search modal (#1348) ([4d41106](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4d41106157bfdaf50bd201877688e259eb0884da))
+* Support serialized JSON environment variables (#1415) ([c3be536](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c3be536f286629be20c493f6b0e9d99f3b48e6c2))
+* survey for table modal is blinking (#1396) ([6ddda71](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6ddda718439364d0b21743738a257f721246dc82))
+* Update `unique_table_ownership` constraint to allow owner per type (#1403) ([8531df1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8531df1dbbfcb630af89f568db291f7ee729c25b))
+* Update text highlight color for dark mode ([37cb8e1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/37cb8e1d66f9885cec2b76389d3be56fb1ed9921))
+* XSS injection with Querybook RichTextEditor (#1412) ([bc620da](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bc620dabaaf13ff1dcb30af0b46a490403fb9908))
+
 ## [0.89.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.88.0...0.89.0) (2024-02-28)
 
 
