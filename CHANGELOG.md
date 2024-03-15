@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.90.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.0...0.90.1) (2024-03-15)
+
+
+### Bug Fixes
+
+* Pin openai dependency to avoid httpx issue ([02fa2a6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/02fa2a6f52e1925a5728f6d39db503cca57035be))
+
 ## [0.90.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.89.0...0.90.0) (2024-03-15)
 
 
