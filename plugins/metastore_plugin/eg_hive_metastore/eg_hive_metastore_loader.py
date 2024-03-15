@@ -2,8 +2,10 @@ import base64
 import re
 
 from enum import Enum
-from typing import List, Tuple
+import time
+from typing import Dict, List, Tuple
 
+from app.db import with_session
 from lib.logger import get_logger
 from lib.metastore.base_metastore_loader import (
     DataTable,
@@ -25,8 +27,8 @@ from const.metastore import (
     MetadataMode,
 )
 
+from logic.metastore import get_table_by_schema_id_and_name
 from metastore_plugin.eg_hive_metastore.data_elements import (
-    data_elements,
     find_data_element,
 )
 
@@ -104,6 +106,25 @@ DATASET_TAGS = [
 # Expedia-customized version of the HMSMetastoreLoader
 #
 class EgHMSMetastoreLoader(HMSMetastoreLoader):
+
+    def __init__(self, metastore_dict: Dict):
+        super().__init__(metastore_dict)
+
+        # Number of days to wait before refreshing a table (in batch refresh mode)
+        # This is used to stagger the refresh of tables across multiple days
+        # Every table will be refreshed every `resync_tables_every_n_days` days
+        self.resync_tables_every_n_days = 5
+
+        # Calculate the modulo of the current day, which is used to stagger the refresh of tables
+        # This assigns every day a number from 0 to `resync_tables_every_n_days - 1`, and every day
+        # when the sync is run, it will only refresh tables that match the current day modulo
+        #
+        # This value is calculated once and used for the entire lifetime of the loader
+        # A new instance of the loader will be created every time the metastore is refreshed
+        self.current_day_modulo = (
+            self.int(time.time() / 86400) % self.resync_tables_every_n_days
+        )
+
     loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig(
         {
             MetadataType.TAG: MetadataMode.WRITE_BACK,
@@ -142,6 +163,68 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 description="Creator of the table, from the `eg-creator` tag",
             ),
         ]
+
+    def should_sync_table(self, table=None):
+        """
+        Determine if a table should by synced or not.  This function should
+        only be used in batch refresh mode.
+
+        We want to stagger the refresh of tables across multiple days, so we don't
+        refresh all tables at once. This is to prevent overloading the metastore, speed up
+        the refresh process, and spread out the load across multiple days.
+
+        Every table will be refreshed every `resync_tables_every_n_days` days.
+
+        Tables are assigned to N buckets based on their id. Then we check if the modulo of the current day
+        matches the bucket of the table. If it does, we refresh the table.
+
+        Any new tables will be immediately refreshed since they don't have an id yet.
+        """
+        if not table:
+            return True
+        if self.current_day_modulo == table.id % self.resync_tables_every_n_days:
+            return True
+        return False
+
+    @with_session
+    def _create_table_table(
+        self,
+        schema_id,
+        schema_name,
+        table_name,
+        table=None,
+        columns=None,
+        from_batch=False,
+        session=None,
+    ):
+        """
+        Override the base method to filter out tables we don't want to refresh.
+        """
+        # If from_batch is True, it is a batch refresh of the metastore
+        # Check if the table is already in the database.
+        # If it is, check if we should refresh it or not.
+        # This is a performance optimization to speed up the batch refresh process
+        if from_batch:
+            # Get the existing table from the database
+            existing_table = get_table_by_schema_id_and_name(
+                schema_id, table_name, session=session
+            )
+
+            # If the table exists and we don't want to refresh it, then skip it
+            if not self.should_sync_table(existing_table):
+                LOG.debug(f"Skipping refresh of {schema_name}.{table_name}")
+                return None
+
+        # Sync the table as normal
+        return super()._create_table_table(
+            schema_id,
+            schema_name,
+            table_name,
+            table=table,
+            columns=columns,
+            from_batch=from_batch,
+            session=session,
+        )
 
     # Can override this to test a limited set of tables
     # def get_all_schema_names(self) -> List[str]:
