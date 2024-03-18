@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.90.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.1...0.90.2) (2024-03-18)
+
+
+### Bug Fixes
+
+* Fix int bug in EG Hive Metastore ([67d2eb4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/67d2eb43368f10d0e3cb06a940bc6d6ff2d309e7))
+
 ### [0.90.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.0...0.90.1) (2024-03-15)
 
 
