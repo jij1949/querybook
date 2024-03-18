@@ -122,7 +122,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         # This value is calculated once and used for the entire lifetime of the loader
         # A new instance of the loader will be created every time the metastore is refreshed
         self.current_day_modulo = (
-            self.int(time.time() / 86400) % self.resync_tables_every_n_days
+            int(time.time() / 86400) % self.resync_tables_every_n_days
         )
 
     loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig(
