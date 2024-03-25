@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.90.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.2...0.90.3) (2024-03-25)
+
+
+### Bug Fixes
+
+* Improve file type detection for EgHMSMetastoreLoader ([c1c9e87](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c1c9e876f32c34fc184a3966677d5fe0114bc40c))
+
 ### [0.90.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.1...0.90.2) (2024-03-18)
 
 
