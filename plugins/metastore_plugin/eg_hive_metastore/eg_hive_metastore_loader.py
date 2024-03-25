@@ -49,6 +49,7 @@ class EgTagColors(Enum):
     GOVERNANCE: str = "#35b5bb"  # blue
     ICEBERG: str = "#529dce"  # picton blue
     DELTA: str = "#b7652b"  # choco
+    HUDI: str = "#b7652b"  # choco
     VIEW: str = "#f5a623"  # orange
     FILE_FORMAT: str = "#6ba097"  # creamy forest green
 
@@ -182,6 +183,16 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         """
         if not table:
             return True
+
+        # If the table updated_at is more than self.resync_tables_every_n_days days ago, then refresh it
+        # This might happen if the resync doesn't run every day
+        if (
+            time.time() - table.updated_at.timestamp()
+            > self.resync_tables_every_n_days * 86400
+        ):
+            return True
+
+        # If the table id modulo matches the current day modulo, then refresh it
         if self.current_day_modulo == table.id % self.resync_tables_every_n_days:
             return True
         return False
@@ -368,9 +379,11 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         #     table = table._replace(golden=True)
 
         # Check if the table is a view
-        # Note: There's also `tableType` which can be `VIRTUAL_VIEW` or `MATERIALIZED_VIEW`
-        # but we're using `viewOriginalText` to determine if it's a view
-        if description.viewOriginalText is not None:
+        if (
+            description.tableType == "VIEW"
+            or description.tableType == "VIRTUAL_VIEW"
+            or description.tableType == "MATERIALIZED_VIEW"
+        ):
             tags.append(
                 DataTag(
                     name="View",
@@ -379,44 +392,47 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 )
             )
 
-            # Support for Presto Views, which store base64 encoded data
-            if parameters.get("presto_view") == "true":
-                # Parse out the base64 encoded data from the viewOriginalText
-                # Format: "/* Presto View: <BASE64 DATA> */"
-                base64_data = extract_base64_data(description.viewOriginalText)
-                if base64_data:
-                    # Decode and deserialize the Base64 JSON data
-                    view_data = base64.b64decode(base64_data).decode("utf-8")
-                    view_data = ujson.loads(view_data)
+            # Process viewOriginalText for views
+            # Note: not all views have viewOriginalText
+            if description.viewOriginalText:
+                # Support for Presto Views, which store base64 encoded data
+                if parameters.get("presto_view") == "true":
+                    # Parse out the base64 encoded data from the viewOriginalText
+                    # Format: "/* Presto View: <BASE64 DATA> */"
+                    base64_data = extract_base64_data(description.viewOriginalText)
+                    if base64_data:
+                        # Decode and deserialize the Base64 JSON data
+                        view_data = base64.b64decode(base64_data).decode("utf-8")
+                        view_data = ujson.loads(view_data)
 
-                    # Add the original SQL to custom properties
+                        # Add the original SQL to custom properties
+                        table = table._replace(
+                            custom_properties={
+                                "original_sql": view_data["originalSql"],
+                            }
+                        )
+
+                        # Replace the columns with the view data columns
+                        columns = [
+                            DataColumn(name=col["name"], type=col["type"])
+                            for col in view_data["columns"]
+                        ]
+
+                        # Get view comment (if any) and replace the generated "Presto view" description
+                        if view_data.get("comment"):
+                            table = table._replace(description=view_data["comment"])
+
+                else:
+                    # Some views have `viewOriginalText` containing the SQL in plain text
+                    # (I assume these are Hive views)
                     table = table._replace(
                         custom_properties={
-                            "original_sql": view_data["originalSql"],
+                            "original_sql": description.viewOriginalText,
                         }
                     )
 
-                    # Replace the columns with the view data columns
-                    columns = [
-                        DataColumn(name=col["name"], type=col["type"])
-                        for col in view_data["columns"]
-                    ]
-
-                    # Get view comment (if any) and replace the generated "Presto view" description
-                    if view_data.get("comment"):
-                        table = table._replace(description=view_data["comment"])
-
-            else:
-                # Some views have `viewOriginalText` containing the SQL in plain text
-                # (I assume these are Hive views)
-                table = table._replace(
-                    custom_properties={
-                        "original_sql": description.viewOriginalText,
-                    }
-                )
-
         # Detect and tag table / file formats
-        # Skip views
+        # Skip all views, since they don't have a file format
         else:
             file_format = detect_file_format(sd, parameters)
             if file_format:
@@ -472,6 +488,17 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                         type="Table Format",
                         description="This is a Delta Lake table",
                         color=EgTagColors.DELTA.value,
+                    )
+                )
+
+            # Hudi!
+            elif sd.inputFormat == "org.apache.hudi.hadoop.HoodieParquetInputFormat":
+                tags.append(
+                    DataTag(
+                        name="Hudi",
+                        type="Table Format",
+                        description="This is a Hudi table",
+                        color=EgTagColors.HUDI.value,
                     )
                 )
 
