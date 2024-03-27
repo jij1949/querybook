@@ -44,6 +44,7 @@ FILE_FORMAT_MAPPING = [
         "serde": [
             "org.openx.data.jsonserde.JsonSerDe",
             "org.apache.hadoop.hive.contrib.serde2.JsonSerde",
+            "org.apache.hive.hcatalog.data.JsonSerDe",
         ],
         "format": "JSON",
     },
@@ -56,13 +57,17 @@ FILE_FORMAT_MAPPING = [
         "input_format": [
             "org.apache.hadoop.mapred.TextInputFormat",
             "org.apache.hadoop.mapred.FileInputFormat",
+            "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat",
         ],
         "serde": ["org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"],
         "format": "Text",
     },
     {
         "input_format": ["org.apache.hadoop.hive.ql.io.RCFileInputFormat"],
-        "serde": ["org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe"],
+        "serde": [
+            "org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe",
+            "org.apache.hadoop.hive.serde2.columnar.LazyBinaryColumnarSerDe",
+        ],
         "format": "RCFile",
     },
     {
