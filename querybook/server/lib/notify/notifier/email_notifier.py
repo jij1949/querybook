@@ -32,11 +32,11 @@ class EmailNotifier(BaseNotifier):
             msg["Subject"] = subject
             msg["Date"] = date
             msg["From"] = from_email
-            msg["To"] = ",".join(recipients)
+            msg["To"] = ", ".join(recipients)
             msg.attach(MIMEText(message, "html"))
 
             smtp = smtplib.SMTP(QuerybookSettings.EMAILER_CONN)
-            smtp.sendmail(msg["From"], msg["To"], msg.as_string())
+            smtp.sendmail(msg["From"], recipients, msg.as_string())
         except Exception as e:
             LOG.info(e)
 
@@ -44,7 +44,7 @@ class EmailNotifier(BaseNotifier):
         self.notify_recipients(recipients=[user.email], message=message)
 
     def process_subject(self, subject):
-        if subject.startswith('<p>'):
+        if subject.startswith("<p>"):
             subject = subject[3:]
             subject = subject[:-4]
         return subject
