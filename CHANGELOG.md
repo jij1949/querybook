@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.90.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.3...0.90.4) (2024-04-11)
+
+
+### Bug Fixes
+
+* Add additional file formats ([60764d2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/60764d259d46d0304515bf32863fd8a1272a0a91))
+* add bom to downloaded csv (#251) ([4d2ccd6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4d2ccd6bcebf4ef005f167d5cb3433d4f20c2dad))
+* Fix Email notifications to multiple email addresses ([4ef3acd](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4ef3acd2f0f145733742c840f2dbda87fb2070cd))
+
 ### [0.90.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.2...0.90.3) (2024-03-25)
 
 
