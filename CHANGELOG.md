@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.91.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.4...0.91.0) (2024-04-19)
+
+
+### Features
+
+* Add current_user variable and slugify filter to Jinja ([632ea66](https://github.expedia.biz/eg-analytics-platform/querybook/commit/632ea66fa740c302f92924d615a1ed5cd0e99f16))
+* add download as xlsx option via streaming (#254) ([bca3c28](https://github.expedia.biz/eg-analytics-platform/querybook/commit/bca3c2807ea0e4459a06095a9ecfd8bfd5684378))
+
+
+### Bug Fixes
+
+* Make datadog optional and switch to lazy importing ([f146764](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f146764bcaaadb61234264623a1f56b9b8bc6856))
+
 ### [0.90.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.3...0.90.4) (2024-04-11)
 
 
