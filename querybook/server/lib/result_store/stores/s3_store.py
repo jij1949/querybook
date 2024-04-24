@@ -57,8 +57,7 @@ class S3Reader(BaseReader):
         return self._reader.read_lines(number_of_lines)
 
     def read_raw(self) -> str:
-        # TODO: implement read raw for s3 reader
-        raise NotImplementedError()
+        return self._reader.read()
 
     def end(self):
         self._reader = None
