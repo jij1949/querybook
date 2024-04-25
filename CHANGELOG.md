@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.91.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.91.0...0.91.1) (2024-04-25)
+
+
+### Bug Fixes
+
+* Add openpyxl for Excel exports ([6f07114](https://github.expedia.biz/eg-analytics-platform/querybook/commit/6f071141e0e7095d8340e3f1bdb26571ff1ddc7e))
+* Implement read_raw for S3 result store ([0767555](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0767555bd7a7215f7b1f2dbbaddbe68202233162))
+
 ## [0.91.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.90.4...0.91.0) (2024-04-19)
 
 
