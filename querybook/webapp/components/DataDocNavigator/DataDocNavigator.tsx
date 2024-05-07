@@ -29,6 +29,7 @@ import {
 } from './navigatorConst';
 
 import './DataDocNavigator.scss';
+import { UploadDataDocButton } from '../UploadDataDoc/UploadDataDocButton';
 
 export const DataDocNavigator: React.FC = () => {
     const loadedFilterModes =
@@ -95,6 +96,7 @@ export const DataDocNavigator: React.FC = () => {
                     transparent
                 />
                 <CreateDataDocButton />
+                <UploadDataDocButton />
             </div>
             <div className="list-content data-docs">
                 <RecentDataDocsSection {...commonSectionProps} />

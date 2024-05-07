@@ -10,9 +10,15 @@ import { StyledText } from 'ui/StyledText/StyledText';
 
 import { IDragObjectFiles } from './types';
 
+export enum UploadType {
+    DataDoc = 'datadoc',
+    Table = 'table',
+}
+
 interface IFileUploaderAreaProps {
     onUpload: (f?: File) => void;
     file?: File;
+    uploadType?: UploadType;
 }
 
 const StyledDropArea = styled.div<{ isActive: boolean }>`
@@ -31,18 +37,27 @@ const StyledDropArea = styled.div<{ isActive: boolean }>`
 `;
 
 // Mime type -> readable name
-const AllowedMimeTypesDict = {
+const AllowedMimeTypesDictTable = {
     'text/csv': 'csv',
     'text/tab-separated-values': 'tsv',
     'text/plain': 'txt',
 };
-const AllowedFileTypes = Object.values(AllowedMimeTypesDict).join(', ');
-const AllowedMimeTypes = Object.keys(AllowedMimeTypesDict).join(',');
+const AllowedMimeTypesDictDataDoc = {
+    'application/json': 'json',
+};
 
 export const FileUploaderArea: React.FC<IFileUploaderAreaProps> = ({
     onUpload,
     file: selectedFile,
+    uploadType,
 }) => {
+    const AllowedMimeTypesDict =
+        uploadType === UploadType.Table
+            ? AllowedMimeTypesDictTable
+            : AllowedMimeTypesDictDataDoc;
+    const AllowedFileTypes = Object.values(AllowedMimeTypesDict).join(', ');
+    const AllowedMimeTypes = Object.keys(AllowedMimeTypesDict).join(',');
+
     const noDropReasonRef = React.useRef('');
 
     const [{ canDrop, isOver, noDropReason }, dropRef] = useDrop<
@@ -89,6 +104,7 @@ export const FileUploaderArea: React.FC<IFileUploaderAreaProps> = ({
 
     let innerMessageDOM: React.ReactNode;
     let uploadedFileDOM: React.ReactNode;
+
     if (!isOver) {
         innerMessageDOM = (
             <div>
@@ -96,13 +112,18 @@ export const FileUploaderArea: React.FC<IFileUploaderAreaProps> = ({
                     <StyledText untitled>
                         Drag a file here to upload (Allowed types:{' '}
                         {AllowedFileTypes})
-                        <div>
-                            Note: Files should be under 200MB and 200K rows
-                        </div>
+                        {uploadType === UploadType.Table && (
+                            <div>
+                                Note: Files should be under 200MB and 200K rows
+                            </div>
+                        )}
                     </StyledText>
                 </div>
 
-                <FileUploaderButton onUpload={onUpload} />
+                <FileUploaderButton
+                    onUpload={onUpload}
+                    allowedMimeTypes={AllowedMimeTypes}
+                />
             </div>
         );
         uploadedFileDOM = selectedFile && (
@@ -133,9 +154,10 @@ export const FileUploaderArea: React.FC<IFileUploaderAreaProps> = ({
     );
 };
 
-const FileUploaderButton: React.FC<{ onUpload: (f: File) => void }> = ({
-    onUpload,
-}) => {
+const FileUploaderButton: React.FC<{
+    onUpload: (f: File) => void;
+    allowedMimeTypes: string;
+}> = ({ onUpload, allowedMimeTypes }) => {
     const hiddenInputRef = useRef<HTMLInputElement>();
     const handleButtonClick = useCallback(() => {
         hiddenInputRef.current.click();
@@ -159,7 +181,7 @@ const FileUploaderButton: React.FC<{ onUpload: (f: File) => void }> = ({
                 style={{ display: 'none' }}
                 type="file"
                 onChange={handleFileInputChange}
-                accept={AllowedMimeTypes}
+                accept={allowedMimeTypes}
             />
         </>
     );

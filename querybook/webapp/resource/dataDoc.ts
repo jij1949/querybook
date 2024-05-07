@@ -42,13 +42,16 @@ export const DataDocResource = {
     create: (
         cells: Array<Partial<IDataCell>>,
         environmentId: number,
-        meta?: Record<string, any>
+        meta?: Record<string, any>,
+        title?: string,
+        isPublic?: boolean
     ) =>
         ds.save<IRawDataDoc>('/datadoc/', {
-            title: '',
+            title: title || '',
             meta,
             environment_id: environmentId,
             cells,
+            public: isPublic,
         }),
 
     createFromExecution: (

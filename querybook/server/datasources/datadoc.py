@@ -26,7 +26,12 @@ from logic import (
     schedule as schedule_logic,
     user as user_logic,
 )
-from logic.datadoc_permission import assert_can_read, assert_can_write, assert_is_owner, assert_is_not_group
+from logic.datadoc_permission import (
+    assert_can_read,
+    assert_can_write,
+    assert_is_owner,
+    assert_is_not_group,
+)
 from logic.query_execution import get_query_execution_by_id
 from logic.schedule import (
     run_and_log_scheduled_task,
@@ -88,7 +93,7 @@ def get_data_docs(
 
 
 @register("/datadoc/", methods=["POST"])
-def create_data_doc(environment_id, cells=[], title=None, meta={}):
+def create_data_doc(environment_id, cells=[], title=None, meta={}, public=None):
     with DBSession() as session:
         verify_environment_permission([environment_id])
         environment = Environment.get(id=environment_id, session=session)
@@ -97,7 +102,7 @@ def create_data_doc(environment_id, cells=[], title=None, meta={}):
             environment_id=environment_id,
             owner_uid=current_user.id,
             cells=cells,
-            public=environment.shareable,
+            public=public if public is not None else environment.shareable,
             archived=False,
             title=title,
             meta=meta,

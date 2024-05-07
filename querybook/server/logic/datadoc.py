@@ -63,8 +63,12 @@ def create_data_doc(
     )
 
     for index, cell in enumerate(cells):
+        # type_key accounts for the format in which data docs are uploaded
+        type_key = "type"
+        if "cell_type" in cell:
+            type_key = "cell_type"
         data_cell = create_data_cell(
-            cell_type=cell["type"],
+            cell_type=cell[type_key],
             context=cell["context"],
             meta=cell["meta"],
             commit=False,

@@ -6,7 +6,7 @@ import { IOptions } from 'lib/utils/react-select';
 import { FormWrapper } from 'ui/Form/FormWrapper';
 import { SimpleField } from 'ui/FormikField/SimpleField';
 
-import { FileUploaderArea } from './FileUploaderArea';
+import { FileUploaderArea, UploadType } from './FileUploaderArea';
 import { ITableUploadFormikForm } from './types';
 
 export const UploadSourceTypeOptions: IOptions<UploadSourceType> = [
@@ -31,6 +31,7 @@ export const ITableUploaderSourceForm: React.FC = ({}) => {
                     <FileUploaderArea
                         onUpload={(f) => setFieldValue('file', f)}
                         file={values.file}
+                        uploadType={UploadType.Table}
                     />
                 </div>
 
