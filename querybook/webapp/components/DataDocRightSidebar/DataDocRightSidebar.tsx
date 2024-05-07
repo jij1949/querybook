@@ -20,6 +20,7 @@ import { DataDocScheduleButton } from './DataDocScheduleButton';
 import { DeleteDataDocButton } from './DeleteDataDocButton';
 
 import './DataDocRightSidebar.scss';
+import { DataDocJsonDownloadButton } from './DataDocJsonDownloadButton';
 
 interface IProps {
     dataDoc: IDataDoc;
@@ -84,6 +85,10 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
 
     const cloneButtonDOM = <DataDocCloneButton docId={dataDoc.id} />;
 
+    const jsonDownloadButtonDOM = (
+        <DataDocJsonDownloadButton docId={dataDoc.id} />
+    );
+
     const buttonSection = (
         <div className="DataDocRightSidebar-button-section vertical-space-between">
             <div className="DataDocRightSidebar-button-section-top flex-column">
@@ -139,6 +144,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
                 {templateButtonDOM}
                 {scheduleButtonDOM}
                 {cloneButtonDOM}
+                {jsonDownloadButtonDOM}
                 {deleteButtonDOM}
             </div>
         </div>
