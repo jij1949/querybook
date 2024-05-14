@@ -29,9 +29,9 @@ export const ExpediaOktaError: React.FunctionComponent = () => {
                 <Subtitle className="ErrorPage-message mb16">
                     <a
                         style={{ fontWeight: 'bold' }}
-                        href="https://confluence.expedia.biz/display/DSPKB/EGAP+Access+and+Support+Request"
+                        href="https://confluence.expedia.biz/display/DSPKB/Querybook+Access"
                     >
-                        EGAP Access and Support Request
+                        Querybook Access Request
                     </a>
                 </Subtitle>
             </Center>
