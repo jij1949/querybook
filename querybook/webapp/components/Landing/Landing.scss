@@ -35,9 +35,7 @@
         max-width: 960px;
         padding: 0px 12px;
 
-        > div:first-child {
-            margin-bottom: 24px;
-        }
+        gap: 24px;
 
         .Landing-section-title {
             font-size: var(--med-text-size);

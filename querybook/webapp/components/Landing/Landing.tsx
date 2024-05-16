@@ -20,6 +20,7 @@ import { currentEnvironmentSelector } from 'redux/environment/selector';
 import { IStoreState } from 'redux/store/types';
 import { Column, Columns } from 'ui/Column/Column';
 import { Link } from 'ui/Link/Link';
+import { Markdown } from 'ui/Markdown/Markdown';
 
 import './Landing.scss';
 
@@ -99,7 +100,7 @@ const DefaultLanding: React.FC = ({ children }) => {
     );
 
     const LandingFooter = (
-        <div className="Landing-bottom">
+        <div className="Landing-bottom flex-column">
             <Columns>
                 <Column>
                     <div className="Landing-section-title">Documentation</div>
@@ -114,12 +115,21 @@ const DefaultLanding: React.FC = ({ children }) => {
                         </div>
                         <div>
                             <Link
+                                to="https://confluence.expedia.biz/display/DSPKB/Querybook+Best+Practices"
+                                newTab={true}
+                            >
+                                Querybook Best Practices 📚
+                            </Link>
+                        </div>
+                        <div>
+                            <Link
                                 to="https://pages.github.expedia.biz/analytics-learning/analytics-bootcamp/docs/Querybook/querybook"
                                 newTab={true}
                             >
                                 Querybook 101 in Analytics Bootcamp 🎓
                             </Link>
                         </div>
+                        <br />
                         <div>
                             <Link
                                 to="https://analytics.expedia.biz/trino"
@@ -142,7 +152,9 @@ const DefaultLanding: React.FC = ({ children }) => {
             <Columns>
                 <Column>
                     <div className="Landing-section-title">Did you know?</div>
-                    <p>{hint}</p>
+                    <p>
+                        <Markdown>{hint}</Markdown>
+                    </p>
                 </Column>
             </Columns>
             <Columns>
