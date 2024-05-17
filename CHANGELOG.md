@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.92.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.91.1...0.92.0) (2024-05-17)
+
+
+### Features
+
+* Added button to import a datadoc from a JSON file (#258) ([4f6eaba](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4f6eabafd5a6bb97e7c197dc2800eb6469a60941))
+* Added download button to convert datadoc to JSON and download it (#257) ([f32af60](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f32af6062e7f0bfd36a1857f2b36e39eefe31889))
+* Improvements to the Landing page ([7765999](https://github.expedia.biz/eg-analytics-platform/querybook/commit/776599929b5e7f7fa8260367cdd90bad1f3dbdad))
+
+
+### Bug Fixes
+
+* link users directly to the querybook access page ([2985a8e](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2985a8e76938841f3af9fff568dc1723f5dc7049))
+* Use `read_csv()` for XLSX export to ensure entire file is read ([a272785](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a2727855eebcba27a8da21f4407d254a55cd55c7))
+
 ### [0.91.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.91.0...0.91.1) (2024-04-25)
 
 
