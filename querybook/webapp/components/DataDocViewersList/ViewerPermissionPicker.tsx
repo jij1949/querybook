@@ -53,9 +53,17 @@ export const ViewerPermissionPicker: React.FunctionComponent<IProp> = ({
                         onClick={() =>
                             sendConfirm({
                                 header: 'Transfer Ownership',
-                                message:
-                                    'Are you sure you want to transfer ownership? This will reset all editor ' +
-                                    "permissions to 'read only' and disable any enabled schedules.",
+                                message: (
+                                    <p>
+                                        Are you sure you want to transfer
+                                        ownership?{' '}
+                                        <strong>
+                                            This will reset all editor
+                                            permissions to 'read only' and
+                                            disable any enabled schedules.
+                                        </strong>
+                                    </p>
+                                ),
                                 onConfirm: () =>
                                     onPermissionChange(Permission.OWNER),
                             })
