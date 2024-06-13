@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 from sqlglot import exp, parse, parse_one, transpile, errors
+from sqlglot.expressions import Identifier
 
 from lib.logger import get_logger
 from const.sqlglot import QUERYBOOK_TO_SQLGLOT_LANGUAGE_MAPPING
@@ -35,7 +36,7 @@ def get_select_statement_limit(
     Args:
         statement_ast: The select statement ast
     Returns:
-        int: The limit of the select statement. -1 if no limit, or None if not a select/union statement
+        int: The limit of the select statement. -1 if no limit, -2 if unlimited, or None if not a select/union statement
     """
     if isinstance(statement, str):
         statement = parse_one(statement, dialect=_get_sqlglot_dialect(language))
@@ -50,6 +51,8 @@ def get_select_statement_limit(
 
     if isinstance(limit_clause, exp.Limit):
         limit = limit_clause.expression.this
+        if limit == Identifier(this="ALL"):
+            limit = -2
     elif isinstance(limit_clause, exp.Fetch):
         limit = limit_clause.args.get("count").this
 
@@ -61,7 +64,7 @@ def get_limited_select_statement(statement_ast: exp.Expression, limit: int):
     It returns a new statement with the limit applied and the original statement is not modified.
     """
     current_limit = get_select_statement_limit(statement_ast)
-    if current_limit is None or current_limit >= 0:
+    if current_limit is None or current_limit >= 0 or current_limit == -2:
         return statement_ast
 
     return statement_ast.limit(limit)

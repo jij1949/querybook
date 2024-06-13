@@ -41,6 +41,7 @@ class GetSelectStatementLimitTestCase(TestCase):
             ),
             ("SELECT * FROM (SELECT * FROM table LIMIT 5) AS x LIMIT 10", 10),
             ("SELECT * FROM table_1 WHERE field = 1 LIMIT 1000;", 1000),
+            ("SELECT * FROM table_1 LIMIT ALL;", -2),
         ]
         for query, expected in tests:
             with self.subTest(query=query):
@@ -110,6 +111,7 @@ class GetLimitedQueryTestCase(TestCase):
             "SELECT * FROM table_1 ORDER BY id OFFSET 10 FETCH NEXT 10 ROWS ONLY",
             "SELECT * FROM (SELECT * FROM table LIMIT 5) AS x LIMIT 10",
             "SELECT * FROM table_1 WHERE field = 1 LIMIT 1000",
+            "SELECT * FROM table_1 WHERE field = 1 LIMIT ALL",
         ]
         for query in tests:
             with self.subTest(query=query):
