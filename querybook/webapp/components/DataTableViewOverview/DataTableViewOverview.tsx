@@ -155,19 +155,22 @@ export const DataTableViewOverview: React.FC<
 
     const customPropertiesDOM = Object.entries(
         table.custom_properties ?? {}
-    ).map(([key, value]) => (
-        <KeyContentDisplay key={key} keyString={titleize(key, '_', ' ')}>
-            {value && /https?:\/\/[^\s]+/.test(value.trim()) ? (
-                <Link to={value} newTab>
-                    {value}
-                </Link>
-            ) : key === 'original_sql' ? (
-                <ThemedCodeHighlight value={value} />
-            ) : (
-                value
-            )}
-        </KeyContentDisplay>
-    ));
+    ).map(([key, value]) => {
+        const valueStr = value?.toString() ?? '';
+        return (
+            <KeyContentDisplay key={key} keyString={titleize(key, '_', ' ')}>
+                {valueStr && /https?:\/\/[^\s]+/.test(valueStr.trim()) ? (
+                    <Link to={valueStr} newTab>
+                        {valueStr}
+                    </Link>
+                ) : key === 'original_sql' ? (
+                    <ThemedCodeHighlight value={value} />
+                ) : (
+                    valueStr
+                )}
+            </KeyContentDisplay>
+        );
+    });
 
     const rawMetastoreInfoDOM = table.hive_metastore_description ? (
         <pre className="raw-metastore-info">

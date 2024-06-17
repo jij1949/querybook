@@ -17,6 +17,7 @@ cell_types:
             collapsed: false
             query_collapsed: false
             limit: 0
+            sample_rate: 0.0
             disabled: false
         meta_default:
             title: ''
@@ -24,6 +25,7 @@ cell_types:
             collapsed: false
             query_collapsed: false
             limit: 0
+            sample_rate: 0
             disabled: false
     chart:
         key: 'chart'

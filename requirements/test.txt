@@ -7,5 +7,4 @@ moto==2.2.4
 -r engine/trino.txt
 -r metastore/glue.txt
 -r exporter/gspread.txt
--r parser/sqlglot.txt
 -r ai/langchain.txt
