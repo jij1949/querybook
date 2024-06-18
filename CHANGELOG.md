@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.93.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.92.0...0.93.0) (2024-06-18)
+
+
+### Features
+
+* add [@mention](https://github.expedia.biz/mention) to select a table for the command input (#1432) ([067d96d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/067d96db321e1f2f2908dece1e4ee5a9470a31e4))
+* Add any links associated with a table to querybook descriptions (#1450) ([d81d582](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d81d5824b381b24a4d45884ab5da3a37361ff0d7))
+* add table sampling support (#1421) ([4287294](https://github.expedia.biz/eg-analytics-platform/querybook/commit/428729492e9834f2d0ffac82eed2324d779a1711))
+* Auto-load built-in notifiers if configured (#1420) ([8c6600c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8c6600c84221ffedd3d7469ef0c6e78e8cde2c85))
+* Improve Cron schedule support (#1395) ([26007d6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/26007d6b7ca2678003c7cf4fb45dce2e2218c1be))
+* update text2sql ui (#1429) ([a6f73fc](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a6f73fc0829a181f7b73c6106c9a734a18ad3277))
+
+
+### Bug Fixes
+
+* add back text2sql survey (#1452) ([b8d9a95](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b8d9a95e0636421459d50da44c73a176a5e50c63))
+* add csp header for iframe embedding (#1442) ([80a9eee](https://github.expedia.biz/eg-analytics-platform/querybook/commit/80a9eee94b1b70e339379fe1558981279dd72400))
+* add default search parameters for table concise search (#1439) ([302b6ac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/302b6ac7ae86e63ca980713eed8b87e472bb2020))
+* add warning to notification, bold text (#262) ([0897413](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0897413cb1d6e5ca633c81089bcfb49002f92383))
+* added sort key when more data tables are loaded in a search (#239) (#1424) ([174e444](https://github.expedia.biz/eg-analytics-platform/querybook/commit/174e4448a2cef8e2f285f4f21fee236a7450dbfa))
+* Correct mapping for table_updated_at/table_updated_by (#1426) ([44d8055](https://github.expedia.biz/eg-analytics-platform/querybook/commit/44d8055ff71e8a808280a1627a13fa5632d42e6d))
+* enable websocket cors for production (#1425) ([3e992ee](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3e992eea99411a75aeb6eb41fe60100b0e6afb59))
+* Fix Email notifications to multiple email addresses (#1437) ([2dbc30d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/2dbc30de9f7340e463e62269987392e8c2fe6b5b))
+* Fix upstream merge issues ([b5f29b5](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b5f29b5b5693fb41a0cbb72e43cf4f675d674e18))
+* Metastore ACL support for wildcard prefix match (#1423) ([1e664d3](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1e664d305a5c6057de02864f9322ed1a3c929617))
+* move slack channel to top of table description (#1446) ([af818be](https://github.expedia.biz/eg-analytics-platform/querybook/commit/af818be536469ecdddc1c26ef0a12b2bef088e1b))
+* move to first match on search term change (#1416) ([3507385](https://github.expedia.biz/eg-analytics-platform/querybook/commit/35073850d0d7e5d522eac761f37197bbbd09d211))
+* move workflow link to source query tab (#1445) ([74790d6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/74790d6c99f2a8a2653fe628ee59bb76afb6501c))
+* querybook edit access issue (#1444) ([29fdf95](https://github.expedia.biz/eg-analytics-platform/querybook/commit/29fdf95bde7d635042c956fc951677e38b23704f))
+* requirements/dev.txt to reduce vulnerabilities (#1427) ([357132a](https://github.expedia.biz/eg-analytics-platform/querybook/commit/357132ac9de392b500b75f37b81919f0657e30e3))
+* revert to use searchConcise for mentioning a table (#1438) ([4c74ac8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4c74ac8ce0d1489b5e3f4a98cc4cb9bc70bd8dd4))
+* update cookie config (#1431) ([b445a22](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b445a2272cb965f7a5deb6f022de0772245913ec))
+* use match_phrase_prefix on full_name field for table suggestion (#1433) ([cd11be9](https://github.expedia.biz/eg-analytics-platform/querybook/commit/cd11be939e6955341de701228cd0d6d52e944ed5))
+
 ## [0.92.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.91.1...0.92.0) (2024-05-17)
 
 
