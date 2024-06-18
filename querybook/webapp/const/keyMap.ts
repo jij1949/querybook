@@ -85,6 +85,12 @@ const DEFAULT_KEY_MAP = {
             name: 'Delete current cell',
         },
     },
+    aiCommandBar: {
+        openCommands: {
+            key: 'Cmd-/',
+            name: 'Open commands',
+        },
+    },
     queryEditor: {
         runQuery: {
             key: 'Shift-Enter',
@@ -135,6 +141,10 @@ const DEFAULT_KEY_MAP = {
         addCursorToNextLine: {
             key: 'Cmd-Alt-Down',
             name: 'Select the same position on the below line and then edit all selected lines together',
+        },
+        focusCommandInput: {
+            key: 'Cmd-I',
+            name: 'Focus command input',
         },
     },
 };

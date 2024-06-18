@@ -91,27 +91,31 @@ export function recurrenceToCron(recurrence: IRecurrence): string {
         return recurrence.cron;
     }
 
-    const { minute } = recurrence;
+    try {
+        const { minute } = recurrence;
 
-    let hour = recurrence.hour.toString();
-    let dayMonth = '*';
-    let month = '*';
-    let dayWeek = '*';
-    let hourly = '';
+        let hour = recurrence.hour.toString();
+        let dayMonth = '*';
+        let month = '*';
+        let dayWeek = '*';
+        let hourly = '';
 
-    if (recurrence.recurrence === 'yearly') {
-        month = recurrence.on.month.join(',');
-        dayMonth = recurrence.on.dayMonth.join(',');
-    } else if (recurrence.recurrence === 'monthly') {
-        dayMonth = recurrence.on.dayMonth.join(',');
-    } else if (recurrence.recurrence === 'weekly') {
-        dayWeek = recurrence.on.dayWeek.join(',');
-    } else if (recurrence.recurrence === 'hourly') {
-        hourly = recurrence.step.hour.toString();
-        hour = '*/' + hourly;
+        if (recurrence.recurrence === 'yearly') {
+            month = recurrence.on.month.join(',');
+            dayMonth = recurrence.on.dayMonth.join(',');
+        } else if (recurrence.recurrence === 'monthly') {
+            dayMonth = recurrence.on.dayMonth.join(',');
+        } else if (recurrence.recurrence === 'weekly') {
+            dayWeek = recurrence.on.dayWeek.join(',');
+        } else if (recurrence.recurrence === 'hourly') {
+            hourly = recurrence.step.hour.toString();
+            hour = '*/' + hourly;
+        }
+
+        return `${minute} ${hour} ${dayMonth} ${month} ${dayWeek}`;
+    } catch (error) {
+        return '';
     }
-
-    return `${minute} ${hour} ${dayMonth} ${month} ${dayWeek}`;
 }
 
 export const WEEKDAYS = [
@@ -223,11 +227,14 @@ export function validateCronForRecurrrence(cron: string) {
         return false;
     }
 
-    const [minute, hour, month, monthDay, weekDay] = cronValArr.map(
+    const [minute, hour, monthDay, month, weekDay] = cronValArr.map(
         (s) => s !== '*'
     );
-    // Minute and hour must be provided
-    if (!(minute && hour)) {
+
+    const isHourly = minute && !hour && !monthDay && !month && !weekDay;
+
+    // Minute and hour must be provided unless hourly
+    if (!(minute && hour) && !isHourly) {
         return false;
     }
     // Recurrence doesn't current support having both monthday and weekday
