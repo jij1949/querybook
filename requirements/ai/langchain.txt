@@ -4,7 +4,8 @@ opensearch-py==2.3.0
 langchain-community==0.0.38
 
 # Elasticsearch 8
-elasticsearch==8.8.2
+langchain-elasticsearch==0.2.2
+elasticsearch==8.14.0
 
 # Required for `sentence_transformers` or `bge` embeddings
 # sentence_transformers==2.2.2

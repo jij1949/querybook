@@ -11,7 +11,8 @@ __vector_store = None
 
 REQUESTS_CA_BUNDLE = os.environ.get("REQUESTS_CA_BUNDLE")
 
-httpx_client = httpx.Client(verify=REQUESTS_CA_BUNDLE)
+
+http_client = httpx.Client(verify=REQUESTS_CA_BUNDLE)
 
 
 def get_embeddings():
@@ -27,7 +28,13 @@ def get_embeddings():
     embeddings_config = QuerybookSettings.EMBEDDINGS_CONFIG
 
     embeddings_class = get_embeddings_class(embeddings_provider)
-    __embeddings = embeddings_class(**embeddings_config, http_client=httpx_client)
+    __embeddings = embeddings_class(
+        **embeddings_config,
+        # Enable to avoid checking the length of the embeddings; workaround for GenAI Proxy not supporting token input
+        # Not needed if we patch the Embeddings class to convert tokens to text
+        # check_embedding_ctx_length=False,
+        http_client=http_client,
+    )
     return __embeddings
 
 

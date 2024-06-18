@@ -13,6 +13,7 @@ from tasks_plugin import sync_ldap_user_task
 
 LOG = get_logger(__file__)
 
+
 #
 # Expedia-customized version of the OktaLoginManager
 #
@@ -20,7 +21,7 @@ class EgOktaLoginManager(OktaLoginManager):
     @property
     @in_mem_memoized()
     def oauth_config(self):
-        authorization_url, token_url, profile_url = self.get_okta_urls()
+        authorization_url, token_url, profile_url = self.get_oauth_urls()
 
         return {
             "callback_url": "{}{}".format(

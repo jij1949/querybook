@@ -51,15 +51,15 @@ def make_flask_app():
     if QuerybookSettings.TABLE_MAX_UPLOAD_SIZE is not None:
         app.config["MAX_CONTENT_LENGTH"] = int(QuerybookSettings.TABLE_MAX_UPLOAD_SIZE)
 
-    # Add Content-Security-Policy header to restrict iframe embedding to the allowed origins
-    csp_header_value = "frame-ancestors 'self' " + " ".join(
-        QuerybookSettings.IFRAME_ALLOWED_ORIGINS or []
-    )
+    # # Add Content-Security-Policy header to restrict iframe embedding to the allowed origins
+    # csp_header_value = "frame-ancestors 'self' " + " ".join(
+    #     QuerybookSettings.IFRAME_ALLOWED_ORIGINS or []
+    # )
 
-    @app.after_request
-    def add_csp_header(response):
-        response.headers["Content-Security-Policy"] = csp_header_value
-        return response
+    # @app.after_request
+    # def add_csp_header(response):
+    #     response.headers["Content-Security-Policy"] = csp_header_value
+    #     return response
 
     # Configure session cookie to allow use in iframes
     app.config["SESSION_COOKIE_SAMESITE"] = "None"
