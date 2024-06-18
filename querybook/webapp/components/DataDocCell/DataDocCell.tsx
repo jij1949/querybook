@@ -35,7 +35,6 @@ interface IDataDocCellProps {
     lastQueryCellId: number;
     queryIndexInDoc: number;
     isFocused: boolean;
-    isScheduled: boolean;
 }
 
 function getEstimatedCellHeight(cell: IDataCell) {
@@ -63,7 +62,6 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
             lastQueryCellId,
             queryIndexInDoc,
             isFocused,
-            isScheduled,
         }) => {
             const {
                 cellIdToExecutionId,
@@ -190,7 +188,6 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                         templatedVariables,
                         isFullScreen,
                         toggleFullScreen,
-                        isScheduled,
                     };
                     cellDOM = <DataDocQueryCell {...allProps} />;
                 } else if (cell.cell_type === 'chart') {

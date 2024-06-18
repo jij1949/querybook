@@ -6,13 +6,11 @@ import { BoardItemAddButton } from 'components/BoardItemAddButton/BoardItemAddBu
 import { DataDocViewersBadge } from 'components/DataDocViewersBadge/DataDocViewersBadge';
 import { ImpressionWidget } from 'components/ImpressionWidget/ImpressionWidget';
 import { emptyDataDocTitleMessage, IDataDoc } from 'const/datadoc';
-import { hasQueryContainUnlimitedSelect } from 'lib/sql-helper/sql-limiter';
 import { generateFormattedDate } from 'lib/utils/datetime';
 import { favoriteDataDoc, unfavoriteDataDoc } from 'redux/dataDoc/action';
 import { Dispatch, IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
 import { Icon } from 'ui/Icon/Icon';
-import { Message } from 'ui/Message/Message';
 import { ResizableTextArea } from 'ui/ResizableTextArea/ResizableTextArea';
 import { AccentText } from 'ui/StyledText/StyledText';
 
@@ -56,20 +54,6 @@ export const DataDocHeader = React.forwardRef<HTMLDivElement, IProps>(
             </div>
         ) : (
             `Updated ${generateFormattedDate(lastUpdated, 'X')}`
-        );
-
-        const hasCellsWithoutLimit = React.useMemo(
-            () =>
-                dataDoc.dataDocCells
-                    .filter((cell) => cell.cell_type === 'query')
-                    .some(({ context, meta }) => {
-                        const disabled = meta?.['disabled'] ?? false;
-                        return (
-                            !disabled &&
-                            hasQueryContainUnlimitedSelect(context as string)
-                        );
-                    }),
-            [dataDoc.dataDocCells]
         );
 
         return (
@@ -120,19 +104,6 @@ export const DataDocHeader = React.forwardRef<HTMLDivElement, IProps>(
                         transparent
                     />
                 </AccentText>
-                {isEditable && dataDoc.scheduled && hasCellsWithoutLimit && (
-                    <Message type="warning">
-                        This DataDoc is scheduled and contains{' '}
-                        <code>SELECT</code> queries without <code>LIMIT</code>,
-                        denoted by <Icon name="AlertTriangle" size={16} />.
-                        <br />
-                        <br />
-                        Limits are recommended because the automatic limit
-                        feature is not applied to scheduled or multi-cell
-                        executions, and unlimited queries may cause performance
-                        issues.
-                    </Message>
-                )}
             </div>
         );
     }
