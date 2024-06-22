@@ -22,6 +22,7 @@ from lib.richtext import richtext_to_plaintext
 from lib.utils.utils import DATETIME_TO_UTC, with_exception
 from logic import admin as admin_logic
 from logic import datadoc as datadoc_logic
+from logic import metastore as metastore_logic
 from logic.datadoc import (
     get_all_data_docs,
     get_all_query_cells,
@@ -612,6 +613,12 @@ def table_to_es(table, fields=None, session=None):
         "golden": table.golden,
         "importance_score": compute_weight,
         "tags": [tag.tag_name for tag in table.tags],
+        "owner_uids": [
+            owner.uid
+            for owner in metastore_logic.get_all_table_ownerships_by_table_id(
+                table.id, session=session
+            )
+        ],
     }
     return _get_dict_by_field(field_to_getter, fields=fields)
 

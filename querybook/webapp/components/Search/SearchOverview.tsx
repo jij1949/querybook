@@ -634,7 +634,10 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
         />
     );
 
-    const getAuthorFiltersDOM = (searchFilterKey: string) => {
+    const getAuthorFiltersDOM = (
+        searchFilterKey: string,
+        addLabel = 'more authors'
+    ) => {
         const filterVal = searchFilters[searchFilterKey];
 
         const options = searchAuthorChoices.map(({ id, name }) => {
@@ -677,7 +680,7 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                 onClick={toggleShowAddSearchAuthor}
                 className="add-authors"
                 icon="Plus"
-                title="more authors"
+                title={addLabel}
                 theme="text"
                 color="light"
                 size="small"
@@ -820,6 +823,11 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                 <div className="search-filter">
                     <span className="filter-title">Created At</span>
                     {dateFilterDOM}
+                </div>
+
+                <div className="search-filter">
+                    <span className="filter-title">Table Owners</span>
+                    {getAuthorFiltersDOM('owner_uids', 'more owners')}
                 </div>
             </>
         ) : (

@@ -417,6 +417,7 @@ class TableTestCase(TestCase):
             "golden": False,
             "importance_score": self.TABLE_WEIGHT,
             "tags": ["tag_1", "tag_2"],
+            "owner_uids": [],
         }
 
         self.assertEqual(

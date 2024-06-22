@@ -241,6 +241,8 @@ tables:
                     type: long
                 tags:
                     type: keyword
+                owner_uids:
+                    type: long
 users:
     index_name: search_users_v1
     type_name: users
