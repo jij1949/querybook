@@ -10,6 +10,7 @@ import React, {
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { DataDocTableSamplingInfo } from 'components/DataDocTableSamplingInfo/DataDocTableSamplingInfo';
 import { DataDocTemplateInfoButton } from 'components/DataDocTemplateButton/DataDocTemplateInfoButton';
 import { DataDocTemplateVarForm } from 'components/DataDocTemplateButton/DataDocTemplateVarForm';
 import { detectVariableType } from 'components/DataDocTemplateButton/helpers';
@@ -439,6 +440,9 @@ const QueryComposer: React.FC = () => {
 
     const [hasLintErrors, setHasLintErrors] = useState(false);
 
+    const [showTableSamplingInfoModal, setShowTableSamplingInfoModal] =
+        useState(false);
+
     const runButtonRef = useRef<IQueryRunButtonHandles>(null);
     const clickOnRunButton = useCallback(() => {
         if (runButtonRef.current) {
@@ -500,6 +504,7 @@ const QueryComposer: React.FC = () => {
             element: ElementType.RUN_QUERY_BUTTON,
             aux: {
                 lintError: hasLintErrors,
+                sampleRate,
             },
         });
         // Throttle to prevent double run
@@ -519,7 +524,12 @@ const QueryComposer: React.FC = () => {
             engine.id,
             async (query, engineId) => {
                 const data = await dispatch(
-                    queryExecutionsAction.createQueryExecution(query, engineId)
+                    queryExecutionsAction.createQueryExecution(
+                        query,
+                        engineId,
+                        null,
+                        sampleRate > 0 ? { sample_rate: sampleRate } : null
+                    )
                 );
                 return data.id;
             }
@@ -657,6 +667,15 @@ const QueryComposer: React.FC = () => {
         </Modal>
     );
 
+    const renderTableSamplingInfoDOM = showTableSamplingInfoModal && (
+        <DataDocTableSamplingInfo
+            query={getCurrentSelectedQuery()}
+            language={engine.language}
+            samplingTables={samplingTables}
+            onHide={() => setShowRenderedTemplateModal(false)}
+        />
+    );
+
     const queryEditorWrapperClassname = clsx({
         'query-editor-wrapper': true,
         mb16: executionId != null,
@@ -674,6 +693,7 @@ const QueryComposer: React.FC = () => {
             </div>
             {executionDOM()}
             {udfModalDOM}
+            {renderTableSamplingInfoDOM}
         </div>
     );
 
@@ -693,6 +713,9 @@ const QueryComposer: React.FC = () => {
                 hasSamplingTables={Object.keys(samplingTables).length > 0}
                 sampleRate={sampleRate}
                 onSampleRateChange={setSampleRate}
+                onTableSamplingInfoClick={() =>
+                    setShowTableSamplingInfoModal(true)
+                }
                 docId={null}
                 index={null}
             />

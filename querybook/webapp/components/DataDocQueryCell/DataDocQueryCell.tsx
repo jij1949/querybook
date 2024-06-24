@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 
 import { AICommandBar } from 'components/AIAssistant/AICommandBar';
 import { DataDocQueryExecutions } from 'components/DataDocQueryExecutions/DataDocQueryExecutions';
+import { DataDocTableSamplingInfo } from 'components/DataDocTableSamplingInfo/DataDocTableSamplingInfo';
 import { QueryCellTitle } from 'components/QueryCellTitle/QueryCellTitle';
 import { runQuery, transformQuery } from 'components/QueryComposer/RunQuery';
 import { BoundQueryEditor } from 'components/QueryEditor/BoundQueryEditor';
@@ -126,6 +127,7 @@ interface IState {
     hasLintError: boolean;
     tableNamesInQuery: string[];
     samplingTables: ISamplingTables;
+    showTableSamplingInfoModal: boolean;
 
     transpilerConfig?: {
         toEngine: IQueryEngine;
@@ -156,6 +158,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             hasLintError: false,
             tableNamesInQuery: [],
             samplingTables: {},
+            showTableSamplingInfoModal: false,
             isScheduled: props.isScheduled,
         };
     }
@@ -228,7 +231,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
     }
 
     public get hasSamplingTables() {
-        return Object.keys(this.samplingTables).length > 0;
+        return Object.keys(this.state.samplingTables).length > 0;
     }
 
     public get sampleRate() {
@@ -482,7 +485,10 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                     await this.props.createQueryExecution(
                         query,
                         engineId,
-                        this.props.cellId
+                        this.props.cellId,
+                        this.sampleRate > 0
+                            ? { sample_rate: this.sampleRate }
+                            : null
                     )
                 ).id;
 
@@ -553,7 +559,8 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             return this.props.createQueryExecution(
                 renderedQuery,
                 this.engineId,
-                this.props.cellId
+                this.props.cellId,
+                this.sampleRate > 0 ? { sample_rate: this.sampleRate } : null
             );
         }
     }
@@ -751,6 +758,13 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
     }
 
     @bind
+    public toggleShowTableSamplingInfoModal() {
+        this.setState(({ showTableSamplingInfoModal }) => ({
+            showTableSamplingInfoModal: !showTableSamplingInfoModal,
+        }));
+    }
+
+    @bind
     public fetchDataTableByNameIfNeeded(schema: string, table: string) {
         return this.props.fetchDataTableByNameIfNeeded(
             schema,
@@ -871,6 +885,9 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                                 this.hasSamplingTables
                                     ? this.handleMetaSampleRateChange
                                     : null
+                            }
+                            onTableSamplingInfoClick={
+                                this.toggleShowTableSamplingInfoModal
                             }
                             docId={this.props.docId}
                             index={this.props.queryIndexInDoc}
@@ -1007,6 +1024,16 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             />
         ) : null;
 
+        const renderTableSamplingInfoDOM = this.state
+            .showTableSamplingInfoModal && (
+            <DataDocTableSamplingInfo
+                query={this.state.query}
+                language={this.queryEngine.language}
+                samplingTables={this.samplingTables}
+                onHide={this.toggleShowTableSamplingInfoModal}
+            />
+        );
+
         return (
             <>
                 {editorDOM}
@@ -1014,6 +1041,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                 {templatedQueryViewModalDOM}
                 {UDFModal}
                 {transpilerModal}
+                {renderTableSamplingInfoDOM}
             </>
         );
     }
@@ -1151,8 +1179,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
         createQueryExecution: (
             query: string,
             engineId: number,
-            cellId: number
-        ) => dispatch(createQueryExecution(query, engineId, cellId)),
+            cellId: number,
+            metadata: Record<string, string | number>
+        ) => dispatch(createQueryExecution(query, engineId, cellId, metadata)),
 
         setTableSidebarId: (id: number) => dispatch(setSidebarTableId(id)),
 
