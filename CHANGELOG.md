@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.94.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.93.0...0.94.0) (2024-06-24)
+
+
+### Features
+
+* Apply row limit transform to query in backend (#263) ([dc139cb](https://github.expedia.biz/eg-analytics-platform/querybook/commit/dc139cbb159c1880c139f950eafbca45df264f1f))
+* Table Search by Owner ([d33bf53](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d33bf53954817e115fa2b30c1a9b6f25b4e80c11))
+
 ## [0.93.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.92.0...0.93.0) (2024-06-18)
 
 
