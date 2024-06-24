@@ -48,12 +48,7 @@ import {
 } from 'lib/sql-helper/sql-limiter';
 import { getPossibleTranspilers } from 'lib/templated-query/transpile';
 import { enableResizable } from 'lib/utils';
-import {
-    getShortcutSymbols,
-    KeyMap,
-    matchKeyMap,
-    matchKeyPress,
-} from 'lib/utils/keyboard';
+import { getShortcutSymbols, KeyMap, matchKeyPress } from 'lib/utils/keyboard';
 import { doesLanguageSupportUDF } from 'lib/utils/udf';
 import * as dataDocActions from 'redux/dataDoc/action';
 import * as dataSourcesActions from 'redux/dataSources/action';
