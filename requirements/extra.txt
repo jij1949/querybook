@@ -27,9 +27,6 @@
 -r platform/aws.txt
 #-r platform/gcp.txt
 
-# Parser
--r parser/sqlglot.txt
-
 # AI Assistant
 -r ai/langchain.txt
 
