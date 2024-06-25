@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.94.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.94.0...0.94.1) (2024-06-25)
+
+
+### Bug Fixes
+
+* Remove missing parser/sqlglot.txt, already required ([a09ddc2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a09ddc23c63915c6f7cb237e28ba722631795b24))
+
 ## [0.94.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.93.0...0.94.0) (2024-06-24)
 
 
