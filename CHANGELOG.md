@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.95.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.94.1...0.95.0) (2024-06-25)
+
+
+### Features
+
+* Revert "feat: added warning at top of doc and at each cell with select statement and no limit (#160)" ([aa78920](https://github.expedia.biz/eg-analytics-platform/querybook/commit/aa78920645d45b9be97b63a744e5b23e70a41048))
+
 ### [0.94.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.94.0...0.94.1) (2024-06-25)
 
 
