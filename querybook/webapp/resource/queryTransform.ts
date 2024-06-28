@@ -51,7 +51,7 @@ export const QueryTransformResource = {
                 sampling_tables,
             },
             {
-                notifyOnError: false,
+                notifyOnError: true,
             }
         ),
 };

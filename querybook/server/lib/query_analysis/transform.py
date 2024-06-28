@@ -74,16 +74,20 @@ def has_query_contains_unlimited_select(query: str, language: str = None):
     Returns:
         str: The first select statement without a limit. None if all select statements have a limit.
     """
-    dialect = _get_sqlglot_dialect(language)
-    statements = parse(query, dialect)
-    return next(
-        (
-            s.sql(dialect=dialect, pretty=True)
-            for s in statements
-            if get_select_statement_limit(s) == -1
-        ),
-        None,
-    )
+    try:
+        dialect = _get_sqlglot_dialect(language)
+        statements = parse(query, dialect)
+        return next(
+            (
+                s.sql(dialect=dialect, pretty=True)
+                for s in statements
+                if get_select_statement_limit(s) == -1
+            ),
+            None,
+        )
+    except errors.ParseError:
+        # If parsing fails, return none
+        return None
 
 
 def transform_to_limited_query(
