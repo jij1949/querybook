@@ -92,6 +92,8 @@ def run_datadoc_with_config(
                 continue
 
             engine_id = query_cell.meta["engine"]
+            engine = admin_logic.get_query_engine_by_id(engine_id, session=session)
+
             limit = query_cell.meta.get("limit", -1)
             raw_query = query_cell.context
 
@@ -109,11 +111,9 @@ def run_datadoc_with_config(
                 )
 
                 # If meta["limit"] is set and > 0, apply limit to the query
-                row_limit_enabled = admin_logic.get_engine_feature_param(
-                    engine_id, "row_limit", False, session=session
-                )
+                row_limit_enabled = engine.get_feature_params().get("row_limit", False)
                 if row_limit_enabled and limit >= 0:
-                    query = transform_to_limited_query(query, limit)
+                    query = transform_to_limited_query(query, limit, engine.language)
 
             except Exception as e:
                 on_datadoc_completion(
