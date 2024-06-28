@@ -12,12 +12,10 @@ from const.schedule import TaskRunStatus
 
 from lib.logger import get_logger
 from lib.query_analysis.templating import render_templated_query
-from lib.query_analysis.transform import transform_to_limited_query
 from lib.scheduled_datadoc.export import export_datadoc
 from lib.scheduled_datadoc.legacy import convert_if_legacy_datadoc_schedule
 from lib.scheduled_datadoc.notification import notifiy_on_datadoc_complete
 
-from logic import admin as admin_logic
 from logic import datadoc as datadoc_logic
 from logic import query_execution as qe_logic
 from logic import schedule as schedule_logic
@@ -92,9 +90,7 @@ def run_datadoc_with_config(
                 continue
 
             engine_id = query_cell.meta["engine"]
-            engine = admin_logic.get_query_engine_by_id(engine_id, session=session)
 
-            limit = query_cell.meta.get("limit", -1)
             raw_query = query_cell.context
 
             # Skip empty cells
@@ -110,10 +106,14 @@ def run_datadoc_with_config(
                     session=session,
                 )
 
-                # If meta["limit"] is set and > 0, apply limit to the query
-                row_limit_enabled = engine.get_feature_params().get("row_limit", False)
-                if row_limit_enabled and limit >= 0:
-                    query = transform_to_limited_query(query, limit, engine.language)
+                # # Disable automatic limit for now
+                # engine = admin_logic.get_query_engine_by_id(engine_id, session=session)
+                # limit = query_cell.meta.get("limit", -1)
+
+                # # If meta["limit"] is set and > 0, apply limit to the query
+                # row_limit_enabled = engine.get_feature_params().get("row_limit", False)
+                # if row_limit_enabled and limit >= 0:
+                #     query = transform_to_limited_query(query, limit, engine.language)
 
             except Exception as e:
                 on_datadoc_completion(

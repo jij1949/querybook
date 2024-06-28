@@ -97,6 +97,48 @@ export function hasQueryContainUnlimitedSelect(
         (statement) => getSelectStatementLimit(statement, language) === -1
     );
 }
+
+/**
+ * Automatically apply a limit to a query that does not already have a limit.
+ *
+ * @param {string} query - Query to be executed.
+ * @param {number} rowLimit - Number of rows to limit the query to.
+ * @param {string} language - Language of the query.
+ * @return {string} - Query with limit applied (if necessary).
+ */
+export function getLimitedQuery(
+    query: string,
+    rowLimit?: number,
+    language?: string
+): string {
+    if (rowLimit == null) {
+        return query;
+    }
+
+    const statements = getStatementsFromQuery(query, language);
+
+    let addedLimit = false;
+    const updatedQuery = statements
+        .map((statement) => {
+            const existingLimit = getSelectStatementLimit(statement, language);
+            if (
+                existingLimit == null ||
+                existingLimit >= 0 ||
+                existingLimit === -2
+            ) {
+                return statement + ';';
+            }
+
+            addedLimit = true;
+            return `${statement} limit ${rowLimit};`;
+        })
+        .join('\n');
+
+    // If no limit was added, return the original query
+    // to avoid changing whitespace, etc.
+    return addedLimit ? updatedQuery : query;
+}
+
 // 10^1 to 10^5
 export const ROW_LIMIT_SCALE =
     window.ROW_LIMIT_SCALE ?? [1, 2, 3, 4, 5].map((v) => Math.pow(10, v));
