@@ -673,6 +673,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                     queryIndexInDoc={queryIndexInDoc}
                     lastQueryCellId={lastQueryCellId}
                     isFocused={focusedCellIndex === index}
+                    isScheduled={dataDoc.scheduled}
                 />
             );
         }
