@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.95.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.95.1...0.95.2) (2024-06-28)
+
+
+### Bug Fixes
+
+* Revert automatic limit in backend, restore old behavior ([4587449](https://github.expedia.biz/eg-analytics-platform/querybook/commit/45874494483265752f13eab13ef37a4e7a604cc1))
+* Un-reverts "feat: added warning at top of doc and at each cell with select statement and no limit (#160)"" ([d35d0d4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d35d0d4b622a8db4b0427d7c0b602e4bba4218c6))
+
 ### [0.95.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.95.0...0.95.1) (2024-06-28)
 
 
