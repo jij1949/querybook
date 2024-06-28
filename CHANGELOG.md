@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.95.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.95.0...0.95.1) (2024-06-28)
+
+
+### Bug Fixes
+
+* Add limit transform support for `LIMIT ALL` ([1883c32](https://github.expedia.biz/eg-analytics-platform/querybook/commit/1883c323347e86ce61dcbd9a13c8748cac4be847))
+* Catch transform errors in `has_query_contains_unlimited_select` ([58e2186](https://github.expedia.biz/eg-analytics-platform/querybook/commit/58e218621ea61edef27982ff27ca4715b0b98195))
+* Send language to query transform when running DataDoc ([0a0e2c6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/0a0e2c61af2fed7f9879d70abbec6d13c0a359f6))
+
 ## [0.95.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.94.1...0.95.0) (2024-06-25)
 
 
