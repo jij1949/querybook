@@ -58,6 +58,8 @@ export interface IQueryEditorProps extends IStyledQueryEditorProps {
     className?: string;
     autoCompleteType?: AutoCompleteType;
 
+    hidePin?: boolean;
+
     /**
      * If provided, then the container component will handle the fullscreen logic
      */
@@ -115,6 +117,9 @@ export const QueryEditor: React.FC<
             keyMap = {},
             className,
             autoCompleteType = 'all',
+
+            hidePin,
+
             onFullScreen,
 
             onChange,
@@ -346,7 +351,7 @@ export const QueryEditor: React.FC<
                 // Sanity check
                 showTooltipFor(
                     markerNodes,
-                    tooltipProps,
+                    { ...tooltipProps, hidePin },
                     () => {
                         markerRef.current?.clear();
                         markerRef.current = null;

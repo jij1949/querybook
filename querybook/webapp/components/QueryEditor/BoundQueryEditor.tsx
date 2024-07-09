@@ -109,6 +109,7 @@ export const BoundQueryEditor = React.forwardRef<
                 }
                 metastoreId={engine?.metastore_id}
                 language={engine?.language}
+                hidePin={cellId === undefined}
             />
         );
 

@@ -18,6 +18,7 @@ export interface ICodeMirrorTooltipProps {
     functionDocumentations?: IFunctionDescription[];
     error?: React.ReactChild;
     suggestionText?: string;
+    hidePin?: boolean;
 
     openTableModal?: () => any;
     onAcceptSuggestion?: (suggestion: string) => void;
@@ -34,6 +35,7 @@ export const CodeMirrorTooltip: React.FunctionComponent<
     openTableModal,
     suggestionText,
     onAcceptSuggestion,
+    hidePin,
 }) => {
     const { table, schema, columns } = useShallowSelector(
         (state: IStoreState) => {
@@ -77,6 +79,7 @@ export const CodeMirrorTooltip: React.FunctionComponent<
                 schema={schema}
                 columns={columns}
                 openTableModal={openTableModal}
+                hidePinItButton={hidePin || false}
             />
         );
     } else if (functionDocumentations) {
