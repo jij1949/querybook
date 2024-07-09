@@ -351,7 +351,9 @@ def create_table_warnings(
                 "message": message,
                 "severity": severity,
                 "table_id": table_id,
-            }
+            },
+            commit=False,
+            session=session,
         )
     if commit:
         session.commit()
@@ -458,6 +460,7 @@ def create_table_ownerships(
                 f"auto_{owner.username}",
                 fullname=owner.username,
                 session=session,
+                commit=False,
                 properties={"auto": True},
             )
         # add table ownership
