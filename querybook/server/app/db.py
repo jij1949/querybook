@@ -41,6 +41,7 @@ def get_db_engine(
             pool_recycle=pool_recycle,
             pool_pre_ping=True,
             encoding="utf-8",
+            echo=QuerybookSettings.DATABASE_ECHO,
         )
 
         """This is to ensure pooled connections are not used in multi-processing.

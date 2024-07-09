@@ -72,6 +72,7 @@ class QuerybookSettings(object):
     DATABASE_CONN = get_env_config("DATABASE_CONN", optional=False)
     DATABASE_POOL_SIZE = int(get_env_config("DATABASE_POOL_SIZE"))
     DATABASE_POOL_RECYCLE = int(get_env_config("DATABASE_POOL_RECYCLE"))
+    DATABASE_ECHO = str(get_env_config("DATABASE_ECHO")).lower() == "true"
 
     # Communications
     EMAILER_CONN = get_env_config("EMAILER_CONN")

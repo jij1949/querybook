@@ -21,6 +21,7 @@ DATA_LINEAGE_BACKEND: lib.lineage.db
 DATABASE_CONN: ~
 DATABASE_POOL_SIZE: 10
 DATABASE_POOL_RECYCLE: 3600
+DATABASE_ECHO: false
 
 # --------------- Communications ---------------
 # Url to the email server
