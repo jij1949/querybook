@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.96.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.95.2...0.96.0) (2024-07-10)
+
+
+### Features
+
+* Add `DATABASE_ECHO` to enable debug SQL logging ([3a4405b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/3a4405b31e63ee7315b01748a7139aaf99d2463e))
+
+
+### Bug Fixes
+
+* hide pin button for adhoc queries, but keep for datadoc queries (#268) ([ba81988](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ba819887071d2dd6d7aae7a126f14987981a9d87))
+* Metastore sync tables with a single transaction ([8e867ea](https://github.expedia.biz/eg-analytics-platform/querybook/commit/8e867eaa4f6aebbbca294ddbec8a5e6cd8c39369))
+
 ### [0.95.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.95.1...0.95.2) (2024-06-28)
 
 
