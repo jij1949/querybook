@@ -6,3 +6,5 @@ from tasks_plugin.sync_ldap_task import sync_ldap_task
 from tasks_plugin.sync_ldap_user_task import sync_ldap_user_task
 from tasks_plugin.create_user_group_task import create_user_group_task
 from tasks_plugin.clean_up_query_execution_task import clean_up_query_execution_task
+
+from tasks_plugin.top_tier_task import top_tier_task

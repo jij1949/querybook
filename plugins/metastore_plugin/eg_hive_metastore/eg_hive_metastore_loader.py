@@ -5,7 +5,8 @@ from enum import Enum
 import time
 from typing import Dict, List, Tuple
 
-from app.db import with_session
+from app.db import DBSession, with_session
+from env import QuerybookSettings
 from lib.logger import get_logger
 from lib.metastore.base_metastore_loader import (
     DataTable,
@@ -32,6 +33,8 @@ from metastore_plugin.eg_hive_metastore.data_elements import (
     find_data_element,
 )
 
+from logic.admin import get_query_metastore_by_id
+
 from const.data_element import (
     DataElementAssociationTuple,
     DataElementAssociationType,
@@ -52,6 +55,7 @@ class EgTagColors(Enum):
     HUDI: str = "#b7652b"  # choco
     VIEW: str = "#f5a623"  # orange
     FILE_FORMAT: str = "#6ba097"  # creamy forest green
+    SOURCE: str = "#C792EA"  # light purple
 
 
 # Max length of a tag name in the database (tag.name)
@@ -300,6 +304,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         )
 
         tags = []
+        custom_properties = {}
 
         if description.owner and description.owner not in [
             "cloverleaf",
@@ -369,15 +374,6 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                         )
                     )
 
-        # # Disabled top tier for now
-        # # If parameters contains all 5 mandatory tags, then set Top Tier
-        # if all(
-        #     parameters.get(tag["name"]) is not None
-        #     for tag in DATASET_TAGS
-        #     if tag["mandatory"]
-        # ):
-        #     table = table._replace(golden=True)
-
         # Check if the table is a view
         if (
             description.tableType == "VIEW"
@@ -406,11 +402,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                         view_data = ujson.loads(view_data)
 
                         # Add the original SQL to custom properties
-                        table = table._replace(
-                            custom_properties={
-                                "original_sql": view_data["originalSql"],
-                            }
-                        )
+                        custom_properties["original_sql"] = view_data["originalSql"]
 
                         # Replace the columns with the view data columns
                         columns = [
@@ -425,28 +417,15 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 else:
                     # Some views have `viewOriginalText` containing the SQL in plain text
                     # (I assume these are Hive views)
-                    table = table._replace(
-                        custom_properties={
-                            "original_sql": description.viewOriginalText,
-                        }
-                    )
+                    custom_properties["original_sql"] = description.viewOriginalText
 
         # Detect and tag table / file formats
         # Skip all views, since they don't have a file format
         else:
             file_format = detect_file_format(sd, parameters)
             if file_format:
-                # Add to existing custom_properties
-                table = table._replace(
-                    custom_properties={
-                        **(
-                            table.custom_properties
-                            if table.custom_properties is not None
-                            else {}
-                        ),
-                        "file_format": file_format,
-                    }
-                )
+
+                custom_properties["file_format"] = file_format
 
                 tags.append(
                     DataTag(
@@ -538,6 +517,66 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 for col in columns
             ]
 
+        # Determine source data lake and schema name
+        source_data_lake, source_schema_name = get_source_data_lake_and_schema(
+            self.metastore_id,
+            schema_name,
+            sd.location,
+        )
+        if source_data_lake is None:
+            tags.append(
+                DataTag(
+                    name="Unknown Source Data Lake",
+                    description="The source data lake for this table is unknown",
+                    color=EgTagColors.SOURCE.value,
+                )
+            )
+        else:
+            tags.append(
+                DataTag(
+                    name=source_data_lake,
+                    type="Source Data Lake",
+                    description="The source data lake for this table",
+                    color=EgTagColors.SOURCE.value,
+                )
+            )
+
+            # Add custom properties which are visible in the table details
+            custom_properties["source_schema_name"] = source_schema_name
+            custom_properties["source_data_lake"] = source_data_lake
+
+        # Determine Top Tier status
+        # This comes from the `querybook2.eg_top_tier_table` table,
+        # which is populated by the `top_tier_task.py` task
+        #
+        # If a row is found, then the table is a Top Tier table
+        try:
+            with DBSession() as session:
+                top_tier_rows = session.execute(
+                    """
+                    SELECT * FROM eg_top_tier_table
+                    WHERE source_data_lake = :source_data_lake
+                        AND schema_name = :schema_name
+                        AND table_name = :table_name
+                """,
+                    {
+                        "source_data_lake": source_data_lake,
+                        "schema_name": source_schema_name,
+                        "table_name": table_name,
+                    },
+                ).fetchall()
+
+                if top_tier_rows and len(top_tier_rows) > 0:
+                    row = top_tier_rows[0]
+                    LOG.debug(f"Top Tier Rows {row}")
+                    table = table._replace(
+                        golden=True,
+                        # boost_score = top_tier_rows[0][6]
+                    )
+
+        except Exception as e:
+            LOG.error(f"Error checking Top Tier status: {e}")
+
         # Update the table with the tags if any
         if tags:
             # Shorten tags if any names are too long (TAG_NAME_LIMIT)
@@ -552,6 +591,9 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
             # Add to the table
             table = table._replace(tags=tags)
+
+        if custom_properties:
+            table = table._replace(custom_properties=custom_properties)
 
         return table, new_columns
 
@@ -648,3 +690,84 @@ def extract_base64_data(view_text):
         return match.group(1)  # group(1) refers to the first parenthesized subgroup
     else:
         return None
+
+
+# Map of federation prefixes to data lakes
+schema_prefixes_to_data_lakes = {
+    "bexg_etl_prod_": "bexg_etl_prod",
+    "bexg_etl_test_": "bexg_etl_test",
+    "bexg_prod_": "bexg_prod",
+    "bexg_test_": "bexg_test",
+    "content_prod_": "content_prod",
+    "controlplane_prod_": "controlplane_prod",
+    "data_dw_": "egdataplatform_dw",
+    "data_test_": "egdataplatform_test",
+    "dspprod_": "dsp_prod",
+    "egdp_classic_": "egdp_classic",
+    "egdp_analytics_": "egdp_analytics",
+    "egdp_dev_": "egdp_dev",
+    "egdp_dwh_": "egdp_dwh",
+    "egdp_prod_": "egdp_prod",
+    "egdp_stage_": "egdp_stage",
+    "egdp_test_": "egdp_test",
+    "egp_prod_": "egp_prod",
+    "eps_prod_": "eps_prod",
+    "finance_prod_": "finance_prod",
+    "gco_": "gco",
+    "gmo_meta_prod_": "gmo_meta_prod",
+    "hcom_data_analytics_uw2_": "hcom_data_analytics",
+    "hcom_data_lab_uw2_": "hcom_data_lab",
+    "hcom_data_prod_uw2_": "hcom_.data_prod",
+    "hotwire_prod_": "hotwire_prod",
+    "marketplacehealth_prod_": "marketplacehealth_prod",
+    "perf_": "perf",
+    "qubole_meta_": "dsp_prod",
+    "vrbo_prod_": "vrbo_prod",
+    "vrbo_stage_": "vrbo_stage",
+    "vrbo_test_": "vrbo_test",
+}
+
+
+def get_source_data_lake_and_schema(metastore_id, schema_name, location):
+    """
+    Get the source schema from the schema name.
+    The source schema is a schema name without any federation prefix.
+    Not all schemas have a federation prefix, so this function may return the same schema name.
+
+    Returns (source_data_lake, source_schema_name)
+    """
+    metastore = get_query_metastore_by_id(metastore_id)
+    querybook_instance = (
+        "prod"
+        if QuerybookSettings.PUBLIC_URL == "https://querybook.expedia.biz"
+        else "test"
+    )
+    # LOG.debug(
+    #     f"Schema Name: {schema_name}, Metastore name: {metastore.name}, Querybook instance: {querybook_instance}"
+    # )
+
+    # Test for matching prefixes
+    for prefix, data_lake in schema_prefixes_to_data_lakes.items():
+        if schema_name.startswith(prefix):
+            return (data_lake, schema_name[len(prefix) :])
+
+    # If there's no prefix, then it's not federated,
+    # so we can use the metastore name to determine the data lake
+    if metastore.name == "egdp-analytics-waggledance":
+        return ("egdp_analytics", schema_name)
+    if metastore.name == "egdp-test-waggledance":
+        return ("egdp_test", schema_name)
+    if metastore.name == "bex-waggledance" and querybook_instance == "prod":
+        return ("bexg_prod", schema_name)
+    if metastore.name == "bex-waggledance" and querybook_instance == "test":
+        return ("bexg_test", schema_name)
+    if metastore.name == "data-corp-waggledance":
+        return ("egdataplatform_corp", schema_name)
+    if metastore.name == "data-test-waggledance":
+        return ("egdataplatform_test", schema_name)
+    if metastore.name == "vrbo-waggledance" and querybook_instance == "prod":
+        return ("vrbo_prod", schema_name)
+    if metastore.name == "vrbo-waggledance" and querybook_instance == "test":
+        return ("vrbo_test", schema_name)
+
+    return (None, schema_name)
