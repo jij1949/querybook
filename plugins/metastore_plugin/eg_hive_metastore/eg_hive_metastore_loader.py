@@ -303,6 +303,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             )
         )
 
+        table_links = []
         tags = []
         custom_properties = {}
 
@@ -339,6 +340,14 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         if parameters.get("eg-creator") is not None:
             table.owners.append(
                 DataOwner(username=parameters.get("eg-creator"), type="CREATOR")
+            )
+
+        if parameters.get("eg-source-control-url") is not None:
+            table_links.append(
+                {
+                    "label": "Source Control",
+                    "url": parameters.get("eg-source-control-url"),
+                }
             )
 
         # Iterate through the list of dataset tags, filtered to tag: True
@@ -576,6 +585,10 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
         except Exception as e:
             LOG.error(f"Error checking Top Tier status: {e}")
+
+        # Update the table with table_links (if any)
+        if table_links:
+            table = table._replace(table_links=table_links)
 
         # Update the table with the tags if any
         if tags:
