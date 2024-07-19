@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.97.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.96.0...0.97.0) (2024-07-19)
+
+
+### Features
+
+* Sync Top Tier tables via PUMA data ([96579ec](https://github.expedia.biz/eg-analytics-platform/querybook/commit/96579ec154b2a6a2ca72303183fd8d401aeb09b7))
+
 ## [0.96.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.95.2...0.96.0) (2024-07-10)
 
 
