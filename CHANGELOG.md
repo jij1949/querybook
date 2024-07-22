@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.98.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.97.0...0.98.0) (2024-07-22)
+
+
+### Features
+
+* Add `eg-source-control-url` properties to Table Links ([526dcf8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/526dcf830fc6568c45a0586756039856525b3a97))
+
+
+### Bug Fixes
+
+* Change default AI model, add context sizes for new models ([52204ee](https://github.expedia.biz/eg-analytics-platform/querybook/commit/52204ee84661a7ce9c9f366cf34e33dfec9a4a33))
+* Handle source data lake for egdp-waggledance ([69e76cf](https://github.expedia.biz/eg-analytics-platform/querybook/commit/69e76cff749e7239f905ef8150c973cb09670fd7))
+
 ## [0.97.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.96.0...0.97.0) (2024-07-19)
 
 
