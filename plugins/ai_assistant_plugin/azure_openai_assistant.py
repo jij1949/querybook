@@ -9,8 +9,10 @@ LOG = get_logger(__file__)
 AZURE_OPENAI_MODEL_CONTEXT_WINDOW_SIZE = {
     "gpt-35-turbo": 4097,
     "gpt-35-turbo-16k": 16385,
+    "gpt-35-turbo-0125": 16385,
     "gpt-4": 8192,
     "gpt-4-32k": 32768,
+    "gpt-4o-2024-05-13": 32768,  # actually 128,000 but we're limiting to 32k
 }
 DEFAULT_MODEL_NAME = "gpt-35-turbo"
 

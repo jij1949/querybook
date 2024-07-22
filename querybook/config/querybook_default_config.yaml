@@ -96,10 +96,10 @@ AI_ASSISTANT_PROVIDER: ~
 AI_ASSISTANT_CONFIG:
     default:
         model_args:
-            model_name: gpt-35-turbo
+            model_name: gpt-35-turbo-0125
             temperature: 0.2
             streaming: False
-        reserved_tokens: 1024
+        reserved_tokens: 2048
 
 EMBEDDINGS_PROVIDER: ~
 EMBEDDINGS_CONFIG: ~

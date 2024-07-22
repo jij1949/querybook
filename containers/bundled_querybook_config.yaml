@@ -50,17 +50,17 @@ AI_ASSISTANT_PROVIDER: azure_openai
 AI_ASSISTANT_CONFIG:
     default:
         model_args:
-            model_name: gpt-35-turbo
+            model_name: gpt-35-turbo-0125
             temperature: 0.2
             streaming: False
     sql_fix:
         model_args:
-            model_name: gpt-4
+            model_name: gpt-4o-2024-05-13
             temperature: 0.2
             streaming: False
     text_to_sql:
         model_args:
-            model_name: gpt-4
+            model_name: gpt-4o-2024-05-13
             temperature: 0.2
             streaming: False
 
