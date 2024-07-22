@@ -5,7 +5,7 @@ from enum import Enum
 import time
 from typing import Dict, List, Tuple
 
-from app.db import DBSession, with_session
+from app.db import with_session
 from env import QuerybookSettings
 from lib.logger import get_logger
 from lib.metastore.base_metastore_loader import (
@@ -130,6 +130,11 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             int(time.time() / 86400) % self.resync_tables_every_n_days
         )
 
+        # Load top tier tables from the database
+        # These have already been calculated by the top_tier_task.py task, run daily
+        self.top_tier_tables = self.load_top_tier_tables()
+        LOG.debug(f"Loaded {len(self.top_tier_tables)} top tier tables")
+
     loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig(
         {
             MetadataType.TAG: MetadataMode.WRITE_BACK,
@@ -168,6 +173,25 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 description="Creator of the table, from the `eg-creator` tag",
             ),
         ]
+
+    @with_session
+    def load_top_tier_tables(self, session=None):
+        """
+        Load the top tier tables from the database.
+        These are tables that have been manually marked as top tier by the top_tier_task.py task.
+        """
+        try:
+            top_tier_tables = session.execute(
+                """
+                SELECT * FROM eg_top_tier_table
+            """
+            ).fetchall()
+
+            return top_tier_tables
+
+        except Exception as e:
+            LOG.error(f"Error loading top tier tables: {e}")
+            return []
 
     def should_sync_table(self, table=None):
         """
@@ -559,32 +583,25 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         # which is populated by the `top_tier_task.py` task
         #
         # If a row is found, then the table is a Top Tier table
-        try:
-            with DBSession() as session:
-                top_tier_rows = session.execute(
-                    """
-                    SELECT * FROM eg_top_tier_table
-                    WHERE source_data_lake = :source_data_lake
-                        AND schema_name = :schema_name
-                        AND table_name = :table_name
-                """,
-                    {
-                        "source_data_lake": source_data_lake,
-                        "schema_name": source_schema_name,
-                        "table_name": table_name,
-                    },
-                ).fetchall()
+        if self.top_tier_tables:
+            # Find matching row in the top_tier_table by source_data_lake, schema_name, and table_name
+            top_tier_row = next(
+                (
+                    row
+                    for row in self.top_tier_tables
+                    if row[0] == source_data_lake
+                    and row[1] == source_schema_name
+                    and row[2] == table_name
+                ),
+                None,
+            )
 
-                if top_tier_rows and len(top_tier_rows) > 0:
-                    row = top_tier_rows[0]
-                    LOG.debug(f"Top Tier Rows {row}")
-                    table = table._replace(
-                        golden=True,
-                        # boost_score = top_tier_rows[0][6]
-                    )
-
-        except Exception as e:
-            LOG.error(f"Error checking Top Tier status: {e}")
+            if top_tier_row:
+                LOG.debug(f"Top Tier Row {top_tier_row}")
+                table = table._replace(
+                    golden=True,
+                    # boost_score = top_tier_row[6]
+                )
 
         # Update the table with table_links (if any)
         if table_links:
