@@ -769,5 +769,11 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
         return ("vrbo_prod", schema_name)
     if metastore.name == "vrbo-waggledance" and querybook_instance == "test":
         return ("vrbo_test", schema_name)
+    if metastore.name == "egdp-waggledance":
+        if schema_name == "sandbox":
+            # Sandbox is a special case
+            return ("egdp_analytics", schema_name)
+        else:
+            return ("egdp_prod", schema_name)
 
     return (None, schema_name)
