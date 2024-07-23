@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.98.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.98.1...0.98.2) (2024-07-23)
+
+
+### Bug Fixes
+
+* Handle tables with `eg-sensitivity.is-sensitive: false` ([c0486da](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c0486dafdd5337c8b8f93bc03cff9c66598c7e9f))
+
 ### [0.98.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.98.0...0.98.1) (2024-07-22)
 
 
