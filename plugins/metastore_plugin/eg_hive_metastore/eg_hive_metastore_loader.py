@@ -521,7 +521,10 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
         # Look for eg-sensitivity tags and apply them to the table and columns
         new_columns = columns
-        if any(p.startswith("eg-sensitivity.") for p in parameters):
+        if (
+            any(p.startswith("eg-sensitivity.") for p in parameters)
+            and parameters.get("eg-sensitivity.is-sensitive") != "false"
+        ):
 
             # Map of eg-sensitivity tags: eg-sensitivity.<column_name> = <sensitivity_tag>
             # Map contains <column_name in lower-case>: <sensitivity_tag> pairs
@@ -529,6 +532,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 key.lower().replace("eg-sensitivity.", ""): value.lower()
                 for key, value in parameters.items()
                 if key.lower().startswith("eg-sensitivity.")
+                and key.lower() != "eg-sensitivity.is-sensitive"
             }
 
             tags.append(
