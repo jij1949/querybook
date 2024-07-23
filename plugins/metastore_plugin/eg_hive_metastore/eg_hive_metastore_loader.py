@@ -528,8 +528,9 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
             # Map of eg-sensitivity tags: eg-sensitivity.<column_name> = <sensitivity_tag>
             # Map contains <column_name in lower-case>: <sensitivity_tag> pairs
+            # If the column_name contains a dot, then it's a nested column, and we parse out the first part only
             sensitivity_tags = {
-                key.lower().replace("eg-sensitivity.", ""): value.lower()
+                key.lower().replace("eg-sensitivity.", "").split(".")[0]: value
                 for key, value in parameters.items()
                 if key.lower().startswith("eg-sensitivity.")
                 and key.lower() != "eg-sensitivity.is-sensitive"
