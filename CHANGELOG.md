@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.98.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.98.2...0.98.3) (2024-07-25)
+
+
+### Bug Fixes
+
+* Add top-tier icon in search results list ([9171190](https://github.expedia.biz/eg-analytics-platform/querybook/commit/917119018c14f269a6b2d23e34f88a9f419f752d))
+* Add top-tier icons and popover details about PUMA ([a9a9e43](https://github.expedia.biz/eg-analytics-platform/querybook/commit/a9a9e431cbf7f93da65b056fb40a3bc308c04e7f))
+* Change to `egdp_test_analytics` source data lake ([4f620a6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/4f620a6be6ff5e38846b7a209ba933a262413944))
+* Fix missing column sensitivity tag for nested values ([b0aa7b1](https://github.expedia.biz/eg-analytics-platform/querybook/commit/b0aa7b1c211b2e5c02de385e81770f440367faa1))
+
 ### [0.98.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.98.1...0.98.2) (2024-07-23)
 
 
