@@ -791,7 +791,7 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
     if metastore.name == "egdp-analytics-waggledance":
         return ("egdp_analytics", schema_name)
     if metastore.name == "egdp-test-waggledance":
-        return ("egdp_test", schema_name)
+        return ("egdp_test_analytics", schema_name)
     if metastore.name == "bex-waggledance" and querybook_instance == "prod":
         return ("bexg_prod", schema_name)
     if metastore.name == "bex-waggledance" and querybook_instance == "test":
