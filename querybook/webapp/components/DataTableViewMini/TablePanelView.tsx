@@ -14,6 +14,7 @@ import { Loader } from 'ui/Loader/Loader';
 
 import { ColumnIcon } from './ColumnIcon';
 import { PanelSection, SubPanelSection } from './PanelSection';
+import { Icon } from 'ui/Icon/Icon';
 
 interface ITablePanelViewProps {
     tableId: number;
@@ -38,7 +39,20 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
         const overviewSection = (
             <PanelSection title="table">
                 <SubPanelSection title="schema">{schema.name}</SubPanelSection>
-                <SubPanelSection title="name">{table.name}</SubPanelSection>
+                <SubPanelSection title="name">
+                    <span className="flex-row">
+                        {table.name}
+                        {table.golden && (
+                            <span
+                                className="flex-row"
+                                aria-label="Based on Trino usage via PUMA"
+                                data-balloon-pos="down"
+                            >
+                                <Icon className="crown ml4" name="Crown" />
+                            </span>
+                        )}
+                    </span>
+                </SubPanelSection>
                 <SubPanelSection title="description" hideIfNoContent>
                     {table.description
                         ? (table.description as ContentState).getPlainText()

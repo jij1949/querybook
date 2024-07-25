@@ -23,6 +23,7 @@ import { Title } from 'ui/Title/Title';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
 
 import './DataTableNavigatorSearch.scss';
+import { Icon } from 'ui/Icon/Icon';
 
 export const DataTableNavigatorSearch: React.FC<{
     queryMetastore: IQueryMetastore;
@@ -98,15 +99,24 @@ export const DataTableNavigatorSearch: React.FC<{
                         title="Top Tier"
                         className="toggle-padding"
                     >
-                        <ToggleSwitch
-                            checked={searchFilters.golden}
-                            onChange={(checked) =>
-                                updateSearchFilter(
-                                    'golden',
-                                    checked ? true : null
-                                )
-                            }
-                        />
+                        <div className="flex-row">
+                            <ToggleSwitch
+                                checked={searchFilters.golden}
+                                onChange={(checked) =>
+                                    updateSearchFilter(
+                                        'golden',
+                                        checked ? true : null
+                                    )
+                                }
+                            />
+                            <span
+                                className="flex-row"
+                                aria-label="Based on Trino usage via PUMA"
+                                data-balloon-pos="right"
+                            >
+                                <Icon className="crown ml4" name="Crown" />
+                            </span>
+                        </div>
                     </SearchFilterRow>
                     <SearchFilterRow title="Schema">
                         <SearchBar

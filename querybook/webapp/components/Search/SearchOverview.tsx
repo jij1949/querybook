@@ -766,7 +766,13 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                     <div className="result-item-golden horizontal-space-between">
                         <span>
                             <span>top tier only</span>
-                            <Icon className="crown ml4" name="Crown" />
+                            <span
+                                className="flex-row"
+                                aria-label="Based on Trino usage via PUMA"
+                                data-balloon-pos="down"
+                            >
+                                <Icon className="crown ml4" name="Crown" />
+                            </span>
                         </span>
                         <Checkbox
                             value={!!searchFilters.golden}
