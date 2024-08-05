@@ -33,8 +33,8 @@ export function useExactMatchTableId() {
 
         return dataTables.find(
             (table) =>
-                table.name === searchStringTable &&
-                table.schema === searchStringSchema
+                table.name.toLowerCase() === searchStringTable.toLowerCase() &&
+                table.schema.toLowerCase() === searchStringSchema.toLowerCase()
         )?.id;
     }, [searchStringSchema, searchStringTable, dataTables]);
 
