@@ -127,6 +127,12 @@ export const TableTag: React.FC<{
         </Menu>
     );
 
+    // Split the tag type out of the tag name if included
+    // Example: 'File Format: Parquet' -> 'Parquet'
+    const tagName = tag.name.startsWith(tagMeta.type + ': ')
+        ? tag.name.substring(tagMeta.type.length + 2)
+        : tag.name;
+
     return (
         <div className="TableTag">
             {canUserUpdate && (
@@ -144,7 +150,7 @@ export const TableTag: React.FC<{
             )}
             <HoverIconTag
                 key={tag.id}
-                name={tag.name}
+                name={tagName}
                 type={tagMeta.type}
                 icon={tagMeta.icon}
                 iconOnHover={canUserDelete ? 'X' : null}

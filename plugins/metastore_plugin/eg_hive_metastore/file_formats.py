@@ -19,7 +19,7 @@ FILE_FORMAT_MAPPING = [
             "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat",
             "*",
         ],
-        "serde": ["org.apache.hadoop.hive.ql.io.orc.OrcSerde"],
+        "serde": ["org.apache.hadoop.hive.ql.io.orc.OrcSerde" "*"],
         "format": "ORC",
     },
     {
@@ -45,6 +45,7 @@ FILE_FORMAT_MAPPING = [
             "org.openx.data.jsonserde.JsonSerDe",
             "org.apache.hadoop.hive.contrib.serde2.JsonSerde",
             "org.apache.hive.hcatalog.data.JsonSerDe",
+            "com.proofpoint.hive.serde.JsonSerde",
         ],
         "format": "JSON",
     },
@@ -59,7 +60,10 @@ FILE_FORMAT_MAPPING = [
             "org.apache.hadoop.mapred.FileInputFormat",
             "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat",
         ],
-        "serde": ["org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"],
+        "serde": [
+            "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+            "org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe",
+        ],
         "format": "Text",
     },
     {
@@ -122,7 +126,7 @@ def detect_file_format(sd, parameters):
                 i_format == "*" or i_format == input_format
                 for i_format in item["input_format"]
             )
-            and any(s == serde for s in item["serde"])
+            and any(s == "*" or s == serde for s in item["serde"])
         ),
         None,
     )
@@ -131,4 +135,4 @@ def detect_file_format(sd, parameters):
         return match["format"]
     else:
         LOG.warn(f"No match for input_format: {input_format} and serde: {serde}")
-        return "Unknown File Format"
+        return "Unknown"

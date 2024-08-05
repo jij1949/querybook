@@ -34,6 +34,7 @@ def get_tags_by_keyword(keyword, limit=10, session=None):
     return (
         session.query(Tag)
         .filter(Tag.name.like("%" + keyword + "%"))
+        .filter(Tag.count > 0)
         .order_by(Tag.count.desc())
         .offset(0)
         .limit(limit)
@@ -125,6 +126,7 @@ def create_table_tags(
             else None
         )
         meta = {
+            **(tag.meta or {}),
             "type": tag.type,
             "tooltip": tag.description,
             "color": tag_color_name,

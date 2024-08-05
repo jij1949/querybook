@@ -71,38 +71,42 @@ DATASET_TAGS = [
         "label": "Brand",
         "mandatory": False,
         "tag": True,
+        "meta": {"rank": 59},
     },
     {
         "name": "eg-domain",
         "label": "Domain",
         "mandatory": False,
         "tag": True,
-    },
-    {
-        "name": "eg-storage-location",
-        "label": "Storage Location",
-        "mandatory": True,
-        "tag": True,
-        "concat": "Storage",
-    },
-    {
-        "name": "eg-origin-location",
-        "label": "Origin Location",
-        "mandatory": True,
-        "tag": True,
-        "concat": "Origin",
+        "meta": {"rank": 58},
     },
     {
         "name": "eg-application-name",
         "label": "Application",
         "mandatory": True,
         "tag": True,
+        "meta": {"rank": 57},
+    },
+    {
+        "name": "eg-origin-location",
+        "label": "Origin Location",
+        "mandatory": True,
+        "tag": True,
+        "meta": {"rank": 56},
+    },
+    {
+        "name": "eg-storage-location",
+        "label": "Storage Location",
+        "mandatory": True,
+        "tag": True,
+        "meta": {"rank": 55},
     },
     {
         "name": "eg-partner-data",
         "label": "Partner Data",
         "mandatory": False,
         "tag": True,
+        "meta": {"rank": 54},
     },
 ]
 
@@ -357,6 +361,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     name="Cloverleaf",
                     description="This table is managed by Cloverleaf",
                     color=EgTagColors.CLOVERLEAF.value,
+                    meta={"rank": 20, "icon": "Clover"},
                 )
             )
 
@@ -385,29 +390,26 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 if tag_name == "eg-partner-data":
                     # Special case for partner data, which is either true / false
                     tags.append(
-                        # either "No Partner Data" or "Partner Data"
                         DataTag(
                             name=(
-                                "Partner Data"
+                                "Partner Data: Yes"
                                 if parameters.get(tag_name) == "true"
-                                else "No Partner Data"
+                                else "Partner Data: No"
                             ),
                             type=tag["label"],
                             description=f"This table is tagged with `{tag_name}`",
                             color=EgTagColors.GOVERNANCE.value,
+                            meta=tag["meta"] or {},
                         )
                     )
                 else:
                     tags.append(
                         DataTag(
-                            name=(
-                                tag["concat"] + ": " + parameters.get(tag_name)
-                                if tag.get("concat")
-                                else parameters.get(tag_name)
-                            ),
+                            name=tag["label"] + ": " + parameters.get(tag_name),
                             type=tag["label"],
                             description=f"This table is tagged with `{tag_name}`",
                             color=EgTagColors.GOVERNANCE.value,
+                            meta=tag["meta"] or {},
                         )
                     )
 
@@ -422,6 +424,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     name="View",
                     description="This is a view",
                     color=EgTagColors.VIEW.value,
+                    meta={"rank": 101, "icon": "View"},
                 )
             )
 
@@ -466,10 +469,11 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
                 tags.append(
                     DataTag(
-                        name=file_format,
+                        name=f"File Format: {file_format}",
                         type="File Format",
                         description=f"This table is stored in {file_format} format",
                         color=EgTagColors.FILE_FORMAT.value,
+                        meta={"rank": 100},
                     )
                 )
 
@@ -490,20 +494,23 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             if parameters.get("table_type") == "ICEBERG":
                 tags.append(
                     DataTag(
-                        name="Iceberg",
+                        name="Table Format: Iceberg",
                         type="Table Format",
                         description="This is an Iceberg table",
                         color=EgTagColors.ICEBERG.value,
+                        meta={"rank": 99},
                     )
                 )
+
             # Delta Lake!
             elif parameters.get("spark.sql.sources.provider") == "delta":
                 tags.append(
                     DataTag(
-                        name="Delta",
+                        name="Table Format: Delta",
                         type="Table Format",
                         description="This is a Delta Lake table",
                         color=EgTagColors.DELTA.value,
+                        meta={"rank": 99},
                     )
                 )
 
@@ -511,10 +518,11 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             elif sd.inputFormat == "org.apache.hudi.hadoop.HoodieParquetInputFormat":
                 tags.append(
                     DataTag(
-                        name="Hudi",
+                        name="Table Format: Hudi",
                         type="Table Format",
                         description="This is a Hudi table",
                         color=EgTagColors.HUDI.value,
+                        meta={"rank": 99},
                     )
                 )
 
@@ -545,6 +553,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     name="Sensitivity",
                     description="This table contains sensitivity tags",
                     color=EgTagColors.SENSITIVITY.value,
+                    meta={"rank": 90, "icon": "Fingerprint"},
                 )
             )
 
@@ -568,18 +577,21 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         if source_data_lake is None:
             tags.append(
                 DataTag(
-                    name="Unknown Source Data Lake",
+                    name="Source Data Lake: Unknown",
+                    type="Source Data Lake",
                     description="The source data lake for this table is unknown",
                     color=EgTagColors.SOURCE.value,
+                    meta={"rank": 40},
                 )
             )
         else:
             tags.append(
                 DataTag(
-                    name=source_data_lake,
+                    name=f"Source Data Lake: {source_data_lake}",
                     type="Source Data Lake",
                     description="The source data lake for this table",
                     color=EgTagColors.SOURCE.value,
+                    meta={"rank": 40},
                 )
             )
 
@@ -691,7 +703,7 @@ def apply_sensitivity_tag_and_data_element(col, value):
         tags=col.tags
         + [
             DataTag(
-                name=value.lower(),
+                name=f"Sensitivity: {value.lower()}",
                 type="Sensitivity",
                 color=EgTagColors.SENSITIVITY.value,
                 description="This column contains a sensitivity tag",

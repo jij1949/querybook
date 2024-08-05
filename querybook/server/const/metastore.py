@@ -21,6 +21,9 @@ class DataTag(NamedTuple):
     # color in hex format, e.g. #4287f5
     color: str = None
 
+    # Optional
+    meta: dict[str, any] = None
+
 
 class DataOwnerType(NamedTuple):
     name: str
