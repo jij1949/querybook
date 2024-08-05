@@ -298,9 +298,6 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
         parameters = description.parameters
         sd = description.sd
-        partitions = (
-            self.get_partitions(schema_name, table_name) if self.load_partitions else []
-        )
 
         last_modified_time = parameters.get("last_modified_time") or parameters.get(
             "transient_lastDdlTime"
@@ -321,7 +318,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             table_updated_at=last_modified_time,
             data_size_bytes=total_size,
             location=sd.location,
-            partitions=partitions,
+            partitions=[],
             raw_description=ujson.pdumps(description, default=lambda o: o.__dict__),
             partition_keys=self.get_partition_keys(description),
         )
@@ -623,6 +620,12 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     golden=True,
                     # boost_score = top_tier_row[6]
                 )
+
+                # Load partitions if enabled and top tier
+                if self.load_partitions:
+                    table = table._replace(
+                        partitions=self.get_partitions(schema_name, table_name)
+                    )
 
         # Update the table with table_links (if any)
         if table_links:
