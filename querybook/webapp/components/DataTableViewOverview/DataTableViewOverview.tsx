@@ -143,7 +143,7 @@ export const DataTableViewOverview: React.FC<
     ));
 
     const detailsDOM = dataTableDetailsRows
-        .filter((row) => table[row] != null)
+        .filter((row) => table[row] != null && table[row] !== '[]')
         .map((row) => {
             let value: string = '';
             switch (row) {
