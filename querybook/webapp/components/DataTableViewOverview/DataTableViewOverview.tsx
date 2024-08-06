@@ -44,6 +44,7 @@ import { DataTableViewOverviewSection } from './DataTableViewOverviewSection';
 import { Icon } from 'ui/Icon/Icon';
 
 import './DataTableViewOverview.scss';
+import { PartitionList } from 'components/PartitionList/PartitionList';
 
 const dataTableDetailsRows = [
     'type',
@@ -145,7 +146,7 @@ export const DataTableViewOverview: React.FC<
     const detailsDOM = dataTableDetailsRows
         .filter((row) => table[row] != null && table[row] !== '[]')
         .map((row) => {
-            let value: string = '';
+            let value: string | JSX.Element = '';
             switch (row) {
                 case 'table_created_at':
                 case 'table_updated_at': {
@@ -154,6 +155,11 @@ export const DataTableViewOverview: React.FC<
                 }
                 case 'data_size_bytes': {
                     value = getHumanReadableByteSize(table[row]);
+                    break;
+                }
+                case 'earliest_partitions':
+                case 'latest_partitions': {
+                    value = <PartitionList partitionString={table[row]} />;
                     break;
                 }
                 default:

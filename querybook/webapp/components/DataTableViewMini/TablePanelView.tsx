@@ -15,6 +15,7 @@ import { Loader } from 'ui/Loader/Loader';
 import { ColumnIcon } from './ColumnIcon';
 import { PanelSection, SubPanelSection } from './PanelSection';
 import { Icon } from 'ui/Icon/Icon';
+import { PartitionList } from 'components/PartitionList/PartitionList';
 
 interface ITablePanelViewProps {
     tableId: number;
@@ -85,11 +86,15 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
             hasPartitions(table.earliest_partitions) ? (
                 <PanelSection title="partitions">
                     <SubPanelSection title={`Latest`}>
-                        {table.latest_partitions}
+                        <PartitionList
+                            partitionString={table.latest_partitions}
+                        />
                     </SubPanelSection>
 
                     <SubPanelSection title={`Earliest`}>
-                        {table.earliest_partitions}
+                        <PartitionList
+                            partitionString={table.earliest_partitions}
+                        />
                     </SubPanelSection>
                 </PanelSection>
             ) : null;
