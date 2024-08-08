@@ -5,7 +5,7 @@ from enum import Enum
 import time
 from typing import Dict, List, Tuple
 
-from app.db import with_session
+from app.db import get_session, with_session
 from env import QuerybookSettings
 from lib.logger import get_logger
 from lib.metastore.base_metastore_loader import (
@@ -174,13 +174,17 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             ),
         ]
 
-    @with_session
     def load_top_tier_tables(self, session=None):
         """
         Load the top tier tables from the database.
         These are tables that have been manually marked as top tier by the top_tier_task.py task.
         """
         try:
+            # Avoid using with_session or DBSession here, as it will close
+            # the session at the end of the function
+            #
+            # We know a session is active when this function is called, so we can use it
+            session = get_session() if session is None else session
             top_tier_tables = session.execute(
                 """
                 SELECT * FROM eg_top_tier_table
@@ -771,7 +775,7 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
 
     Returns (source_data_lake, source_schema_name)
     """
-    metastore = get_query_metastore_by_id(metastore_id)
+    metastore = get_query_metastore_by_id(metastore_id, session=get_session())
     querybook_instance = (
         "prod"
         if QuerybookSettings.PUBLIC_URL == "https://querybook.expedia.biz"
