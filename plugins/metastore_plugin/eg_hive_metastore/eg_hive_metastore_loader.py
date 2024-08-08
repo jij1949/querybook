@@ -596,11 +596,12 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             custom_properties["source_schema_name"] = source_schema_name
             custom_properties["source_data_lake"] = source_data_lake
 
-        # Determine Top Tier status
+        # Determine Top Tier status and boost score
         # This comes from the `querybook2.eg_top_tier_table` table,
         # which is populated by the `top_tier_task.py` task
         #
-        # If a row is found, then the table is a Top Tier table
+        # This table started as just top tier, but now contains the most popular tables as well
+        # As a result, Top Tier tables are identified via the `top_tier` column
         if self.top_tier_tables:
             # Find matching row in the top_tier_table by source_data_lake, schema_name, and table_name
             top_tier_row = next(
@@ -616,9 +617,16 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
             if top_tier_row:
                 LOG.debug(f"Top Tier Row {top_tier_row}")
+
+                # The `top_tier` column is a boolean (0 or 1) and determines whether the table is top tier or not
+                is_top_tier = top_tier_row[6] == 1
+
+                # The `boost_score` column is a float and is derived from the popularity of the table
+                boost_score = top_tier_row[7]
+
                 table = table._replace(
-                    golden=True,
-                    # boost_score = top_tier_row[6]
+                    golden=is_top_tier,
+                    boost_score=boost_score,
                 )
 
                 # Load partitions if enabled and top tier

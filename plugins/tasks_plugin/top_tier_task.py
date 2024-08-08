@@ -19,14 +19,13 @@ query_template = """
       p.user_count,
       p.number_of_queries,
       p.popularity,
+      case when user_count >= {min_user_count} and number_of_queries >= {min_number_of_queries} then 1 else 0 end as top_tier,
       (
-        FLOOR(LOG(2, user_count + LOG10(number_of_queries)) / 2)
+        LOG(1.5, user_count + LOG(2, number_of_queries))
       ) AS boost_score
     FROM plat_metrics.cleansed_usage_table_popular p
-    WHERE user_count >= {min_user_count}
-      AND number_of_queries >= {min_number_of_queries}
-    ORDER BY p.popularity
-    LIMIT 1500
+    ORDER BY p.popularity ASC
+    LIMIT 10000
 """
 
 
@@ -72,33 +71,36 @@ def top_tier_task(
                 """
                 CREATE TABLE eg_top_tier_table (
                     source_data_lake VARCHAR(255),
-                    schema_name VARCHAR(255),
+                    source_schema_name VARCHAR(255),
                     table_name VARCHAR(255),
                     user_count INT,
                     number_of_queries INT,
                     popularity FLOAT,
-                    boost_score INT
+                    top_tier INT,
+                    boost_score FLOAT
                 )
                 """
             )
             values = [
                 {
                     "source_data_lake": source_data_lake,
-                    "schema_name": schema_name,
+                    "source_schema_name": source_schema_name,
                     "table_name": table_name,
                     "user_count": user_count,
                     "number_of_queries": number_of_queries,
                     "popularity": popularity,
+                    "top_tier": top_tier,
                     "boost_score": boost_score,
                 }
                 for (
                     (
                         source_data_lake,
-                        schema_name,
+                        source_schema_name,
                         table_name,
                         user_count,
                         number_of_queries,
                         popularity,
+                        top_tier,
                         boost_score,
                     )
                 ) in rows
@@ -106,8 +108,8 @@ def top_tier_task(
 
             session.execute(
                 """
-                INSERT INTO eg_top_tier_table (source_data_lake, schema_name, table_name, user_count, number_of_queries, popularity, boost_score)
-                VALUES (:source_data_lake, :schema_name, :table_name, :user_count, :number_of_queries, :popularity, :boost_score)
+                INSERT INTO eg_top_tier_table (source_data_lake, source_schema_name, table_name, user_count, number_of_queries, popularity, top_tier, boost_score)
+                VALUES (:source_data_lake, :source_schema_name, :table_name, :user_count, :number_of_queries, :popularity, :top_tier, :boost_score)
                 """,
                 values,
             )

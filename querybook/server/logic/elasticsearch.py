@@ -544,6 +544,10 @@ def get_table_weight(table_id: int, session=None) -> int:
     )
     boost_score = get_table_by_id(table_id, session=session).boost_score
 
+    # EG-specific -- use our own boost score instead of the out-of-the-box one
+    if boost_score > 1:
+        return int(boost_score)
+
     # Samples worth 10x as much as impression
     # Log the score to flatten the score distrution (since its power law distribution)
     return int(math.log2(((num_impressions + num_samples * 10) + 1) + boost_score))
