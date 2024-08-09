@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.99.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.98.4...0.99.0) (2024-08-09)
+
+
+### Features
+
+* Improve partition view ([933a3d4](https://github.expedia.biz/eg-analytics-platform/querybook/commit/933a3d499fe2d90ecb3e8231f08f247f2e8f5b81))
+* Load table boost_score via PUMA / top tier ([9c00b49](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9c00b494c2bb9543727351713883bc96ecca547c))
+* Only load partitions for top tier tables ([9dffedf](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9dffedf804dd6e890f5b118ccd8c5c2d887731f5))
+* Rework table tag sync, include rank & icons ([08d2251](https://github.expedia.biz/eg-analytics-platform/querybook/commit/08d2251bd650a03da5e0db3ae3fcb78b1976914f))
+
+
+### Bug Fixes
+
+* Add metastore loader logging for schema count ([d0d565c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d0d565c676496f8b526634d63896c762c4631568))
+* Break word on survey question ([26be5d8](https://github.expedia.biz/eg-analytics-platform/querybook/commit/26be5d8f94f1b1a295a58850878578669d9b4b63))
+* Case-insensitive exact match ([5024188](https://github.expedia.biz/eg-analytics-platform/querybook/commit/5024188624a86409364f4c083821ff5d8ab0c4e0))
+* Don't show empty partition lists ([16924ec](https://github.expedia.biz/eg-analytics-platform/querybook/commit/16924ec64dc19d8f7da47a46baba0269990703f3))
+* Limit loaded partitions to 5 earliest/latest ([6512141](https://github.expedia.biz/eg-analytics-platform/querybook/commit/65121413f9bf426b21b8573f477cf85279ee027d))
+* Upgrade celery to 5.5.0b1 to address Redis issues ([f0037ea](https://github.expedia.biz/eg-analytics-platform/querybook/commit/f0037eaee9e88bab3480a771917fcc6151b13644))
+
 ### [0.98.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.98.3...0.98.4) (2024-08-08)
 
 
