@@ -20,6 +20,7 @@ from lib.utils.utils import with_exception
 from logic.data_element import create_column_data_element_association
 from logic.elasticsearch import delete_es_table_by_id, update_table_by_id
 from logic.metastore import (
+    count_data_schema,
     create_column,
     create_schema,
     create_table,
@@ -282,6 +283,11 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         schema_names = set(self._get_all_filtered_schema_names())
 
         with DBSession() as session:
+            current_schema_count = count_data_schema(self.metastore_id, session=session)
+            LOG.debug(
+                f"Found {len(schema_names)} schemas in metastore {self.metastore_id}, current schema count: {current_schema_count}"
+            )
+
             delete_schema_not_in_metastore(
                 self.metastore_id, schema_names, session=session
             )

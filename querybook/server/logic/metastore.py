@@ -711,6 +711,11 @@ def iterate_data_schema(metastore_id, session=None):
 
 
 @with_session
+def count_data_schema(metastore_id, session=None):
+    return session.query(DataSchema).filter_by(metastore_id=metastore_id).count()
+
+
+@with_session
 def create_table_query_execution_log(
     table_id, cell_id, query_execution_id, commit=True, session=None
 ):
