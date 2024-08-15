@@ -42,6 +42,10 @@
 
         .search-filter-row-item {
             flex: 1;
+
+            // Set the width zero so it can grow, but won't overflow the container
+            width: 0;
+
             .DebouncedInput input {
                 padding: 2px 8px;
             }
