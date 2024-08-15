@@ -14,6 +14,7 @@ COPY certs/* /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 
 ENV NODE_MAJOR=16
+ENV NODE_OPTIONS=--use-openssl-ca
 
 ## Install Querybook package requirements + NodeJS
 # Installing build-essential and python-dev for uwsgi
