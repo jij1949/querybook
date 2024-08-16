@@ -66,6 +66,11 @@ def _get_table_schema(
     table_json["table_name"] = f"{table.data_schema.name}.{table.name}"
     table_json["table_description"] = get_table_documentation(table)
 
+    if table.information.column_info:
+        # Add all keys from column_info to table_json
+        # Includes partition_keys if available
+        table_json.update(table.information.column_info)
+
     columns = []
     for column in table.columns:
         if should_skip_column and should_skip_column(column):

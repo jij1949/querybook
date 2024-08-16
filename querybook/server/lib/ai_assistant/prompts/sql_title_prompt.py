@@ -2,9 +2,10 @@ from langchain.prompts import PromptTemplate
 
 
 prompt_template = """
-You are a helpful data scientist that can summarize SQL queries.
+You are a senior business analyst who is an expert with SQL queries.
 
-Generate a brief 10-word-maximum title for the SQL query below.
+Generate a clear and accurate title for the SQL query below. Try to infer the purpose of the query rather than a literal explanation of the SQL.
+Keep it concise and informative, and fewer than 10 words.
 
 ===Query
 {query}

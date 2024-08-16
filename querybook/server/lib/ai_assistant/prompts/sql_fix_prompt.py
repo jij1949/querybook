@@ -1,7 +1,7 @@
 from langchain.prompts import PromptTemplate
 
 
-prompt_template = """You are a {dialect} expert that can help fix SQL query errors.
+prompt_template = """You are a data analyst and {dialect} SQL expert.
 
 Please help fix below {dialect} query based on the given error message and table schemas.
 
