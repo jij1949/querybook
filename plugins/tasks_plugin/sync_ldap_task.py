@@ -6,8 +6,15 @@ import time
 from app.db import DBSession, with_session
 from app.flask_app import celery
 from const.user import UserGroup
+from const.user_roles import UserRoleType
 from lib.logger import get_logger
-from logic.user import create_or_update_user_group, get_user_by_name
+from logic.user import (
+    create_or_update_user_group,
+    create_user_role,
+    delete_user_role,
+    get_all_admin_user_roles,
+    get_user_by_name,
+)
 from logic.schedule import with_task_logging
 from env import QuerybookSettings
 from logic.admin import (
@@ -525,3 +532,81 @@ def sync_ldap_group(args, group, ad_connection, session=None):
         ),
         session=session,
     )
+
+
+@celery.task(bind=True)
+@with_task_logging()
+def sync_querybook_admins(self):
+    """
+    This task syncs Querybook admins from LDAP.
+
+    During the sync, the following happens:
+    - All users in the `querybook-admins` group in LDAP are added as admins in Querybook
+    - Users who are currently admins in Querybook but are not in the `querybook-admins` group are removed as admins
+
+    Uses the environment variable `LDAP_QUERYBOOK_ADMINS_GROUP` to determine the group name.
+    """
+    LOG.info("Starting LDAP Sync Querybook Admins Task...")
+
+    args = Object()
+    args.dryrun = False
+    args.tracead = False
+
+    admin_group = QuerybookSettings.LDAP_QUERYBOOK_ADMINS_GROUP
+    if not admin_group:
+        LOG.error("LDAP_QUERYBOOK_ADMINS_GROUP is not set")
+        return
+
+    LOG.debug(f"Querying group {admin_group} for Querybook admins")
+
+    ad_connection = ad_connect(args, ad_server, ad_bind_user, ad_bind_password)
+
+    with DBSession() as session:
+
+        ad_group = ad_query_group(args, ad_connection, admin_group)
+
+        if not ad_group:
+            LOG.warning(f'Group "{admin_group}" does not exist')
+            return
+
+        # Get group members
+        group_members = get_groups_members_list(args, [admin_group], ad_connection)
+
+        LOG.debug(f"Group {admin_group} has {len(group_members)} members")
+        LOG.debug(f"Querybook admins: {group_members}")
+
+        # Find matching users in Querybook (if they exist)
+        matching_users = (
+            session.query(User).filter(User.username.in_(group_members)).all()
+        )
+
+        LOG.debug(f"Querybook admins: {matching_users}")
+
+        # Get all existing admins
+        existing_admins = get_all_admin_user_roles(session=session)
+
+        LOG.debug(f"Existing admins: {existing_admins}")
+
+        # Iterate through matching users and add them as admins
+        for user in matching_users:
+            # If existing admin
+            if user.id in [admin.uid for admin in existing_admins]:
+                LOG.debug(f"{user.username} is already an admin")
+                existing_admins = [
+                    admin for admin in existing_admins if admin.uid != user.id
+                ]
+            else:
+                # Add user as admin
+                LOG.debug(f"Adding {user.username} as Querybook admin")
+
+                # Add record in user_role table with role="ADMIN"
+                create_user_role(
+                    user.id, UserRoleType.ADMIN, commit=False, session=session
+                )
+
+        # Remove users who are no longer admins
+        for user_role in existing_admins:
+            LOG.debug(f"Removing {user_role.uid} from Querybook admin role")
+            delete_user_role(user_role.id, commit=False, session=session)
+
+        session.commit()

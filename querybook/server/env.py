@@ -129,6 +129,10 @@ class QuerybookSettings(object):
                 "LDAP_USER_DN has to be set when using direct LDAP connection"
             )
 
+    LDAP_QUERYBOOK_ADMINS_GROUP = get_env_config(
+        "LDAP_QUERYBOOK_ADMINS_GROUP", optional=True
+    )
+
     # Result Store
     RESULT_STORE_TYPE = get_env_config("RESULT_STORE_TYPE")
 
