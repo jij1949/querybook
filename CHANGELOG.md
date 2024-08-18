@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.100.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.99.0...0.100.0) (2024-08-18)
+
+
+### Features
+
+* Improve AI Assistant prompts ([95fb9b6](https://github.expedia.biz/eg-analytics-platform/querybook/commit/95fb9b66d5cf4836b39a148c7eeaf8a795c75dc4))
+* Sync Querybook admin task ([05418ac](https://github.expedia.biz/eg-analytics-platform/querybook/commit/05418ac7b1f903300e43cbd2e7d5a19e7652c3e7))
+
+
+### Bug Fixes
+
+* Fix table search tags overflowing container ([ca49dcd](https://github.expedia.biz/eg-analytics-platform/querybook/commit/ca49dcd6bb87882203254a22c352d306b3491ee4))
+
 ## [0.99.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.98.4...0.99.0) (2024-08-09)
 
 
