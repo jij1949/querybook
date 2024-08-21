@@ -54,6 +54,6 @@ class OpenAIAssistant(BaseAIAssistant):
     def _get_llm(self, ai_command: str, prompt_length: int):
         config = self._get_llm_config(ai_command)
 
-        LOG.debug(f"Using OpenAI config {config}")
+        # LOG.debug(f"Using OpenAI config {config}")
 
         return ChatOpenAI(**config)

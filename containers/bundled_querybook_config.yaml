@@ -58,6 +58,11 @@ AI_ASSISTANT_CONFIG:
             model_name: gpt-4o-2024-05-13
             temperature: 0.2
             streaming: False
+    sql_title:
+        model_args:
+            model_name: gpt-4o-2024-05-13
+            temperature: 0.7
+            streaming: False
     text_to_sql:
         model_args:
             model_name: gpt-4o-2024-05-13
@@ -80,7 +85,7 @@ VECTOR_STORE_CONFIG:
 #
 EMBEDDINGS_PROVIDER: eg_openai
 EMBEDDINGS_CONFIG:
-    model: text-embedding-ada-002
+    model: text-embedding-3-small
     chunk_size: 4096
 # #
 # # Vector Store Embeddings: Sentence Transformers
