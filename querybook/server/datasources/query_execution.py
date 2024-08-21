@@ -57,8 +57,8 @@ from app.db import with_session
 from env import QuerybookSettings
 from lib.notify.utils import notify_user
 
-from pandas import DataFrame, ExcelWriter
-from io import BytesIO
+import pandas as pd
+from io import BytesIO, StringIO
 
 QUERY_RESULT_LIMIT_CONFIG = get_config_value("query_result_limit")
 
@@ -336,21 +336,30 @@ def download_statement_execution_result_xlsx(statement_execution_id):
             statement_execution.query_execution_id, session=session
         )
 
-        download_file_name = f"result_{statement_execution.query_execution_id}_{statement_execution_id}.xlsx"
-
         reader = GenericReader(statement_execution.result_path)
-        reader.start()
+        response = None
+        df = None
+        download_file_name = (
+            f"result_{statement_execution.query_execution_id}_{statement_execution_id}"
+        )
 
-        # Read all rows and create a DataFrame
-        data = reader.read_csv(number_of_lines=None)
-        column_names = data[0]
-        data_rows = data[1:]
+        if reader.has_download_url:
+            download_url = reader.get_download_url(
+                custom_name=(download_file_name + ".csv")
+            )
 
-        df = DataFrame(data_rows, columns=column_names)
+            # Use built-in pandas read_csv function to convert the CSV to a DataFrame
+            df = pd.read_csv(download_url)
+        else:
+            # We read the raw file, convert it to StringIO, and then read it to a DataFrame with pandas
+            reader.start()
+            raw = reader.read_raw()
+            csvStringIO = StringIO(raw)
+            df = pd.read_csv(csvStringIO, sep=",", header=None)
 
         # Write the DataFrame to an Excel spreadsheet
         xlsx_output = BytesIO()
-        with ExcelWriter(xlsx_output) as writer:
+        with pd.ExcelWriter(xlsx_output) as writer:
             df.to_excel(
                 writer,
                 sheet_name=f"Execution {statement_execution.query_execution_id}",
@@ -363,9 +372,10 @@ def download_statement_execution_result_xlsx(statement_execution_id):
             data,
             mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             headers={
-                "Content-disposition": f"attachment; filename={download_file_name}"
+                "Content-disposition": f"attachment; filename={download_file_name}.xlsx"
             },
         )
+
         return response
 
 
