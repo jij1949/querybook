@@ -50,6 +50,14 @@ show_full_view:
         - disabled
     helper: Instead of modal, show full view when opening table/execution/snippet
 
+spin_favicon_on_query:
+    default: disabled
+    tab: general
+    options:
+        - enabled
+        - disabled
+    helper: Animate the tab's favicon when you have running executions.
+
 rows_in_query_results:
     default: 20 rows
     tab: general

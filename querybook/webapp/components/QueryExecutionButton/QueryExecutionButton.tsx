@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { DynamicFavicon } from 'components/DynamicFavicon/DynamicFavicon';
 import { QueryExecutionStatus } from 'const/queryExecution';
 import { TooltipDirection } from 'const/tooltip';
 import { useShallowSelector } from 'hooks/redux/useShallowSelector';
@@ -16,7 +17,7 @@ interface IQueryExecutionButtonProps {
     active?: boolean;
 }
 
-function useActiveQueryExecutions() {
+export function useActiveQueryExecutions() {
     const [loading, setLoading] = useState(true);
 
     const { queryExecutionById, uid, queryEnginesInEnv } = useShallowSelector(
@@ -46,7 +47,7 @@ function useActiveQueryExecutions() {
         dispatch(fetchActiveQueryExecutionForUser(uid)).then(() => {
             setLoading(false);
         });
-    }, []);
+    }, [dispatch, uid]);
 
     return {
         loading,
@@ -66,6 +67,7 @@ export const QueryExecutionButton = React.memo<IQueryExecutionButtonProps>(
 
         return (
             <>
+                <DynamicFavicon />
                 <span className="QueryExecutionButton">
                     <IconButton
                         onClick={onClick}
