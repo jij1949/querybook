@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.101.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.100.0...0.101.0) (2024-08-22)
+
+
+### Features
+
+* some tab animation options (#289) ([cd25553](https://github.expedia.biz/eg-analytics-platform/querybook/commit/cd2555338fae091cd65baebb2f70846be01100d5))
+
+
+### Bug Fixes
+
+* Update `ingest_vector_index` tasks, add top_tier kwarg ([9c66b2b](https://github.expedia.biz/eg-analytics-platform/querybook/commit/9c66b2b3c88368d56dd45055a960d18073d321ae))
+* XLSX is now created the same way as the CSV, so it will always have the same number of rows. (#294) ([d0a9ae2](https://github.expedia.biz/eg-analytics-platform/querybook/commit/d0a9ae2c6d81b8e0180380d4a3b4b97476c7831f))
+
 ## [0.100.0](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.99.0...0.100.0) (2024-08-18)
 
 
