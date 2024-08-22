@@ -21,11 +21,11 @@ query_template = """
       p.popularity,
       case when user_count >= {min_user_count} and number_of_queries >= {min_number_of_queries} then 1 else 0 end as top_tier,
       (
-        LOG(1.5, user_count + LOG(2, number_of_queries))
+        LOG(1.5, user_count + LOG(2, number_of_queries)) + 1
       ) AS boost_score
     FROM plat_metrics.cleansed_usage_table_popular p
     ORDER BY p.popularity ASC
-    LIMIT 10000
+    LIMIT {limit}
 """
 
 
@@ -36,6 +36,7 @@ def top_tier_task(
     query_engine_id: int = 1,
     min_user_count: int = 10,
     min_number_of_queries: int = 30,
+    limit: int = 10000,
 ):
     with DBSession() as session:
         (
@@ -53,6 +54,7 @@ def top_tier_task(
             formatted_query = query_template.format(
                 min_user_count=min_user_count,
                 min_number_of_queries=min_number_of_queries,
+                limit=limit,
             )
             cursor.run(formatted_query)
             cursor.poll_until_finish()
