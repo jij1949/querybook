@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.101.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.101.1...0.101.2) (2024-08-23)
+
+
+### Bug Fixes
+
+* Fix ingest_vector_index infinite loop ([c947499](https://github.expedia.biz/eg-analytics-platform/querybook/commit/c94749915f44ac99a8e2a23e262a110eb0b9eaa6))
+
 ### [0.101.1](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.101.0...0.101.1) (2024-08-22)
 
 
