@@ -63,4 +63,7 @@ def ingest_vector_index(
 
                     table_offset += batch_size
 
-                schema_offset += batch_size
+            if len(schemas) < batch_size:
+                break
+
+            schema_offset += batch_size
