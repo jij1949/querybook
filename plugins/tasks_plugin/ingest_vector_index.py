@@ -5,7 +5,7 @@ from logic.schedule import with_task_logging
 from app.db import DBSession
 from lib.logger import get_logger
 from logic.vector_store import record_table
-from models.metastore import DataSchema, DataTable
+from models.metastore import DataSchema, DataTable, DataTableInformation
 
 
 LOG = get_logger(__file__)
@@ -18,6 +18,7 @@ def ingest_vector_index(
     batch_size: int = 100,
     schema_regex: str = "querybook2",
     top_tier_only: bool = False,
+    max_popularity: int = 0,
 ):
     with DBSession() as session:
 
@@ -38,20 +39,21 @@ def ingest_vector_index(
                 table_offset = 0
 
                 while True:
-                    tables = (
-                        session.query(DataTable)
-                        .filter(DataTable.schema_id == schema.id)
-                        .offset(table_offset)
-                        .limit(batch_size)
-                        .all()
+                    tables_query = session.query(DataTable).filter(
+                        DataTable.schema_id == schema.id
                     )
 
+                    if top_tier_only:
+                        tables_query = tables_query.filter(DataTable.golden == 1)
+                    if max_popularity > 0:
+                        tables_query = tables_query.join(DataTableInformation).filter(
+                            DataTableInformation.custom_properties["popularity"]
+                            <= max_popularity
+                        )
+
+                    tables = tables_query.offset(table_offset).limit(batch_size).all()
+
                     for table in tables:
-
-                        if top_tier_only and not table.golden:
-                            # Skip non top tier tables
-                            continue
-
                         full_table_name = f"{table.data_schema.name}.{table.name}"
                         LOG.info(f"Ingesting table: {full_table_name}")
                         record_table(

@@ -616,7 +616,8 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             )
 
             if top_tier_row:
-                LOG.debug(f"Top Tier Row {top_tier_row}")
+                # The `popularity` column is the rank of the table per PUMA data
+                custom_properties["popularity"] = top_tier_row[5]
 
                 # The `top_tier` column is a boolean (0 or 1) and determines whether the table is top tier or not
                 is_top_tier = top_tier_row[6] == 1
