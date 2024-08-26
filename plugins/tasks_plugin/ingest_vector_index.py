@@ -72,3 +72,24 @@ def ingest_vector_index(
                 break
 
             schema_offset += batch_size
+
+
+@celery.task(bind=True)
+@with_task_logging()
+def ingest_vector_index_table(
+    self,
+    table_id: int,
+):
+    with DBSession() as session:
+        table = session.query(DataTable).filter(DataTable.id == table_id).first()
+        if table:
+            full_table_name = f"{table.data_schema.name}.{table.name}"
+            LOG.info(f"Ingesting table: {full_table_name}")
+            record_table(
+                table=table,
+                ingest_sample_queries=True,
+                session=session,
+            )
+        else:
+            LOG.error(f"Table not found: {table_id}")
+        LOG.info(f"Finished ingesting table: {table_id}")

@@ -80,6 +80,7 @@ def record_query_cell_from_es(
             "query": query_text,
             "query_cell_id": es_query_cell["id"],
             "metastore_id": metastore_id,
+            "updated_at": datetime.now(),
         }
         doc_id = _get_query_doc_id(es_query_cell["id"])
         create_and_store_document(summary, metadata, doc_id)
