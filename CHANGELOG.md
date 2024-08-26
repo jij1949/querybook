@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.101.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.101.2...0.101.3) (2024-08-26)
+
+
+### Bug Fixes
+
+* Track popularity and add filter to the ingest_vector_index task ([428315c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/428315c34e93d5b4e5d5f49cd63cfeda02a7723d))
+
 ### [0.101.2](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.101.1...0.101.2) (2024-08-23)
 
 
