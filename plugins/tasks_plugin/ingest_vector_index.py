@@ -19,6 +19,7 @@ def ingest_vector_index(
     schema_regex: str = "querybook2",
     top_tier_only: bool = False,
     max_popularity: int = 0,
+    ingest_sample_queries: bool = True,
 ):
     with DBSession() as session:
 
@@ -57,7 +58,9 @@ def ingest_vector_index(
                         full_table_name = f"{table.data_schema.name}.{table.name}"
                         LOG.info(f"Ingesting table: {full_table_name}")
                         record_table(
-                            table=table, ingest_sample_queries=True, session=session
+                            table=table,
+                            ingest_sample_queries=ingest_sample_queries,
+                            session=session,
                         )
 
                     if len(tables) < batch_size:
