@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [0.101.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.101.3...0.101.4) (2024-08-26)
+
+
+### Bug Fixes
+
+* Add updated_at to indexed queries ([07ffd3c](https://github.expedia.biz/eg-analytics-platform/querybook/commit/07ffd3c3ab25116720133dd8fb8f34b226f7023b))
+* Optionally ingest sample queries to vector index ([982f65d](https://github.expedia.biz/eg-analytics-platform/querybook/commit/982f65d0ffb21a80b349c888c87f0806b9fdd8b2))
+
 ### [0.101.3](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.101.2...0.101.3) (2024-08-26)
 
 
