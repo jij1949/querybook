@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.101.5](https://github.com/eg-internal/querybook/compare/0.101.4...v0.101.5) (2024-09-05)
+
+
+### Bug Fixes
+
+* Turn Celery heartbeat back on ([6dc435d](https://github.com/eg-internal/querybook/commit/6dc435dbef61645dc7827188061b00578ef77380))
+
 ### [0.101.4](https://github.expedia.biz/eg-analytics-platform/querybook/compare/0.101.3...0.101.4) (2024-08-26)
 
 
