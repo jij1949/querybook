@@ -3,10 +3,10 @@ name: Release
 on:
     push:
         branches:
-            - main
+            - master
 
 jobs:
     release-please:
         uses: eg-internal/workflow-release-please/.github/workflows/workflow.yml@v2.0.1
         with:
-            publish-workflow: deploy.yaml
+            publish-workflow: docker.yaml
