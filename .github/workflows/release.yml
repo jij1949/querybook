@@ -9,4 +9,4 @@ jobs:
     release-please:
         uses: eg-internal/workflow-release-please/.github/workflows/workflow.yml@v2.0.1
         with:
-            publish-workflow: docker.yaml
+            publish-workflow: docker.yml
