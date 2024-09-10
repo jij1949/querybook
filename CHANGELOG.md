@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.102.0](https://github.com/eg-internal/querybook/compare/v0.101.5...v0.102.0) (2024-09-10)
+
+
+### Features
+
+* Remove XLSX export option from UI ([96a5850](https://github.com/eg-internal/querybook/commit/96a5850572604256f3091bfbe3587d7645d305e1))
+* Revert "fix: Upgrade celery to 5.5.0b1 to address Redis issues" ([d8a504b](https://github.com/eg-internal/querybook/commit/d8a504bc9360f418c5b7255cc2b83523ba41d026))
+
 ## [0.101.5](https://github.com/eg-internal/querybook/compare/0.101.4...v0.101.5) (2024-09-05)
 
 
