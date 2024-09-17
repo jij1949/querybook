@@ -67,6 +67,7 @@ import { SearchSchemaSelect } from './SearchSchemaSelect';
 import { TableSelect } from './TableSelect';
 
 import './SearchOverview.scss';
+import { InfoButton } from 'ui/Button/InfoButton';
 
 const AIAssistantConfig = PublicConfig.ai_assistant;
 
@@ -742,13 +743,18 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                     {dateFilterDOM}
                 </div>
                 <div className="search-filter">
-                    <span className="filter-title">Scheduled</span>
+                    <span className="filter-title">
+                        Scheduled
+                        <InfoButton>
+                            DataDocs with an enabled schedule
+                        </InfoButton>
+                    </span>
                     <Checkbox
-                        value={!!searchFilters['scheduled']}
+                        value={!!searchFilters['enabled']}
                         onChange={updateSearchFilter.bind(
                             null,
-                            'scheduled',
-                            searchFilters['scheduled'] ? null : true
+                            'enabled',
+                            searchFilters['enabled'] ? null : true
                         )}
                     />
                 </div>

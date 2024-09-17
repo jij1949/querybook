@@ -23,6 +23,7 @@ from lib.utils.utils import DATETIME_TO_UTC, with_exception
 from logic import admin as admin_logic
 from logic import datadoc as datadoc_logic
 from logic import metastore as metastore_logic
+from logic import schedule as schedule_logic
 from logic.datadoc import (
     get_all_data_docs,
     get_all_query_cells,
@@ -80,6 +81,16 @@ def _get_datadoc_editors(datadoc, session) -> List[str]:
         data_doc_id=datadoc.id, session=session
     )
     return [editor.uid for editor in editors]
+
+
+def _get_datadoc_schedule_enabled(datadoc, session) -> bool:
+    if datadoc is None:
+        return False
+    schedule_name = schedule_logic.get_data_doc_schedule_name(datadoc.id)
+    schedule = schedule_logic.get_task_schedule_by_name(schedule_name, session=session)
+    if schedule is None:
+        return False
+    return schedule.enabled
 
 
 def _get_table_names_from_query(query, language=None) -> List[str]:
@@ -449,6 +460,7 @@ def datadocs_to_es(datadoc, fields=None, session=None):
         "public": datadoc.public,
         "readable_user_ids": lambda: _get_datadoc_editors(datadoc, session=session),
         "scheduled": datadoc.scheduled,
+        "enabled": lambda: _get_datadoc_schedule_enabled(datadoc, session=session),
     }
     return _get_dict_by_field(field_to_getter, fields=fields)
 

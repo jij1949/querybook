@@ -12,6 +12,7 @@ from models.schedule import (
     TaskSchedule,
     TaskRunRecord,
 )
+from logic.datadoc import update_es_data_doc_by_id
 from models.datadoc import DataDoc
 from models.board import BoardItem
 
@@ -76,6 +77,9 @@ def create_task_schedule(
 
     if commit:
         session.commit()
+        if name.startswith(DATADOC_SCHEDULE_PREFIX):
+            data_doc_id = int(name.split("_")[-1])
+            update_es_data_doc_by_id(data_doc_id)
     else:
         session.flush()
     schedule.id
@@ -108,6 +112,9 @@ def update_task_schedule(id, commit=True, session=None, no_changes=False, **kwar
 
     if commit:
         session.commit()
+        if task_schedule.name.startswith(DATADOC_SCHEDULE_PREFIX):
+            data_doc_id = int(task_schedule.name.split("_")[-1])
+            update_es_data_doc_by_id(data_doc_id)
 
     return task_schedule
 

@@ -291,9 +291,20 @@ class DataDocTestCase(TestCase):
             MagicMock(uid="charlie"),
         ]
 
+    def _patch_get_data_doc_schedule_enabled(self):
+        get_data_doc_schedule_enabled_patch = patch(
+            "logic.elasticsearch._get_datadoc_schedule_enabled"
+        )
+        self.get_data_doc_schedule_enabled_mock = (
+            get_data_doc_schedule_enabled_patch.start()
+        )
+        self.addCleanup(get_data_doc_schedule_enabled_patch.stop)
+        self.get_data_doc_schedule_enabled_mock.return_value = True
+
     def setUp(self):
         self.mock_doc = self._get_datadoc_mock()
         self._patch_get_data_doc_editors_by_doc_id()
+        self._patch_get_data_doc_schedule_enabled()
 
     def test_data_doc_to_es(self):
         result = datadocs_to_es(self.mock_doc, session=MagicMock())
@@ -307,6 +318,7 @@ class DataDocTestCase(TestCase):
             "public": False,
             "readable_user_ids": ["alice", "charlie"],
             "scheduled": self.SCHEDULED,
+            "enabled": True,
         }
         self.assertEqual(result, expected_result)
 

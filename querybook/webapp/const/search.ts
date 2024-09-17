@@ -1,10 +1,10 @@
-
 export interface IDataDocPreview {
     id: number;
     created_at: number;
     title: string;
     owner_uid: number;
     scheduled: boolean;
+    enabled: boolean;
     highlight?: {
         cells?: string[];
     };
