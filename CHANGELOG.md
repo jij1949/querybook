@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.102.1](https://github.com/eg-internal/querybook/compare/v0.102.0...v0.102.1) (2024-09-18)
+
+
+### Bug Fixes
+
+* Disable Elasticsearch Geo IP Downloader ([dffa634](https://github.com/eg-internal/querybook/commit/dffa6341acb0d3b8c5522b315c78b7c824dbf8f8))
+* Enable redis_socket_keepalive ([a508165](https://github.com/eg-internal/querybook/commit/a508165624674146b356e8ccc7cc2402c4db0d37))
+* Fix ORC file format ([48d0843](https://github.com/eg-internal/querybook/commit/48d084388b268111967e011191926581c8b8fa8f))
+* modify scheduled filter in datadoc search to only show datadocs that are both scheduled & enabled ([#311](https://github.com/eg-internal/querybook/issues/311)) ([3cfc1b1](https://github.com/eg-internal/querybook/commit/3cfc1b18a73b72b4be7507b10925a30fe9405ead))
+* Remove top tier table cache ([353d15c](https://github.com/eg-internal/querybook/commit/353d15cfb1cca3618b7957deda3cce1aab648944))
+
 ## [0.102.0](https://github.com/eg-internal/querybook/compare/v0.101.5...v0.102.0) (2024-09-10)
 
 
