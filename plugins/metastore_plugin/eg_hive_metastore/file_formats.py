@@ -19,7 +19,7 @@ FILE_FORMAT_MAPPING = [
             "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat",
             "*",
         ],
-        "serde": ["org.apache.hadoop.hive.ql.io.orc.OrcSerde" "*"],
+        "serde": ["org.apache.hadoop.hive.ql.io.orc.OrcSerde", "*"],
         "format": "ORC",
     },
     {
