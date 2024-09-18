@@ -134,11 +134,6 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             int(time.time() / 86400) % self.resync_tables_every_n_days
         )
 
-        # Load top tier tables from the database
-        # These have already been calculated by the top_tier_task.py task, run daily
-        self.top_tier_tables = self.load_top_tier_tables()
-        LOG.debug(f"Loaded {len(self.top_tier_tables)} top tier tables")
-
     loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig(
         {
             MetadataType.TAG: MetadataMode.WRITE_BACK,
@@ -177,29 +172,6 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 description="Creator of the table, from the `eg-creator` tag",
             ),
         ]
-
-    def load_top_tier_tables(self, session=None):
-        """
-        Load the top tier tables from the database.
-        These are tables that have been manually marked as top tier by the top_tier_task.py task.
-        """
-        try:
-            # Avoid using with_session or DBSession here, as it will close
-            # the session at the end of the function
-            #
-            # We know a session is active when this function is called, so we can use it
-            session = get_session() if session is None else session
-            top_tier_tables = session.execute(
-                """
-                SELECT * FROM eg_top_tier_table
-            """
-            ).fetchall()
-
-            return top_tier_tables
-
-        except Exception as e:
-            LOG.error(f"Error loading top tier tables: {e}")
-            return []
 
     def should_sync_table(self, table=None):
         """
@@ -602,39 +574,40 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         #
         # This table started as just top tier, but now contains the most popular tables as well
         # As a result, Top Tier tables are identified via the `top_tier` column
-        if self.top_tier_tables:
-            # Find matching row in the top_tier_table by source_data_lake, schema_name, and table_name
-            top_tier_row = next(
-                (
-                    row
-                    for row in self.top_tier_tables
-                    if row[0] == source_data_lake
-                    and row[1] == source_schema_name
-                    and row[2] == table_name
-                ),
-                None,
+        top_tier_row = get_top_tier_row(
+            source_data_lake, source_schema_name, table_name
+        )
+
+        if top_tier_row:
+            # Columns: source_data_lake, source_schema_name, table_name, user_count, number_of_queries, popularity, top_tier, boost_score
+            [
+                _,
+                _,
+                _,
+                _,
+                _,
+                popularity,
+                top_tier,
+                boost_score,
+            ] = top_tier_row
+
+            # The `popularity` column is the rank of the table per PUMA data (1 = most popular)
+            custom_properties["popularity"] = popularity
+
+            # The `top_tier` column is a boolean (0 or 1) and determines whether the table is top tier or not
+            is_top_tier = top_tier == 1
+
+            # The `boost_score` column is a float and is derived from the popularity of the table
+            table = table._replace(
+                golden=is_top_tier,
+                boost_score=boost_score,
             )
 
-            if top_tier_row:
-                # The `popularity` column is the rank of the table per PUMA data
-                custom_properties["popularity"] = top_tier_row[5]
-
-                # The `top_tier` column is a boolean (0 or 1) and determines whether the table is top tier or not
-                is_top_tier = top_tier_row[6] == 1
-
-                # The `boost_score` column is a float and is derived from the popularity of the table
-                boost_score = top_tier_row[7]
-
+            # Load partitions if enabled and top tier
+            if self.load_partitions and is_top_tier:
                 table = table._replace(
-                    golden=is_top_tier,
-                    boost_score=boost_score,
+                    partitions=self.get_partitions(schema_name, table_name)
                 )
-
-                # Load partitions if enabled and top tier
-                if self.load_partitions:
-                    table = table._replace(
-                        partitions=self.get_partitions(schema_name, table_name)
-                    )
 
         # Update the table with table_links (if any)
         if table_links:
@@ -840,3 +813,38 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
             return ("egdp_prod", schema_name)
 
     return (None, schema_name)
+
+
+def get_top_tier_row(source_data_lake, source_schema_name, table_name, session=None):
+    """
+    Get the top tier row for a given table.
+    Returns the row if found, otherwise None.
+    """
+    try:
+        session = get_session() if session is None else session
+
+        top_tier_rows = session.execute(
+            """
+            SELECT * FROM eg_top_tier_table
+            WHERE source_data_lake = :source_data_lake
+                AND source_schema_name = :source_schema_name
+                AND table_name = :table_name
+        """,
+            {
+                "source_data_lake": source_data_lake,
+                "source_schema_name": source_schema_name,
+                "table_name": table_name,
+            },
+        ).fetchall()
+
+        if top_tier_rows and len(top_tier_rows) > 0:
+            row = top_tier_rows[0]
+            LOG.debug(f"Top Tier Rows {row}")
+            return row
+
+        # No row found
+        return None
+
+    except Exception as e:
+        LOG.error(f"Error checking Top Tier status: {e}")
+        return None
