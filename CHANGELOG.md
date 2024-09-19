@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.102.2](https://github.com/eg-internal/querybook/compare/v0.102.1...v0.102.2) (2024-09-19)
+
+
+### Bug Fixes
+
+* Fix docker image tagging ([d8a7863](https://github.com/eg-internal/querybook/commit/d8a7863d648b180cc34d387c093202bb213d2b38))
+
 ## [0.102.1](https://github.com/eg-internal/querybook/compare/v0.102.0...v0.102.1) (2024-09-18)
 
 
