@@ -1,13 +1,7 @@
 name: Publish Docker
 on:
+    # Release Please will trigger this workflow when a new release is created
     workflow_dispatch:
-    release:
-        types:
-            - published
-    # push:
-    #     branches-ignore:
-    #         - main
-    #         - master
 
 env:
     IMAGE_NAME: egdp-querybook
@@ -21,7 +15,7 @@ jobs:
 
         steps:
             - name: Checkout ${{ github.event.release.tag_name }}
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
               with:
                   ref: ${{ github.event.release.tag_name }}
 
@@ -53,9 +47,10 @@ jobs:
                   flavor: |
                       latest=true
                   tags: |
+                      type=semver,pattern={{version}},value=${{ github.event.release.tag_name }}
                       type=semver,pattern={{version}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
-                      type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
-                      type=semver,pattern={{major}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'v0.') }}
+                      type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ !startsWith(github.event.release.tag_name, 'v0.') }}
+                      type=semver,pattern={{major}},value=${{ github.event.release.tag_name }},enable=${{ !startsWith(github.event.release.tag_name, 'v0.') }}
                       type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short,enable=${{ github.event_name == 'workflow_dispatch' }}
 
             - name: Docker build
