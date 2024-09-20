@@ -2,17 +2,13 @@ import * as React from 'react';
 
 import { ComponentType, ElementType } from 'const/analytics';
 import { trackClick } from 'lib/analytics';
-import localStore from 'lib/local-store';
-import { CHANGE_LOG_KEY, ChangeLogValue } from 'lib/local-store/const';
 import { navigateWithinEnv } from 'lib/utils/query-string';
-import { ChangeLogResource } from 'resource/utils/changelog';
 import { IconButton } from 'ui/Button/IconButton';
 import {
     Menu,
     MenuDivider,
     MenuInfoItem,
     MenuItem,
-    MenuItemPing,
 } from 'ui/Menu/Menu';
 import { Popover } from 'ui/Popover/Popover';
 
@@ -20,21 +16,7 @@ import { QuerybookVersion } from './QuerybookVersion';
 
 export const InfoMenuButton: React.FunctionComponent = () => {
     const [showPanel, setShowPanel] = React.useState(false);
-    const [notification, setNotification] = React.useState(false);
-
     const buttonRef = React.useRef<HTMLAnchorElement>();
-
-    React.useEffect(() => {
-        localStore
-            .get<ChangeLogValue>(CHANGE_LOG_KEY)
-            .then((lastViewedDate) => {
-                ChangeLogResource.getAll(lastViewedDate).then(({ data }) => {
-                    if (data) {
-                        setNotification(true);
-                    }
-                });
-            });
-    }, []);
 
     const getPanelDOM = () => {
         const panelContent = (
@@ -45,14 +27,10 @@ export const InfoMenuButton: React.FunctionComponent = () => {
                 <MenuDivider />
                 <MenuItem
                     onClick={() => {
-                        navigateWithinEnv('/changelog/', {
-                            isModal: true,
-                        });
-                        setNotification(false);
+                        window.open('https://confluence.expedia.biz/display/DSPKB/Querybook+Change+Logs', '_blank')
                     }}
                 >
                     Change Logs
-                    {notification ? <MenuItemPing /> : null}
                 </MenuItem>
                 <MenuItem
                     onClick={() =>
@@ -118,7 +96,6 @@ export const InfoMenuButton: React.FunctionComponent = () => {
                 icon={'HelpCircle'}
                 tooltip={'Logs, Tips, Shortcuts, & FAQs'}
                 tooltipPos="right"
-                ping={notification}
                 title="Help"
             />
             {showPanel ? getPanelDOM() : null}

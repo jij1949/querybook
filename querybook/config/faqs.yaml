@@ -83,15 +83,10 @@ faqs:
     - q: 'I found a bug! How do I report it?'
       a: |
           <p>
-              Please report bugs <i><a href="https://github.com/pinterest/querybook/issues">here</a></i>
+              Please report bugs <i><a href="https://jira.expedia.biz/servicedesk/customer/portal/483">here</a></i>
           </p>
     - q: 'How do I make a feature request?'
       a: |
           <p>
-              Please make feature requests <i><a href="https://github.com/pinterest/querybook/issues">here</a></i>
-          </p>
-    - q: 'Where can I see all the planned features for Querybook?'
-      a: |
-          <p>
-              You can view our roadmap and feature development process <i><a href="https://github.com/pinterest/querybook/projects">here</a></i>
+              Please make feature requests <i><a href="https://jira.expedia.biz/servicedesk/customer/portal/483">here</a></i>
           </p>
