@@ -11,7 +11,10 @@ from flask_caching import Cache
 
 from const.path import BUILD_PATH, STATIC_PATH, WEBAPP_DIR_PATH
 from env import QuerybookSettings
+from lib.logger import get_logger
 from lib.utils.json import JSONEncoder
+
+LOG = get_logger(__file__)
 
 
 def validate_db():
@@ -85,7 +88,7 @@ def make_celery(app):
 
     celery.conf.update(
         worker_prefetch_multiplier=1,
-        worker_max_tasks_per_child=1,
+        worker_max_tasks_per_child=QuerybookSettings.CELERY_MAX_TASKS_PER_CHILD,
         task_track_started=True,
         task_soft_time_limit=172800,
         worker_proc_alive_timeout=60,
@@ -97,6 +100,17 @@ def make_celery(app):
             # after visibility timeout
             "visibility_timeout": 180000  # 2 days + 2 hours
         },
+    )
+
+    LOG.info(
+        f"""Starting Celery with settings:
+    backend: {QuerybookSettings.REDIS_URL}
+    broker: {QuerybookSettings.REDIS_URL}
+    worker_prefetch_multiplier: {celery.conf.worker_prefetch_multiplier}
+    worker_max_tasks_per_child: {QuerybookSettings.CELERY_MAX_TASKS_PER_CHILD}
+    worker_proc_alive_timeout: {celery.conf.worker_proc_alive_timeout}
+    task_compression: {celery.conf.task_compression}
+"""
     )
 
     TaskBase = celery.Task

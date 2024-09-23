@@ -60,6 +60,9 @@ class QuerybookSettings(object):
 
     # Celery
     REDIS_URL = get_env_config("REDIS_URL", optional=False)
+    CELERY_MAX_TASKS_PER_CHILD = int(
+        get_env_config("CELERY_MAX_TASKS_PER_CHILD", optional=True) or 1
+    )
 
     # Search
     ELASTICSEARCH_HOST = get_env_config("ELASTICSEARCH_HOST", optional=False)
