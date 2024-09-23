@@ -33,10 +33,16 @@ export function useLoader({
                     setLoading(false);
                 } catch (errorObj) {
                     console.error(errorObj);
+                    setLoading(false);
                     setErrorObj(errorObj);
                     setHasError(true);
                 }
             })();
+        } else {
+            // Items is already loaded, so reset the error state in
+            // case it was previously errored
+            setHasError(false);
+            setErrorObj(null);
         }
 
         return () => {
