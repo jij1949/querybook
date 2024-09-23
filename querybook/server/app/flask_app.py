@@ -90,6 +90,7 @@ def make_celery(app):
         task_soft_time_limit=172800,
         worker_proc_alive_timeout=60,
         redis_socket_keepalive=True,
+        task_compression="gzip",
         broker_transport_options={
             # This must be higher than soft time limit,
             # otherwise the task will get retried (in the case of acks_late=True)
