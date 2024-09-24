@@ -89,6 +89,7 @@ def make_celery(app):
     celery.conf.update(
         worker_prefetch_multiplier=1,
         worker_max_tasks_per_child=QuerybookSettings.CELERY_MAX_TASKS_PER_CHILD,
+        worker_cancel_long_running_tasks_on_connection_loss=False,
         task_track_started=True,
         task_soft_time_limit=172800,
         worker_proc_alive_timeout=60,
@@ -104,6 +105,7 @@ def make_celery(app):
 
     LOG.info(
         f"""Starting Celery with settings:
+    worker_cancel_long_running_tasks_on_connection_loss: {celery.conf.worker_cancel_long_running_tasks_on_connection_loss}
     worker_prefetch_multiplier: {celery.conf.worker_prefetch_multiplier}
     worker_max_tasks_per_child: {QuerybookSettings.CELERY_MAX_TASKS_PER_CHILD}
     worker_proc_alive_timeout: {celery.conf.worker_proc_alive_timeout}
