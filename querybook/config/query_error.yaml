@@ -222,3 +222,10 @@ trino:
             Please filter on partition keys to optimize your query.
 
             For more information on using partitions: [Trino Filter required on table for at least one partition column](https://confluence.expedia.biz/x/RPe_pw)
+
+    already_executed:
+        regex: 'This is likely caused by a worker crash.'
+        message: |
+            This error can occur if a query is assigned to two workers at once.  The query may still be executing on the other worker, and if it succeeds, this error will be replaced with the actual query result.
+
+            Please check the Trino tracking URL below to see if the query is still running, before attempting to re-run the query.
