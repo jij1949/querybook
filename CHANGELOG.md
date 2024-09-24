@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.104.0](https://github.com/eg-internal/querybook/compare/v0.103.0...v0.104.0) (2024-09-24)
+
+
+### Features
+
+* Add an error suggestion for "already executed" error message ([0d1470f](https://github.com/eg-internal/querybook/commit/0d1470f3f177a4ca5107fc6813b47ace00921ce5))
+
+
+### Bug Fixes
+
+* Remove backend/broker logs since they contain credentials ([c4aa614](https://github.com/eg-internal/querybook/commit/c4aa61477f07bc5438db93530c294115ac4b0afe))
+
 ## [0.103.0](https://github.com/eg-internal/querybook/compare/v0.102.2...v0.103.0) (2024-09-24)
 
 
