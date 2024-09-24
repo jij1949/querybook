@@ -104,8 +104,6 @@ def make_celery(app):
 
     LOG.info(
         f"""Starting Celery with settings:
-    backend: {QuerybookSettings.REDIS_URL}
-    broker: {QuerybookSettings.REDIS_URL}
     worker_prefetch_multiplier: {celery.conf.worker_prefetch_multiplier}
     worker_max_tasks_per_child: {QuerybookSettings.CELERY_MAX_TASKS_PER_CHILD}
     worker_proc_alive_timeout: {celery.conf.worker_proc_alive_timeout}
