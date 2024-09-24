@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.103.0](https://github.com/eg-internal/querybook/compare/v0.102.2...v0.103.0) (2024-09-24)
+
+
+### Features
+
+* Add option for CELERY_MAX_TASKS_PER_CHILD ([e2de1c4](https://github.com/eg-internal/querybook/commit/e2de1c47390841476955f5f2bc71649845f3589d))
+* Enable Celery task compression (gzip) ([d5603e6](https://github.com/eg-internal/querybook/commit/d5603e639e10192b864a4b30491a6d746c439d5d))
+
+
+### Bug Fixes
+
+* redirect the Change Logs and FAQs in the Help section to internal pages ([#319](https://github.com/eg-internal/querybook/issues/319)) ([86df2df](https://github.com/eg-internal/querybook/commit/86df2df12791766d30b72ee7c1cefa231c717213))
+* useLoader shows previous error messages if data is already loaded ([3631313](https://github.com/eg-internal/querybook/commit/36313131e8445e580f5d3cc6b5c11a2922a04d7a))
+
 ## [0.102.2](https://github.com/eg-internal/querybook/compare/v0.102.1...v0.102.2) (2024-09-19)
 
 
