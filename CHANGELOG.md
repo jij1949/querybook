@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.104.1](https://github.com/eg-internal/querybook/compare/v0.104.0...v0.104.1) (2024-09-25)
+
+
+### Bug Fixes
+
+* Add additional error suggestions ([8aeb744](https://github.com/eg-internal/querybook/commit/8aeb744d12bc9fc04ea746022831b476b9978a80))
+* Fix `egdp_dwh_` prefix mapping ([d6a5c8c](https://github.com/eg-internal/querybook/commit/d6a5c8c37c4067937cf8df4500357f7a8a0066c2))
+
 ## [0.104.0](https://github.com/eg-internal/querybook/compare/v0.103.0...v0.104.0) (2024-09-24)
 
 
