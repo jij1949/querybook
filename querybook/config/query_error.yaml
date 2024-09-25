@@ -221,7 +221,7 @@ trino:
         message: |
             Please filter on partition keys to optimize your query.
 
-            For more information on using partitions: [Trino Filter required on table for at least one partition column](https://confluence.expedia.biz/x/RPe_pw)
+            For more information on using partitions: [Trino Filter required on table for at least one partition column](https://confluence.expedia.biz/x/RPe_pw).
 
     already_executed:
         regex: 'This is likely caused by a worker crash.'
@@ -229,3 +229,24 @@ trino:
             This error can occur if a query is assigned to two workers at once.  The query may still be executing on the other worker, and if it succeeds, this error will be replaced with the actual query result.
 
             Please check the Trino tracking URL below to see if the query is still running, before attempting to re-run the query.
+
+    exceeded_cpu_limit:
+        regex: 'Exceeded CPU limit of'
+        message: |
+            The query has exceeded the CPU limit set for the cluster.  This limit is in place to prevent runaway queries from consuming all cluster resources.
+
+            Please optimize the query to reduce the CPU usage. For more information on optimizing queries: [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
+
+    exceeded_time_limit:
+        regex: 'Query exceeded .*? time limit'
+        message: |
+            The query has exceeded a time limit set for the cluster.  This limit is in place to prevent runaway queries from consuming all cluster resources.
+
+            Please optimize the query to reduce the time taken. For more information on optimizing queries: [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
+
+    modifying_hive_table_rows:
+        regex: 'Modifying Hive table rows is only supported for transactional tables'
+        message: |
+            Only Iceberg or transactional Hive tables support modifying rows. All other tables require overwriting the entire table or partition to make changes.
+
+            For more information: [Modifying Hive table rows is only supported for transactional tables](https://confluence.expedia.biz/x/BWAH5Q).
