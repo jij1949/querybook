@@ -742,7 +742,7 @@ schema_prefixes_to_data_lakes = {
     "egdp_classic_": "egdp_classic",
     "egdp_analytics_": "egdp_analytics",
     "egdp_dev_": "egdp_dev",
-    "egdp_dwh_": "egdp_dwh",
+    "egdp_dwh_": "egdp_prod",  # Special case, duplicated prefix
     "egdp_prod_": "egdp_prod",
     "egdp_stage_": "egdp_stage",
     "egdp_test_": "egdp_test",
