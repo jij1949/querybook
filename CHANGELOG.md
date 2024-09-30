@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.104.2](https://github.com/eg-internal/querybook/compare/v0.104.1...v0.104.2) (2024-09-30)
+
+
+### Bug Fixes
+
+* Allow restricting query_execution search to recent IDs only ([109a71f](https://github.com/eg-internal/querybook/commit/109a71f75919370e2fe7a2ea3153de83440aa3fd))
+
 ## [0.104.1](https://github.com/eg-internal/querybook/compare/v0.104.0...v0.104.1) (2024-09-25)
 
 
