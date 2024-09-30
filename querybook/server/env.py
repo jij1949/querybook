@@ -177,6 +177,11 @@ class QuerybookSettings(object):
     # Ranger
     RANGER_URL = get_env_config("RANGER_URL")
 
+    # EG Specific
+    QUERY_EXECUTION_SEARCH_MIN_ID = int(
+        get_env_config("QUERY_EXECUTION_SEARCH_MIN_ID", optional=True) or 0
+    )
+
     # Datadog
     DD_AGENT_HOST = get_env_config("DD_AGENT_HOST", optional=True)
     DD_DOGSTATSD_PORT = int(get_env_config("DD_DOGSTATSD_PORT", optional=True) or 8125)

@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from env import QuerybookSettings
+
 from sqlalchemy.orm import joinedload
 from app.db import with_session
 from app.flask_app import celery
@@ -88,6 +90,10 @@ def search_query_execution(
 ):
     query = (
         session.query(QueryExecution)
+        # Due to missing indices, this query is slowing down as the table grows
+        # This filter is a temporary fix; it limits the search to more recent executions
+        # The value can be changed in Vault periodically to keep up with the table growth
+        .filter(QueryExecution.id >= QuerybookSettings.QUERY_EXECUTION_SEARCH_MIN_ID)
         .join(QueryEngine)
         .join(QueryEngineEnvironment)
         .filter(QueryEngineEnvironment.environment_id == environment_id)
@@ -115,7 +121,7 @@ def search_query_execution(
                 )
 
     if orderBy == "created_at":
-        query = query.order_by(QueryExecution.created_at.desc())
+        query = query.order_by(QueryExecution.id.desc())
     query = query.offset(offset).limit(limit)
 
     return query.all()
