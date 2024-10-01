@@ -133,14 +133,18 @@ export function enableResizable(
     };
 }
 
-export function getCodeEditorTheme(theme: string) {
+export function getCodeEditorTheme(globalTheme: string, editorTheme?: string) {
+    const theme =
+        editorTheme === 'auto' ? globalTheme : editorTheme ?? globalTheme;
     switch (theme) {
         case 'dark':
             return 'monokai';
         case 'lush':
             return 'solarized dark';
-        default:
+        case '':
             return 'default';
+        default:
+            return theme;
     }
 }
 

@@ -22,9 +22,15 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/sql/sql';
 import 'codemirror/mode/jinja2/jinja2';
 
+import 'codemirror/theme/base16-light.css';
+import 'codemirror/theme/bespin.css';
+import 'codemirror/theme/darcula.css';
 import 'codemirror/theme/duotone-light.css';
+import 'codemirror/theme/elegant.css';
 import 'codemirror/theme/material-palenight.css';
 import 'codemirror/theme/monokai.css';
+import 'codemirror/theme/nord.css';
+import 'codemirror/theme/paraiso-light.css';
 import 'codemirror/theme/solarized.css';
 // This should apply the hover option to codemirror
 import 'lib/codemirror/codemirror-hover';

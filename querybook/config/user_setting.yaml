@@ -70,6 +70,32 @@ rows_in_query_results:
         - 100 rows
     helper: Number of rows displayed by default for query results
 
+editor_theme:
+    default: auto
+    tab: editor
+    options:
+        - auto
+        - base16-light
+        - bespin
+        - darcula
+        - default
+        - duotone-light
+        - elegant
+        - material-palenight
+        - monokai
+        - nord
+        - paraiso-light
+        - solarized dark
+    helper: Color themes for Querybook editor.
+
+editor_theme_quick_toggle:
+    default: disabled
+    tab: editor
+    options:
+        - enabled
+        - disabled
+    helper: Enable the quick toggle for editor theme.
+
 editor_font_size:
     default: medium
     tab: editor

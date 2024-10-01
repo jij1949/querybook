@@ -52,6 +52,15 @@ test('enableResizable', () => {
 test('getCodeEditorTheme', () => {
     expect(utils.getCodeEditorTheme('dark')).toStrictEqual('monokai');
     expect(utils.getCodeEditorTheme('')).toStrictEqual('default');
+
+    expect(utils.getCodeEditorTheme('dark', 'auto')).toStrictEqual('monokai');
+    expect(utils.getCodeEditorTheme('dark', 'elegant')).toStrictEqual('elegant');
+
+    expect(utils.getCodeEditorTheme('lush', 'auto')).toStrictEqual('solarized dark');
+    expect(utils.getCodeEditorTheme('lush', 'monokai')).toStrictEqual('monokai');
+
+    expect(utils.getCodeEditorTheme('', 'auto')).toStrictEqual('default');
+    expect(utils.getCodeEditorTheme('', 'bespin')).toStrictEqual('bespin');
 });
 
 test('getQueryEngineId', () => {

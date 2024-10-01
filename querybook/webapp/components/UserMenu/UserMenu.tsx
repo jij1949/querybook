@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { TokenCreation } from 'components/Token/TokenCreation';
 import { UserBadge } from 'components/UserBadge/UserBadge';
+import userSettingConfig from 'config/user_setting.yaml';
 import { ComponentType, ElementType } from 'const/analytics';
 import { TooltipDirection } from 'const/tooltip';
 import { trackClick } from 'lib/analytics';
@@ -15,6 +16,7 @@ import { Link } from 'ui/Link/Link';
 import { Menu, MenuDivider, MenuInfoItem, MenuItem } from 'ui/Menu/Menu';
 import { Modal } from 'ui/Modal/Modal';
 import { Popover, PopoverLayout } from 'ui/Popover/Popover';
+import { Select } from 'ui/Select/Select';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
 
 import './UserMenu.scss';
@@ -65,7 +67,40 @@ export const UserMenu: React.FC<IUserMenuProps> = ({
         []
     );
 
+    const editorTheme = useSelector(
+        (state: IStoreState) => state.user.computedSettings['editor_theme']
+    );
+    const setEditorTheme = useCallback(
+        (newTheme: string) =>
+            dispatch(UserActions.setUserSettings('editor_theme', newTheme)),
+        []
+    );
+
+    const editorThemeQuickToggle = useSelector(
+        (state: IStoreState) =>
+            state.user.computedSettings['editor_theme_quick_toggle']
+    );
+
     const getUserDropdownDOM = () => {
+        const showEditorThemeToggle = editorThemeQuickToggle !== 'disabled';
+        const editorThemeToggle = showEditorThemeToggle ? (
+            <MenuInfoItem className="horizontal-space-between">
+                <span className="mr12">Editor Theme</span>
+                <Select
+                    value={editorTheme}
+                    onChange={(val) => setEditorTheme(val.target.value)}
+                >
+                    {userSettingConfig['editor_theme'].options.map(
+                        (option: any) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        )
+                    )}
+                </Select>
+            </MenuInfoItem>
+        ) : null;
+
         const showThemeToggle = theme === 'dark' || theme === 'default';
         const themeToggle = showThemeToggle ? (
             <MenuInfoItem className="horizontal-space-between">
@@ -83,6 +118,7 @@ export const UserMenu: React.FC<IUserMenuProps> = ({
                 </MenuInfoItem>
                 <MenuDivider />
                 {themeToggle}
+                {editorThemeToggle}
                 <MenuItem onClick={goToUserSettingsMenu}>Settings</MenuItem>
                 <MenuDivider />
                 {/* <MenuItem onClick={toggleShowTokenModal}>

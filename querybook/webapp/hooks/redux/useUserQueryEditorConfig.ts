@@ -19,7 +19,10 @@ export function useUserQueryEditorConfig(
     autoCompleteType: AutoCompleteType;
 } {
     const editorSettings = useShallowSelector((state: IStoreState) => ({
-        theme: getCodeEditorTheme(state.user.computedSettings['theme']),
+        theme: getCodeEditorTheme(
+            state.user.computedSettings['theme'],
+            state.user.computedSettings['editor_theme']
+        ),
         fontSize:
             UserSettingsFontSizeToCSSFontSize[
                 state.user.computedSettings['editor_font_size']
