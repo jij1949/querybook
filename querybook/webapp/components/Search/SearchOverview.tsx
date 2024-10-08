@@ -38,6 +38,7 @@ import { RESULT_PER_PAGE, SearchOrder, SearchType } from 'redux/search/types';
 import { IStoreState } from 'redux/store/types';
 import { DataElementResource, TableTagResource } from 'resource/table';
 import { Button } from 'ui/Button/Button';
+import { InfoButton } from 'ui/Button/InfoButton';
 import { Checkbox } from 'ui/Checkbox/Checkbox';
 import { Container } from 'ui/Container/Container';
 import { Dropdown } from 'ui/Dropdown/Dropdown';
@@ -67,7 +68,6 @@ import { SearchSchemaSelect } from './SearchSchemaSelect';
 import { TableSelect } from './TableSelect';
 
 import './SearchOverview.scss';
-import { InfoButton } from 'ui/Button/InfoButton';
 
 const AIAssistantConfig = PublicConfig.ai_assistant;
 
@@ -768,16 +768,16 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                     </div>
                 )}
                 <div className="search-filter">
-                    <span className="filter-title">Top Tier</span>
+                    <span className="filter-title">Trending</span>
                     <div className="result-item-golden horizontal-space-between">
                         <span>
-                            <span>top tier only</span>
+                            <span>trending only</span>
                             <span
                                 className="flex-row"
                                 aria-label="Based on Trino usage via PUMA"
                                 data-balloon-pos="down"
                             >
-                                <Icon className="crown ml4" name="Crown" />
+                                <Icon className="flame ml4" name="Flame" />
                             </span>
                         </span>
                         <Checkbox

@@ -16,6 +16,7 @@ import { IStoreState } from 'redux/store/types';
 import { DataElementResource, TableTagResource } from 'resource/table';
 import { SoftButton } from 'ui/Button/Button';
 import { IconButton } from 'ui/Button/IconButton';
+import { Icon } from 'ui/Icon/Icon';
 import { OrderByButton } from 'ui/OrderByButton/OrderByButton';
 import { Popover } from 'ui/Popover/Popover';
 import { SearchBar } from 'ui/SearchBar/SearchBar';
@@ -23,7 +24,6 @@ import { Title } from 'ui/Title/Title';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
 
 import './DataTableNavigatorSearch.scss';
-import { Icon } from 'ui/Icon/Icon';
 
 export const DataTableNavigatorSearch: React.FC<{
     queryMetastore: IQueryMetastore;
@@ -96,7 +96,7 @@ export const DataTableNavigatorSearch: React.FC<{
                 />
                 <div>
                     <SearchFilterRow
-                        title="Top Tier"
+                        title="Trending"
                         className="toggle-padding"
                     >
                         <div className="flex-row">
@@ -114,7 +114,7 @@ export const DataTableNavigatorSearch: React.FC<{
                                 aria-label="Based on Trino usage via PUMA"
                                 data-balloon-pos="right"
                             >
-                                <Icon className="crown ml4" name="Crown" />
+                                <Icon className="flame ml4" name="Flame" />
                             </span>
                         </div>
                     </SearchFilterRow>

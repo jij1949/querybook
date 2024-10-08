@@ -3,19 +3,19 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { DataTableTags } from 'components/DataTableTags/DataTableTags';
+import { PartitionList } from 'components/PartitionList/PartitionList';
 import { useDataTable } from 'hooks/redux/useDataTable';
 import { ComplexType, parseType } from 'lib/utils/complex-types';
 import { generateFormattedDate } from 'lib/utils/datetime';
 import { stopPropagationAndDefault } from 'lib/utils/noop';
 import { getHumanReadableByteSize } from 'lib/utils/number';
 import { IconButton } from 'ui/Button/IconButton';
+import { Icon } from 'ui/Icon/Icon';
 import { AllLucideIconNames } from 'ui/Icon/LucideIcons';
 import { Loader } from 'ui/Loader/Loader';
 
 import { ColumnIcon } from './ColumnIcon';
 import { PanelSection, SubPanelSection } from './PanelSection';
-import { Icon } from 'ui/Icon/Icon';
-import { PartitionList } from 'components/PartitionList/PartitionList';
 
 interface ITablePanelViewProps {
     tableId: number;
@@ -49,7 +49,7 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
                                 aria-label="Based on Trino usage via PUMA"
                                 data-balloon-pos="down"
                             >
-                                <Icon className="crown ml4" name="Crown" />
+                                <Icon className="flame ml4" name="Flame" />
                             </span>
                         )}
                     </span>

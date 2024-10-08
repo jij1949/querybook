@@ -320,7 +320,7 @@ const TableRow: React.FC<{
             onClick={handleLinkClick}
             isRow
             title={table.displayName}
-            icons={table.golden === true ? ['Crown'] : []}
+            icons={table.golden === true ? ['Flame'] : []}
         />
     );
 

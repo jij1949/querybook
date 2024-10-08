@@ -24,12 +24,12 @@ import {
 import { Dispatch, IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
 import { CommentButton } from 'ui/Comment/CommentButton';
+import { Icon } from 'ui/Icon/Icon';
 import { AccentText } from 'ui/StyledText/StyledText';
 import { Tag } from 'ui/Tag/Tag';
 import { ToggleButton } from 'ui/ToggleButton/ToggleButton';
 
 import './DataTableHeader.scss';
-import { Icon } from 'ui/Icon/Icon';
 
 export interface IDataTableHeader {
     table: IDataTable;
@@ -88,15 +88,15 @@ export const DataTableHeader: React.FunctionComponent<IDataTableHeader> = ({
             <ToggleButton
                 checked={table.golden}
                 onClick={updateDataTableGolden}
-                title={table.golden ? 'Top Tier' : 'Make Top Tier'}
+                title={table.golden ? 'Trending' : 'Make Trending'}
                 size="small"
-                icon="Crown"
+                icon="Flame"
             />
         );
     } else if (table.golden) {
         featuredBadge = (
             <Tag>
-                Top Tier <Icon className="crown ml4" name="Crown" />
+                Trending <Icon className="flame ml4" name="Flame" />
             </Tag>
         );
     }

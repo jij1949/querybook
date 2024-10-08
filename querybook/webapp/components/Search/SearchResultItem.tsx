@@ -381,7 +381,7 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
 
     const goldenIcon = golden ? (
         <div className="result-item-golden ml4">
-            <Icon className="crown" name="Crown" />
+            <Icon className="flame" name="Flame" />
         </div>
     ) : null;
 
