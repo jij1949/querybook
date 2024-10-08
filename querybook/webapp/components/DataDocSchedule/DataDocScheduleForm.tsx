@@ -487,17 +487,15 @@ const ScheduleRetryForm: React.FC = () => {
 
     const retryValue = values.kwargs.retry ?? { enabled: false };
 
-    const retryCountOptions = [1, 2, 3, 4, 5].map((retryValue) => ({
+    const retryCountOptions = [1, 2].map((retryValue) => ({
         label: <span>{retryValue}</span>,
         value: retryValue,
     }));
 
-    const delayCountOptions = [0, 60, 120, 300, 600, 900, 1800, 3600].map(
-        (delayValue) => ({
-            label: <span>{delayValue / 60}</span>,
-            value: delayValue,
-        })
-    );
+    const delayCountOptions = [300, 600, 900, 1800, 3600].map((delayValue) => ({
+        label: <span>{delayValue / 60}</span>,
+        value: delayValue,
+    }));
 
     return (
         <>
