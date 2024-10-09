@@ -28,12 +28,20 @@ from const.metastore import (
     MetadataMode,
 )
 
-from logic.metastore import get_table_by_schema_id_and_name
+from hmsclient.genthrift.hive_metastore.ttypes import NoSuchObjectException
+
+from logic.admin import get_query_metastore_by_id
+from logic.elasticsearch import delete_es_table_by_id
+from logic.metastore import (
+    delete_schema,
+    delete_table,
+    get_table_by_schema_id,
+    get_table_by_schema_id_and_name,
+    iterate_data_schema,
+)
 from metastore_plugin.eg_hive_metastore.data_elements import (
     find_data_element,
 )
-
-from logic.admin import get_query_metastore_by_id
 
 from const.data_element import (
     DataElementAssociationTuple,
@@ -205,6 +213,78 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             return True
         return False
 
+    # Custom implementation to double-check before deleting schemas
+    @with_session
+    def delete_schema_not_in_metastore(self, metastore_id, schema_names, session=None):
+        checked_count = 0
+        deleted_count = 0
+
+        for data_schema in iterate_data_schema(metastore_id, session=session):
+            checked_count += 1
+            LOG.info(f"Checking schema {data_schema.id}, {data_schema.name}...")
+            if data_schema.name not in schema_names:
+                # Note: this bypasses the ACL check, but we're not currently using ACLs
+                LOG.info(
+                    f"Double-checking if schema should be deleted: {data_schema.id}, {data_schema.name}"
+                )
+                schema = self.get_schema(data_schema.name)
+                if schema is not None:
+                    LOG.warning(
+                        f"Schema was found in metastore, skipping deletion: {data_schema.id}, {data_schema.name}"
+                    )
+                    continue
+
+                LOG.info(f"Deleting schema {data_schema.id}, {data_schema.name}...")
+                # We delete table 1 by 1 since we need to delete it for elasticsearch
+                # Maybe we can optimize it to allow batch deletion
+                for table in data_schema.tables:
+                    table_id = table.id
+                    delete_table(table_id=table_id, commit=False, session=session)
+                    delete_es_table_by_id(table_id)
+                delete_schema(id=data_schema.id, commit=False, session=session)
+                LOG.info(f"Deleted schema {data_schema.id}, {data_schema.name}")
+                deleted_count += 1
+        session.commit()
+
+        LOG.info(
+            f"Checked {checked_count} schemas for metastore {metastore_id}, deleted {deleted_count} schemas"
+        )
+
+    # Custom implementation to double-check before deleting tables
+    @with_session
+    def delete_table_not_in_metastore(self, schema_id, table_names, session=None):
+        checked_count = 0
+        deleted_count = 0
+
+        db_tables = get_table_by_schema_id(schema_id, session=session)
+
+        with session.no_autoflush:
+            for data_table in db_tables:
+                checked_count += 1
+                if data_table.name not in table_names:
+                    # Note: this bypasses the ACL check, but we're not currently using ACLs
+                    LOG.info(
+                        f"Double-checking if table should be deleted: {data_table.id}, {data_table.data_schema.name}.{data_table.name}"
+                    )
+                    table = self.get_table(data_table.data_schema.name, data_table.name)
+                    if table is not None:
+                        LOG.warning(
+                            f"Table was found in metastore, skipping deletion: {data_table.id}, {data_table.name} "
+                        )
+                        continue
+
+                    LOG.info(f"Deleting table {data_table.id}, {data_table.name}...")
+                    table_id = data_table.id
+                    delete_table(table_id=table_id, commit=False, session=session)
+                    delete_es_table_by_id(table_id)
+                    LOG.info(f"Deleted table {table_id}, {data_table.name}")
+                    deleted_count += 1
+            session.commit()
+
+            LOG.info(
+                f"Checked {checked_count} tables for schema {schema_id}, deleted {deleted_count} tables"
+            )
+
     @with_session
     def _create_table_table(
         self,
@@ -245,19 +325,29 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             session=session,
         )
 
-    # Can override this to test a limited set of tables
-    # def get_all_schema_names(self) -> List[str]:
-    #     # dbs = self.hmc.get_all_databases()
-    #     # LOG.info("dbs: %s", dbs)
+    def get_all_schema_names(self) -> List[str]:
+        schemas = self.hmc.get_all_databases()
+        LOG.info(f"Found {len(schemas)} schemas in metastore {self.metastore_id}")
 
-    #     return [
-    #         "conversation",
-    #         "egdp_test_conversation",
-    #         "project_meso_raw",
-    #         "supply",
-    #         "egdp_prod_content",
-    #         "bexg_etl_test_meso",
-    #     ]
+        return schemas
+
+    def get_schema(self, schema_name: str):
+        """
+        Get the schema object from the metastore.
+        """
+        try:
+            return self.hmc.get_database(schema_name)
+        except NoSuchObjectException:
+            return None
+
+    def get_table(self, schema_name: str, table_name: str):
+        """
+        Get the table object from the metastore.
+        """
+        try:
+            return self.hmc.get_table(schema_name, table_name)
+        except NoSuchObjectException:
+            return None
 
     def get_table_and_columns(
         self, schema_name, table_name

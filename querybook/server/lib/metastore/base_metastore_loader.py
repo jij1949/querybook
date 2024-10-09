@@ -284,11 +284,11 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
 
         with DBSession() as session:
             current_schema_count = count_data_schema(self.metastore_id, session=session)
-            LOG.debug(
-                f"Found {len(schema_names)} schemas in metastore {self.metastore_id}, current schema count: {current_schema_count}"
+            LOG.info(
+                f"Found {len(schema_names)} schemas in metastore {self.metastore_id}, local schema count: {current_schema_count}"
             )
 
-            delete_schema_not_in_metastore(
+            self.delete_schema_not_in_metastore(
                 self.metastore_id, schema_names, session=session
             )
             for schema_name in schema_names:
@@ -299,7 +299,9 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
                     metastore_id=self.metastore_id,
                     session=session,
                 ).id
-                delete_table_not_in_metastore(schema_id, table_names, session=session)
+                self.delete_table_not_in_metastore(
+                    schema_id, table_names, session=session
+                )
                 schema_tables += [
                     (schema_id, schema_name, table_name) for table_name in table_names
                 ]
@@ -607,35 +609,33 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             "template": cls.get_metastore_params_template().to_dict(),
         }
 
-
-@with_session
-def delete_schema_not_in_metastore(metastore_id, schema_names, session=None):
-    for data_schema in iterate_data_schema(metastore_id, session=session):
-        LOG.info("checking schema %d" % data_schema.id)
-        if data_schema.name not in schema_names:
-            # We delete table 1 by 1 since we need to delete it for elasticsearch
-            # Maybe we can optimize it to allow batch deletion
-            for table in data_schema.tables:
-                table_id = table.id
-                delete_table(table_id=table_id, commit=False, session=session)
-                delete_es_table_by_id(table_id)
-            delete_schema(id=data_schema.id, commit=False, session=session)
-            LOG.info("deleted schema %d" % data_schema.id)
-    session.commit()
-
-
-@with_session
-def delete_table_not_in_metastore(schema_id, table_names, session=None):
-    db_tables = get_table_by_schema_id(schema_id, session=session)
-
-    with session.no_autoflush:
-        for data_table in db_tables:
-            if data_table.name not in table_names:
-                table_id = data_table.id
-                delete_table(table_id=table_id, commit=False, session=session)
-                delete_es_table_by_id(table_id)
-                LOG.info(f"deleted table {table_id}")
+    @with_session
+    def delete_schema_not_in_metastore(self, metastore_id, schema_names, session=None):
+        for data_schema in iterate_data_schema(metastore_id, session=session):
+            LOG.info("checking schema %d" % data_schema.id)
+            if data_schema.name not in schema_names:
+                # We delete table 1 by 1 since we need to delete it for elasticsearch
+                # Maybe we can optimize it to allow batch deletion
+                for table in data_schema.tables:
+                    table_id = table.id
+                    delete_table(table_id=table_id, commit=False, session=session)
+                    delete_es_table_by_id(table_id)
+                delete_schema(id=data_schema.id, commit=False, session=session)
+                LOG.info("deleted schema %d" % data_schema.id)
         session.commit()
+
+    @with_session
+    def delete_table_not_in_metastore(self, schema_id, table_names, session=None):
+        db_tables = get_table_by_schema_id(schema_id, session=session)
+
+        with session.no_autoflush:
+            for data_table in db_tables:
+                if data_table.name not in table_names:
+                    table_id = data_table.id
+                    delete_table(table_id=table_id, commit=False, session=session)
+                    delete_es_table_by_id(table_id)
+                    LOG.info(f"deleted table {table_id}")
+            session.commit()
 
 
 @with_session

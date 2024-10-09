@@ -705,9 +705,8 @@ def iterate_data_table(session=None):
 
 @with_session
 def iterate_data_schema(metastore_id, session=None):
-    yield from session.query(DataSchema).filter_by(metastore_id=metastore_id).yield_per(
-        100
-    )
+    schemas = session.query(DataSchema).filter_by(metastore_id=metastore_id).all()
+    yield from schemas
 
 
 @with_session
