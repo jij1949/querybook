@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.105.0](https://github.com/eg-internal/querybook/compare/v0.104.2...v0.105.0) (2024-10-09)
+
+
+### Features
+
+* Add query editor themes in User Settings ([#329](https://github.com/eg-internal/querybook/issues/329)) ([b3990a6](https://github.com/eg-internal/querybook/commit/b3990a6cffe84da77e96dcd3f1a5a3c5677fa8af))
+* Improve metastore sync reliability ([05d4a1f](https://github.com/eg-internal/querybook/commit/05d4a1f31ad97dd48520fb779789444568205fe6))
+* modify retry options for scheduled datadocs ([12ebcfb](https://github.com/eg-internal/querybook/commit/12ebcfb8b461514dbc6221a5607e9e62d64ec2cb))
+* rename the current Top Tier feature to Trending and change icon to a flame ([#333](https://github.com/eg-internal/querybook/issues/333)) ([b8cd958](https://github.com/eg-internal/querybook/commit/b8cd958dc1efadc9cf405143dfbca3fdc7afe6c0))
+
 ## [0.104.2](https://github.com/eg-internal/querybook/compare/v0.104.1...v0.104.2) (2024-09-30)
 
 
