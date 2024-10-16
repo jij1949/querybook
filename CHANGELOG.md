@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.106.0](https://github.com/eg-internal/querybook/compare/v0.105.0...v0.106.0) (2024-10-16)
+
+
+### Features
+
+* Stats logging of the number of queries with INITIALIZED status ([6162c40](https://github.com/eg-internal/querybook/commit/6162c40e2e03c1277e0b617daf976f576bab6c6d))
+
+
+### Bug Fixes
+
+* Catch exceptions during celery stats logger ([79a9358](https://github.com/eg-internal/querybook/commit/79a935839bd6bc70c406a1c1f5f071eb2cd61120))
+
 ## [0.105.0](https://github.com/eg-internal/querybook/compare/v0.104.2...v0.105.0) (2024-10-09)
 
 
