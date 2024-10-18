@@ -11,7 +11,6 @@ TASK_SUCCESSES = "task.successes"
 TASK_RECEIVED = "task.received"
 REDIS_OPERATIONS = "redis.operations"
 QUERY_EXECUTIONS = "query.executions"
-QUERY_INITIALIZED = "query.initialized"
 ACTIVE_WORKERS = "celery.active_workers"
 ACTIVE_TASKS = "celery.active_tasks"
 

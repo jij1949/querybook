@@ -1,15 +1,12 @@
-import time
 import threading
+import time
+
 from app.db import DBSession
 from const.query_execution import QueryExecutionStatus
 from lib.logger import get_logger
-from lib.stats_logger import (
-    stats_logger,
-    ACTIVE_WORKERS,
-    ACTIVE_TASKS,
-    QUERY_INITIALIZED,
-)
+from lib.stats_logger import ACTIVE_TASKS, ACTIVE_WORKERS, stats_logger
 from models.query_execution import QueryExecution
+from sqlalchemy.sql import func
 
 LOG = get_logger(__file__)
 
@@ -33,15 +30,18 @@ def send_stats_logger_metrics(celery):
 
             # Querybook stats #
             with DBSession() as session:
-                # Count the number of queries that are in the initialized state
-                # AKA "Send to Worker"
-                # This indicates a bottleneck on the Querybook worker side
-                initialized_queries = (
-                    session.query(QueryExecution)
-                    .filter(QueryExecution.status == QueryExecutionStatus.INITIALIZED)
-                    .count()
+                # Count the number of queries that are in each state
+                query_status_count = (
+                    session.query(QueryExecution.status, func.count())
+                    .group_by(QueryExecution.status)
+                    .all()
                 )
-                stats_logger.gauge(QUERY_INITIALIZED, initialized_queries)
+
+                for status, count in query_status_count:
+                    stats_logger.gauge(
+                        f"query_executions.status.{QueryExecutionStatus(status).name.lower()}",
+                        count,
+                    )
 
         except Exception:
             LOG.exception("Error collecting celery stats")
