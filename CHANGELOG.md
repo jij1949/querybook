@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.107.0](https://github.com/eg-internal/querybook/compare/v0.106.0...v0.107.0) (2024-10-22)
+
+
+### Features
+
+* Abort scheduled retries for timed out queries ([#340](https://github.com/eg-internal/querybook/issues/340)) ([dedecbc](https://github.com/eg-internal/querybook/commit/dedecbc65e54223f3cc9e9d7ce74f0693916471e))
+* Explicitly set `worker_cancel_long_running_tasks_on_connection_loss` to False ([3418da5](https://github.com/eg-internal/querybook/commit/3418da5e4fd8c8105a149baf314edce849308d5b))
+* Stats logging of all QueryExecution status counts ([3d8acdc](https://github.com/eg-internal/querybook/commit/3d8acdc4f1620f2a9cf797933c5de44d3279d09d))
+
+
+### Bug Fixes
+
+* Upgrade celery to 5.5.0rc1 ([18d9685](https://github.com/eg-internal/querybook/commit/18d9685cfcd1c6ce449bb98bcb87bc3f770b9baa))
+
 ## [0.106.0](https://github.com/eg-internal/querybook/compare/v0.105.0...v0.106.0) (2024-10-16)
 
 
