@@ -24,10 +24,46 @@ from logic.schedule import (
     update_task_run_record,
 )
 from tasks.run_query import run_query_task
+import re
 
 LOG = get_logger(__file__)
 GENERIC_QUERY_FAILURE_MSG = "Execution did not finish successfully, workflow failed"
 
+# List of regex patterns for error messages that shouldn't retry
+NON_RETRYABLE_ERRORS = [
+    r"Access Denied: Cannot",
+    r"Array subscript must be less than or equal to array length",
+    r"Cannot apply operator: ",
+    r"Cannot cast .* to .*",
+    r"Cannot unnest type:",
+    r"Could not parse rfc1738",
+    r"Decimal overflow",
+    r"Division by zero",
+    r"Exceeded CPU limit of",
+    r"Filter required on .* for at least one partition column: .*",
+    r"Invalid format: \"\"",
+    r"Invalid partition value ",
+    r"Invalid position .* and length .* in page with .* positions",
+    r"Key not present in map:",
+    r"Modifying Hive table rows is only supported for transactional tables",
+    r'\{"line": .*, "char": .*, "message": .*\}',
+    r"Partition no longer exists",
+    r"Query exceeded maximum time limit of",
+    r"Query exceeded the maximum execution time limit of",
+    r"Query exceeded the maximum planning time limit of",
+    r"Query killed\. Message: Killed via web UI",
+    r"Query killed\. No message provided\.",
+    r"Remote page is too large",
+    r"ROW comparison not supported",
+    r"Row type must have at least 1 field",
+    r"Size of pages index cannot exceed",
+    r"SQL array indices start at 1",
+    r"Unable to cast",
+    r"Unknown type",
+    r"Unsupported Hive type:",
+    r"Unsupported Trino column type",
+    r"Value cannot be cast to",
+]
 
 @celery.task(bind=True)
 def run_datadoc(self, *args, **kwargs):
@@ -201,6 +237,7 @@ def _run_datadoc_cell(
         retry["enabled"] is True
         and retry["max_retries"] != 0
         and query_run_status == QueryExecutionStatus.ERROR.value
+        and not should_not_retry(get_datadoc_error_message(query_execution.id))
     ):
 
         self.retry(
@@ -237,6 +274,8 @@ def get_datadoc_error_message(query_execution_id, session=None):
     )[:description_length]
     return error_msg
 
+def should_not_retry(error_message):
+    return any(re.search(pattern, error_message) for pattern in NON_RETRYABLE_ERRORS)
 
 @celery.task
 def on_datadoc_run_success(
