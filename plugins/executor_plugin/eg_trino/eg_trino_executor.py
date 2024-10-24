@@ -10,7 +10,6 @@ from logic.metastore import get_table_information_by_table_id, get_table_by_name
 from app.db import DBSession
 import re
 
-
 def get_trino_error_dict(e):
     if hasattr(e, "args") and e.args[0] is not None:
         error_arg = e.args[0]
@@ -41,7 +40,8 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
         self._json_csv_warning_checked = False
         self._client_setting = client_setting | \
                                {'execution_type': 'execution_type:' + execution_type,
-                                'query_execution_id': query_execution_id}
+                                'query_execution_id': query_execution_id,
+                                'retries': 'retries:' + str(celery_task.request.retries)}
 
         self._get_datadoc_info(query_execution_id)
 

@@ -24,7 +24,8 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
         self._json_csv_warning_checked = False
         self._client_setting = client_setting | \
                                {'execution_type': 'execution_type:' + execution_type,
-                                'query_execution_id': query_execution_id}
+                                'query_execution_id': query_execution_id,
+                                'retries': 'retries:' + str(celery_task.request.retries)}
 
         self._get_datadoc_info(query_execution_id)
 

@@ -65,6 +65,7 @@ NON_RETRYABLE_ERRORS = [
     r"Value cannot be cast to",
 ]
 
+
 @celery.task(bind=True)
 def run_datadoc(self, *args, **kwargs):
     """
@@ -274,8 +275,10 @@ def get_datadoc_error_message(query_execution_id, session=None):
     )[:description_length]
     return error_msg
 
+
 def should_not_retry(error_message):
     return any(re.search(pattern, error_message) for pattern in NON_RETRYABLE_ERRORS)
+
 
 @celery.task
 def on_datadoc_run_success(
