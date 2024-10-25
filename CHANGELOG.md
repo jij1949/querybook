@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.108.0](https://github.com/eg-internal/querybook/compare/v0.107.0...v0.108.0) (2024-10-25)
+
+
+### Features
+
+* include query retry count in Trino client tags ([28f4531](https://github.com/eg-internal/querybook/commit/28f4531a482ad4821b6cd5e2283f33cfc427d5d0))
+
+
+### Bug Fixes
+
+* Revert "fix: Upgrade celery to 5.5.0rc1" ([0f07d9c](https://github.com/eg-internal/querybook/commit/0f07d9c4fbc91d8f650dd5cad0ca60378872e050))
+
 ## [0.107.0](https://github.com/eg-internal/querybook/compare/v0.106.0...v0.107.0) (2024-10-22)
 
 
