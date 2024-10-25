@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.108.1](https://github.com/eg-internal/querybook/compare/v0.108.0...v0.108.1) (2024-10-25)
+
+
+### Bug Fixes
+
+* Restrict non-retry-able errors for initial release ([96864cc](https://github.com/eg-internal/querybook/commit/96864ccd322bd6fe1a9d216ae4b6a29137ea14d9))
+
 ## [0.108.0](https://github.com/eg-internal/querybook/compare/v0.107.0...v0.108.0) (2024-10-25)
 
 
