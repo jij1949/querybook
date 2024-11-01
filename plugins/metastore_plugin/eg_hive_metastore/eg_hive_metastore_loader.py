@@ -222,28 +222,35 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         for data_schema in iterate_data_schema(metastore_id, session=session):
             checked_count += 1
             LOG.info(f"Checking schema {data_schema.id}, {data_schema.name}...")
-            if data_schema.name not in schema_names:
-                # Note: this bypasses the ACL check, but we're not currently using ACLs
-                LOG.info(
-                    f"Double-checking if schema should be deleted: {data_schema.id}, {data_schema.name}"
-                )
-                schema = self.get_schema(data_schema.name)
-                if schema is not None:
-                    LOG.warning(
-                        f"Schema was found in metastore, skipping deletion: {data_schema.id}, {data_schema.name}"
+            try:
+                if data_schema.name not in schema_names:
+                    # Note: this bypasses the ACL check, but we're not currently using ACLs
+                    LOG.info(
+                        f"Double-checking if schema should be deleted: {data_schema.id}, {data_schema.name}"
                     )
-                    continue
+                    schema = self.get_schema(data_schema.name)
+                    if schema is not None:
+                        LOG.warning(
+                            f"Schema was found in metastore, skipping deletion: {data_schema.id}, {data_schema.name}"
+                        )
+                        continue
 
-                LOG.info(f"Deleting schema {data_schema.id}, {data_schema.name}...")
-                # We delete table 1 by 1 since we need to delete it for elasticsearch
-                # Maybe we can optimize it to allow batch deletion
-                for table in data_schema.tables:
-                    table_id = table.id
-                    delete_table(table_id=table_id, commit=False, session=session)
-                    delete_es_table_by_id(table_id)
-                delete_schema(id=data_schema.id, commit=False, session=session)
-                LOG.info(f"Deleted schema {data_schema.id}, {data_schema.name}")
-                deleted_count += 1
+                    LOG.info(f"Deleting schema {data_schema.id}, {data_schema.name}...")
+                    # We delete table 1 by 1 since we need to delete it for elasticsearch
+                    # Maybe we can optimize it to allow batch deletion
+                    for table in data_schema.tables:
+                        table_id = table.id
+                        delete_table(table_id=table_id, commit=False, session=session)
+                        delete_es_table_by_id(table_id)
+                    delete_schema(id=data_schema.id, commit=False, session=session)
+                    LOG.info(f"Deleted schema {data_schema.id}, {data_schema.name}")
+                    deleted_count += 1
+            except Exception as e:
+                LOG.error(
+                    f"Error deleting schema, skipping deletion: {data_schema.id}, {data_schema.name}",
+                    e,
+                )
+
         session.commit()
 
         LOG.info(
@@ -261,24 +268,34 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         with session.no_autoflush:
             for data_table in db_tables:
                 checked_count += 1
-                if data_table.name not in table_names:
-                    # Note: this bypasses the ACL check, but we're not currently using ACLs
-                    LOG.info(
-                        f"Double-checking if table should be deleted: {data_table.id}, {data_table.data_schema.name}.{data_table.name}"
-                    )
-                    table = self.get_table(data_table.data_schema.name, data_table.name)
-                    if table is not None:
-                        LOG.warning(
-                            f"Table was found in metastore, skipping deletion: {data_table.id}, {data_table.name} "
+                try:
+                    if data_table.name not in table_names:
+                        # Note: this bypasses the ACL check, but we're not currently using ACLs
+                        LOG.info(
+                            f"Double-checking if table should be deleted: {data_table.id}, {data_table.data_schema.name}.{data_table.name}"
                         )
-                        continue
+                        table = self.get_table(
+                            data_table.data_schema.name, data_table.name
+                        )
+                        if table is not None:
+                            LOG.warning(
+                                f"Table was found in metastore, skipping deletion: {data_table.id}, {data_table.name} "
+                            )
+                            continue
 
-                    LOG.info(f"Deleting table {data_table.id}, {data_table.name}...")
-                    table_id = data_table.id
-                    delete_table(table_id=table_id, commit=False, session=session)
-                    delete_es_table_by_id(table_id)
-                    LOG.info(f"Deleted table {table_id}, {data_table.name}")
-                    deleted_count += 1
+                        LOG.info(
+                            f"Deleting table {data_table.id}, {data_table.name}..."
+                        )
+                        table_id = data_table.id
+                        delete_table(table_id=table_id, commit=False, session=session)
+                        delete_es_table_by_id(table_id)
+                        LOG.info(f"Deleted table {table_id}, {data_table.name}")
+                        deleted_count += 1
+                except Exception as e:
+                    LOG.error(
+                        f"Error deleting table, skipping deletion: {data_table.id}, {data_table.data_schema.name}.{data_table.name}",
+                        e,
+                    )
             session.commit()
 
             LOG.info(
