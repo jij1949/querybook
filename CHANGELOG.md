@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.108.4](https://github.com/eg-internal/querybook/compare/v0.108.3...v0.108.4) (2024-11-04)
+
+
+### Bug Fixes
+
+* Remove latest tag ([5c457f9](https://github.com/eg-internal/querybook/commit/5c457f99ae8da91b2bf414fd746a1696b8c14f65))
+
 ## [0.108.3](https://github.com/eg-internal/querybook/compare/v0.108.2...v0.108.3) (2024-11-04)
 
 
