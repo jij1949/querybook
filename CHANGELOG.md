@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.108.2](https://github.com/eg-internal/querybook/compare/v0.108.1...v0.108.2) (2024-11-04)
+
+
+### Bug Fixes
+
+* Catch exceptions during delete_schema/table_not_in_metastore ([76a8ff0](https://github.com/eg-internal/querybook/commit/76a8ff08013e3f54c296ba353501c424e0a639fe))
+
 ## [0.108.1](https://github.com/eg-internal/querybook/compare/v0.108.0...v0.108.1) (2024-10-25)
 
 
