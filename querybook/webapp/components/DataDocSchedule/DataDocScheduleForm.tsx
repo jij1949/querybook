@@ -162,7 +162,7 @@ export const DataDocScheduleForm: React.FunctionComponent<
                   notifications: [],
                   retry: {
                       enabled: false,
-                      max_retries: 2,
+                      max_retries: 1,
                       delay_sec: 60,
                   },
                   disable_if_running_doc: false,
