@@ -207,7 +207,7 @@ trino:
     schema_does_not_exist:
         regex: 'Schema .*? does not exist'
         message: |
-            If you are trying to access a federated schema, please check if you are using a prefix, e.g. egdp_prod, bexg_prod, vrbo_prod, etc.
+            If you are trying to access a federated schema, please check if you are using a prefix, e.g. `egdp_prod`, `bexg_prod`, `vrbo_prod`, etc.
 
             Otherwise please ensure you are using the correct environment, and check if the schema exists in the cluster you are trying to access.
 
