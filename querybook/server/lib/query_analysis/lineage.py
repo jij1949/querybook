@@ -153,8 +153,8 @@ def get_statement_schema(statement, current_schema) -> str:
 
 def sanitize_table_name(name, default_schema):
     if "." in name:
-        return name
-    return f"{default_schema}.{name}"
+        return name.lower()
+    return f"{default_schema}.{name}".lower()
 
 
 def get_full_table_name(statement, index):
