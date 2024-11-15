@@ -185,7 +185,9 @@ class HiveMetastoreClient:
             DataBase: Object with the following type: https://github.com/apache/hive/blob/master/standalone-metastore/metastore-common/src/main/thrift/hive_metastore.thrift#L404
         """
         _LOG.info("Get db info %s", db_name)
-        return self._perform_read_op(lambda: self._read_client.get_database(db_name))
+        return self._perform_read_op(
+            lambda: self._read_client.get_database(db_name.lower())
+        )
 
     def get_all_tables(self, db_name):
         """
@@ -220,7 +222,7 @@ class HiveMetastoreClient:
             hive_metastore.ttypes.Table object
         """
         return self._perform_read_op(
-            lambda: self._read_client.get_table(db_name, tb_name)
+            lambda: self._read_client.get_table(db_name.lower(), tb_name.lower())
         )
 
     def _get_table_partition_keys(self, db_name: str, tb_name: str) -> List[str]:
@@ -252,7 +254,7 @@ class HiveMetastoreClient:
         """
         partitions = self._perform_read_op(
             lambda: self._read_client.get_partitions_by_filter(
-                db_name, tb_name, filter_clause, -1
+                db_name.lower(), tb_name.lower(), filter_clause, -1
             )
         )
         partition_keys = self._get_table_partition_keys(db_name, tb_name)
@@ -278,7 +280,9 @@ class HiveMetastoreClient:
         if filter_clause:
             return self.get_filtered_partitions(db_name, tb_name, filter_clause)
         return self._perform_read_op(
-            lambda: self._read_client.get_partition_names(db_name, tb_name, -1)
+            lambda: self._read_client.get_partition_names(
+                db_name.lower(), tb_name.lower(), -1
+            )
         )
 
 
