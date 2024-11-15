@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.108.5](https://github.com/eg-internal/querybook/compare/v0.108.4...v0.108.5) (2024-11-15)
+
+
+### Bug Fixes
+
+* Automatically lower database/table name in HiveMetastoreClient ([35b28a3](https://github.com/eg-internal/querybook/commit/35b28a3b74b3364ffe2ec7db8b8d935179e805aa))
+* Change default retry count to 1 ([a2431bb](https://github.com/eg-internal/querybook/commit/a2431bb69e07e3b28ed8e88e75798389e3fe5ba1))
+* Improve error suggestion when schema does not exist ([6f93a3c](https://github.com/eg-internal/querybook/commit/6f93a3c7d9a3fa7fc44b2a1962d8371b17aaae6a))
+* Sanitize_table_name() now with lowercase ([2e954d4](https://github.com/eg-internal/querybook/commit/2e954d4aea6a3b76008f5494ece02af060b38741))
+
 ## [0.108.4](https://github.com/eg-internal/querybook/compare/v0.108.3...v0.108.4) (2024-11-04)
 
 
