@@ -9,6 +9,10 @@ from logic import (
 from logic.metastore import get_table_information_by_table_id, get_table_by_name
 from app.db import DBSession
 import re
+from trino.exceptions import Error, TrinoQueryError
+from lib.query_executor.utils import get_parsed_syntax_error
+from const.query_execution import QueryExecutionErrorType
+
 
 def get_trino_error_dict(e):
     if hasattr(e, "args") and e.args[0] is not None:
@@ -187,3 +191,28 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
         except ValueError as e:
             return False
         return True
+
+    def _parse_exception(self, e):
+        error_type = QueryExecutionErrorType.INTERNAL.value
+        error_str = str(e)
+        error_extracted = None
+
+        if isinstance(e, TrinoQueryError):
+            try:
+                line_number, column_number = e.error_location
+                return get_parsed_syntax_error(
+                    e.message, line_number - 1, column_number - 1, e
+                )
+            except Exception:
+                return QueryExecutionErrorType.ENGINE.value, error_str, e.message
+
+
+        if isinstance(e, Error):
+            error_type = QueryExecutionErrorType.ENGINE.value
+            try:
+                error_dict = get_trino_error_dict(e)
+                if error_dict:
+                    error_extracted = error_dict.get("message", None)
+            except Exception:
+                pass
+        return error_type, error_str, error_extracted

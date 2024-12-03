@@ -7,7 +7,11 @@ from app.flask_app import celery, socketio
 from const.db import (
     description_length,
 )
-from const.query_execution import QueryExecutionStatus, QueryExecutionType
+from const.query_execution import (
+    QueryExecutionErrorType,
+    QueryExecutionStatus,
+    QueryExecutionType,
+)
 from const.schedule import TaskRunStatus
 
 from lib.logger import get_logger
@@ -29,43 +33,34 @@ import re
 LOG = get_logger(__file__)
 GENERIC_QUERY_FAILURE_MSG = "Execution did not finish successfully, workflow failed"
 
-# List of regex patterns for error messages that shouldn't retry
+
 NON_RETRYABLE_ERRORS = [
-    r'\{"line": .*, "char": .*, "message": .*\}',
-    r"Exceeded CPU limit of",
-    r"Query exceeded distributed user memory limit of",
-    r"Query exceeded maximum time limit of",
-    r"Query exceeded per-node memory limit of",
-    r"Query killed\. Message: Killed via web UI",
-    r"Query killed\. No message provided\.",
-    r"Query was canceled",
-    # r"Access Denied: Cannot",
-    # r"Array subscript must be less than or equal to array length",
-    # r"Cannot apply operator: ",
-    # r"Cannot cast .* to .*",
-    # r"Cannot unnest type:",
-    # r"Could not parse rfc1738",
-    # r"Decimal overflow",
-    # r"Division by zero",
-    # r"Filter required on .* for at least one partition column: .*",
-    # r"Invalid format: \"\"",
-    # r"Invalid partition value ",
-    # r"Invalid position .* and length .* in page with .* positions",
-    # r"Key not present in map:",
-    # r"Modifying Hive table rows is only supported for transactional tables",
-    # r"Partition no longer exists",
-    # r"Query exceeded the maximum execution time limit of",
-    # r"Query exceeded the maximum planning time limit of",
-    # r"Remote page is too large",
-    # r"ROW comparison not supported",
-    # r"Row type must have at least 1 field",
-    # r"Size of pages index cannot exceed",
-    # r"SQL array indices start at 1",
-    # r"Unable to cast",
-    # r"Unknown type",
-    # r"Unsupported Hive type:",
-    # r"Unsupported Trino column type",
-    # r"Value cannot be cast to",
+    r"type=USER_ERROR",
+    r"name=HIVE_BAD_DATA",
+    r"name=HIVE_CANNOT_OPEN_SPLIT",
+    r"name=HIVE_CONCURRENT_MODIFICATION_DETECTED",
+    r"name=HIVE_CURSOR_ERROR",
+    r"name=HIVE_DATABASE_LOCATION_ERROR",
+    r"name=HIVE_FILE_NOT_FOUND",
+    r"name=HIVE_FILESYSTEM_ERROR",
+    r"name=HIVE_INVALID_BUCKET_FILES",
+    r"name=HIVE_INVALID_METADATA",
+    r"name=HIVE_INVALID_PARTITION_VALUE",
+    r"name=HIVE_INVALID_VIEW_DATA",
+    r"name=HIVE_PARTITION_SCHEMA_MISMATCH",
+    r"name=HIVE_PATH_ALREADY_EXISTS",
+    r"name=HIVE_UNSUPPORTED_FORMAT",
+    r"name=HIVE_WRITER_CLOSE_ERROR",
+    r"name=ICEBERG_CANNOT_OPEN_SPLIT",
+    r"name=ICEBERG_COMMIT_ERROR",
+    r"name=ICEBERG_CURSOR_ERROR",
+    r"name=ICEBERG_FILESYSTEM_ERROR",
+    r"name=ICEBERG_MISSING_METADATA",
+    r"name=UNSUPPORTED_TABLE_TYPE",
+    r"name=EXCEEDED_CPU_LIMIT",
+    r"name=EXCEEDED_GLOBAL_MEMORY_LIMIT",
+    r"name=EXCEEDED_LOCAL_MEMORY_LIMIT",
+    r"name=EXCEEDED_TIME_LIMIT",
 ]
 
 
@@ -241,7 +236,7 @@ def _run_datadoc_cell(
         retry["enabled"] is True
         and retry["max_retries"] != 0
         and query_run_status == QueryExecutionStatus.ERROR.value
-        and not should_not_retry(get_datadoc_error_message(query_execution.id))
+        and not should_not_retry(get_datadoc_error(query_execution.id))
     ):
 
         self.retry(
@@ -277,6 +272,13 @@ def get_datadoc_error_message(query_execution_id, session=None):
         else GENERIC_QUERY_FAILURE_MSG
     )[:description_length]
     return error_msg
+
+
+def get_datadoc_error(query_execution_id, session=None):
+    query_execution_error = qe_logic.get_query_execution_error(
+        query_execution_id, session=session
+    )
+    return query_execution_error.error_message
 
 
 def should_not_retry(error_message):

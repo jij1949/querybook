@@ -61,13 +61,16 @@ def get_parsed_syntax_error(
     message: str,
     line_num: int = None,
     char_num: int = None,
+    exception=None,
 ):
     error_type = QueryExecutionErrorType.SYNTAX.value
+
     error_str = json.dumps(
         {
             "line": line_num,
             "char": char_num,
             "message": message,
+            "exception": str(exception),
         }
     )
     return error_type, error_str, None
