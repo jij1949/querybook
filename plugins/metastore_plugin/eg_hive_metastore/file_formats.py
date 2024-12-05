@@ -3,29 +3,34 @@ from lib.logger import get_logger
 
 LOG = get_logger(__file__)
 
+# Generally, the serde is the more specific determinant of the file format,
+# although there are some exceptions. As such, the mappings are ordered by
+# specificity, with the most specific mappings at the top.
+#
+# The mappings are structured as a list of dictionaries, where each dictionary
+# contains the following keys:
+# - input_format: A list of input formats that the mapping applies to. The
+#                 wildcard "*" can be used to match any input format.
+# - serde: A list of serdes that the mapping applies to. The wildcard "*" can
+#          be used to match any serde.
+# - format: The determined file format.
+#
+# When matching against a table, the first mapping that matches both the input format and serde
+# will be used to determine the file format.
+#
+# While technically any mapping with a "*" wildcard in the input_format or serde fields will match
+# any value, common values are included in the list to make it easier to understand the mappings.
+#
+# Note: wildcard serdes should be placed at the bottom of the list since they are less specific
+#
 FILE_FORMAT_MAPPING = [
     {
         "input_format": [
-            "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
-            "org.apache.hudi.hadoop.HoodieParquetInputFormat",
+            "org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat",
             "*",
         ],
-        "serde": ["org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"],
-        "format": "Parquet",
-    },
-    {
-        "input_format": [
-            "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
-            "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat",
-            "*",
-        ],
-        "serde": ["org.apache.hadoop.hive.ql.io.orc.OrcSerde", "*"],
-        "format": "ORC",
-    },
-    {
-        "input_format": ["org.apache.hadoop.mapred.SequenceFileInputFormat"],
-        "serde": ["org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"],
-        "format": "Sequence",
+        "serde": ["org.apache.hadoop.hive.serde2.avro.AvroSerDe"],
+        "format": "Avro",
     },
     {
         "input_format": ["org.apache.hadoop.mapred.TextInputFormat", "*"],
@@ -36,35 +41,66 @@ FILE_FORMAT_MAPPING = [
         "format": "CSV",
     },
     {
+        "input_format": ["*"],
+        "serde": [
+            "com.willetinc.hive.mapreduce.dynamodb.HiveDynamoDBSerde",
+            "org.apache.hadoop.hive.dynamodb.DynamoDBSerDe",
+        ],
+        "format": "DynamoDB",
+    },
+    {
+        "input_format": ["*"],
+        "serde": ["org.elasticsearch.hadoop.hive.EsSerDe"],
+        "format": "Elasticsearch",
+    },
+    {
+        "input_format": ["org.apache.iceberg.mr.hive.HiveIcebergInputFormat"],
+        "serde": ["org.apache.iceberg.mr.hive.HiveIcebergSerDe"],
+        "format": "Iceberg",
+    },
+    {
+        "input_format": ["*"],
+        "serde": ["org.apache.hadoop.hive.jdbc.storagehandler.JdbcSerDe"],
+        "format": "JDBC",
+    },
+    {
         "input_format": [
             "org.apache.hadoop.mapred.TextInputFormat",
             "com.amazon.emr.cloudtrail.CloudTrailInputFormat",
             "*",
         ],
         "serde": [
-            "org.openx.data.jsonserde.JsonSerDe",
+            "com.expedia.edw.hive.serde.ExpJSONSerDe",
+            "com.proofpoint.hive.serde.JsonSerde",
             "org.apache.hadoop.hive.contrib.serde2.JsonSerde",
             "org.apache.hive.hcatalog.data.JsonSerDe",
-            "com.proofpoint.hive.serde.JsonSerde",
+            "org.openx.data.jsonserde.JsonSerDe",
         ],
         "format": "JSON",
     },
     {
-        "input_format": ["org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat"],
-        "serde": ["org.apache.hadoop.hive.serde2.avro.AvroSerDe"],
-        "format": "Avro",
+        "input_format": ["org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"],
+        "serde": ["org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"],
+        "format": "ORC",
     },
     {
         "input_format": [
-            "org.apache.hadoop.mapred.TextInputFormat",
-            "org.apache.hadoop.mapred.FileInputFormat",
+            "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
             "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat",
+            "org.apache.hadoop.mapred.TextInputFormat",
+            "*",
         ],
-        "serde": [
-            "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
-            "org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe",
+        "serde": ["org.apache.hadoop.hive.ql.io.orc.OrcSerde"],
+        "format": "ORC",
+    },
+    {
+        "input_format": [
+            "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+            "org.apache.hudi.hadoop.HoodieParquetInputFormat",
+            "*",
         ],
-        "format": "Text",
+        "serde": ["org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"],
+        "format": "Parquet",
     },
     {
         "input_format": ["org.apache.hadoop.hive.ql.io.RCFileInputFormat"],
@@ -74,20 +110,42 @@ FILE_FORMAT_MAPPING = [
         ],
         "format": "RCFile",
     },
+    # Wildcard sedres at the bottom to avoid matching with more specific mappings
     {
-        "input_format": ["*"],
-        "serde": ["org.apache.hadoop.hive.jdbc.storagehandler.JdbcSerDe"],
-        "format": "JDBC",
+        "input_format": ["org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"],
+        "serde": ["*"],
+        "format": "ORC",
     },
     {
-        "input_format": ["*"],
-        "serde": ["org.elasticsearch.hadoop.hive.EsSerDe"],
-        "format": "Elasticsearch",
+        "input_format": [
+            "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+        ],
+        "serde": ["*"],
+        "format": "Parquet",
     },
     {
-        "input_format": ["*"],
-        "serde": ["com.willetinc.hive.mapreduce.dynamodb.HiveDynamoDBSerde"],
-        "format": "DynamoDB",
+        "input_format": ["org.apache.hadoop.mapred.SequenceFileInputFormat"],
+        "serde": [
+            "org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe",
+            "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+            "org.apache.hadoop.hive.serde2.MetadataTypedColumnsetSerDe",
+            "*",
+        ],
+        "format": "Sequence",
+    },
+    {
+        "input_format": [
+            "org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat",
+            "org.apache.hadoop.mapred.FileInputFormat",
+            "org.apache.hadoop.mapred.TextInputFormat",
+        ],
+        "serde": [
+            "org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe",
+            "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+            "org.apache.hadoop.hive.serde2.RegexSerDe",
+            "*",
+        ],
+        "format": "Text",
     },
 ]
 
