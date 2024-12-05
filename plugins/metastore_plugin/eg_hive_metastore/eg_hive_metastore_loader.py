@@ -757,24 +757,30 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 default_partition_spec = ujson.loads(
                     hive_metastore_description.parameters.get("default-partition-spec")
                 )
-                current_schema = ujson.loads(
-                    hive_metastore_description.parameters.get("current-schema")
-                )
-                current_schema_fields = {
-                    field["id"]: field for field in current_schema["fields"]
-                }
+                # Do this path if the "current-schema" field exists
+                try:
+                    current_schema = ujson.loads(
+                        hive_metastore_description.parameters.get("current-schema")
+                    )
+                    current_schema_fields = {
+                        field["id"]: field for field in current_schema["fields"]
+                    }
 
-                # Get a list of source-ids for the partition fields
-                partition_source_ids = [
-                    field["source-id"] for field in default_partition_spec["fields"]
-                ]
+                    # Get a list of source-ids for the partition fields
+                    partition_source_ids = [
+                        field["source-id"] for field in default_partition_spec["fields"]
+                    ]
 
-                # Convert the source-ids to column names
-                return [
-                    current_schema_fields[source_id]["name"]
-                    for source_id in partition_source_ids
-                ]
-
+                    # Convert the source-ids to column names
+                    return [
+                        current_schema_fields[source_id]["name"]
+                        for source_id in partition_source_ids
+                    ]
+                # Do this path if it fails to find "current-schema" field
+                except:
+                    return [
+                        field["name"] for field in default_partition_spec["fields"]
+                    ]
             else:
                 return []
 
