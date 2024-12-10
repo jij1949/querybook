@@ -233,16 +233,38 @@ trino:
     exceeded_cpu_limit:
         regex: 'Exceeded CPU limit of'
         message: |
-            The query has exceeded the CPU limit set for the cluster.  This limit is in place to prevent runaway queries from consuming all cluster resources.
+            The query has exceeded the CPU limit set for the cluster. This limit is in place to prevent runaway queries from consuming all cluster resources.
 
-            Please optimize the query to reduce the CPU usage. For more information on optimizing queries: [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
+            Please optimize the query to reduce the CPU usage. For specific query tuning tips related to CPU usage, refer to [Trino Efficient Client Usage - CPU time](https://confluence.expedia.biz/display/DSPKB/Trino+Efficient+Client+Usage#TrinoEfficientClientUsage-CPUtime).
+
+            For general information on optimizing queries, refer to [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
 
     exceeded_time_limit:
         regex: 'Query exceeded .*? time limit'
         message: |
             The query has exceeded a time limit set for the cluster.  This limit is in place to prevent runaway queries from consuming all cluster resources.
 
-            Please optimize the query to reduce the time taken. For more information on optimizing queries: [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
+            Please optimize the query to reduce the time taken. For specific query tuning tips related to time usage, refer to [Trino Efficient Client Usage - Execution Time](https://confluence.expedia.biz/display/DSPKB/Trino+Efficient+Client+Usage#TrinoEfficientClientUsage-Executiontime).
+
+            For general information on optimizing queries, refer to [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
+
+    exceeded_distributed_memory_limit:
+        regex: 'Query exceeded distributed user memory limit'
+        message: |
+            The query has exceeded a memory limit set for the cluster.  This limit is in place to prevent runaway queries from consuming all cluster resources.
+
+            Please optimize the query to reduce the memory consumed. For specific query tuning tips related to memory usage, refer to [Trino Efficient Client Usage - Memory](https://confluence.expedia.biz/display/DSPKB/Trino+Efficient+Client+Usage#TrinoEfficientClientUsage-Memory).
+
+            For general information on optimizing queries, refer to [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
+
+    exceeded_scan_limit:
+        regex: 'Exceeded scan limit of'
+        message: |
+            The query has scanned more input data than is allowed by the cluster. This limit is in place to prevent runaway queries from consuming all cluster resources.
+
+            Please optimize the query to reduce the time taken. For specific query tuning tips related to reducing the input data amount, refer to [Trino Efficient Client Usage - Input Data Amount](https://confluence.expedia.biz/display/DSPKB/Trino+Efficient+Client+Usage#TrinoEfficientClientUsage-Inputdataamount).
+
+            For general information on optimizing queries, refer to [Trino Best Practices and Query Optimization](https://confluence.expedia.biz/x/WItIxw).
 
     modifying_hive_table_rows:
         regex: 'Modifying Hive table rows is only supported for transactional tables'
@@ -250,3 +272,10 @@ trino:
             Only Iceberg or transactional Hive tables support modifying rows. All other tables require overwriting the entire table or partition to make changes.
 
             For more information: [Modifying Hive table rows is only supported for transactional tables](https://confluence.expedia.biz/x/BWAH5Q).
+
+    too_many_queued_queries:
+        regex: 'Too many queued queries'
+        message: |
+            The cluster has reached the maximum number of queued queries per user. This limit is to prevent users from overloading the cluster with too many queries.
+
+            For more information: [Trino Efficient Client Usage - Concurrency/Queuing limit](https://confluence.expedia.biz/display/DSPKB/Trino+Efficient+Client+Usage#TrinoEfficientClientUsage-Concurrency/Queuinglimit).
