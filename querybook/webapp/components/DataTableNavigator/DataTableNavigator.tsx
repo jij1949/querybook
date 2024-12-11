@@ -302,6 +302,7 @@ const TableRow: React.FC<{
 }> = ({ table, handleTableRowClick, environmentName }) => {
     const className = clsx({
         selected: table.selected,
+        deprecated: table.tags?.includes('Deprecated'),
     });
     const tableUrl = `/${environmentName}/table/${table.id}/`;
     const handleLinkClick = useCallback(
@@ -314,13 +315,26 @@ const TableRow: React.FC<{
     );
     const { isDragging, dragProps } = useTableNameDrag(tableFullName);
 
+    const icons = [];
+    if (table.golden) {
+        icons.push('Flame');
+    }
+    if (table.tags) {
+        if (table.tags.includes('Platinum')) {
+            icons.push('Crown');
+        }
+        if (table.tags.includes('Deprecated')) {
+            icons.push('Trash');
+        }
+    }
+
     const linkDOM = (
         <ListLink
             className={className}
             onClick={handleLinkClick}
             isRow
             title={table.displayName}
-            icons={table.golden === true ? ['Flame'] : []}
+            icons={icons}
         />
     );
 

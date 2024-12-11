@@ -118,6 +118,39 @@ export const DataTableNavigatorSearch: React.FC<{
                             </span>
                         </div>
                     </SearchFilterRow>
+                    <SearchFilterRow
+                        title="Platinum"
+                        className="toggle-padding"
+                    >
+                        <div className="flex-row">
+                            <ToggleSwitch
+                                checked={searchFilters?.tags?.includes(
+                                    'Platinum'
+                                )}
+                                onChange={(checked) => {
+                                    if (checked) {
+                                        updateTags([
+                                            ...(searchFilters?.tags ?? []),
+                                            'Platinum',
+                                        ]);
+                                    } else {
+                                        updateTags(
+                                            searchFilters?.tags?.filter(
+                                                (tag) => tag !== 'Platinum'
+                                            )
+                                        );
+                                    }
+                                }}
+                            />
+                            <span
+                                className="flex-row"
+                                aria-label="Based on Trino usage via PUMA"
+                                data-balloon-pos="right"
+                            >
+                                <Icon className="crown ml4" name="Crown" />
+                            </span>
+                        </div>
+                    </SearchFilterRow>
                     <SearchFilterRow title="Schema">
                         <SearchBar
                             value={searchFilters?.schema ?? ''}

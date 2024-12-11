@@ -64,6 +64,7 @@ class EgTagColors(Enum):
     VIEW: str = "#f5a623"  # orange
     FILE_FORMAT: str = "#6ba097"  # creamy forest green
     SOURCE: str = "#C792EA"  # light purple
+    PLATINUM: str = "#08c4c4"  # miku turquoise
 
 
 # Max length of a tag name in the database (tag.name)
@@ -675,7 +676,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             custom_properties["source_schema_name"] = source_schema_name
             custom_properties["source_data_lake"] = source_data_lake
 
-        # Determine Top Tier status and boost score
+        # Determine Top Tier status, boost score, and Platinum tag
         # This comes from the `querybook2.eg_top_tier_table` table,
         # which is populated by the `top_tier_task.py` task
         #
@@ -686,34 +687,36 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         )
 
         if top_tier_row:
-            # Columns: source_data_lake, source_schema_name, table_name, user_count, number_of_queries, popularity, top_tier, boost_score
-            [
-                _,
-                _,
-                _,
-                _,
-                _,
-                popularity,
-                top_tier,
-                boost_score,
-            ] = top_tier_row
+            # Columns: source_data_lake, source_schema_name, table_name, trending, platinum, popularity, importance_score
+            [_, _, _, trending, platinum, popularity, importance_score] = top_tier_row
 
             # The `popularity` column is the rank of the table per PUMA data (1 = most popular)
             custom_properties["popularity"] = popularity
 
-            # The `top_tier` column is a boolean (0 or 1) and determines whether the table is top tier or not
-            is_top_tier = top_tier == 1
+            # The `trending` column is a boolean (0 or 1) and set to 1 if the table is trending
+            is_trending = trending == 1
 
-            # The `boost_score` column is a float and is derived from the popularity of the table
+            # The `importance_score` column is a float and is derived from the popularity of the table
             table = table._replace(
-                golden=is_top_tier,
-                boost_score=boost_score,
+                golden=is_trending,
+                boost_score=importance_score,
             )
 
-            # Load partitions if enabled and top tier
-            if self.load_partitions and is_top_tier:
+            # Load partitions if enabled and trending
+            if self.load_partitions and is_trending:
                 table = table._replace(
                     partitions=self.get_partitions(schema_name, table_name)
+                )
+
+            # Add platinum tag if necessary
+            if platinum:
+                tags.append(
+                    DataTag(
+                        name="Platinum",
+                        description="This table is a Platinum dataset in Collibra",
+                        color=EgTagColors.PLATINUM.value,
+                        meta={"rank": 200, "icon": "Crown"},
+                    )
                 )
 
         # Update the table with table_links (if any)
@@ -938,7 +941,15 @@ def get_top_tier_row(source_data_lake, source_schema_name, table_name, session=N
 
         top_tier_rows = session.execute(
             """
-            SELECT * FROM eg_top_tier_table
+            SELECT
+                source_data_lake,
+                source_schema_name,
+                table_name,
+                trending,
+                platinum,
+                popularity,
+                importance_score
+            FROM eg_top_tier_table
             WHERE source_data_lake = :source_data_lake
                 AND source_schema_name = :source_schema_name
                 AND table_name = :table_name

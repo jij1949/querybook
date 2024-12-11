@@ -40,4 +40,8 @@
         font-weight: var(--bold-font);
         color: var(--color-accent-dark);
     }
+
+    &.deprecated {
+        color: var(--text-light);
+    }
 }

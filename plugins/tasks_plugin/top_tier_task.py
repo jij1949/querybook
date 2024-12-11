@@ -13,18 +13,15 @@ LOG = get_logger(__file__)
 # Query to get the top tier tables
 query_template = """
     SELECT
-      p.source_data_lake,
-      p.source_schema_name,
-      p.table_name,
-      p.user_count,
-      p.number_of_queries,
-      p.popularity,
-      case when user_count >= {min_user_count} and number_of_queries >= {min_number_of_queries} then 1 else 0 end as top_tier,
-      (
-        LOG(1.5, user_count + LOG(2, number_of_queries)) + 1
-      ) AS boost_score
-    FROM plat_metrics.cleansed_usage_table_popular p
-    ORDER BY p.popularity ASC
+    d.source_data_lake,
+    d.source_schema_name,
+    d.table_name,
+    d.trending,
+    d.platinum,
+    d.popularity,
+    d.importance_score
+    FROM plat_metrics.cleansed_eg_table_discovery d
+    ORDER BY d.popularity ASC
     LIMIT {limit}
 """
 
@@ -75,11 +72,10 @@ def top_tier_task(
                     source_data_lake VARCHAR(255),
                     source_schema_name VARCHAR(255),
                     table_name VARCHAR(255),
-                    user_count INT,
-                    number_of_queries INT,
-                    popularity FLOAT,
-                    top_tier INT,
-                    boost_score FLOAT
+                    trending BOOLEAN,
+                    platinum BOOLEAN,
+                    popularity INT,
+                    importance_score FLOAT
                 )
                 """
             )
@@ -88,30 +84,28 @@ def top_tier_task(
                     "source_data_lake": source_data_lake,
                     "source_schema_name": source_schema_name,
                     "table_name": table_name,
-                    "user_count": user_count,
-                    "number_of_queries": number_of_queries,
+                    "trending": trending,
+                    "platinum": platinum,
                     "popularity": popularity,
-                    "top_tier": top_tier,
-                    "boost_score": boost_score,
+                    "importance_score": importance_score,
                 }
                 for (
                     (
                         source_data_lake,
                         source_schema_name,
                         table_name,
-                        user_count,
-                        number_of_queries,
+                        trending,
+                        platinum,
                         popularity,
-                        top_tier,
-                        boost_score,
+                        importance_score,
                     )
                 ) in rows
             ]
 
             session.execute(
                 """
-                INSERT INTO eg_top_tier_table (source_data_lake, source_schema_name, table_name, user_count, number_of_queries, popularity, top_tier, boost_score)
-                VALUES (:source_data_lake, :source_schema_name, :table_name, :user_count, :number_of_queries, :popularity, :top_tier, :boost_score)
+                INSERT INTO eg_top_tier_table (source_data_lake, source_schema_name, table_name, trending, platinum, popularity, importance_score)
+                VALUES (:source_data_lake, :source_schema_name, :table_name, :trending, :platinum, :popularity, :importance_score)
                 """,
                 values,
             )
