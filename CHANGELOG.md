@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.109.0](https://github.com/eg-internal/querybook/compare/v0.108.5...v0.109.0) (2024-12-11)
+
+
+### Features
+
+* Sync Platinum tag from PUMA table ([#363](https://github.com/eg-internal/querybook/issues/363)) ([0f32e61](https://github.com/eg-internal/querybook/commit/0f32e619633ab649029ec63003d539a2180fad64))
+* Use error type and name to get non_retryable errors ([#358](https://github.com/eg-internal/querybook/issues/358)) ([0407218](https://github.com/eg-internal/querybook/commit/040721853cbbdddf8f757ce18e578373fe79b673))
+
+
+### Bug Fixes
+
+* Update error suggestions, add more ([f0aefde](https://github.com/eg-internal/querybook/commit/f0aefdeefa36ad6ccade3073247128edceb52511))
+* Update file format mapping for table tagging ([98a245a](https://github.com/eg-internal/querybook/commit/98a245a7b7124d2724a36ac73152bddc962cf8ab))
+* wrap in try except, which falls back to just fetching partition names ([#360](https://github.com/eg-internal/querybook/issues/360)) ([ceaaca9](https://github.com/eg-internal/querybook/commit/ceaaca98963213d4316267867291dd9af5705db1))
+
 ## [0.108.5](https://github.com/eg-internal/querybook/compare/v0.108.4...v0.108.5) (2024-11-15)
 
 
