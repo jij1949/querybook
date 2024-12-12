@@ -21,6 +21,7 @@ import { IStoreState } from 'redux/store/types';
 import { Column, Columns } from 'ui/Column/Column';
 import { Link } from 'ui/Link/Link';
 import { Markdown } from 'ui/Markdown/Markdown';
+import { Message } from 'ui/Message/Message';
 
 import './Landing.scss';
 
@@ -101,6 +102,22 @@ const DefaultLanding: React.FC = ({ children }) => {
 
     const LandingFooter = (
         <div className="Landing-bottom flex-column">
+            <div style={{ marginLeft: '-8px' }}>
+                <Link to="https://analytics.expedia.biz/" newTab={true}>
+                    <Message type="tip">
+                        <div className="flex-row">
+                            <img
+                                src="/static/workbench.png"
+                                style={{
+                                    width: '24px',
+                                    marginRight: '4px',
+                                }}
+                            />{' '}
+                            Try out our new chatbot on Analytics Workbench 🎉
+                        </div>
+                    </Message>
+                </Link>
+            </div>
             <Columns>
                 <Column>
                     <div className="Landing-section-title">Documentation</div>
