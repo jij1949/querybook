@@ -676,19 +676,28 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             custom_properties["source_schema_name"] = source_schema_name
             custom_properties["source_data_lake"] = source_data_lake
 
-        # Determine Top Tier status, boost score, and Platinum tag
+        # Determine Trending status, boost score, and Platinum tag
         # This comes from the `querybook2.eg_top_tier_table` table,
         # which is populated by the `top_tier_task.py` task
         #
         # This table started as just top tier, but now contains the most popular tables as well
-        # As a result, Top Tier tables are identified via the `top_tier` column
+        # As a result, Trending tables are identified via the `trending` column
         top_tier_row = get_top_tier_row(
             source_data_lake, source_schema_name, table_name
         )
 
         if top_tier_row:
-            # Columns: source_data_lake, source_schema_name, table_name, trending, platinum, popularity, importance_score
-            [_, _, _, trending, platinum, popularity, importance_score] = top_tier_row
+            [
+                _,
+                _,
+                _,
+                trending,
+                platinum,
+                popularity,
+                importance_score,
+                collibra_table_link,
+                _,
+            ] = top_tier_row
 
             # The `popularity` column is the rank of the table per PUMA data (1 = most popular)
             custom_properties["popularity"] = popularity
@@ -717,6 +726,15 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                         color=EgTagColors.PLATINUM.value,
                         meta={"rank": 200, "icon": "Crown"},
                     )
+                )
+
+            # Add a link to Collibra if available
+            if collibra_table_link is not None:
+                table_links.append(
+                    {
+                        "label": "Collibra",
+                        "url": collibra_table_link,
+                    }
                 )
 
         # Update the table with table_links (if any)
@@ -781,9 +799,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     ]
                 # Do this path if it fails to find "current-schema" field
                 except:
-                    return [
-                        field["name"] for field in default_partition_spec["fields"]
-                    ]
+                    return [field["name"] for field in default_partition_spec["fields"]]
             else:
                 return []
 
@@ -948,7 +964,9 @@ def get_top_tier_row(source_data_lake, source_schema_name, table_name, session=N
                 trending,
                 platinum,
                 popularity,
-                importance_score
+                importance_score,
+                collibra_table_link,
+                collibra_tags
             FROM eg_top_tier_table
             WHERE source_data_lake = :source_data_lake
                 AND source_schema_name = :source_schema_name

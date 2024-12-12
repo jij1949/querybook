@@ -1,6 +1,7 @@
 from lib.query_executor.base_client import CursorBaseClass
 
 from app.flask_app import celery
+from lib.utils import json
 from logic.schedule import with_task_logging
 from app.db import DBSession
 from lib.logger import get_logger
@@ -19,7 +20,9 @@ query_template = """
     d.trending,
     d.platinum,
     d.popularity,
-    d.importance_score
+    d.importance_score,
+    d.collibra_table_link,
+    d.collibra_tags
     FROM plat_metrics.cleansed_eg_table_discovery d
     ORDER BY d.popularity ASC
     LIMIT {limit}
@@ -75,7 +78,9 @@ def top_tier_task(
                     trending BOOLEAN,
                     platinum BOOLEAN,
                     popularity INT,
-                    importance_score FLOAT
+                    importance_score FLOAT,
+                    collibra_table_link VARCHAR(255),
+                    collibra_tags JSON
                 )
                 """
             )
@@ -88,6 +93,10 @@ def top_tier_task(
                     "platinum": platinum,
                     "popularity": popularity,
                     "importance_score": importance_score,
+                    "collibra_table_link": collibra_table_link,
+                    "collibra_tags": (
+                        json.dumps(collibra_tags) if collibra_tags else None
+                    ),
                 }
                 for (
                     (
@@ -98,14 +107,23 @@ def top_tier_task(
                         platinum,
                         popularity,
                         importance_score,
+                        collibra_table_link,
+                        collibra_tags,
                     )
                 ) in rows
             ]
 
             session.execute(
                 """
-                INSERT INTO eg_top_tier_table (source_data_lake, source_schema_name, table_name, trending, platinum, popularity, importance_score)
-                VALUES (:source_data_lake, :source_schema_name, :table_name, :trending, :platinum, :popularity, :importance_score)
+                INSERT INTO eg_top_tier_table (
+                    source_data_lake, source_schema_name, table_name,
+                    trending, platinum, popularity, importance_score,
+                    collibra_table_link, collibra_tags
+                ) VALUES (
+                    :source_data_lake, :source_schema_name, :table_name,
+                    :trending, :platinum, :popularity, :importance_score,
+                    :collibra_table_link, :collibra_tags
+                )
                 """,
                 values,
             )

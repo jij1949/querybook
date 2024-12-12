@@ -16,6 +16,7 @@ import {
     DataTableViewQueryUsers,
     useLoadQueryUsers,
 } from 'components/DataTableViewQueryExample/DataTableViewQueryUsers';
+import { PartitionList } from 'components/PartitionList/PartitionList';
 import {
     DataTableWarningSeverity,
     IDataColumn,
@@ -33,6 +34,7 @@ import { navigateWithinEnv } from 'lib/utils/query-string';
 import { refreshDataTableInMetastore } from 'redux/dataSources/action';
 import { SoftButton, TextButton } from 'ui/Button/Button';
 import { EditableTextField } from 'ui/EditableTextField/EditableTextField';
+import { Icon } from 'ui/Icon/Icon';
 import { KeyContentDisplay } from 'ui/KeyContentDisplay/KeyContentDisplay';
 import { KeyContentDisplayLink } from 'ui/KeyContentDisplay/KeyContentDisplayLink';
 import { Link } from 'ui/Link/Link';
@@ -41,10 +43,8 @@ import { Message } from 'ui/Message/Message';
 import { ShowMoreText } from 'ui/ShowMoreText/ShowMoreText';
 
 import { DataTableViewOverviewSection } from './DataTableViewOverviewSection';
-import { Icon } from 'ui/Icon/Icon';
 
 import './DataTableViewOverview.scss';
-import { PartitionList } from 'components/PartitionList/PartitionList';
 
 const dataTableDetailsRows = [
     'type',
@@ -138,6 +138,14 @@ export const DataTableViewOverview: React.FC<
             <Link to={link.url} newTab className="data-table-table-links">
                 <Icon name="Link" size={12} />
                 {link.label ?? link.url}
+                {link.url.includes('collibra') && (
+                    <img
+                        src="/static/collibra.png"
+                        style={{
+                            width: '24px',
+                        }}
+                    />
+                )}
             </Link>
             <br />
         </div>
