@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.109.1](https://github.com/eg-internal/querybook/compare/v0.109.0...v0.109.1) (2024-12-12)
+
+
+### Bug Fixes
+
+* Add link to Analytics Workbench chatbot ([bc944d4](https://github.com/eg-internal/querybook/commit/bc944d4b2ef72a4d3d70aac693afe492321f59c2))
+* Sync Collibra links for tables via PUMA, add to the table ([18f4f4a](https://github.com/eg-internal/querybook/commit/18f4f4abc337a1aa31ca82547eeac3301ae0e0e0))
+
 ## [0.109.0](https://github.com/eg-internal/querybook/compare/v0.108.5...v0.109.0) (2024-12-11)
 
 
