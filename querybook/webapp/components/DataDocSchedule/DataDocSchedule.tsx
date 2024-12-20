@@ -98,10 +98,14 @@ export const DataDocScheduleFormWrapper: React.FunctionComponent<
                 }
                 onRun={
                     data
-                        ? () =>
-                              DataDocScheduleResource.run(docId).then(() => {
-                                  toast.success('DataDoc execution started!');
-                              })
+                        ? (manual = 0) =>
+                              DataDocScheduleResource.run(docId, manual).then(
+                                  () => {
+                                      toast.success(
+                                          'DataDoc execution started!'
+                                      );
+                                  }
+                              )
                         : null
                 }
             />

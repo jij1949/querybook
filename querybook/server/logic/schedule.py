@@ -342,8 +342,12 @@ def with_task_logging(
 
 
 @with_session
-def run_and_log_scheduled_task(scheduled_task_id, wait_to_finish=False, session=None):
+def run_and_log_scheduled_task(
+    scheduled_task_id, uid=None, wait_to_finish=False, session=None
+):
     schedule = get_task_schedule_by_id(scheduled_task_id)
+    if uid is not None:
+        schedule.kwargs = {**schedule.kwargs, "user_id": uid}
     if schedule:
         result = celery.send_task(
             schedule.task,

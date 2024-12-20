@@ -192,7 +192,8 @@ export const DataDocScheduleResource = {
     ) => ds.update<IDataDocTaskSchedule>(`/datadoc/${docId}/schedule/`, params),
     delete: (docId: number) => ds.delete(`/datadoc/${docId}/schedule/`),
 
-    run: (docId: number) => ds.save<null>(`/datadoc/${docId}/schedule/run/`),
+    run: (docId: number, manual: number) =>
+        ds.save<null>(`/datadoc/${docId}/schedule/run/${manual}/`),
     getLogs: (docId: number) =>
         ds.fetch<ITaskStatusRecord[]>(`/datadoc/${docId}/schedule/logs/`),
 

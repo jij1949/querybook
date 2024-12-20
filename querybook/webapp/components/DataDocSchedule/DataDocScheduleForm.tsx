@@ -56,7 +56,7 @@ interface IDataDocScheduleFormProps {
         kwargs: IDataDocScheduleKwargs
     ) => Promise<any>;
     onDelete?: () => Promise<void>;
-    onRun?: () => Promise<void>;
+    onRun?: (manual: number) => Promise<void>;
 }
 
 const scheduleFormSchema = Yup.object().shape({
@@ -291,7 +291,7 @@ export const DataDocScheduleForm: React.FunctionComponent<
                                 <AsyncButton
                                     disabled={dirty}
                                     title="Manual Run"
-                                    onClick={onRun}
+                                    onClick={() => onRun(1)}
                                 />
                             )}
                         </div>

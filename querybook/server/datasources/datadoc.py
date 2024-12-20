@@ -383,8 +383,8 @@ def get_datadoc_schedule_run(id):
         return runs
 
 
-@register("/datadoc/<int:id>/schedule/run/", methods=["POST"])
-def run_data_doc(id):
+@register("/datadoc/<int:id>/schedule/run/<int:manual>/", methods=["POST"])
+def run_data_doc(id, manual):
     schedule_name = schedule_logic.get_data_doc_schedule_name(id)
     with DBSession() as session:
         assert_can_write(id, session=session)
@@ -393,7 +393,10 @@ def run_data_doc(id):
             schedule_name, session=session
         )
         api_assert(schedule, "Schedule does not exist")
-        run_and_log_scheduled_task(schedule.id, session=session)
+        if manual:
+            run_and_log_scheduled_task(schedule.id, current_user.id, session=session)
+        else:
+            run_and_log_scheduled_task(schedule.id, session=session)
 
 
 @register("/datadoc/<int:id>/run/", methods=["POST"])
