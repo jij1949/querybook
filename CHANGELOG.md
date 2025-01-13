@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.110.0](https://github.com/eg-internal/querybook/compare/v0.109.1...v0.110.0) (2025-01-13)
+
+
+### Features
+
+* Enable query vector search and SQL complete ([6c2982d](https://github.com/eg-internal/querybook/commit/6c2982d679f543394e90e21c4cae1541985316e5))
+* Merge branch 'upstream' ([7f99ac6](https://github.com/eg-internal/querybook/commit/7f99ac65fbec58425800344ae2f040af36786be8))
+* nlp query search ([#1531](https://github.com/eg-internal/querybook/issues/1531)) ([ac64e35](https://github.com/eg-internal/querybook/commit/ac64e35b24160917cd48eb21434a40a1fe26b968))
+* Update Editor themes to work with Codemirror 6 ([fff4bdb](https://github.com/eg-internal/querybook/commit/fff4bdb338d05b20c7fcda6417d8869b95c81cbf))
+
+
+### Bug Fixes
+
+* manual schedule runs now run under current user id ([#367](https://github.com/eg-internal/querybook/issues/367)) ([06d121b](https://github.com/eg-internal/querybook/commit/06d121b88d2608b38e6334eb5e5ebf50e041af23))
+
 ## [0.109.1](https://github.com/eg-internal/querybook/compare/v0.109.0...v0.109.1) (2024-12-12)
 
 
