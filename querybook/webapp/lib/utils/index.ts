@@ -133,17 +133,26 @@ export function enableResizable(
     };
 }
 
+/**
+ * Determines the effective code editor theme based on the global theme and the editor theme.
+ *
+ * If the editor theme is set to 'auto', it will use a default theme based on the global theme.
+ * Otherwise it will use the editor theme.
+ */
 export function getCodeEditorTheme(globalTheme: string, editorTheme?: string) {
     const theme =
         editorTheme === 'auto' ? globalTheme : editorTheme ?? globalTheme;
     switch (theme) {
+        // Default themes for each global theme
         case 'dark':
             return 'monokai';
         case 'lush':
-            return 'solarized dark';
+            return 'solarized-dark';
+        case 'default':
         case '':
-            return 'default';
+            return 'xcode';
         default:
+            // User has selected a specific editor theme
             return theme;
     }
 }

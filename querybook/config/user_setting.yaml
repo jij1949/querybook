@@ -81,18 +81,21 @@ editor_theme:
     tab: editor
     options:
         - auto
-        - base16-light
-        - bespin
         - darcula
-        - default
+        - duotone-dark
         - duotone-light
-        - elegant
-        - material-palenight
+        - github-light
+        - github-dark
         - monokai
         - nord
-        - paraiso-light
-        - solarized dark
-    helper: Color themes for Querybook editor.
+        - quietlight
+        - solarized-dark
+        - solarized-light
+        - tokyo-night-storm
+        - vscode-dark
+        - vscode-light
+        - xcode
+    helper: Color themes for Querybook editor.  Set to 'auto' to use the global theme default.
 
 editor_theme_quick_toggle:
     default: disabled

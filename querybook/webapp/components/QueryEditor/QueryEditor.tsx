@@ -40,7 +40,7 @@ import { TableToken } from 'lib/sql-helper/sql-lexer';
 import { navigateWithinEnv } from 'lib/utils/query-string';
 import { IconButton } from 'ui/Button/IconButton';
 
-import { CustomMonokaiDarkTheme, CustomXcodeTheme } from './themes';
+import { getTheme } from './themes';
 
 import './QueryEditor.scss';
 
@@ -453,11 +453,7 @@ export const QueryEditor: React.FC<
                 {floatButtons}
                 <CodeMirror
                     ref={editorRef}
-                    theme={
-                        theme === 'dark'
-                            ? CustomMonokaiDarkTheme
-                            : CustomXcodeTheme
-                    }
+                    theme={getTheme(theme)}
                     className="ReactCodeMirror"
                     value={value}
                     height="100%"

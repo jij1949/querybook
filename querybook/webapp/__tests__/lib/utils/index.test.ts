@@ -50,17 +50,27 @@ test('enableResizable', () => {
 });
 
 test('getCodeEditorTheme', () => {
+    expect(utils.getCodeEditorTheme('default')).toStrictEqual('xcode');
     expect(utils.getCodeEditorTheme('dark')).toStrictEqual('monokai');
-    expect(utils.getCodeEditorTheme('')).toStrictEqual('default');
+    expect(utils.getCodeEditorTheme('lush')).toStrictEqual('solarized-dark');
+    expect(utils.getCodeEditorTheme('')).toStrictEqual('xcode');
+
+    expect(utils.getCodeEditorTheme('default', 'auto')).toStrictEqual('xcode');
+    expect(
+        utils.getCodeEditorTheme('default', 'tokyo-night-storm')
+    ).toStrictEqual('tokyo-night-storm');
 
     expect(utils.getCodeEditorTheme('dark', 'auto')).toStrictEqual('monokai');
-    expect(utils.getCodeEditorTheme('dark', 'elegant')).toStrictEqual('elegant');
+    expect(utils.getCodeEditorTheme('dark', 'darcula')).toStrictEqual(
+        'darcula'
+    );
 
-    expect(utils.getCodeEditorTheme('lush', 'auto')).toStrictEqual('solarized dark');
-    expect(utils.getCodeEditorTheme('lush', 'monokai')).toStrictEqual('monokai');
-
-    expect(utils.getCodeEditorTheme('', 'auto')).toStrictEqual('default');
-    expect(utils.getCodeEditorTheme('', 'bespin')).toStrictEqual('bespin');
+    expect(utils.getCodeEditorTheme('lush', 'auto')).toStrictEqual(
+        'solarized-dark'
+    );
+    expect(utils.getCodeEditorTheme('lush', 'monokai')).toStrictEqual(
+        'monokai'
+    );
 });
 
 test('getQueryEngineId', () => {

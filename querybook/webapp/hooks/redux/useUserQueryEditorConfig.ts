@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { UserSettingsFontSizeToCSSFontSize } from 'const/font';
 import { AutoCompleteType } from 'hooks/queryEditor/extensions/useAutoCompleteExtension';
 import CodeMirror from 'lib/codemirror';
+import { getCodeEditorTheme } from 'lib/utils';
 import { IStoreState } from 'redux/store/types';
 
 import { useShallowSelector } from './useShallowSelector';
@@ -15,8 +16,10 @@ export function useUserQueryEditorConfig(): {
     sqlCompleteEnabled: boolean;
 } {
     const editorSettings = useShallowSelector((state: IStoreState) => ({
-        // TODO @dbauman
-        theme: state.user.computedSettings['theme'],
+        theme: getCodeEditorTheme(
+            state.user.computedSettings['theme'],
+            state.user.computedSettings['editor_theme']
+        ),
         fontSize:
             UserSettingsFontSizeToCSSFontSize[
                 state.user.computedSettings['editor_font_size']
