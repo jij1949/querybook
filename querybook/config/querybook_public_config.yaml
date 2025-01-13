@@ -16,10 +16,10 @@ ai_assistant:
         enabled: true
 
     query_vector_search:
-        enabled: false
+        enabled: true
 
     sql_complete:
-        enabled: false
+        enabled: true
 
 survey:
     global_response_cooldown: 432000 # 5 days
