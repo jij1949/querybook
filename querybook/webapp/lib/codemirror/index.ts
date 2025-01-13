@@ -18,9 +18,9 @@ import 'codemirror/addon/runmode/runmode';
 // Search highlighting
 import 'codemirror/addon/search/match-highlighter.js';
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/jinja2/jinja2';
 // From codemirror non-react package:
 import 'codemirror/mode/sql/sql';
-import 'codemirror/mode/jinja2/jinja2';
 
 import 'codemirror/theme/base16-light.css';
 import 'codemirror/theme/bespin.css';
@@ -58,5 +58,5 @@ export default CodeMirror;
 
 export type CodeMirrorKeyMap = Record<
     string,
-    (editor: CodeMirror.Editor) => any | string
+    (editor?: CodeMirror.Editor) => any | string
 >;

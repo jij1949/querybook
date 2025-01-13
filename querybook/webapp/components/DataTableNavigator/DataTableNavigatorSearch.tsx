@@ -22,6 +22,7 @@ import { Popover } from 'ui/Popover/Popover';
 import { SearchBar } from 'ui/SearchBar/SearchBar';
 import { Title } from 'ui/Title/Title';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
+import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 import './DataTableNavigatorSearch.scss';
 
@@ -147,7 +148,8 @@ export const DataTableNavigatorSearch: React.FC<{
                                 aria-label="Based on Trino usage via PUMA"
                                 data-balloon-pos="right"
                             >
-                                <Icon className="crown ml4" name="Crown" />
+                                <TopTierCrown className="ml4" />
+                                {/* TODO @dbauman */}
                             </span>
                         </div>
                     </SearchFilterRow>

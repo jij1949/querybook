@@ -105,7 +105,7 @@ export const TableTooltip: React.FunctionComponent<IProps> = ({
 
     const contentDOM = (
         <>
-            <div className="table-tooltip-header flex-row">
+            <div className="tooltip-header flex-row">
                 <div>{tableName}</div>
                 <div className="flex-row mt4 ml4">
                     {pinToSidebarButton}
@@ -120,7 +120,7 @@ export const TableTooltip: React.FunctionComponent<IProps> = ({
         </>
     );
 
-    return <div className="rich-text-content ">{contentDOM}</div>;
+    return <div className="rich-text-content">{contentDOM}</div>;
 };
 
 export const TableTooltipByName: React.FunctionComponent<{
@@ -154,7 +154,9 @@ export const TableTooltipByName: React.FunctionComponent<{
                         metastoreId
                     )
                 );
-                setTableId(table.id);
+                if (table) {
+                    setTableId(table.id);
+                }
             } catch (error) {
                 console.error('Error fetching table:', error);
             }

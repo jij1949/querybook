@@ -9,6 +9,7 @@ class AICommandType(Enum):
     SQL_SUMMARY = "sql_summary"
     TABLE_SUMMARY = "table_summary"
     TABLE_SELECT = "table_select"
+    SQL_COMPLETE = "sql_complete"
 
 
 AI_ASSISTANT_NAMESPACE = "/ai_assistant"
@@ -25,6 +26,8 @@ DEFAULT_SIMILARITY_SCORE_THRESHOLD_GREAT_MATCH = 0.7
 # how many docs to fetch from vector store, it may include both table and query summary docs and they need additional processing.
 DEFAULT_VECTOR_STORE_FETCH_LIMIT = 30
 # how many tables to return from vector table search eventually
-DEFAUTL_TABLE_SEARCH_LIMIT = 10
+DEFAULT_TABLE_SEARCH_LIMIT = 10
+# how many queries to return from vector query search eventually
+DEFAULT_QUERY_SEARCH_LIMIT = 10
 # how many tables to select for text-to-sql
-DEFAUTL_TABLE_SELECT_LIMIT = 3
+DEFAULT_TABLE_SELECT_LIMIT = 3

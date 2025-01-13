@@ -25,6 +25,7 @@ import { Level } from 'ui/Level/Level';
 import { LoadingRow } from 'ui/Loading/Loading';
 import { AccentText, StyledText, UntitledText } from 'ui/StyledText/StyledText';
 import { Tag } from 'ui/Tag/Tag';
+import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 import { SearchResultItemBoardItemAddButton } from './SearchResultItemBoardItemAddButton';
 
@@ -380,9 +381,7 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
     );
 
     const goldenIcon = golden ? (
-        <div className="result-item-golden ml4">
-            <Icon className="flame" name="Flame" />
-        </div>
+        <TopTierCrown showTooltip={true} tooltipPos="right" />
     ) : null;
 
     const highlightedDescription = (preview.highlight || {}).description;

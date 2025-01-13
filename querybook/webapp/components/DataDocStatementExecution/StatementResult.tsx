@@ -6,13 +6,13 @@ import {
     IStatementResultTableHandles,
     StatementResultTable,
 } from 'components/StatementResultTable/StatementResultTable';
-import PublicConfig from 'config/querybook_public_config.yaml';
 import { IStatementExecution, IStatementResult } from 'const/queryExecution';
 import { StatementExecutionResultSizes } from 'const/queryResultLimit';
 import { MIN_COLUMN_TO_SHOW_FILTER } from 'const/uiConfig';
 import { useImmer } from 'hooks/useImmer';
 import { useResource } from 'hooks/useResource';
 import { useToggleState } from 'hooks/useToggleState';
+import { TABLE_SAMPLING_CONFIG } from 'lib/public-config';
 import { getSelectStatementLimit } from 'lib/sql-helper/sql-limiter';
 import { stopPropagation } from 'lib/utils/noop';
 import { formatNumber } from 'lib/utils/number';
@@ -298,25 +298,34 @@ const FetchInfo: React.FC<{
         }
 
         const sampleUserGuideLink =
-            PublicConfig.table_sampling?.sample_user_guide_link ?? '';
+            TABLE_SAMPLING_CONFIG.sample_user_guide_link ?? '';
         const sampleRateText = (
             <div className="flex-row ml4">
                 (Full Result,
                 <span className="accent-warning-text ml4">
                     Sampled {sampleRate}%
                 </span>
-                {sampleUserGuideLink ? (
-                    <IconButton
-                        className="ml4"
-                        onClick={() => {
-                            window.open(sampleUserGuideLink, '_blank');
-                        }}
-                        icon="Info"
-                        size={16}
-                        noPadding
-                    />
-                ) : null}
                 )
+                <span className="accent-warning-text ml4">
+                    Results must be upscaled by {Math.round(100 / sampleRate)}x
+                </span>
+                .
+                {sampleUserGuideLink ? (
+                    <>
+                        <span className="ml4">
+                            Learn more about accuracy and opt-out
+                        </span>
+                        <IconButton
+                            className="ml4"
+                            onClick={() => {
+                                window.open(sampleUserGuideLink, '_blank');
+                            }}
+                            icon="Info"
+                            size={16}
+                            noPadding
+                        />
+                    </>
+                ) : null}
             </div>
         );
 

@@ -13,6 +13,7 @@ import { IconButton } from 'ui/Button/IconButton';
 import { Icon } from 'ui/Icon/Icon';
 import { AllLucideIconNames } from 'ui/Icon/LucideIcons';
 import { Loader } from 'ui/Loader/Loader';
+import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 import { ColumnIcon } from './ColumnIcon';
 import { PanelSection, SubPanelSection } from './PanelSection';

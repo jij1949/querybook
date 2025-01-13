@@ -3,6 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { UserSettingsTab } from 'components/EnvironmentAppRouter/modalRoute/UserSettingsMenuRoute';
 import userSettingConfig from 'config/user_setting.yaml';
+import {
+    getTableSamplingRateOptions,
+    isAIFeatureEnabled,
+    TABLE_SAMPLING_CONFIG,
+} from 'lib/public-config';
 import { titleize } from 'lib/utils';
 import { availableEnvironmentsSelector } from 'redux/environment/selector';
 import { notificationServiceSelector } from 'redux/notificationService/selector';
@@ -35,9 +40,14 @@ export const UserSettingsMenu: React.FC<{ tab: UserSettingsTab }> = ({
 
     const settingsToShow = useMemo(
         () =>
-            Object.entries(userSettingConfig).filter(
-                ([key, value]) => value.tab === tab
-            ),
+            Object.entries(userSettingConfig).filter(([key, value]) => {
+                if (key === 'sql_complete') {
+                    return (
+                        isAIFeatureEnabled('sql_complete') && value.tab === tab
+                    );
+                }
+                return value.tab === tab;
+            }),
         [tab]
     );
 
@@ -71,6 +81,9 @@ export const UserSettingsMenu: React.FC<{ tab: UserSettingsTab }> = ({
                 return makeSelectOptions(
                     notifiers.map((notifier) => notifier.name)
                 );
+            } else if (key === 'table_sample_rate') {
+                const options = getTableSamplingRateOptions();
+                return makeSelectOptions(options);
             }
             return makeSelectOptions(userSettingConfig[key].options);
         },
@@ -90,9 +103,18 @@ export const UserSettingsMenu: React.FC<{ tab: UserSettingsTab }> = ({
         [userSettingByKey, setUserSettings, getRawKey]
     );
 
+    const getValueByKey = (key: string) => {
+        let defaultValue = userSettingConfig[key].default;
+
+        if (key === 'table_sample_rate') {
+            defaultValue = TABLE_SAMPLING_CONFIG.default_sample_rate.toString();
+        }
+
+        return userSettingByKey[getRawKey(key)] ?? defaultValue;
+    };
+
     const makeFieldByKey = (key: string) => {
-        const value =
-            userSettingByKey[getRawKey(key)] ?? userSettingConfig[key].default;
+        const value = getValueByKey(key);
 
         const formField = (
             <>

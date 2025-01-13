@@ -188,3 +188,10 @@ class QuerybookSettings(object):
     DD_PREFIX = get_env_config("DD_PREFIX", optional=True)
     DD_SERVICE = get_env_config("DD_SERVICE", optional=True) or "querybook"
     DD_TAGS = get_env_config("DD_TAGS", optional=True) or []
+
+    # GitHub Integration
+    GITHUB_CLIENT_ID = get_env_config("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET = get_env_config("GITHUB_CLIENT_SECRET")
+    GITHUB_REPO_NAME = get_env_config("GITHUB_REPO_NAME")
+    GITHUB_BRANCH = get_env_config("GITHUB_BRANCH")
+    GITHUB_CRYPTO_SECRET = get_env_config("GITHUB_CRYPTO_SECRET")

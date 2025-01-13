@@ -15,9 +15,16 @@ ai_assistant:
     table_vector_search:
         enabled: true
 
+    query_vector_search:
+        enabled: false
+
+    sql_complete:
+        enabled: false
+
 survey:
     global_response_cooldown: 432000 # 5 days
     global_trigger_cooldown: 14400 # 4 hours
+    global_trigger_duration: 60 # 1 minute
     global_max_per_week: 12
     global_max_per_day: 3
 
@@ -52,3 +59,7 @@ table_sampling:
         - 0.1
     default_sample_rate: 0 # 0 means no sampling
     sample_user_guide_link: ''
+    sampling_tool_tip_delay: 10000 # delay duration (ms) of sampling tool tip
+
+github_integration:
+    enabled: false

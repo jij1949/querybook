@@ -28,6 +28,7 @@ import { Icon } from 'ui/Icon/Icon';
 import { AccentText } from 'ui/StyledText/StyledText';
 import { Tag } from 'ui/Tag/Tag';
 import { ToggleButton } from 'ui/ToggleButton/ToggleButton';
+import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 import './DataTableHeader.scss';
 

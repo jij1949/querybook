@@ -22,6 +22,7 @@ import { Loading } from 'ui/Loading/Loading';
 import { ExecutedQueryCell } from './ExecutedQueryCell';
 import { QueryErrorWrapper } from './QueryError';
 import { QuerySteps } from './QuerySteps';
+import { SamplingTooltip } from './SamplingToolTip';
 
 import './QueryExecution.scss';
 
@@ -29,6 +30,10 @@ interface IProps {
     id: number;
     docId?: number;
     changeCellContext?: (context: string, run: boolean) => void;
+
+    onSamplingInfoClick?: () => void;
+    hasSamplingTables?: boolean;
+    sampleRate?: number;
 }
 
 function useQueryExecutionReduxState(queryId: number) {
@@ -85,6 +90,10 @@ export const QueryExecution: React.FC<IProps> = ({
     id,
     docId,
     changeCellContext,
+
+    onSamplingInfoClick,
+    hasSamplingTables,
+    sampleRate,
 }) => {
     const isEditable = useSelector((state: IStoreState) =>
         canCurrentUserEditSelector(state, docId)
@@ -131,11 +140,26 @@ export const QueryExecution: React.FC<IProps> = ({
     const getQueryExecutionDOM = () => {
         const { statement_executions: statementExecutionIds } = queryExecution;
         const queryStepsDOM = <QuerySteps queryExecution={queryExecution} />;
+
+        const samplingToolTipDOM = (
+            <SamplingTooltip
+                queryExecution={queryExecution}
+                onSamplingInfoClick={onSamplingInfoClick}
+                hasSamplingTables={hasSamplingTables}
+                sampleRate={sampleRate}
+            />
+        );
+
         if (
             statementExecutionIds == null ||
             queryExecution.status === QueryExecutionStatus.INITIALIZED
         ) {
-            return <div className="QueryExecution ">{queryStepsDOM}</div>;
+            return (
+                <div className="QueryExecution ">
+                    {queryStepsDOM}
+                    {samplingToolTipDOM}
+                </div>
+            );
         }
         const statementExecutionId = statementExecution
             ? statementExecution.id
@@ -170,6 +194,7 @@ export const QueryExecution: React.FC<IProps> = ({
             <div className="QueryExecution ">
                 <div className="execution-wrapper">
                     {queryStepsDOM}
+                    {samplingToolTipDOM}
                     {getQueryExecutionErrorDOM()}
                     {getStatementExecutionHeaderDOM()}
                     {executedQueryDOM}

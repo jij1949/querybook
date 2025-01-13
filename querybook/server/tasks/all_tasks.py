@@ -78,20 +78,23 @@ def configure_workers(sender=None, conf=None, **kwargs):
 
 @task_failure.connect
 def handle_task_failure(sender, signal, *args, **kwargs):
-    tags = {"task_name": sender.name, "task_type": get_schedule_task_type(sender.name)}
+    task_type = get_schedule_task_type(sender.name)
+    tags = {"task_name": sender.name, "task_type": task_type.value}
     stats_logger.incr(TASK_FAILURES, tags=tags)
 
 
 @task_success.connect
 def handle_task_success(sender, signal, *args, **kwargs):
-    tags = {"task_name": sender.name, "task_type": get_schedule_task_type(sender.name)}
+    task_type = get_schedule_task_type(sender.name)
+    tags = {"task_name": sender.name, "task_type": task_type.value}
     stats_logger.incr(TASK_SUCCESSES, tags=tags)
 
 
 @task_received.connect
 def handle_task_received(sender, signal, *args, **kwargs):
     tags = {"task_name": kwargs["request"].name}
-    tags["task_type"] = get_schedule_task_type(tags["task_name"])
+    task_type = get_schedule_task_type(tags["task_name"])
+    tags["task_type"] = task_type.value
     stats_logger.incr(TASK_RECEIVED, tags=tags)
 
 
