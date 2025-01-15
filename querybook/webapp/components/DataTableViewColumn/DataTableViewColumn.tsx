@@ -6,9 +6,11 @@ import { useResource } from 'hooks/useResource';
 import { Nullable } from 'lib/typescript';
 import { TableResource } from 'resource/table';
 import { Loading } from 'ui/Loading/Loading';
-import { SearchBar } from 'ui/SearchBar/SearchBar';
 import { OrderByButton } from 'ui/OrderByButton/OrderByButton';
+import { SearchBar } from 'ui/SearchBar/SearchBar';
+
 import { DataTableColumnCard } from './DataTableColumnCard';
+
 import './DataTableViewColumn.scss';
 
 export interface IDataTableViewColumnProps {
@@ -35,7 +37,7 @@ export const DataTableViewColumn: React.FunctionComponent<
 }) => {
     const [filterString, setFilterString] = React.useState('');
     const [orderColumnsBy, setOrderColumnsBy] =
-        React.useState<ColumnOrderBy>('Aa');
+        React.useState<ColumnOrderBy>('Default');
     const [orderColumnsByAsc, setOrderColumnsByAsc] = React.useState(false);
     const { data: tableColumns } = useResource(
         React.useCallback(
