@@ -152,6 +152,9 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
 
             # table doesn't exist in metastore, delete the table in database
             if not table:
+                LOG.error(
+                    f"Table {schema_name}.{table_name} ({db_table.id}) doesn't exist in metastore, deleting it from database"
+                )
                 delete_table(table_id=db_table.id, session=session)
                 return -1
 
