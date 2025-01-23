@@ -62,4 +62,4 @@ table_sampling:
     sampling_tool_tip_delay: 10000 # delay duration (ms) of sampling tool tip
 
 github_integration:
-    enabled: false
+    enabled: true
