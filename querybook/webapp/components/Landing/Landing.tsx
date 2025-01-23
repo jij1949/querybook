@@ -113,7 +113,8 @@ const DefaultLanding: React.FC = ({ children }) => {
                                     marginRight: '4px',
                                 }}
                             />{' '}
-                            Try out our new chatbot on Analytics Workbench 🎉
+                            Try out Ava, a new AI Agent on Analytics Workbench
+                            🎉
                         </div>
                     </Message>
                 </Link>
