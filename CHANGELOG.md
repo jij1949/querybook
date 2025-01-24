@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.111.0](https://github.com/eg-internal/querybook/compare/v0.110.0...v0.111.0) (2025-01-24)
+
+
+### Features
+
+* Add Ava as a sidebar navigator ([54a05de](https://github.com/eg-internal/querybook/commit/54a05de4a1d922ee0973e55c9ac9a37fb9548732))
+
+
+### Bug Fixes
+
+* Change DataTableViewColumn default sort order to Default ([11c25fe](https://github.com/eg-internal/querybook/commit/11c25fe336bd63b6a1fe8f1ddad6344a1ca2bded))
+* Log when sync_table deletes a table ([a2b1aa4](https://github.com/eg-internal/querybook/commit/a2b1aa4dfa91e722c192bd7199d739f20db1e3f8))
+* Migrate dockerfile to Artifactory-edge ([600c2e9](https://github.com/eg-internal/querybook/commit/600c2e9d607c7d7c701e9d3adb82dfd8ba5b281f))
+* Update text of Ava agent link ([3b6e752](https://github.com/eg-internal/querybook/commit/3b6e7529b1900bd1841872ac388c49e72e51df6a))
+
 ## [0.110.0](https://github.com/eg-internal/querybook/compare/v0.109.1...v0.110.0) (2025-01-13)
 
 
