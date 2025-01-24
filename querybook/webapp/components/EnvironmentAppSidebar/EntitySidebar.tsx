@@ -153,6 +153,20 @@ export const EntitySidebar: React.FunctionComponent<IEntitySidebarProps> =
                         }}
                         active={selectedEntity === 'execution'}
                     />
+                    <IconButton
+                        icon="Bot"
+                        tooltip="Chat with Ava"
+                        tooltipPos="right"
+                        active={selectedEntity === 'chat'}
+                        onClick={() => {
+                            trackClick({
+                                component: ComponentType.LEFT_SIDEBAR,
+                                element: ElementType.SNIPS_BUTTON,
+                            });
+                            onSelectEntity('chat');
+                        }}
+                        title="Ava"
+                    />
                 </div>
                 <div className="apps-list flex-column">
                     <QueryEngineStatusButton />

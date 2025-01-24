@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { DataDocNavigator } from 'components/DataDocNavigator/DataDocNavigator';
 import { DataDocSchemaNavigator } from 'components/DataDocSchemaNavigator/DataDocSchemaNavigator';
+import { IFrameNavigator } from 'components/IFrameNavigator/IFrameNavigator';
 import { QuerySnippetNavigator } from 'components/QuerySnippetNavigator/QuerySnippetNavigator';
 import { QueryViewNavigator } from 'components/QueryViewNavigator/QueryViewNavigator';
 import { useEvent } from 'hooks/useEvent';
@@ -95,6 +96,8 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
                 />
             ) : entity === 'execution' ? (
                 <QueryViewNavigator />
+            ) : entity === 'chat' ? (
+                <IFrameNavigator src="https://analytics.expedia.biz/ava?fullscreen=true" />
             ) : (
                 <div />
             );
