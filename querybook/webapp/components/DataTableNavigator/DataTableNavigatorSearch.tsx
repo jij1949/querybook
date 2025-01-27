@@ -16,13 +16,13 @@ import { IStoreState } from 'redux/store/types';
 import { DataElementResource, TableTagResource } from 'resource/table';
 import { SoftButton } from 'ui/Button/Button';
 import { IconButton } from 'ui/Button/IconButton';
-import { Icon } from 'ui/Icon/Icon';
 import { OrderByButton } from 'ui/OrderByButton/OrderByButton';
 import { Popover } from 'ui/Popover/Popover';
 import { SearchBar } from 'ui/SearchBar/SearchBar';
 import { Title } from 'ui/Title/Title';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
 import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
+import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 import './DataTableNavigatorSearch.scss';
 
@@ -110,13 +110,7 @@ export const DataTableNavigatorSearch: React.FC<{
                                     )
                                 }
                             />
-                            <span
-                                className="flex-row"
-                                aria-label="Based on Trino usage via PUMA"
-                                data-balloon-pos="right"
-                            >
-                                <Icon className="flame ml4" name="Flame" />
-                            </span>
+                            <TrendingFlame className="ml4" />
                         </div>
                     </SearchFilterRow>
                     <SearchFilterRow
@@ -143,14 +137,7 @@ export const DataTableNavigatorSearch: React.FC<{
                                     }
                                 }}
                             />
-                            <span
-                                className="flex-row"
-                                aria-label="Based on Trino usage via PUMA"
-                                data-balloon-pos="right"
-                            >
-                                <TopTierCrown className="ml4" />
-                                {/* TODO @dbauman */}
-                            </span>
+                            <TopTierCrown className="ml4" />
                         </div>
                     </SearchFilterRow>
                     <SearchFilterRow title="Schema">

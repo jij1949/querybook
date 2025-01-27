@@ -3,26 +3,23 @@ import React from 'react';
 
 import { Icon } from 'ui/Icon/Icon';
 
-import './TopTierCrown.scss';
+import './TrendingFlame.scss';
 
-export const TopTierCrown: React.FunctionComponent<{
+export const TrendingFlame: React.FunctionComponent<{
     className?: string;
     showTooltip?: boolean;
     tooltip?: string;
     tooltipPos?: string;
 }> = ({ className, showTooltip = true, tooltip, tooltipPos = 'down' }) => (
     <span
-        className={clsx('TopTierCrown', 'flex-row', className)}
+        className={clsx('TrendingFlame', 'flex-row', className)}
         {...(showTooltip
             ? {
-                  'aria-label':
-                      tooltip ??
-                      'Platinum designation via Collibra, indicating financial, business, or regulatory impact',
+                  'aria-label': tooltip ?? 'Trending in Trino usage via PUMA',
                   'data-balloon-pos': tooltipPos,
-                  'data-balloon-length': 'medium',
               }
             : {})}
     >
-        <Icon name="Crown" />
+        <Icon name="Flame" />
     </span>
 );

@@ -719,6 +719,9 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
             # Add platinum tag if necessary
             if platinum:
+                # Along with the tag, add a custom property to the table to make some things easier
+                custom_properties["platinum"] = True
+
                 tags.append(
                     DataTag(
                         name="Platinum",

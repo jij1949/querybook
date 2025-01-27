@@ -24,13 +24,12 @@ import {
 import { Dispatch, IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
 import { CommentButton } from 'ui/Comment/CommentButton';
-import { Icon } from 'ui/Icon/Icon';
 import { AccentText } from 'ui/StyledText/StyledText';
 import { Tag } from 'ui/Tag/Tag';
 import { ToggleButton } from 'ui/ToggleButton/ToggleButton';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 import './DataTableHeader.scss';
+import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 export interface IDataTableHeader {
     table: IDataTable;
@@ -97,7 +96,7 @@ export const DataTableHeader: React.FunctionComponent<IDataTableHeader> = ({
     } else if (table.golden) {
         featuredBadge = (
             <Tag>
-                Trending <Icon className="flame ml4" name="Flame" />
+                Trending <TrendingFlame />
             </Tag>
         );
     }

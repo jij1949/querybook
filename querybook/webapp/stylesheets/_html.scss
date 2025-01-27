@@ -334,15 +334,3 @@ blockquote {
 [aria-label][data-balloon-pos]:after {
     z-index: 1000;
 }
-
-.crown svg {
-    color: var(--color-accent);
-    height: 16px;
-    stroke-width: 2.5px;
-}
-
-.flame svg {
-    color: var(--color-accent);
-    height: 16px;
-    stroke-width: 2.5px;
-}

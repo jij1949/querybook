@@ -25,11 +25,12 @@ import { Level } from 'ui/Level/Level';
 import { LoadingRow } from 'ui/Loading/Loading';
 import { AccentText, StyledText, UntitledText } from 'ui/StyledText/StyledText';
 import { Tag } from 'ui/Tag/Tag';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 import { SearchResultItemBoardItemAddButton } from './SearchResultItemBoardItemAddButton';
 
 import './SearchResultItem.scss';
+import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
+import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 const HighlightTitle: React.FunctionComponent<{
     title: string;
@@ -380,8 +381,10 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
         [url, onTrackClick]
     );
 
-    const goldenIcon = golden ? (
-        <TopTierCrown showTooltip={true} tooltipPos="right" />
+    const goldenIcon = golden ? <TrendingFlame tooltipPos="down" /> : null;
+
+    const platinumIcon = tags.includes('Platinum') ? (
+        <TopTierCrown tooltipPos="down" />
     ) : null;
 
     const highlightedDescription = (preview.highlight || {}).description;
@@ -423,6 +426,7 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
                                 searchString={searchString}
                             />
                             {goldenIcon}
+                            {platinumIcon}
                         </div>
                         <StyledText
                             size="small"

@@ -55,7 +55,6 @@ import { SimpleReactSelect } from 'ui/SimpleReactSelect/SimpleReactSelect';
 import { AccentText, EmptyText } from 'ui/StyledText/StyledText';
 import { Tabs } from 'ui/Tabs/Tabs';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 import { EntitySelect } from './EntitySelect';
 import { SearchDatePicker } from './SearchDatePicker';
@@ -69,6 +68,8 @@ import { SearchSchemaSelect } from './SearchSchemaSelect';
 import { TableSelect } from './TableSelect';
 
 import './SearchOverview.scss';
+import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
+import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 const userReactSelectStyle = makeReactSelectStyle(
     true,
@@ -774,14 +775,8 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                     <span className="filter-title">Trending</span>
                     <div className="result-item-golden horizontal-space-between">
                         <span>
-                            <span>trending only</span>
-                            <span
-                                className="flex-row"
-                                aria-label="Based on Trino usage via PUMA"
-                                data-balloon-pos="down"
-                            >
-                                <Icon className="flame ml4" name="Flame" />
-                            </span>
+                            <span>Trending Only</span>
+                            <TrendingFlame tooltipPos="down" />
                         </span>
                         <Checkbox
                             value={!!searchFilters.golden}
@@ -790,6 +785,29 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                                 'golden',
                                 searchFilters.golden ? null : true
                             )}
+                        />
+                    </div>
+                    <div className="result-item-golden horizontal-space-between">
+                        <span>
+                            <span>Platinum Only</span>
+                            <TopTierCrown tooltipPos="down" />
+                        </span>
+                        <Checkbox
+                            value={searchFilters?.tags?.includes('Platinum')}
+                            onChange={(checked) => {
+                                if (checked) {
+                                    updateTags([
+                                        ...(searchFilters?.tags ?? []),
+                                        'Platinum',
+                                    ]);
+                                } else {
+                                    updateTags(
+                                        searchFilters?.tags?.filter(
+                                            (tag) => tag !== 'Platinum'
+                                        )
+                                    );
+                                }
+                            }}
                         />
                     </div>
                 </div>

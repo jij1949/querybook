@@ -10,10 +10,10 @@ import { generateFormattedDate } from 'lib/utils/datetime';
 import { stopPropagationAndDefault } from 'lib/utils/noop';
 import { getHumanReadableByteSize } from 'lib/utils/number';
 import { IconButton } from 'ui/Button/IconButton';
-import { Icon } from 'ui/Icon/Icon';
 import { AllLucideIconNames } from 'ui/Icon/LucideIcons';
 import { Loader } from 'ui/Loader/Loader';
 import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
+import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 import { ColumnIcon } from './ColumnIcon';
 import { PanelSection, SubPanelSection } from './PanelSection';
@@ -44,14 +44,9 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
                 <SubPanelSection title="name">
                     <span className="flex-row">
                         {table.name}
-                        {table.golden && (
-                            <span
-                                className="flex-row"
-                                aria-label="Based on Trino usage via PUMA"
-                                data-balloon-pos="down"
-                            >
-                                <Icon className="flame ml4" name="Flame" />
-                            </span>
+                        {table.golden && <TrendingFlame className="ml4" />}
+                        {table.custom_properties?.platinum && (
+                            <TopTierCrown className="ml4" />
                         )}
                     </span>
                 </SubPanelSection>
