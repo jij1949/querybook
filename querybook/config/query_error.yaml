@@ -144,14 +144,23 @@ trino:
     access_denied_ranger:
         regex: 'Access Denied: Cannot select from columns'
         message: |
-            Ranger is restricting access to the queried data.
+            Ranger is restricting access to one or more columns in the query.
+
+            Please review the documentation for [Ranger Access Issues](https://confluence.expedia.biz/x/7Zh9q).
+
+    access_denied_ranger2:
+        regex: 'Access Denied: Cannot select table'
+        message: |
+            Ranger is restricting access to one or more tables in the query.
+
+            Our AI agent Ava can help identify the policy that is blocking access as well as the security group(s) that grant access.  Try using Ava either from the sidebar or in [Analytics Workbench](https://analytics.expedia.biz/ava).
 
             Please review the documentation for [Ranger Access Issues](https://confluence.expedia.biz/x/7Zh9q).
 
     permission_denied_ranger:
         regex: 'Permission denied: user \[.*?\] does not have \[.*?\] privilege on'
         message: |
-            Ranger is restricting access to the queried data.
+            Ranger is restricting access to one or more tables in the query.
 
             Please review the documentation for [Ranger Access Issues](https://confluence.expedia.biz/x/7Zh9q).
 
@@ -279,3 +288,10 @@ trino:
             The cluster has reached the maximum number of queued queries per user. This limit is to prevent users from overloading the cluster with too many queries.
 
             For more information: [Trino Efficient Client Usage - Concurrency/Queuing limit](https://confluence.expedia.biz/display/DSPKB/Trino+Efficient+Client+Usage#TrinoEfficientClientUsage-Concurrency/Queuinglimit).
+
+    cannot_create_table_egdp_prod:
+        regex: 'Access Denied: Cannot (create|insert|drop).+?egdp_prod_'
+        message: |
+            Querybook cannot create or modify tables in the `egdp_prod` data lake.
+
+            Check out the [Data Processing knowledge base](https://confluence.expedia.biz/display/DAPS/Data+Processing) or reach out to [#ask-data-processing](https://expediagroup.enterprise.slack.com/archives/C012PT76RBJ) for more information.
