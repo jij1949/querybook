@@ -103,21 +103,23 @@ const DefaultLanding: React.FC = ({ children }) => {
     const LandingFooter = (
         <div className="Landing-bottom flex-column">
             <div style={{ marginLeft: '-8px' }}>
-                <Link to="https://analytics.expedia.biz/" newTab={true}>
-                    <Message type="tip">
-                        <div className="flex-row">
-                            <img
-                                src="/static/workbench.png"
-                                style={{
-                                    width: '24px',
-                                    marginRight: '4px',
-                                }}
-                            />{' '}
-                            Try out Ava, a new AI Agent on Analytics Workbench
-                            🎉
-                        </div>
-                    </Message>
-                </Link>
+                <Message type="tip">
+                    <div className="flex-row">
+                        <img
+                            src="/static/workbench.png"
+                            style={{
+                                width: '24px',
+                                marginRight: '4px',
+                            }}
+                        />{' '}
+                        Try out Ava, our new AI Agent! Now available in the
+                        sidebar or on{' '}
+                        <Link to="https://analytics.expedia.biz/" newTab={true}>
+                            Analytics Workbench
+                        </Link>{' '}
+                        🎉
+                    </div>
+                </Message>
             </div>
             <Columns>
                 <Column>
