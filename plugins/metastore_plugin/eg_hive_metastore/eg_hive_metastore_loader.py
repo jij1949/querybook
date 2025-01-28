@@ -65,6 +65,7 @@ class EgTagColors(Enum):
     FILE_FORMAT: str = "#6ba097"  # creamy forest green
     SOURCE: str = "#C792EA"  # light purple
     PLATINUM: str = "#08c4c4"  # miku turquoise
+    DEPRECATION: str = "#bfbfbf"  # grey
 
 
 # Max length of a tag name in the database (tag.name)
@@ -559,7 +560,8 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             # practical to load the schema directly from S3. So we just add a warning to the table.
             if file_format == "Avro" and parameters.get("avro.schema.url"):
                 table = table._replace(
-                    warnings=[
+                    warnings=(table.warnings or [])
+                    + [
                         (
                             DataTableWarningSeverity.WARNING,
                             "This is an Avro table with an external schema file, so the columns shown in Querybook may not be correct.",
@@ -697,6 +699,9 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 importance_score,
                 collibra_table_link,
                 _,
+                deprecation_status,
+                deprecation_date,
+                deprecation_notes,
             ] = top_tier_row
 
             # The `popularity` column is the rank of the table per PUMA data (1 = most popular)
@@ -729,6 +734,32 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                         color=EgTagColors.PLATINUM.value,
                         meta={"rank": 200, "icon": "Crown"},
                     )
+                )
+
+            # Add deprecation status if available
+            if deprecation_status:
+                custom_properties["deprecation_status"] = deprecation_status
+                custom_properties["deprecation_date"] = deprecation_date
+                custom_properties["deprecation_notes"] = deprecation_notes
+
+                tags.append(
+                    DataTag(
+                        name=deprecation_status,
+                        description=f"This table is marked {deprecation_status} in Collibra",
+                        color=EgTagColors.DEPRECATION.value,
+                        meta={"rank": 190, "icon": "Trash2"},
+                    )
+                )
+
+                # Add a warning to the table indicating the deprecation status
+                table = table._replace(
+                    warnings=(table.warnings or [])
+                    + [
+                        (
+                            DataTableWarningSeverity.WARNING,
+                            f"{deprecation_status}{' as of ' + deprecation_date if deprecation_date else ''}: {deprecation_notes}",
+                        )
+                    ]
                 )
 
             # Add a link to Collibra if available
@@ -969,7 +1000,10 @@ def get_top_tier_row(source_data_lake, source_schema_name, table_name, session=N
                 popularity,
                 importance_score,
                 collibra_table_link,
-                collibra_tags
+                collibra_tags,
+                deprecation_status,
+                deprecation_date,
+                deprecation_notes
             FROM eg_top_tier_table
             WHERE source_data_lake = :source_data_lake
                 AND source_schema_name = :source_schema_name

@@ -22,7 +22,10 @@ query_template = """
     d.popularity,
     d.importance_score,
     d.collibra_table_link,
-    d.collibra_tags
+    d.collibra_tags,
+    d.deprecation_status,
+    d.deprecation_date,
+    d.deprecation_notes
     FROM plat_metrics.cleansed_eg_table_discovery d
     ORDER BY d.popularity ASC
     LIMIT {limit}
@@ -80,7 +83,10 @@ def top_tier_task(
                     popularity INT,
                     importance_score FLOAT,
                     collibra_table_link VARCHAR(255),
-                    collibra_tags JSON
+                    collibra_tags JSON,
+                    deprecation_status VARCHAR(255),
+                    deprecation_date VARCHAR(255),
+                    deprecation_notes TEXT
                 )
                 """
             )
@@ -97,6 +103,13 @@ def top_tier_task(
                     "collibra_tags": (
                         json.dumps(collibra_tags) if collibra_tags else None
                     ),
+                    "deprecation_status": (
+                        deprecation_status if deprecation_status else None
+                    ),
+                    "deprecation_date": deprecation_date if deprecation_date else None,
+                    "deprecation_notes": (
+                        deprecation_notes if deprecation_notes else None
+                    ),
                 }
                 for (
                     (
@@ -109,6 +122,9 @@ def top_tier_task(
                         importance_score,
                         collibra_table_link,
                         collibra_tags,
+                        deprecation_status,
+                        deprecation_date,
+                        deprecation_notes,
                     )
                 ) in rows
             ]
@@ -118,11 +134,13 @@ def top_tier_task(
                 INSERT INTO eg_top_tier_table (
                     source_data_lake, source_schema_name, table_name,
                     trending, platinum, popularity, importance_score,
-                    collibra_table_link, collibra_tags
+                    collibra_table_link, collibra_tags, deprecation_status,
+                    deprecation_date, deprecation_notes
                 ) VALUES (
                     :source_data_lake, :source_schema_name, :table_name,
                     :trending, :platinum, :popularity, :importance_score,
-                    :collibra_table_link, :collibra_tags
+                    :collibra_table_link, :collibra_tags, :deprecation_status,
+                    :deprecation_date, :deprecation_notes
                 )
                 """,
                 values,
