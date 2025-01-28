@@ -1,0 +1,4 @@
+# Wraps PyMySQL, has auth issues with StarRocks
+# starrocks==1.0.6
+
+mysql-connector-python==9.2.0
