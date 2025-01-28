@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.112.0](https://github.com/eg-internal/querybook/compare/v0.111.0...v0.112.0) (2025-01-28)
+
+
+### Features
+
+* Add more Platinum icons, filters, update tooltips ([9c2909e](https://github.com/eg-internal/querybook/commit/9c2909ef7b92dd1a9edc02095331dd5ae4655e3b))
+* Add mysql-connector-python library for StarRocks ([8a2b3f6](https://github.com/eg-internal/querybook/commit/8a2b3f669ebd09b4cb61948c4e4eb41e0a2399e7))
+* Load deprecation status into table tags, custom_info, and warnings ([#378](https://github.com/eg-internal/querybook/issues/378)) ([d4d222e](https://github.com/eg-internal/querybook/commit/d4d222e89728bf8097f8c50830ce5201768cb061))
+* Update query error suggestions ([c146d99](https://github.com/eg-internal/querybook/commit/c146d99e41f2ba3fcbaed839ba87e2fbbdf1c356))
+
+
+### Bug Fixes
+
+* Update Ava message on landing page to mention sidebar ([1780d9d](https://github.com/eg-internal/querybook/commit/1780d9d7ba009d6e692336070c9aea68071d153c))
+
 ## [0.111.0](https://github.com/eg-internal/querybook/compare/v0.110.0...v0.111.0) (2025-01-24)
 
 
