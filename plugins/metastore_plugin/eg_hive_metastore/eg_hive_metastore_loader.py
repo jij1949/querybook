@@ -65,7 +65,7 @@ class EgTagColors(Enum):
     FILE_FORMAT: str = "#6ba097"  # creamy forest green
     SOURCE: str = "#C792EA"  # light purple
     PLATINUM: str = "#08c4c4"  # miku turquoise
-    DEPRECATION: str = "#bfbfbf"  # grey
+    DEPRECATION: str = "#4d4d4d"  # darkGrey
 
 
 # Max length of a tag name in the database (tag.name)
@@ -752,12 +752,18 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 )
 
                 # Add a warning to the table indicating the deprecation status
+                warning_message = f"{deprecation_status}"
+                if deprecation_date:
+                    warning_message += f" as of {deprecation_date}"
+                if deprecation_notes:
+                    warning_message += f": {deprecation_notes}"
+
                 table = table._replace(
                     warnings=(table.warnings or [])
                     + [
                         (
                             DataTableWarningSeverity.WARNING,
-                            f"{deprecation_status}{' as of ' + deprecation_date if deprecation_date else ''}: {deprecation_notes}",
+                            warning_message,
                         )
                     ]
                 )

@@ -46,3 +46,6 @@
 - name: choco
   color: '#b7652b'
   fillColor: rgba(183, 101, 43, 0.25)
+- name: darkGrey
+  color: '#6d6d6d'
+  fillColor: rgba(77, 77, 77, 0.25)
