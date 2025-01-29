@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.112.1](https://github.com/eg-internal/querybook/compare/v0.112.0...v0.112.1) (2025-01-29)
+
+
+### Bug Fixes
+
+* Update Deprecation warning text and tag color ([53ab9cc](https://github.com/eg-internal/querybook/commit/53ab9cc643ec69281f2d206fdead9d65a271b474))
+
 ## [0.112.0](https://github.com/eg-internal/querybook/compare/v0.111.0...v0.112.0) (2025-01-28)
 
 
