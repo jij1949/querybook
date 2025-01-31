@@ -50,25 +50,30 @@ test('enableResizable', () => {
 });
 
 test('getCodeEditorTheme', () => {
-    expect(utils.getCodeEditorTheme('default')).toStrictEqual('xcode');
     expect(utils.getCodeEditorTheme('dark')).toStrictEqual('monokai');
-    expect(utils.getCodeEditorTheme('lush')).toStrictEqual('solarized-dark');
-    expect(utils.getCodeEditorTheme('')).toStrictEqual('xcode');
+    expect(utils.getCodeEditorTheme('')).toStrictEqual('default');
+});
 
-    expect(utils.getCodeEditorTheme('default', 'auto')).toStrictEqual('xcode');
+test('getCodeEditorTheme2', () => {
+    expect(utils.getCodeEditorTheme2('default')).toStrictEqual('xcode');
+    expect(utils.getCodeEditorTheme2('dark')).toStrictEqual('monokai');
+    expect(utils.getCodeEditorTheme2('lush')).toStrictEqual('solarized-dark');
+    expect(utils.getCodeEditorTheme2('')).toStrictEqual('xcode');
+
+    expect(utils.getCodeEditorTheme2('default', 'auto')).toStrictEqual('xcode');
     expect(
-        utils.getCodeEditorTheme('default', 'tokyo-night-storm')
+        utils.getCodeEditorTheme2('default', 'tokyo-night-storm')
     ).toStrictEqual('tokyo-night-storm');
 
-    expect(utils.getCodeEditorTheme('dark', 'auto')).toStrictEqual('monokai');
-    expect(utils.getCodeEditorTheme('dark', 'darcula')).toStrictEqual(
+    expect(utils.getCodeEditorTheme2('dark', 'auto')).toStrictEqual('monokai');
+    expect(utils.getCodeEditorTheme2('dark', 'darcula')).toStrictEqual(
         'darcula'
     );
 
-    expect(utils.getCodeEditorTheme('lush', 'auto')).toStrictEqual(
+    expect(utils.getCodeEditorTheme2('lush', 'auto')).toStrictEqual(
         'solarized-dark'
     );
-    expect(utils.getCodeEditorTheme('lush', 'monokai')).toStrictEqual(
+    expect(utils.getCodeEditorTheme2('lush', 'monokai')).toStrictEqual(
         'monokai'
     );
 });
