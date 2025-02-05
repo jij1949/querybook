@@ -4,6 +4,7 @@ from lib.notify.all_notifiers import get_notifier_class, DEFAULT_NOTIFIER
 from logic import user as user_logic
 from app.db import with_session
 
+
 @with_session
 def get_user_preferred_notifier(user_id, session=None):
     notification_preference = user_logic.get_user_settings(
@@ -34,19 +35,29 @@ def notify_user(user, template_name, template_params, notifier_name=None, sessio
 
 
 def render_message(template_name, notifier_name, context):
+    """
+    Render notification template from core or plugin paths.
+    Plugin templates in plugins/notification_templates_plugin/ override core templates.
+    """
     # Check for a notifier-specific template
     # E.g. datadoc_completion_notification_slack.md
-    notifier_specific_template_path = f"./querybook/notification_templates/{template_name}_{notifier_name}.md"
+    notifier_specific_template_path = (
+        f"./querybook/notification_templates/{template_name}_{notifier_name}.md"
+    )
     if os.path.exists(notifier_specific_template_path):
         template_name = f"{template_name}_{notifier_name}"
 
-    jinja_env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader("./querybook/notification_templates/")
-    )
-
+    template_paths = [
+        "./plugins/notification_templates_plugin/",
+        "./querybook/notification_templates/",
+    ]
+    jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_paths))
     jinja_env.filters["escape"] = escape
+
     template = jinja_env.get_template(f"{template_name}.md")
+
     return template.render(context)
 
+
 def escape(s):
-    return s.replace("\\", "\\\\").replace("_", "\_").replace("#", "\#")
+    return s.replace("\\", "\\\\").replace("_", r"\_").replace("#", r"\#")
