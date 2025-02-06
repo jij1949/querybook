@@ -6,7 +6,7 @@ from app.db import with_session
 from const.datasources import ACCESS_RESTRICTED_STATUS_CODE, UNAUTHORIZED_STATUS_CODE
 from const.user_roles import UserRoleType
 
-# from lib.utils.decorators import in_mem_memoized
+from lib.utils.decorators import in_mem_memoized
 from models.user import User
 from app.db import DBSession, get_session
 from logic.admin import (
@@ -37,7 +37,7 @@ class AuthUser(UserMixin):
         return UserRoleType.ADMIN.value in self._user_dict["roles"]
 
     @property
-    # @in_mem_memoized(300)
+    @in_mem_memoized(300)
     def environment_ids(self):
         return get_all_accessible_environment_ids_by_uid(self.id, session=get_session())
 
