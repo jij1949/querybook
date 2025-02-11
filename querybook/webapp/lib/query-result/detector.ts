@@ -15,7 +15,7 @@ const columnDetectors: IColumnDetector[] = [
     },
     {
         type: 'json',
-        priority: 0.1,
+        priority: 3,
         checker: (colName: string, values: any[]) =>
             detectTypeForValues(values, (value) => {
                 try {
