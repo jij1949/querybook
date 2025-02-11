@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.112.2](https://github.com/eg-internal/querybook/compare/v0.112.1...v0.112.2) (2025-02-11)
+
+
+### Bug Fixes
+
+* Boost JSON column detector priority to ensure it matches ([529fd87](https://github.com/eg-internal/querybook/commit/529fd8712ed66e493563882665a8cfa0cebaf481))
+* Fix Codemirror 5 themes ([db7f23b](https://github.com/eg-internal/querybook/commit/db7f23b570b345c1290dabcc8598978db452fa14))
+* Re-enable memoized user environment permissions ([48dd510](https://github.com/eg-internal/querybook/commit/48dd5108ee7c6962d45b86e8cb645f44455255bb))
+
 ## [0.112.1](https://github.com/eg-internal/querybook/compare/v0.112.0...v0.112.1) (2025-01-29)
 
 
