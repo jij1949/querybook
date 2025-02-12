@@ -925,7 +925,7 @@ schema_prefixes_to_data_lakes = {
     "gmo_meta_prod_": "gmo_meta_prod",
     "hcom_data_analytics_uw2_": "hcom_data_analytics",
     "hcom_data_lab_uw2_": "hcom_data_lab",
-    "hcom_data_prod_uw2_": "hcom_.data_prod",
+    "hcom_data_prod_uw2_": "hcom_data_prod",
     "hotwire_prod_": "hotwire_prod",
     "marketplacehealth_prod_": "marketplacehealth_prod",
     "perf_": "perf",
