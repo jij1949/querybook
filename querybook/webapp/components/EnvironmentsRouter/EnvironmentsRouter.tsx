@@ -20,6 +20,9 @@ import { FourOhThree } from 'ui/ErrorPage/FourOhThree';
 import { Loading } from 'ui/Loading/Loading';
 import { EmptyText } from 'ui/StyledText/StyledText';
 
+const QUERYBOOK_ACCESS_URL =
+    'https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Querybook+Access';
+
 const blank: React.FunctionComponent = () => {
     const message =
         window.NO_ENVIRONMENT_MESSAGE ??
@@ -119,7 +122,22 @@ const EnvironmentsRouter: React.FC = () => {
                     if (!isValid) {
                         return (
                             <FourOhFour>
-                                Environment <code>{envName}</code> not found
+                                <div style={{ textAlign: 'center' }}>
+                                    Environment <code>{envName}</code> not found
+                                    <br />
+                                    Please visit{' '}
+                                    <a
+                                        style={{
+                                            textDecorationLine: 'underline',
+                                        }}
+                                        href={QUERYBOOK_ACCESS_URL}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        this page
+                                    </a>{' '}
+                                    for more information.
+                                </div>
                             </FourOhFour>
                         );
                     }
@@ -128,8 +146,23 @@ const EnvironmentsRouter: React.FC = () => {
                     if (!canJoin) {
                         return (
                             <FourOhThree>
-                                You have no access to environment{' '}
-                                <code>{envName}</code>.
+                                <div style={{ textAlign: 'center' }}>
+                                    You have no access to environment{' '}
+                                    <code>{envName}</code>.
+                                    <br />
+                                    Please visit{' '}
+                                    <a
+                                        style={{
+                                            textDecorationLine: 'underline',
+                                        }}
+                                        href={QUERYBOOK_ACCESS_URL}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        this page
+                                    </a>{' '}
+                                    for more information.
+                                </div>
                             </FourOhThree>
                         );
                     }
