@@ -10,7 +10,6 @@
 -r engine/presto.txt
 -r engine/redshift.txt
 -r engine/snowflake.txt
--r engine/starrocks.txt
 -r engine/trino.txt
 
 # Metastores
