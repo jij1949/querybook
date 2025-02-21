@@ -5,6 +5,7 @@ export interface ITagMeta {
     icon?: string;
     tooltip?: string;
     rank?: number;
+    hidden?: boolean;
 }
 export interface ITag {
     id: number;

@@ -56,17 +56,19 @@ export const DataTableTags: React.FunctionComponent<IProps> = ({
         loadTags();
     }, []);
 
-    const listDOM = (tags || []).map((tag) => (
-        <TableTag
-            tag={tag}
-            readonly={readonly}
-            deleteTag={deleteTag}
-            key={tag.id}
-            isUserAdmin={isUserAdmin}
-            mini={mini}
-            showType={showType}
-        />
-    ));
+    const listDOM = (tags || [])
+        .filter((tag) => tag.meta?.hidden !== true)
+        .map((tag) => (
+            <TableTag
+                tag={tag}
+                readonly={readonly}
+                deleteTag={deleteTag}
+                key={tag.id}
+                isUserAdmin={isUserAdmin}
+                mini={mini}
+                showType={showType}
+            />
+        ));
 
     return (
         <div className="DataTableTags flex-row">

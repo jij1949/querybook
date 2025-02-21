@@ -116,6 +116,11 @@ export const TableTagConfigModal: React.FC<{
                             help="Higher ranked tags will appear first"
                             type="number"
                         />
+                        <SimpleField
+                            name="hidden"
+                            type="toggle"
+                            help="Hides the tag from the tag list, but still can be searched"
+                        />
                     </FormWrapper>
                     <div className="right-align mt12">
                         <AsyncButton
