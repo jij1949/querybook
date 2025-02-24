@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.113.0](https://github.com/eg-internal/querybook/compare/v0.112.2...v0.113.0) (2025-02-24)
+
+
+### Features
+
+* Add StarRocks executor and client ([#391](https://github.com/eg-internal/querybook/issues/391)) ([5258ad4](https://github.com/eg-internal/querybook/commit/5258ad446bb7713c9b61d9ebb532bd378f7fa724))
+* Batch processing for the top_tier_task ([065d3bc](https://github.com/eg-internal/querybook/commit/065d3bc24543ee727b4a15b0703ca72cda0414e8))
+* Collibra criticality level changes ([bb5cbbc](https://github.com/eg-internal/querybook/commit/bb5cbbc0db58b1888af06938586c65e55fe6f2a6))
+* Hidden tag support ([f44a991](https://github.com/eg-internal/querybook/commit/f44a991c2f4cba55cacdbb23dca6a3ecbb8e70be))
+* remove the mysql-connector library ([1a386f5](https://github.com/eg-internal/querybook/commit/1a386f5008ce32e8b962ae91ea8422bdbf89261b))
+
+
+### Bug Fixes
+
+* added links to querybook access page for environment 404 and 403 errors ([#389](https://github.com/eg-internal/querybook/issues/389)) ([1bab625](https://github.com/eg-internal/querybook/commit/1bab625f13a40619738667e373b7d2eaa8c1017e))
+* Typo in hcom_data_prod ([ced3bef](https://github.com/eg-internal/querybook/commit/ced3bef011259740784c8c849758bd69c6fcdd1d))
+
 ## [0.112.2](https://github.com/eg-internal/querybook/compare/v0.112.1...v0.112.2) (2025-02-11)
 
 
