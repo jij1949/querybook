@@ -17,7 +17,7 @@ export const TopTierCrown: React.FunctionComponent<{
             ? {
                   'aria-label':
                       tooltip ??
-                      'Platinum designation via Collibra, indicating financial, business, or regulatory impact',
+                      'Platinum or Platinum Candidate designation via Collibra, indicating financial, business, or regulatory impact',
                   'data-balloon-pos': tooltipPos,
                   'data-balloon-length': 'medium',
               }

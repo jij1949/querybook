@@ -55,6 +55,8 @@ import { SimpleReactSelect } from 'ui/SimpleReactSelect/SimpleReactSelect';
 import { AccentText, EmptyText } from 'ui/StyledText/StyledText';
 import { Tabs } from 'ui/Tabs/Tabs';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
+import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
+import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 import { EntitySelect } from './EntitySelect';
 import { SearchDatePicker } from './SearchDatePicker';
@@ -68,8 +70,6 @@ import { SearchSchemaSelect } from './SearchSchemaSelect';
 import { TableSelect } from './TableSelect';
 
 import './SearchOverview.scss';
-import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 
 const userReactSelectStyle = makeReactSelectStyle(
     true,
@@ -789,21 +789,25 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                     </div>
                     <div className="result-item-golden horizontal-space-between">
                         <span>
-                            <span>Platinum Only</span>
+                            <span>Platinum Candidate Only</span>
                             <TopTierCrown tooltipPos="down" />
                         </span>
                         <Checkbox
-                            value={searchFilters?.tags?.includes('Platinum')}
+                            value={searchFilters?.tags?.includes(
+                                'Criticality Level: Platinum Candidate'
+                            )}
                             onChange={(checked) => {
                                 if (checked) {
                                     updateTags([
                                         ...(searchFilters?.tags ?? []),
-                                        'Platinum',
+                                        'Criticality Level: Platinum Candidate',
                                     ]);
                                 } else {
                                     updateTags(
                                         searchFilters?.tags?.filter(
-                                            (tag) => tag !== 'Platinum'
+                                            (tag) =>
+                                                tag !==
+                                                'Criticality Level: Platinum Candidate'
                                         )
                                     );
                                 }

@@ -14,19 +14,24 @@ LOG = get_logger(__file__)
 # Query to get the top tier tables
 query_template = """
     SELECT
-    d.source_data_lake,
-    d.source_schema_name,
-    d.table_name,
-    d.trending,
-    d.platinum,
-    d.popularity,
-    d.importance_score,
-    d.collibra_table_link,
-    d.collibra_tags,
-    d.deprecation_status,
-    d.deprecation_date,
-    d.deprecation_notes
+        d.source_data_lake,
+        d.source_schema_name,
+        d.table_name,
+        d.trending,
+        d.platinum,
+        d.criticality_level,
+        d.popularity,
+        d.importance_score,
+        d.collibra_table_link,
+        d.collibra_tags,
+        d.deprecation_status,
+        d.deprecation_date,
+        d.deprecation_notes
     FROM plat_metrics.cleansed_eg_table_discovery d
+    WHERE
+        popularity <= {popularity_threshold}
+        OR deprecation_status IS NOT NULL
+        OR criticality_level IS NOT NULL
     ORDER BY d.popularity ASC
     OFFSET {offset}
     LIMIT {limit}
@@ -43,6 +48,8 @@ def top_tier_task(
     batch_size: int = 10000,
     # Maximum number of rows to fetch (across all batches); set to 0 to fetch all rows
     limit: int = 25000,
+    # Popularity threshold for top tier tables
+    popularity_threshold: int = 20000,
 ):
     with DBSession() as session:
         (
@@ -61,6 +68,7 @@ def top_tier_task(
                     table_name VARCHAR(255),
                     trending BOOLEAN,
                     platinum BOOLEAN,
+                    criticality_level VARCHAR(255),
                     popularity INT,
                     importance_score FLOAT,
                     collibra_table_link VARCHAR(255),
@@ -89,6 +97,7 @@ def top_tier_task(
                 paged_query = query_template.format(
                     limit=batch_limit,
                     offset=offset,
+                    popularity_threshold=popularity_threshold,
                 )
                 cursor.run(paged_query)
                 cursor.poll_until_finish()
@@ -110,6 +119,7 @@ def top_tier_task(
                         "table_name": table_name,
                         "trending": trending,
                         "platinum": platinum,
+                        "criticality_level": criticality_level,
                         "popularity": popularity,
                         "importance_score": importance_score,
                         "collibra_table_link": collibra_table_link,
@@ -133,6 +143,7 @@ def top_tier_task(
                             table_name,
                             trending,
                             platinum,
+                            criticality_level,
                             popularity,
                             importance_score,
                             collibra_table_link,
@@ -148,12 +159,14 @@ def top_tier_task(
                     """
                     INSERT INTO eg_top_tier_table (
                         source_data_lake, source_schema_name, table_name,
-                        trending, platinum, popularity, importance_score,
+                        trending, platinum, criticality_level,
+                        popularity, importance_score,
                         collibra_table_link, collibra_tags, deprecation_status,
                         deprecation_date, deprecation_notes
                     ) VALUES (
                         :source_data_lake, :source_schema_name, :table_name,
-                        :trending, :platinum, :popularity, :importance_score,
+                        :trending, :platinum, :criticality_level,
+                        :popularity, :importance_score,
                         :collibra_table_link, :collibra_tags, :deprecation_status,
                         :deprecation_date, :deprecation_notes
                     )

@@ -114,24 +114,26 @@ export const DataTableNavigatorSearch: React.FC<{
                         </div>
                     </SearchFilterRow>
                     <SearchFilterRow
-                        title="Platinum"
+                        title="Platinum Candidate"
                         className="toggle-padding"
                     >
                         <div className="flex-row">
                             <ToggleSwitch
                                 checked={searchFilters?.tags?.includes(
-                                    'Platinum'
+                                    'Criticality Level: Platinum Candidate'
                                 )}
                                 onChange={(checked) => {
                                     if (checked) {
                                         updateTags([
                                             ...(searchFilters?.tags ?? []),
-                                            'Platinum',
+                                            'Criticality Level: Platinum Candidate',
                                         ]);
                                     } else {
                                         updateTags(
                                             searchFilters?.tags?.filter(
-                                                (tag) => tag !== 'Platinum'
+                                                (tag) =>
+                                                    tag !==
+                                                    'Criticality Level: Platinum Candidate'
                                             )
                                         );
                                     }

@@ -695,6 +695,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 _,
                 trending,
                 platinum,
+                criticality_level,
                 popularity,
                 importance_score,
                 collibra_table_link,
@@ -722,17 +723,34 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     partitions=self.get_partitions(schema_name, table_name)
                 )
 
-            # Add platinum tag if necessary
-            if platinum:
-                # Along with the tag, add a custom property to the table to make some things easier
-                custom_properties["platinum"] = True
+            # Add criticality level if available
+            if criticality_level:
+                custom_properties["criticality_level"] = criticality_level
 
                 tags.append(
                     DataTag(
-                        name="Platinum",
-                        description="This table is a Platinum dataset in Collibra",
+                        name=f"Criticality Level",
+                        description=f"This table contains any Criticality Level in Collibra",
                         color=EgTagColors.PLATINUM.value,
-                        meta={"rank": 200, "icon": "Crown"},
+                        meta={"rank": 199, "hidden": True},
+                    )
+                )
+
+                tags.append(
+                    DataTag(
+                        name=f"Criticality Level: {criticality_level}",
+                        type="Criticality Level",
+                        description=f"This table is marked {criticality_level} in Collibra",
+                        color=EgTagColors.PLATINUM.value,
+                        meta={
+                            "rank": 200,
+                            "icon": (
+                                "Crown"
+                                if criticality_level == "Platinum"
+                                or criticality_level == "Platinum Candidate"
+                                else None
+                            ),
+                        },
                     )
                 )
 
@@ -747,7 +765,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                         name=deprecation_status,
                         description=f"This table is marked {deprecation_status} in Collibra",
                         color=EgTagColors.DEPRECATION.value,
-                        meta={"rank": 190, "icon": "Trash2"},
+                        meta={"rank": 500, "icon": "Trash2"},
                     )
                 )
 
@@ -1003,6 +1021,7 @@ def get_top_tier_row(source_data_lake, source_schema_name, table_name, session=N
                 table_name,
                 trending,
                 platinum,
+                criticality_level,
                 popularity,
                 importance_score,
                 collibra_table_link,

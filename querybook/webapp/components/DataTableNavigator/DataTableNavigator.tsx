@@ -320,7 +320,10 @@ const TableRow: React.FC<{
         icons.push('Flame');
     }
     if (table.tags) {
-        if (table.tags.includes('Platinum')) {
+        if (
+            table.tags.includes('Criticality Level: Platinum') ||
+            table.tags.includes('Criticality Level: Platinum Candidate')
+        ) {
             icons.push('Crown');
         }
         if (table.tags.includes('Deprecated')) {
