@@ -73,6 +73,7 @@ def make_flask_app():
 
 
 def make_cache(app):
+    LOG.debug(f"Starting cache with config: {QuerybookSettings.FLASK_CACHE_CONFIG}")
     return Cache(
         app,
         config=QuerybookSettings.FLASK_CACHE_CONFIG,

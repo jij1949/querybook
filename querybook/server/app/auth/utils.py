@@ -3,10 +3,10 @@ from flask_login import UserMixin, LoginManager
 from flask import abort, session as flask_session
 
 from app.db import with_session
+from app.flask_app import cache
 from const.datasources import ACCESS_RESTRICTED_STATUS_CODE, UNAUTHORIZED_STATUS_CODE
 from const.user_roles import UserRoleType
 
-from lib.utils.decorators import in_mem_memoized
 from models.user import User
 from app.db import DBSession, get_session
 from logic.admin import (
@@ -25,6 +25,10 @@ class AuthUser(UserMixin):
     def __init__(self, user: User):
         self._user_dict = user.to_dict(with_roles=True)
 
+    def __repr__(self):
+        # Required for caching
+        return f"<AuthUser id={self.id}>"
+
     @property
     def id(self):
         return self._user_dict["id"]
@@ -37,7 +41,7 @@ class AuthUser(UserMixin):
         return UserRoleType.ADMIN.value in self._user_dict["roles"]
 
     @property
-    @in_mem_memoized(300)
+    @cache.memoize(timeout=300)
     def environment_ids(self):
         return get_all_accessible_environment_ids_by_uid(self.id, session=get_session())
 

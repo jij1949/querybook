@@ -47,6 +47,10 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 # EG Custom #
 #############
 
+# Use this config to set cache policy of Flask, see https://pythonhosted.org/Flask-Cache/ for details
+# This uses the local Redis instance
+FLASK_CACHE_CONFIG: '{ "CACHE_TYPE": "RedisCache", "CACHE_REDIS_HOST": "redis", "CACHE_REDIS_PORT": 6379, "CACHE_DEFAULT_TIMEOUT": 300}'
+
 # #
 # # AI Assistant: Azure OpenAI
 # #
