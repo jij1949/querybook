@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.113.1](https://github.com/eg-internal/querybook/compare/v0.113.0...v0.113.1) (2025-02-25)
+
+
+### Bug Fixes
+
+* Switch AuthUser caching to Flask cache ([080bd16](https://github.com/eg-internal/querybook/commit/080bd16619d97bc8408d346f2b0e99e0ce66c4f0))
+
 ## [0.113.0](https://github.com/eg-internal/querybook/compare/v0.112.2...v0.113.0) (2025-02-24)
 
 
