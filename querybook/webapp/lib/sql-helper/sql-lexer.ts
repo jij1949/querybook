@@ -279,7 +279,7 @@ function sanitizeTable(tableToken: IToken, defaultSchema: string) {
     const stream = new StringStream(tableToken.text);
     const parts = [];
     while (!stream.eol()) {
-        const match = stream.match(/^([_\w\d]+|`.*`)\.?/, true);
+        const match = stream.match(/^\.*?([_\w\d]+|`.*`)\.?/, true);
         if (match[1]) {
             let part = match[1];
             if (part.charAt(0) === '`') {
