@@ -97,7 +97,7 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
             ) : entity === 'execution' ? (
                 <QueryViewNavigator />
             ) : entity === 'chat' ? (
-                <IFrameNavigator src="https://analytics.expedia.biz/ava?fullscreen=true" />
+                <IFrameNavigator src="https://analytics.expedia.biz/ava?fullscreen=true&ref=querybook" />
             ) : (
                 <div />
             );
