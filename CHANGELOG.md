@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.113.2](https://github.com/eg-internal/querybook/compare/v0.113.1...v0.113.2) (2025-02-26)
+
+
+### Bug Fixes
+
+* Add ref property to Ava link ([ed20cb2](https://github.com/eg-internal/querybook/commit/ed20cb2f6035d6c252a53694917679b8e24b0377))
+* Query parsing error blocks execution ([5a141c0](https://github.com/eg-internal/querybook/commit/5a141c06fcbcfd99e0d7bc93b9ba5c22bde60719))
+
 ## [0.113.1](https://github.com/eg-internal/querybook/compare/v0.113.0...v0.113.1) (2025-02-25)
 
 
