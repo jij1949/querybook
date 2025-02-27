@@ -996,11 +996,9 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
     if metastore.name == "vrbo-waggledance" and querybook_instance == "test":
         return ("vrbo_test", schema_name)
     if metastore.name == "egdp-waggledance":
-        if schema_name == "sandbox":
-            # Sandbox is a special case
-            return ("egdp_analytics", schema_name)
-        else:
-            return ("egdp_prod", schema_name)
+        # EGDP env uses an Analytics Waggle Dance, so all the egdp-prod schemas have a prefix
+        # If anything else that doesn't have a prefix shows up, it's actually egdp_analytics
+        return ("egdp_analytics", schema_name)
 
     return (None, schema_name)
 
