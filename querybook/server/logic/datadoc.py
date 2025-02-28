@@ -49,6 +49,23 @@ def create_data_doc(
     commit=True,
     session=None,
 ):
+    # Check for datadoc with same title, append (1), (2) etc if title already exists
+    original_title = title
+    same_title = (
+        session.query(DataDoc)
+        .filter_by(environment_id=environment_id, title=original_title)
+        .first()
+    )
+    title_count = 1
+    while same_title and original_title != "":
+        title = original_title + " (" + str(title_count) + ")"
+        title_count += 1
+        same_title = (
+            session.query(DataDoc)
+            .filter_by(environment_id=environment_id, title=title)
+            .first()
+        )
+
     data_doc = DataDoc.create(
         fields={
             "public": public,

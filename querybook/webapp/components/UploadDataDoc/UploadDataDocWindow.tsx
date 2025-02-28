@@ -11,6 +11,8 @@ import { DataDocResource } from '../../resource/dataDoc';
 import toast from 'react-hot-toast';
 import { normalizeRawDataDoc } from '../../redux/dataDoc/action';
 import { navigateWithinEnv } from '../../lib/utils/query-string';
+import { useSelector } from 'react-redux';
+import { IStoreState } from 'redux/store/types';
 
 interface IUploadDataDocWindowProps {
     onHide: () => void;
@@ -39,6 +41,10 @@ const DataDocUploaderFormModal: React.FC<{
     const { values, setFieldValue } =
         useFormikContext<IDataDocUploadFormikForm>();
 
+    const currentEnvId = useSelector(
+        (state: IStoreState) => state.environment.currentEnvironmentId
+    );
+
     const modalTitleDOM = (
         <AccentText size={'large'} weight={'bold'}>
             Upload a JSON File
@@ -57,7 +63,7 @@ const DataDocUploaderFormModal: React.FC<{
                     // Create DataDoc
                     const createDataDocPromise = DataDocResource.create(
                         jsonData.cells,
-                        jsonData.environment_id,
+                        currentEnvId,
                         jsonData.meta,
                         jsonData.title,
                         jsonData.public
