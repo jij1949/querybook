@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.114.0](https://github.com/eg-internal/querybook/compare/v0.113.2...v0.114.0) (2025-03-04)
+
+
+### Features
+
+* Enable GitHub integration ([f3be42b](https://github.com/eg-internal/querybook/commit/f3be42b2d8149529d240f9f5db3be76664d77e10))
+
+
+### Bug Fixes
+
+* automatically upload datadoc to current environment, append (1), (2), etc. if uploaded or cloned datadocs share ([#402](https://github.com/eg-internal/querybook/issues/402)) ([7a7c416](https://github.com/eg-internal/querybook/commit/7a7c4164f5781cb382d8bb6d023d81f276c243aa))
+* Correctly identify egdp_analytics source data lake for EGDP env ([e6988a0](https://github.com/eg-internal/querybook/commit/e6988a0da42b459c5169cd21ccb03d3914f99b1a))
+
 ## [0.113.2](https://github.com/eg-internal/querybook/compare/v0.113.1...v0.113.2) (2025-02-26)
 
 
