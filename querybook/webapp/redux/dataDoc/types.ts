@@ -271,6 +271,14 @@ export interface IReceiveDataDocDAGExportersAction extends Action {
     };
 }
 
+export interface IReceiveDataDocGitHubLinkedAction extends Action {
+    type: '@@dataDoc/RECEIVE_DATA_DOC_GITHUB_LINKED';
+    payload: {
+        docId: number;
+        isLinked: boolean;
+    };
+}
+
 export type DataDocAction =
     | IReceiveDataDocsAction
     | IReceiveDataDocAction
@@ -301,7 +309,8 @@ export type DataDocAction =
     | IMoveDataDocCursor
     | ISetDataDocDAGExporterSelectionAction
     | IReceiveDataDocDAGExportAction
-    | IReceiveDataDocDAGExportersAction;
+    | IReceiveDataDocDAGExportersAction
+    | IReceiveDataDocGitHubLinkedAction;
 
 export type ThunkResult<R> = ThunkAction<
     R,
@@ -338,4 +347,5 @@ export interface IDataDocState {
     recentDataDocIds: number[];
     dagExportByDocId: Record<number, IDataDocDAGExport>;
     dagExporterDataByName: Record<string, IDataDocDAGExporter>;
+    gitHubLinkedByDocId: Record<string, boolean>;
 }

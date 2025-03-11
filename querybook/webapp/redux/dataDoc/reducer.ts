@@ -23,6 +23,8 @@ const initialState: Readonly<IDataDocState> = {
     accessRequestsByDocIdUserId: {},
     dagExportByDocId: {},
     dagExporterDataByName: {},
+
+    gitHubLinkedByDocId: {},
 };
 
 function loadedEnvironmentFilterModeReducer(
@@ -486,6 +488,21 @@ function dagExporterDataByNameReducer(
     });
 }
 
+function gitHubLinkedByDocIdReducer(
+    state = initialState.gitHubLinkedByDocId,
+    action: DataDocAction
+) {
+    return produce(state, (draft) => {
+        switch (action.type) {
+            case '@@dataDoc/RECEIVE_DATA_DOC_GITHUB_LINKED': {
+                const { docId, isLinked } = action.payload;
+                draft[docId] = isLinked;
+                return;
+            }
+        }
+    });
+}
+
 export default combineReducers({
     dataDocById: dataDocByIdReducer,
     dataDocCellById: dataDocCellByIdReducer,
@@ -500,4 +517,5 @@ export default combineReducers({
     accessRequestsByDocIdUserId: accessRequestsByDocIdUserIdReducer,
     dagExportByDocId: dagExportByDocIdReducer,
     dagExporterDataByName: dagExporterDataByNameReducer,
+    gitHubLinkedByDocId: gitHubLinkedByDocIdReducer,
 });

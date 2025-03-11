@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { TooltipDirection } from 'const/tooltip';
+import { fetchDataDocGitHubLinked } from 'redux/dataDoc/action';
 import { GitHubResource } from 'resource/github';
 import { Loading } from 'ui/Loading/Loading';
 import { Message } from 'ui/Message/Message';
@@ -41,6 +43,7 @@ const GITHUB_TABS = [
 type GitHubTabKey = 'push' | 'versions' | 'settings';
 
 export const GitHubFeatures: React.FC<IProps> = ({ docId }) => {
+    const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState<GitHubTabKey>('push');
     const [linkedDirectory, setLinkedDirectory] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -81,6 +84,7 @@ export const GitHubFeatures: React.FC<IProps> = ({ docId }) => {
                 );
                 setLinkedDirectory(linkResponse.data.directory);
                 setErrorMessage(null);
+                dispatch(fetchDataDocGitHubLinked(docId));
             } catch (error) {
                 console.error('Failed to link directory:', error);
                 setErrorMessage('Failed to link directory. Please try again.');

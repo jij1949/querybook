@@ -33,11 +33,13 @@ import {
     DataDocEditorResource,
     DataDocResource,
 } from 'resource/dataDoc';
+import { GitHubResource } from 'resource/github';
 
 import {
     IReceiveDataDocAction,
     IReceiveDataDocDAGExportAction,
     IReceiveDataDocDAGExportersAction,
+    IReceiveDataDocGitHubLinkedAction,
     IReceiveDataDocsAction,
     ISaveDataDocEndAction,
     ISaveDataDocStartAction,
@@ -748,6 +750,30 @@ export function receiveDAGExporters(
         type: '@@dataDoc/RECEIVE_DATA_DOC_EXPORTERS',
         payload: {
             exporters,
+        },
+    };
+}
+
+export function fetchDataDocGitHubLinked(
+    docId: number
+): ThunkResult<Promise<void>> {
+    return async (dispatch) => {
+        const { data } = await GitHubResource.isGitHubLinked(docId);
+        const isLinked = data.linked_directory != null;
+
+        dispatch(receiveDataDocGitHubLinked(docId, isLinked));
+    };
+}
+
+export function receiveDataDocGitHubLinked(
+    docId: number,
+    isLinked: boolean
+): IReceiveDataDocGitHubLinkedAction {
+    return {
+        type: '@@dataDoc/RECEIVE_DATA_DOC_GITHUB_LINKED',
+        payload: {
+            docId,
+            isLinked,
         },
     };
 }
