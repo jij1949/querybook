@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.115.0](https://github.com/eg-internal/querybook/compare/v0.114.0...v0.115.0) (2025-03-12)
+
+
+### Features
+
+* Connected to GitHub icon coloring ([bb3d5b9](https://github.com/eg-internal/querybook/commit/bb3d5b9690677808ad16d040da43026c2a192ace))
+
+
+### Bug Fixes
+
+* Add GHEC-specific instructions to the GitHub integration auth page ([5dbab0c](https://github.com/eg-internal/querybook/commit/5dbab0c55ef72c49e368912b961c4bbc437a7693))
+
 ## [0.114.0](https://github.com/eg-internal/querybook/compare/v0.113.2...v0.114.0) (2025-03-04)
 
 
