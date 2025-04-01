@@ -127,7 +127,7 @@ const DefaultLanding: React.FC = ({ children }) => {
                     <div className="Landing-list">
                         <div>
                             <Link
-                                to="https://confluence.expedia.biz/display/DSPKB/Querybook"
+                                to="https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393151467/Querybook"
                                 newTab={true}
                             >
                                 Querybook Knowledge Base (KB) 📖
@@ -135,7 +135,7 @@ const DefaultLanding: React.FC = ({ children }) => {
                         </div>
                         <div>
                             <Link
-                                to="https://confluence.expedia.biz/display/DSPKB/Querybook+Best+Practices"
+                                to="https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393151779/Querybook+Best+Practices"
                                 newTab={true}
                             >
                                 Querybook Best Practices 📚

@@ -29,7 +29,7 @@ export const ExpediaOktaError: React.FunctionComponent = () => {
                 <Subtitle className="ErrorPage-message mb16">
                     <a
                         style={{ fontWeight: 'bold' }}
-                        href="https://confluence.expedia.biz/display/DSPKB/Querybook+Access"
+                        href="https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393151755/Querybook+Access"
                     >
                         Querybook Access Request
                     </a>

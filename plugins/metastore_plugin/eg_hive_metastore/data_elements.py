@@ -1,7 +1,7 @@
 from const.data_element import DataElementTuple
 
-# https://confluence.expedia.biz/display/EDMG/EDMG+-+Tags+for+Data+Governance
-# https://confluence.expedia.biz/display/ExGS/Expedia+Group+Information+Classification+Policy
+# https://expediagroup.atlassian.net/wiki/spaces/EDMG/pages/478642776/EDMG+-+Tags+for+Data+Governance
+# https://expediagroup.atlassian.net/wiki/spaces/ExGS/pages/593272951/Expedia+Group+Information+Classification+Policy
 
 data_elements = [
     {
@@ -154,7 +154,7 @@ data_elements = [
             },
         ),
     },
-        {
+    {
         "keys": [
             "last four credit card",
         ],

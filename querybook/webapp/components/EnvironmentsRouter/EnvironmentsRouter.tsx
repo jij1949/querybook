@@ -21,7 +21,7 @@ import { Loading } from 'ui/Loading/Loading';
 import { EmptyText } from 'ui/StyledText/StyledText';
 
 const QUERYBOOK_ACCESS_URL =
-    'https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Querybook+Access';
+    'https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393151755/Querybook+Access';
 
 const blank: React.FunctionComponent = () => {
     const message =

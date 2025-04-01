@@ -8,6 +8,6 @@ hints:
     - 'Press shift + enter to launch queries quickly.'
     - 'Use ⌘S to force save DataDocs'
     - 'Organize your work using Lists, which can contain DataDocs, Query Executions, Tables, and other Lists.'
-    - 'Add your team Security Group to DataDocs to easily share with your entire team.  Follow the [onboarding guide](https://confluence.expedia.biz/display/DSPKB/Adding+User+Groups+to+Querybook) to get started.'
+    - 'Add your team Security Group to DataDocs to easily share with your entire team.  Follow the [onboarding guide](https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393154025/Adding+User+Groups+to+Querybook) to get started.'
     - 'Periodically review your scheduled DataDocs to ensure they are still relevant. Disable any that are no longer needed to save resources.'
     - 'Try the AI Assistant to help you write or edit queries. Click on the AI icon next to any DataDoc cell to get started.'

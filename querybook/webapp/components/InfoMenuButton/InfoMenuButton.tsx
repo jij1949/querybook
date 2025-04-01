@@ -27,7 +27,7 @@ export const InfoMenuButton: React.FunctionComponent = () => {
                 <MenuDivider />
                 <MenuItem
                     onClick={() => {
-                        window.open('https://confluence.expedia.biz/display/DSPKB/Querybook+Change+Logs', '_blank')
+                        window.open('https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393152283/Querybook+Change+Logs', '_blank')
                     }}
                 >
                     Change Logs

@@ -23,7 +23,7 @@ then
 fi
 
 # Schema Deploy managed database secrets
-# https://confluence.expedia.biz/display/DAPS/Integrate+Schema+Deploy+managed+database+secrets+with+RCP
+# https://expediagroup.atlassian.net/wiki/spaces/DAPS/pages/500376374/Integrate+Schema+Deploy+managed+database+secrets+with+RCP
 
 echo "Looking for managed-database.json file in /vault/secrets"
 

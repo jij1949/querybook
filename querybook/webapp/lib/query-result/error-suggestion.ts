@@ -117,7 +117,7 @@ window.GET_QUERY_ERROR_SUGGESTION = (
     ) {
         return `ETL clusters cannot access the \`sandbox\` schema.  Please use an Ad hoc cluster instead.
 
-For more details, please refer to https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DAPS&title=Cluster+Types`;
+For more details, please refer to https://expediagroup.atlassian.net/wiki/spaces/DAPS/pages/500332524/Cluster+Types`;
     }
     if (
         queryEngine.language === 'trino' &&
@@ -128,7 +128,7 @@ For more details, please refer to https://confluence.expedia.biz/pages/viewpage.
     ) {
         return `Ad hoc clusters cannot write to persistent schemas.  Please use an ETL cluster instead.
 
-For more details, please refer to https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DAPS&title=Cluster+Types`;
+For more details, please refer to https://expediagroup.atlassian.net/wiki/spaces/DAPS/pages/500332524/Cluster+Types`;
     }
     if (
         queryEngine.language === 'trino' &&
@@ -149,7 +149,7 @@ If you need to keep data for longer, please use a persistent schema instead.`;
         console.log(JSON.stringify(queryExecution, null, 2));
         return `Clickstream data is very large and your query has exceeded the query limits.
 
-Please refer to the following article to tune your query and reduce the amount of data you are querying: [Tips & Tricks to query Clickstream Data](https://confluence.expedia.biz/x/eT2vqQ)`;
+Please refer to the following article to tune your query and reduce the amount of data you are querying: [Tips & Tricks to query Clickstream Data](https://expediagroup.atlassian.net/wiki/x/Ng5vFw)`;
     }
 
     return '';

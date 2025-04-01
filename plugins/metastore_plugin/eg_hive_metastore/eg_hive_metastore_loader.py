@@ -72,7 +72,7 @@ class EgTagColors(Enum):
 TAG_NAME_LIMIT = 255
 
 
-# See: https://confluence.expedia.biz/display/EDMG/EDMG+-+Tags+for+Data+Governance
+# See: https://expediagroup.atlassian.net/wiki/spaces/EDMG/pages/478642776/EDMG+-+Tags+for+Data+Governance
 DATASET_TAGS = [
     {"name": "eg-owner", "mandatory": True, "tag": False},
     {"name": "eg-creator", "mandatory": True, "tag": False},
@@ -975,7 +975,7 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
     # Test for matching prefixes
     for prefix, data_lake in schema_prefixes_to_data_lakes.items():
         if schema_name.startswith(prefix):
-            return (data_lake, schema_name[len(prefix) :])
+            return (data_lake, schema_name[len(prefix):])
 
     # If there's no prefix, then it's not federated,
     # so we can use the metastore name to determine the data lake

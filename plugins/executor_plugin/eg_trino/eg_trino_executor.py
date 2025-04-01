@@ -43,9 +43,9 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
         self._warning = ""
         self._json_csv_warning_checked = False
         self._client_setting = client_setting | \
-                               {'execution_type': 'execution_type:' + execution_type,
-                                'query_execution_id': query_execution_id,
-                                'retries': 'retries:' + str(celery_task.request.retries)}
+            {'execution_type': 'execution_type:' + execution_type,
+             'query_execution_id': query_execution_id,
+             'retries': 'retries:' + str(celery_task.request.retries)}
 
         self._get_datadoc_info(query_execution_id)
 
@@ -148,7 +148,7 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
             warning = (
                 warning
                 + "Use of non-optimized format can significantly slow down the query. \nMore information at: "
-                f"https://confluence.expedia.biz/pages/viewpage.action?spaceKey=DSPKB&title=Parquet+vs+Json+format"
+                f"https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393153599/Parquet+vs+Json+format"
             )
         self._json_csv_warning_checked = True
         return warning
@@ -167,22 +167,24 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
     def _get_datadoc_info(self, query_execution_id):
         with DBSession() as session:
             datadoc_info = qe_logic.get_datadoc_info_from_query_execution_id(query_execution_id,
-                                                                                     session=session)
+                                                                             session=session)
         if datadoc_info:
             self._datadoc_id, self._data_cell_id, self._data_cell_meta, self._datadoc_title = datadoc_info
             self._datadoc_title = self.simplify_string(self._datadoc_title)
-            self._data_cell_title = self.simplify_string(self._data_cell_meta.get('title', ''))
+            self._data_cell_title = self.simplify_string(
+                self._data_cell_meta.get('title', ''))
             self._client_setting = self._client_setting | \
-                                   {'datadoc_id': 'datadoc_id:' + str(self._datadoc_id),
-                                    'datadoc_title': 'datadoc_title:' + self._datadoc_title,
-                                    'data_cell_id': 'data_cell_id:' + str(self._data_cell_id),
-                                    'data_cell_title': 'data_cell_title:' + self._data_cell_title}
+                {'datadoc_id': 'datadoc_id:' + str(self._datadoc_id),
+                 'datadoc_title': 'datadoc_title:' + self._datadoc_title,
+                 'data_cell_id': 'data_cell_id:' + str(self._data_cell_id),
+                 'data_cell_title': 'data_cell_title:' + self._data_cell_title}
         else:
             return
 
     def simplify_string(self, title_input):
         # Remove non-ASCII characters and trailing/leading whitespace, newlines, and carriage returns
-        title_output = re.sub(r'[^\x00-\x7F]', '', title_input).strip().replace('\n', '').replace('\r', '')
+        title_output = re.sub(
+            r'[^\x00-\x7F]', '', title_input).strip().replace('\n', '').replace('\r', '')
         return title_output
 
     def is_json(self, info):
@@ -205,7 +207,6 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
                 )
             except Exception:
                 return QueryExecutionErrorType.ENGINE.value, error_str, e.message
-
 
         if isinstance(e, Error):
             error_type = QueryExecutionErrorType.ENGINE.value
