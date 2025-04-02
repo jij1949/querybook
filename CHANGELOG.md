@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.116.1](https://github.com/eg-internal/querybook/compare/v0.116.0...v0.116.1) (2025-04-02)
+
+
+### Bug Fixes
+
+* Pin openai dependency to a specific version ([8202fb8](https://github.com/eg-internal/querybook/commit/8202fb89e5145712c88fdef7992e5db94ee355f3))
+
 ## [0.116.0](https://github.com/eg-internal/querybook/compare/v0.115.0...v0.116.0) (2025-04-02)
 
 
