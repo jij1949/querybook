@@ -128,19 +128,42 @@ def test_get_repo_directories(mock_github, mock_github_link, mock_repo):
     branch = "main"
     mock_github_instance = mock_github.return_value
     mock_github_instance.get_repo.return_value = mock_repo
+
     mock_directory = MagicMock()
     mock_directory.type = "dir"
     mock_directory.path = "datadocs"
-    mock_repo.get_contents.return_value = [mock_directory]
+
+    mock_subdirectory = MagicMock()
+    mock_subdirectory.type = "dir"
+    mock_subdirectory.path = "datadocs/subfolder"
+
+    mock_file = MagicMock()
+    mock_file.type = "file"
+    mock_file.path = "datadocs/file.txt"
+
+    def mock_get_contents(path):
+        if path == "":  # Root directory
+            return [mock_directory]
+        elif path == "datadocs":
+            return [mock_subdirectory, mock_file]
+        elif path == "datadocs/subfolder":
+            return []  # Empty subfolder
+        return []
+
+    mock_repo.get_contents.side_effect = mock_get_contents
+
     client = GitHubClient(
         access_token=access_token,
         repo_name=repo_name,
         branch=branch,
         github_link=mock_github_link,
     )
+
     directories = client.get_repo_directories()
-    assert len(directories) == 1
-    assert directories[0] == "datadocs"
+    assert len(directories) == 2
+    assert "datadocs" in directories
+    assert "datadocs/subfolder" in directories
+    assert "datadocs/file.txt" not in directories
 
 
 def test_get_datadoc_at_commit(mock_github, mock_github_link, mock_repo):

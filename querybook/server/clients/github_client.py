@@ -163,16 +163,45 @@ class GitHubClient:
 
     def get_repo_directories(self) -> List[str]:
         """
-        Get all directories in the repository.
+        Get all directories in the repository, including subdirectories.
+
         Returns:
-            List[str]: A list of directory names.
+            List[str]: A list of all directory paths in the repository.
         """
+
+        def get_directories_recursive(path: str) -> List[str]:
+            """
+            Recursively get all directories at and below the given path.
+
+            Args:
+                path: The directory path to start from
+
+            Returns:
+                List of directory paths
+            """
+            try:
+                contents = self.repo.get_contents(path)
+
+                current_dirs = [
+                    content.path for content in contents if content.type == "dir"
+                ]
+
+                subdirs = [
+                    subdir
+                    for dir_path in current_dirs
+                    for subdir in get_directories_recursive(dir_path)
+                ]
+
+                return current_dirs + subdirs
+            except GithubException as e:
+                LOG.error(
+                    f"GitHubException during get_directories_recursive for path {path}: {e}"
+                )
+                return []
+
         try:
-            contents = self.repo.get_contents("")
-            directories = [
-                content.path for content in contents if content.type == "dir"
-            ]
-            return directories
+            # Start the recursion from the root directory
+            return get_directories_recursive("")
         except GithubException as e:
             LOG.error(f"GitHubException during get_directories: {e}")
             return []
