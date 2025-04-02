@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.116.2](https://github.com/eg-internal/querybook/compare/v0.116.1...v0.116.2) (2025-04-02)
+
+
+### Bug Fixes
+
+* Add query_execution_id to Trino client_tags ([#415](https://github.com/eg-internal/querybook/issues/415)) ([5e1bdd5](https://github.com/eg-internal/querybook/commit/5e1bdd5749176c6fe681f2ab82b6dd3cfef96889))
+
 ## [0.116.1](https://github.com/eg-internal/querybook/compare/v0.116.0...v0.116.1) (2025-04-02)
 
 
