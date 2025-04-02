@@ -624,11 +624,13 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
                     delete_table(table_id=table_id, commit=False, session=session)
                     delete_es_table_by_id(table_id)
                 delete_schema(id=data_schema.id, commit=False, session=session)
-                LOG.info("deleted schema %d" % data_schema.id)
+                LOG.info(f"Deleted schema {data_schema.name} ({data_schema.id})")
         session.commit()
 
     @with_session
     def delete_table_not_in_metastore(self, schema_id, table_names, session=None):
+        BATCH_SIZE = 500
+        delete_count = 0
         db_tables = get_table_by_schema_id(schema_id, session=session)
 
         with session.no_autoflush:
@@ -637,8 +639,21 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
                     table_id = data_table.id
                     delete_table(table_id=table_id, commit=False, session=session)
                     delete_es_table_by_id(table_id)
-                    LOG.info(f"deleted table {table_id}")
-            session.commit()
+                    LOG.info(f"Deleted table {data_table.name} ({table_id})")
+
+                    delete_count += 1
+                    if delete_count % BATCH_SIZE == 0:
+                        session.commit()
+                        LOG.info(f"Committed batch of {BATCH_SIZE} deletions")
+
+            # Final commit for any remaining deletions
+            if delete_count % BATCH_SIZE != 0:
+                session.commit()
+                LOG.info(
+                    f"Committed final batch of {delete_count % BATCH_SIZE} deletions"
+                )
+
+        LOG.info(f"Deleted a total of {delete_count} tables from schema {schema_id}")
 
 
 @with_session
