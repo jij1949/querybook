@@ -9,3 +9,5 @@ elasticsearch==8.14.0
 
 # Required for `sentence_transformers` or `bge` embeddings
 # sentence_transformers==2.2.2
+
+openai==1.66.3
