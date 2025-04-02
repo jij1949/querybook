@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.116.0](https://github.com/eg-internal/querybook/compare/v0.115.0...v0.116.0) (2025-04-02)
+
+
+### Features
+
+* GitHub recursive directory listing ([900d4ee](https://github.com/eg-internal/querybook/commit/900d4ee317dd889262228c079048da0354a0fd1e))
+
+
+### Bug Fixes
+
+* Allow the sidebar to overflow if needed ([6821056](https://github.com/eg-internal/querybook/commit/682105644f45a2f0aeed056aaa7be4e9cf6d8ccb))
+* Batch commits when deleting tables from a metastore ([14faa3c](https://github.com/eg-internal/querybook/commit/14faa3c0593d07610bf18fd24b8375ee53bed1a1))
+* Update Confluence Links to Confluence Cloud ([#408](https://github.com/eg-internal/querybook/issues/408)) ([b24b6e2](https://github.com/eg-internal/querybook/commit/b24b6e240328456009c8bc24999b7fbdcc128e81))
+
 ## [0.115.0](https://github.com/eg-internal/querybook/compare/v0.114.0...v0.115.0) (2025-03-12)
 
 
