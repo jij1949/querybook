@@ -38,6 +38,8 @@ class EGTrinoClient(TrinoClient):
         client_tags = []
         if execution_type:
             client_tags.append(execution_type)
+        if query_execution_id:
+            client_tags.append(f"query_execution_id:{query_execution_id}")
         if datadoc_id:
             client_tags.append(datadoc_id)
         if datadoc_title:
