@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.116.3](https://github.com/eg-internal/querybook/compare/v0.116.2...v0.116.3) (2025-04-07)
+
+
+### Bug Fixes
+
+* A failing datadoc cannot be disabled ([e6512cf](https://github.com/eg-internal/querybook/commit/e6512cf4f433233aad30fdf669bb3029b2bed59a))
+
 ## [0.116.2](https://github.com/eg-internal/querybook/compare/v0.116.1...v0.116.2) (2025-04-02)
 
 
