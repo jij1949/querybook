@@ -163,7 +163,7 @@ def get_task_run_records(
     if task_type is not None:
         query = query.join(TaskSchedule).filter(TaskSchedule.task_type == task_type)
     if name:
-        query = query.filter(TaskRunRecord.name.like("%" + name + "%"))
+        query = query.filter(TaskRunRecord.name == name)
     if hide_successful_jobs:
         query = query.filter(TaskRunRecord.status != TaskRunStatus.SUCCESS)
 
