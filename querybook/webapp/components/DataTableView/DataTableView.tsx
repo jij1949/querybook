@@ -8,6 +8,7 @@ import { DataTableViewBoards } from 'components/DataTableViewBoards/DataTableVie
 import { DataTableViewColumn } from 'components/DataTableViewColumn/DataTableViewColumn';
 import { DataTableViewLineage } from 'components/DataTableViewLineage/DataTableViewLineage';
 import { DataTableViewOverview } from 'components/DataTableViewOverview/DataTableViewOverview';
+import { DataTableViewPumaInsights } from 'components/DataTableViewPumaInsights/DataTableViewPumaInsights';
 import { DataTableViewQueryExamples } from 'components/DataTableViewQueryExample/DataTableViewQueryExamples';
 import { DataTableViewSamples } from 'components/DataTableViewSamples/DataTableViewSamples';
 import { DataTableViewSourceQuery } from 'components/DataTableViewSourceQuery/DataTableViewSourceQuery';
@@ -48,6 +49,11 @@ const tabDefinitions = [
         name: 'Overview',
         key: 'overview',
         elementType: ElementType.OVERVIEW_TABLE_TAB,
+    },
+    {
+        name: 'PUMA Insights',
+        key: 'puma_insights',
+        elementType: ElementType.PUMA_INSIGHTS_TABLE_TAB,
     },
     {
         name: 'Columns',
@@ -278,6 +284,10 @@ export const DataTableView: React.FC<IDataTableViewProps> = ({ tableId }) => {
         />
     );
 
+    const makePumaInsightsDOM = () => (
+        <DataTableViewPumaInsights table={table} />
+    );
+
     const makeColumnsDOM = (numberOfRows = null) => (
         <DataTableViewColumn
             table={table}
@@ -353,6 +363,7 @@ export const DataTableView: React.FC<IDataTableViewProps> = ({ tableId }) => {
 
         const rendererByTab = {
             overview: makeOverviewDOM,
+            puma_insights: makePumaInsightsDOM,
             columns: makeColumnsDOM,
             row_samples: makeSamplesDOM,
             lineage: makeLineageDOM,

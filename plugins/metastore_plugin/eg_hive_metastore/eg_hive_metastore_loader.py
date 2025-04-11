@@ -795,6 +795,27 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     }
                 )
 
+        ai_table_descriptions_row = get_ai_table_descriptions_row(
+            source_data_lake, source_schema_name, table_name
+        )
+
+        if ai_table_descriptions_row:
+            [
+                _,
+                _,
+                _,
+                business_value,
+                table_purpose,
+                key_characteristics,
+                partition_information,
+            ] = ai_table_descriptions_row
+
+            # Add the AI table description to the custom properties
+            custom_properties["business_value"] = business_value
+            custom_properties["table_purpose"] = table_purpose
+            custom_properties["key_characteristics"] = key_characteristics
+            custom_properties["partition_information"] = partition_information
+
         # Update the table with table_links (if any)
         if table_links:
             table = table._replace(table_links=table_links)
@@ -1049,4 +1070,47 @@ def get_top_tier_row(source_data_lake, source_schema_name, table_name, session=N
 
     except Exception as e:
         LOG.error(f"Error checking Top Tier status: {e}")
+        return None
+
+
+def get_ai_table_descriptions_row(source_data_lake, source_schema_name, table_name):
+    """
+    Get the AI table descriptions for a given table.
+    Returns the row if found, otherwise None.
+    """
+    try:
+        session = get_session()
+
+        rows = session.execute(
+            """
+            SELECT
+                source_data_lake,
+                source_schema_name,
+                table_name,
+                business_value,
+                table_purpose,
+                key_characteristics,
+                partition_information
+            FROM eg_table_descriptions_table
+            WHERE source_data_lake = :source_data_lake
+                AND source_schema_name = :source_schema_name
+                AND table_name = :table_name
+        """,
+            {
+                "source_data_lake": source_data_lake,
+                "source_schema_name": source_schema_name,
+                "table_name": table_name,
+            },
+        ).fetchall()
+
+        if rows and len(rows) > 0:
+            row = rows[0]
+            LOG.debug(f"AI Table Descriptions {row}")
+            return row
+
+        # No row found
+        return None
+
+    except Exception as e:
+        LOG.error(f"Error checking AI Table Descriptions: {e}")
         return None

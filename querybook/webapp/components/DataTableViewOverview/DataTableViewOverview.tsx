@@ -41,6 +41,7 @@ import { Link } from 'ui/Link/Link';
 import { LoadingRow } from 'ui/Loading/Loading';
 import { Message } from 'ui/Message/Message';
 import { ShowMoreText } from 'ui/ShowMoreText/ShowMoreText';
+import { AccentText, StyledText } from 'ui/StyledText/StyledText';
 
 import { DataTableViewOverviewSection } from './DataTableViewOverviewSection';
 
@@ -63,6 +64,16 @@ const dataTableDetailsRows = [
  * Any custom properties in this array will be shown on top following the order of the array
  */
 const pinnedCustomProperties = ['channels'];
+
+/**
+ * Any ignored custom properties in this array will not be shown in the details section
+ */
+const ignoredCustomProperties = [
+    'business_value',
+    'table_purpose',
+    'key_characteristics',
+    'partition_information',
+];
 
 function useRefreshMetastore(table: IDataTable) {
     const dispatch = useDispatch();
@@ -133,6 +144,28 @@ export const DataTableViewOverview: React.FC<
         />
     ) : null;
 
+    const hasDescription =
+        typeof table.description === 'string'
+            ? table.description
+            : table.description.hasText();
+
+    const tablePurpose = table.custom_properties?.table_purpose as string;
+
+    const tablePurposeDOM = tablePurpose ? (
+        <div className="m12">
+            <AccentText size="small" color="text" weight="bold">
+                <span
+                    aria-label="AI Generated Content from PUMA"
+                    data-balloon-pos="right"
+                >
+                    <Icon name="Stars" size={16} />
+                </span>{' '}
+                AI-Generated Description
+            </AccentText>
+            <StyledText accentFont={false}>{tablePurpose}</StyledText>
+        </div>
+    ) : null;
+
     const tableLinksDOM = (table.table_links ?? []).map((link, index) => (
         <div key={index}>
             <Link to={link.url} newTab className="data-table-table-links">
@@ -201,6 +234,7 @@ export const DataTableViewOverview: React.FC<
 
     const otherPropertiesDOM = Object.entries(customProperties)
         .filter(([key]) => !pinnedCustomProperties.includes(key))
+        .filter(([key]) => !ignoredCustomProperties.includes(key))
         .map(([key, value]) => (
             <KeyContentDisplayLink key={key} keyString={key} value={value} />
         ));
@@ -217,7 +251,9 @@ export const DataTableViewOverview: React.FC<
 
     const descriptionSection = (
         <DataTableViewOverviewSection title="Description">
-            {description}
+            {/* Only include description if hasDescription, or if there is no table purpose */}
+            {(hasDescription || !tablePurpose) && description}
+            {tablePurposeDOM}
             {tableLinksDOM}
         </DataTableViewOverviewSection>
     );

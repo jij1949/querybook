@@ -37,8 +37,21 @@ const markdownOptions: MarkdownToJSX.Options = {
     },
 };
 
-export const Markdown: React.FC<{ children: string }> = ({ children }) => (
-    <Content>
-        <MarkdownJSX options={markdownOptions}>{children}</MarkdownJSX>
-    </Content>
-);
+export const Markdown: React.FC<{
+    children: string;
+    options?: MarkdownToJSX.Options;
+}> = ({ children, options: extraOptions }) => {
+    const mergedOptions = {
+        ...markdownOptions,
+        overrides: {
+            ...markdownOptions.overrides,
+            ...(extraOptions?.overrides || {}),
+        },
+    };
+
+    return (
+        <Content>
+            <MarkdownJSX options={mergedOptions}>{children}</MarkdownJSX>
+        </Content>
+    );
+};
