@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.117.0](https://github.com/eg-internal/querybook/compare/v0.116.3...v0.117.0) (2025-04-24)
+
+
+### Features
+
+* add puma generated table blurbs ([#420](https://github.com/eg-internal/querybook/issues/420)) ([7b1ec18](https://github.com/eg-internal/querybook/commit/7b1ec18a25d61e0660a6108556bfd8e426e7a0b3))
+
+
+### Bug Fixes
+
+* add table purpose to insights tab, add puma link tooltip ([#424](https://github.com/eg-internal/querybook/issues/424)) ([6c1d37d](https://github.com/eg-internal/querybook/commit/6c1d37d3c284f7af8c739cd473fe401525e778c6))
+* Refactor the handeling of a failing datadoc ([10efffc](https://github.com/eg-internal/querybook/commit/10efffcf9abdf029261ed3da094a16d2afe2ebc6))
+
 ## [0.116.3](https://github.com/eg-internal/querybook/compare/v0.116.2...v0.116.3) (2025-04-07)
 
 
