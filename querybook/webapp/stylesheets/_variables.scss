@@ -138,6 +138,15 @@ body {
     --color-warning-dark: var(--color-yellow-dark);
     --color-warning-darkest: var(--color-yellow-darkest);
 
+    --color-info-light: var(--color-blue-light);
+    --color-info-lightest: var(--color-blue-lightest);
+    --color-info-lightest-0: var(--color-blue-lightest-0);
+    --color-info-transp-lightest: var(--color-blue-transp-lightest);
+    --color-info-transp-lightest-0: var(--color-blue-transp-lightest-0);
+    --color-info: var(--color-blue);
+    --color-info-dark: var(--color-blue-dark);
+    --color-info-darkest: var(--color-blue-darkest);
+
     // Colors: Background + Borders
     --bg: var(--color-primary);
     --bg-lightest: var(--color-primary-0);
@@ -250,6 +259,13 @@ body.dark-theme {
     --color-warning: var(--color-yellowlight);
     --color-warning-dark: var(--color-yellow-lightest);
     --color-warning-darkest: var(--color-yellow-lightest-0);
+
+    --color-info-light: var(--color-blue);
+    --color-info-lightest: var(--color-blue-dark);
+    --color-info-lightest-0: var(--color-blue-darkest);
+    --color-info: var(--color-blue-light);
+    --color-info-dark: var(--color-blue-lightest);
+    --color-info-darkest: var(--color-blue-lightest-0);
 
     --color-accent: var(--color-blue-light);
     --color-accent-dark: var(--color-blue);

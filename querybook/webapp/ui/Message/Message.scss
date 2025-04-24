@@ -22,7 +22,11 @@
         --message-bg: var(--color-accent-transp-lightest);
         --message-bg-light: var(--color-accent-transp-lightest-0);
     }
-
+    &.info {
+        --message-color: var(--color-info-darkest);
+        --message-bg: var(--color-info-transp-lightest);
+        --message-bg-light: var(--color-info-transp-lightest-0);
+    }
     --message-header-text-size: var(--text-size);
     --message-text-size: var(--small-text-size);
     &.tip,

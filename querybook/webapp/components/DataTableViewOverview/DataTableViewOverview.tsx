@@ -46,6 +46,7 @@ import { AccentText, StyledText } from 'ui/StyledText/StyledText';
 import { DataTableViewOverviewSection } from './DataTableViewOverviewSection';
 
 import './DataTableViewOverview.scss';
+import { Markdown } from 'ui/Markdown/Markdown';
 
 const dataTableDetailsRows = [
     'type',
@@ -162,7 +163,7 @@ export const DataTableViewOverview: React.FC<
                 </span>{' '}
                 AI-Generated Description
             </AccentText>
-            <StyledText accentFont={false}>{tablePurpose}</StyledText>
+            <Markdown>{tablePurpose as string}</Markdown>
         </div>
     ) : null;
 
