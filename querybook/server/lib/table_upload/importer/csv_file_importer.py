@@ -41,7 +41,9 @@ class CSVFileImporter(BaseTableUploadImporter):
         if self._df is None:
             read_csv_config = self._get_pandas_read_csv_config()
 
-            self._df = pd.read_csv(self.data, **read_csv_config)
+            self._df = pd.read_csv(
+                self.data, **read_csv_config, keep_default_na=False, na_values=["_"]
+            )
         return self._df
 
     def get_columns(self):
