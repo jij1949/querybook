@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ComponentType, ElementType } from 'const/analytics';
 import { trackClick } from 'lib/analytics';
 import { GitHubResource, IGitHubAuthResponse } from 'resource/github';
+import { Link } from 'ui/Link/Link';
 import { Loading } from 'ui/Loading/Loading';
 import { Message } from 'ui/Message/Message';
 import { Modal } from 'ui/Modal/Modal';
@@ -73,6 +74,17 @@ export const GitHubIntegration: React.FC<IProps> = ({ docId, onClose }) => {
             title="GitHub Integration"
             className="GitHubIntegration"
         >
+            <Message type="info" className="mb12">
+                Learn how to configure and use the GitHub integration in our{' '}
+                <Link
+                    to="https://expediagroup.atlassian.net/wiki/x/aQhvFw"
+                    naturalLink
+                    newTab
+                >
+                    user guide
+                </Link>
+                .
+            </Message>
             {isLoading ? (
                 <Loading fullHeight text="Loading, please wait..." />
             ) : !isAuthorized ? (
