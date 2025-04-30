@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.117.1](https://github.com/eg-internal/querybook/compare/v0.117.0...v0.117.1) (2025-04-30)
+
+
+### Bug Fixes
+
+* Add GitHub integration guide link ([596ab78](https://github.com/eg-internal/querybook/commit/596ab780fba9a45b914c1c0172c056357231c574))
+* fix for csv_file_importer turning NA into NaN ([#426](https://github.com/eg-internal/querybook/issues/426)) ([50efe84](https://github.com/eg-internal/querybook/commit/50efe846627ccd2fbbf208e7a31c99c477a9eec3))
+* potential fix ([#425](https://github.com/eg-internal/querybook/issues/425)) ([115bb1c](https://github.com/eg-internal/querybook/commit/115bb1c9ce531140ccb3094594c6ce838f875339))
+
 ## [0.117.0](https://github.com/eg-internal/querybook/compare/v0.116.3...v0.117.0) (2025-04-24)
 
 
