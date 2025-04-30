@@ -25,7 +25,7 @@ export const QueryCellRunAllFromCellButton: React.FunctionComponent<IProps> = ({
     index,
 }) => {
     let queryCells = useQueryCells(docId);
-    const queryTitle = queryCells[index].meta.title;
+    const queryTitle = queryCells[index]?.meta?.title;
     const title =
         queryTitle == null || queryTitle === ''
             ? 'Query #' + (index + 1).toString()
