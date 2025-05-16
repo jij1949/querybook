@@ -9,4 +9,4 @@ class EgStarRocksQueryExecutor(SqlAlchemyQueryExecutor):
 
     @classmethod
     def EXECUTOR_LANGUAGE(cls):
-        return "starRocks"
+        return "starrocks"
