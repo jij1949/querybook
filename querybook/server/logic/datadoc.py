@@ -51,20 +51,31 @@ def create_data_doc(
 ):
     # Check for datadoc with same title, append (1), (2) etc if title already exists
     original_title = title
-    same_title = (
-        session.query(DataDoc)
-        .filter_by(environment_id=environment_id, title=original_title)
-        .first()
-    )
-    title_count = 1
-    while same_title and original_title != "":
-        title = original_title + " (" + str(title_count) + ")"
-        title_count += 1
-        same_title = (
-            session.query(DataDoc)
-            .filter_by(environment_id=environment_id, title=title)
-            .first()
-        )
+    if original_title != "":
+        # Fetch all titles that start with the original_title and a space,
+        # or are exactly the original_title.
+        # This helps to correctly find titles like "My Title (1)", "My Title (2)", etc.
+        # as well as "My Title" itself.
+        existing_titles = {
+            t[0]
+            for t in session.query(DataDoc.title)
+            .filter(
+                DataDoc.environment_id == environment_id,
+                (DataDoc.title == original_title)
+                | (DataDoc.title.like(original_title + " (%")),
+            )
+            .all()
+        }
+
+        if original_title in existing_titles:
+            title_count = 1
+            while True:
+                title = f"{original_title} ({title_count})"
+                if title not in existing_titles:
+                    break
+                title_count += 1
+
+        # If original_title is not in existing_titles, it's already unique
 
     data_doc = DataDoc.create(
         fields={
