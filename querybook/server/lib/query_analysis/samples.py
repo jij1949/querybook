@@ -11,6 +11,7 @@ class QuerybookColumnType(Enum):
     String = "string"
     Number = "number"
     Boolean = "boolean"
+    DateTime = "datetime"
 
     # For composite types
     Composite = "composite"
@@ -123,6 +124,11 @@ def _format_partition_filter(
         column_name, column_val = column_filter.split("=")
         column_type = column_type_by_name.get(column_name, None)
         column_quote = ""
+
+        if column_type == QuerybookColumnType.DateTime:
+            partition_filters.append(f"{column_name}=DATE '{column_val}'")
+            continue
+
         if column_type == QuerybookColumnType.String:
             column_quote = "'"
 
@@ -203,8 +209,8 @@ common_sql_types = {
     "float": QuerybookColumnType.Number,
     "double": QuerybookColumnType.Number,
     # Time
-    "date": QuerybookColumnType.String,
-    "datetime": QuerybookColumnType.String,
+    "date": QuerybookColumnType.DateTime,
+    "datetime": QuerybookColumnType.DateTime,
     "time": QuerybookColumnType.String,
     "timestamp": QuerybookColumnType.String,
     "interval": QuerybookColumnType.String,
