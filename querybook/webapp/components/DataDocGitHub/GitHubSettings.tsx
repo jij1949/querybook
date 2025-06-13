@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import { Card } from 'ui/Card/Card';
 import { Icon } from 'ui/Icon/Icon';
@@ -9,6 +9,9 @@ import { StyledText } from 'ui/StyledText/StyledText';
 import { GitHubDirectory } from './GitHubDirectory';
 
 import './GitHub.scss';
+import { IconButton } from 'ui/Button/IconButton';
+import { GitHubResource } from 'resource/github';
+import toast from 'react-hot-toast';
 
 interface IProps {
     docId: number;
@@ -21,6 +24,17 @@ export const GitHubSettings: React.FC<IProps> = ({
     linkedDirectory,
     onLinkDirectory,
 }) => {
+    const resetGitHubToken = useCallback(async () => {
+        try {
+            await GitHubResource.resetGitHubToken();
+            toast.success(
+                'GitHub token reset successfully. Please reload the page.'
+            );
+        } catch (error) {
+            toast.error('Failed to reset GitHub token.');
+        }
+    }, []);
+
     const authorizationCardDom = (
         <div className="GitHubSettings-section-content p8 mb12 mt16">
             <Message
@@ -31,15 +45,28 @@ export const GitHubSettings: React.FC<IProps> = ({
                 size="large"
                 center
             >
-                <StyledText center>
-                    Your GitHub account is successfully authorized. Manage your
-                    GitHub authorized OAuth apps{' '}
-                    <Link to="https://github.com/settings/applications" newTab>
-                        <strong>here</strong>{' '}
-                        <Icon name="ExternalLink" size={14} />
-                    </Link>
-                    .
-                </StyledText>
+                <div>
+                    <StyledText center>
+                        Your GitHub account is successfully authorized. Manage
+                        your GitHub authorized OAuth apps{' '}
+                        <Link
+                            to="https://github.com/settings/applications"
+                            newTab
+                        >
+                            <strong>here</strong>{' '}
+                            <Icon name="ExternalLink" size={14} />
+                        </Link>
+                        .
+                    </StyledText>
+                    <div className={'flex-row align-items-center mt8'}>
+                        Issues? Try resetting your GitHub token:
+                        <IconButton
+                            icon="RefreshCw"
+                            tooltip="Reset GitHub Token"
+                            tooltipPos="right"
+                        />
+                    </div>
+                </div>
             </Message>
         </div>
     );

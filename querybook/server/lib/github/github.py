@@ -113,6 +113,11 @@ class GitHubManager(GitHubLoginManager):
             <p>Failed to obtain credentials, reason: {error_message}</p>
         """
 
+    def invalidate_token(self) -> None:
+        """Invalidate the GitHub token for the current user."""
+        self.token_manager.invalidate_token(current_user.id)
+        LOG.info("GitHub token invalidated for user: %s", current_user.id)
+
 
 github_manager = GitHubManager(
     additional_scopes=["repo"],

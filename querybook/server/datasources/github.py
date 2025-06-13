@@ -146,3 +146,8 @@ def compare_datadoc_versions(
         "current_content": current_markdown,
         "commit_content": commit_markdown,
     }
+
+
+@register("/github/invalidate_token/", methods=["GET"])
+def invalidate_token():
+    github_manager.invalidate_token()

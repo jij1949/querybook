@@ -53,4 +53,5 @@ export const GitHubResource = {
         }>(`/github/datadocs/${docId}/compare/`, {
             commit_sha: commitSha,
         }),
+    resetGitHubToken: () => ds.fetch('/github/invalidate_token/'),
 };
