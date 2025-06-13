@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.118.0](https://github.com/eg-internal/querybook/compare/v0.117.1...v0.118.0) (2025-06-13)
+
+
+### Features
+
+* Added button to reset/invalidate github token ([#434](https://github.com/eg-internal/querybook/issues/434)) ([09306c7](https://github.com/eg-internal/querybook/commit/09306c780e8b0ff172a3d39ef254935dee5ac76e))
+
+
+### Bug Fixes
+
+* add color to tooltip title and content ([#433](https://github.com/eg-internal/querybook/issues/433)) ([d8d9ba6](https://github.com/eg-internal/querybook/commit/d8d9ba6fa8348855e2952a0f4590c3a7f447400b))
+* Add DateTime option to query sample format partition filter ([#430](https://github.com/eg-internal/querybook/issues/430)) ([1b7bd77](https://github.com/eg-internal/querybook/commit/1b7bd772787f0853569aade63541fa6ff9fbd2b2))
+* Optimize generating a unique name when cloning DataDocs ([c85d429](https://github.com/eg-internal/querybook/commit/c85d4294b25299182393172456e851b355203252))
+* Revise StarRocks Executor Language ([bfbf712](https://github.com/eg-internal/querybook/commit/bfbf712d30b582bae6e187a1bea6b7b15e1c9594))
+
 ## [0.117.1](https://github.com/eg-internal/querybook/compare/v0.117.0...v0.117.1) (2025-04-30)
 
 
