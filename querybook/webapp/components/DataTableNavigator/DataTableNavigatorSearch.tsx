@@ -21,7 +21,6 @@ import { Popover } from 'ui/Popover/Popover';
 import { SearchBar } from 'ui/SearchBar/SearchBar';
 import { Title } from 'ui/Title/Title';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 import './DataTableNavigatorSearch.scss';
@@ -111,35 +110,6 @@ export const DataTableNavigatorSearch: React.FC<{
                                 }
                             />
                             <TrendingFlame className="ml4" />
-                        </div>
-                    </SearchFilterRow>
-                    <SearchFilterRow
-                        title="Platinum Candidate"
-                        className="toggle-padding"
-                    >
-                        <div className="flex-row">
-                            <ToggleSwitch
-                                checked={searchFilters?.tags?.includes(
-                                    'Criticality Level: Platinum Candidate'
-                                )}
-                                onChange={(checked) => {
-                                    if (checked) {
-                                        updateTags([
-                                            ...(searchFilters?.tags ?? []),
-                                            'Criticality Level: Platinum Candidate',
-                                        ]);
-                                    } else {
-                                        updateTags(
-                                            searchFilters?.tags?.filter(
-                                                (tag) =>
-                                                    tag !==
-                                                    'Criticality Level: Platinum Candidate'
-                                            )
-                                        );
-                                    }
-                                }}
-                            />
-                            <TopTierCrown className="ml4" />
                         </div>
                     </SearchFilterRow>
                     <SearchFilterRow title="Schema">

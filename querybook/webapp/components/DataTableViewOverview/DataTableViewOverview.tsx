@@ -39,14 +39,14 @@ import { KeyContentDisplay } from 'ui/KeyContentDisplay/KeyContentDisplay';
 import { KeyContentDisplayLink } from 'ui/KeyContentDisplay/KeyContentDisplayLink';
 import { Link } from 'ui/Link/Link';
 import { LoadingRow } from 'ui/Loading/Loading';
+import { Markdown } from 'ui/Markdown/Markdown';
 import { Message } from 'ui/Message/Message';
 import { ShowMoreText } from 'ui/ShowMoreText/ShowMoreText';
-import { AccentText, StyledText } from 'ui/StyledText/StyledText';
+import { AccentText } from 'ui/StyledText/StyledText';
 
 import { DataTableViewOverviewSection } from './DataTableViewOverviewSection';
 
 import './DataTableViewOverview.scss';
-import { Markdown } from 'ui/Markdown/Markdown';
 
 const dataTableDetailsRows = [
     'type',
@@ -172,14 +172,6 @@ export const DataTableViewOverview: React.FC<
             <Link to={link.url} newTab className="data-table-table-links">
                 <Icon name="Link" size={12} />
                 {link.label ?? link.url}
-                {link.url.includes('collibra') && (
-                    <img
-                        src="/static/collibra.png"
-                        style={{
-                            width: '24px',
-                        }}
-                    />
-                )}
             </Link>
             <br />
         </div>

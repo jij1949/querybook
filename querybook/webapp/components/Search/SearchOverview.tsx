@@ -55,7 +55,6 @@ import { SimpleReactSelect } from 'ui/SimpleReactSelect/SimpleReactSelect';
 import { AccentText, EmptyText } from 'ui/StyledText/StyledText';
 import { Tabs } from 'ui/Tabs/Tabs';
 import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 import { EntitySelect } from './EntitySelect';
@@ -785,33 +784,6 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                                 'golden',
                                 searchFilters.golden ? null : true
                             )}
-                        />
-                    </div>
-                    <div className="result-item-golden horizontal-space-between">
-                        <span>
-                            <span>Platinum Candidate Only</span>
-                            <TopTierCrown tooltipPos="down" />
-                        </span>
-                        <Checkbox
-                            value={searchFilters?.tags?.includes(
-                                'Criticality Level: Platinum Candidate'
-                            )}
-                            onChange={(checked) => {
-                                if (checked) {
-                                    updateTags([
-                                        ...(searchFilters?.tags ?? []),
-                                        'Criticality Level: Platinum Candidate',
-                                    ]);
-                                } else {
-                                    updateTags(
-                                        searchFilters?.tags?.filter(
-                                            (tag) =>
-                                                tag !==
-                                                'Criticality Level: Platinum Candidate'
-                                        )
-                                    );
-                                }
-                            }}
                         />
                     </div>
                 </div>

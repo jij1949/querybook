@@ -12,7 +12,6 @@ import { getHumanReadableByteSize } from 'lib/utils/number';
 import { IconButton } from 'ui/Button/IconButton';
 import { AllLucideIconNames } from 'ui/Icon/LucideIcons';
 import { Loader } from 'ui/Loader/Loader';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 import { ColumnIcon } from './ColumnIcon';
@@ -45,12 +44,6 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
                     <span className="flex-row">
                         {table.name}
                         {table.golden && <TrendingFlame className="ml4" />}
-                        {(table.custom_properties?.criticality_level ===
-                            'Platinum' ||
-                            table.custom_properties?.criticality_level ===
-                                'Platinum Candidate') && (
-                            <TopTierCrown className="ml4" />
-                        )}
                     </span>
                 </SubPanelSection>
                 <SubPanelSection title="description" hideIfNoContent>

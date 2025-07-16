@@ -25,7 +25,6 @@ import { Level } from 'ui/Level/Level';
 import { LoadingRow } from 'ui/Loading/Loading';
 import { AccentText, StyledText, UntitledText } from 'ui/StyledText/StyledText';
 import { Tag } from 'ui/Tag/Tag';
-import { TopTierCrown } from 'ui/TopTierCrown/TopTierCrown';
 import { TrendingFlame } from 'ui/TrendingFlame/TrendingFlame';
 
 import { SearchResultItemBoardItemAddButton } from './SearchResultItemBoardItemAddButton';
@@ -383,12 +382,6 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
 
     const goldenIcon = golden ? <TrendingFlame tooltipPos="down" /> : null;
 
-    const platinumIcon =
-        tags.includes('Criticality Level: Platinum') ||
-        tags.includes('Criticality Level: Platinum Candidate') ? (
-            <TopTierCrown tooltipPos="down" />
-        ) : null;
-
     const highlightedDescription = (preview.highlight || {}).description;
     const descriptionDOM = highlightedDescription ? (
         <span
@@ -428,7 +421,6 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
                                 searchString={searchString}
                             />
                             {goldenIcon}
-                            {platinumIcon}
                         </div>
                         <StyledText
                             size="small"

@@ -64,8 +64,6 @@ class EgTagColors(Enum):
     VIEW: str = "#f5a623"  # orange
     FILE_FORMAT: str = "#6ba097"  # creamy forest green
     SOURCE: str = "#C792EA"  # light purple
-    PLATINUM: str = "#08c4c4"  # miku turquoise
-    DEPRECATION: str = "#4d4d4d"  # darkGrey
 
 
 # Max length of a tag name in the database (tag.name)
@@ -678,7 +676,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             custom_properties["source_schema_name"] = source_schema_name
             custom_properties["source_data_lake"] = source_data_lake
 
-        # Determine Trending status, boost score, and Platinum tag
+        # Determine Trending status, boost score
         # This comes from the `querybook2.eg_top_tier_table` table,
         # which is populated by the `top_tier_task.py` task
         #
@@ -694,15 +692,8 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 _,
                 _,
                 trending,
-                platinum,
-                criticality_level,
                 popularity,
-                importance_score,
-                collibra_table_link,
-                _,
-                deprecation_status,
-                deprecation_date,
-                deprecation_notes,
+                importance_score
             ] = top_tier_row
 
             # The `popularity` column is the rank of the table per PUMA data (1 = most popular)
@@ -721,78 +712,6 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             if self.load_partitions and is_trending:
                 table = table._replace(
                     partitions=self.get_partitions(schema_name, table_name)
-                )
-
-            # Add criticality level if available
-            if criticality_level:
-                custom_properties["criticality_level"] = criticality_level
-
-                tags.append(
-                    DataTag(
-                        name=f"Criticality Level",
-                        description=f"This table contains any Criticality Level in Collibra",
-                        color=EgTagColors.PLATINUM.value,
-                        meta={"rank": 199, "hidden": True},
-                    )
-                )
-
-                tags.append(
-                    DataTag(
-                        name=f"Criticality Level: {criticality_level}",
-                        type="Criticality Level",
-                        description=f"This table is marked {criticality_level} in Collibra",
-                        color=EgTagColors.PLATINUM.value,
-                        meta={
-                            "rank": 200,
-                            "icon": (
-                                "Crown"
-                                if criticality_level == "Platinum"
-                                or criticality_level == "Platinum Candidate"
-                                else None
-                            ),
-                        },
-                    )
-                )
-
-            # Add deprecation status if available
-            if deprecation_status:
-                custom_properties["deprecation_status"] = deprecation_status
-                custom_properties["deprecation_date"] = deprecation_date
-                custom_properties["deprecation_notes"] = deprecation_notes
-
-                tags.append(
-                    DataTag(
-                        name=deprecation_status,
-                        description=f"This table is marked {deprecation_status} in Collibra",
-                        color=EgTagColors.DEPRECATION.value,
-                        meta={"rank": 500, "icon": "Trash2"},
-                    )
-                )
-
-                # Add a warning to the table indicating the deprecation status
-                warning_message = f"{deprecation_status}"
-                if deprecation_date:
-                    warning_message += f" as of {deprecation_date}"
-                if deprecation_notes:
-                    warning_message += f": {deprecation_notes}"
-
-                table = table._replace(
-                    warnings=(table.warnings or [])
-                    + [
-                        (
-                            DataTableWarningSeverity.WARNING,
-                            warning_message,
-                        )
-                    ]
-                )
-
-            # Add a link to Collibra if available
-            if collibra_table_link is not None:
-                table_links.append(
-                    {
-                        "label": "Collibra",
-                        "url": collibra_table_link,
-                    }
                 )
 
         ai_table_descriptions_row = get_ai_table_descriptions_row(
@@ -1039,15 +958,8 @@ def get_top_tier_row(source_data_lake, source_schema_name, table_name, session=N
                 source_schema_name,
                 table_name,
                 trending,
-                platinum,
-                criticality_level,
                 popularity,
-                importance_score,
-                collibra_table_link,
-                collibra_tags,
-                deprecation_status,
-                deprecation_date,
-                deprecation_notes
+                importance_score
             FROM eg_top_tier_table
             WHERE source_data_lake = :source_data_lake
                 AND source_schema_name = :source_schema_name

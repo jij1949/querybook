@@ -18,20 +18,11 @@ query_template = """
         d.source_schema_name,
         d.table_name,
         d.trending,
-        d.platinum,
-        d.criticality_level,
         d.popularity,
-        d.importance_score,
-        d.collibra_table_link,
-        d.collibra_tags,
-        d.deprecation_status,
-        d.deprecation_date,
-        d.deprecation_notes
+        d.importance_score
     FROM plat_metrics.cleansed_eg_table_discovery d
     WHERE
         popularity <= {popularity_threshold}
-        OR deprecation_status IS NOT NULL
-        OR criticality_level IS NOT NULL
     ORDER BY d.popularity ASC
     OFFSET {offset}
     LIMIT {limit}
@@ -67,15 +58,8 @@ def top_tier_task(
                     source_schema_name VARCHAR(255),
                     table_name VARCHAR(255),
                     trending BOOLEAN,
-                    platinum BOOLEAN,
-                    criticality_level VARCHAR(255),
                     popularity INT,
-                    importance_score FLOAT,
-                    collibra_table_link VARCHAR(255),
-                    collibra_tags JSON,
-                    deprecation_status VARCHAR(255),
-                    deprecation_date VARCHAR(255),
-                    deprecation_notes TEXT
+                    importance_score FLOAT
                 )
                 """
             )
@@ -118,23 +102,8 @@ def top_tier_task(
                         "source_schema_name": source_schema_name,
                         "table_name": table_name,
                         "trending": trending,
-                        "platinum": platinum,
-                        "criticality_level": criticality_level,
                         "popularity": popularity,
                         "importance_score": importance_score,
-                        "collibra_table_link": collibra_table_link,
-                        "collibra_tags": (
-                            json.dumps(collibra_tags) if collibra_tags else None
-                        ),
-                        "deprecation_status": (
-                            deprecation_status if deprecation_status else None
-                        ),
-                        "deprecation_date": (
-                            deprecation_date if deprecation_date else None
-                        ),
-                        "deprecation_notes": (
-                            deprecation_notes if deprecation_notes else None
-                        ),
                     }
                     for (
                         (
@@ -142,15 +111,8 @@ def top_tier_task(
                             source_schema_name,
                             table_name,
                             trending,
-                            platinum,
-                            criticality_level,
                             popularity,
                             importance_score,
-                            collibra_table_link,
-                            collibra_tags,
-                            deprecation_status,
-                            deprecation_date,
-                            deprecation_notes,
                         )
                     ) in rows
                 ]
@@ -159,16 +121,10 @@ def top_tier_task(
                     """
                     INSERT INTO eg_top_tier_table (
                         source_data_lake, source_schema_name, table_name,
-                        trending, platinum, criticality_level,
-                        popularity, importance_score,
-                        collibra_table_link, collibra_tags, deprecation_status,
-                        deprecation_date, deprecation_notes
+                        trending, popularity, importance_score
                     ) VALUES (
                         :source_data_lake, :source_schema_name, :table_name,
-                        :trending, :platinum, :criticality_level,
-                        :popularity, :importance_score,
-                        :collibra_table_link, :collibra_tags, :deprecation_status,
-                        :deprecation_date, :deprecation_notes
+                        :trending, :popularity, :importance_score
                     )
                     """,
                     values,
