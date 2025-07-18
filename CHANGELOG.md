@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.119.0](https://github.com/eg-internal/querybook/compare/v0.118.0...v0.119.0) (2025-07-18)
+
+
+### Features
+
+* Remove Collibra DIP features ([#436](https://github.com/eg-internal/querybook/issues/436)) ([63b9e42](https://github.com/eg-internal/querybook/commit/63b9e42263f9da35c128a1a83a775e6332a6191e))
+
+
+### Bug Fixes
+
+* Enable StarRocks transpilation ([90b7f90](https://github.com/eg-internal/querybook/commit/90b7f90108024b6f4b39e34fbdb4859cf68ad277))
+
 ## [0.118.0](https://github.com/eg-internal/querybook/compare/v0.117.1...v0.118.0) (2025-06-13)
 
 
