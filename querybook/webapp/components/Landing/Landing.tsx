@@ -141,29 +141,22 @@ const DefaultLanding: React.FC = ({ children }) => {
                                 Querybook Best Practices 📚
                             </Link>
                         </div>
-                        <div>
-                            <Link
-                                to="https://pages.github.expedia.biz/analytics-learning/analytics-bootcamp/docs/Querybook/querybook"
-                                newTab={true}
-                            >
-                                Querybook 101 in Analytics Bootcamp 🎓
-                            </Link>
-                        </div>
                         <br />
                         <div>
                             <Link
-                                to="https://analytics.expedia.biz/trino"
+                                to="https://analytics.expedia.biz/cluster"
                                 newTab={true}
                             >
-                                Trino Clusters in Analytics Workbench 🎉
+                                View Cluster configurations in Analytics
+                                Workbench 🎉
                             </Link>
                         </div>
                         <div>
                             <Link
-                                to="https://analytics.expedia.biz/apiary"
+                                to="https://analytics.expedia.biz/datalake"
                                 newTab={true}
                             >
-                                Apiary Configuration in Analytics Workbench 🎉
+                                Browse the Data Lake in Analytics Workbench 🎉
                             </Link>
                         </div>
                     </div>
