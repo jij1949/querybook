@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.119.1](https://github.com/eg-internal/querybook/compare/v0.119.0...v0.119.1) (2025-07-24)
+
+
+### Bug Fixes
+
+* Update homepage links and remove Analytics Bootcamp ([de501fc](https://github.com/eg-internal/querybook/commit/de501fc169300b1d6c186df55417efb1faacac1d))
+
 ## [0.119.0](https://github.com/eg-internal/querybook/compare/v0.118.0...v0.119.0) (2025-07-18)
 
 
