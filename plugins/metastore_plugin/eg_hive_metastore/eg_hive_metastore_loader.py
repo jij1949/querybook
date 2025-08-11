@@ -400,6 +400,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             partitions=[],
             raw_description=ujson.pdumps(description, default=lambda o: o.__dict__),
             partition_keys=self.get_partition_keys(description),
+            warnings=[],
         )
 
         columns = list(
