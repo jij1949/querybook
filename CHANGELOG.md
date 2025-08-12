@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.120.0](https://github.com/eg-internal/querybook/compare/v0.119.1...v0.120.0) (2025-08-12)
+
+
+### Features
+
+* Remove JSON/CSV warnings from Trino executors, add to metastore ([8a39eee](https://github.com/eg-internal/querybook/commit/8a39eeed84b3bf216a5808c8e166f447a670f4f5))
+
+
+### Bug Fixes
+
+* Initialize warnings to empty array to force a sync ([12b527f](https://github.com/eg-internal/querybook/commit/12b527f96dcc49bfe600af7e9e85cd34426cd83d))
+
 ## [0.119.1](https://github.com/eg-internal/querybook/compare/v0.119.0...v0.119.1) (2025-07-24)
 
 
