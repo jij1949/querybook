@@ -54,7 +54,6 @@ class EGStarburstCursor(EGTrinoCursor):
             completed = self._cursor._query._finished
             if poll_result:
                 self._update_percent_complete(poll_result)
-                self._update_execution_info(poll_result)
                 self._update_tracking_url(poll_result, info_uri=self._cursor.info_uri)
                 self._update_starburst_tracking_url(
                     poll_result, info_uri=self._cursor.info_uri

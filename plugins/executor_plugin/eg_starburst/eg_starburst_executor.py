@@ -21,7 +21,6 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
             execution_type,
         )
         self._warning = ""
-        self._json_csv_warning_checked = False
         self._client_setting = client_setting | \
                                {'execution_type': 'execution_type:' + execution_type,
                                 'query_execution_id': query_execution_id,
@@ -46,13 +45,5 @@ class EGStarburstQueryExecutor(EGTrinoQueryExecutor):
 
         if self._cursor.tracking_url:
             info += f"Trino Tracking Url: {self._cursor.tracking_url}\n"
-
-        if self.warning != "":
-            info += (
-                '\n\n<Message type="warning" title="Warning">'
-                + self.warning
-                + "</Message>\n"
-            )
-            info += "---\nforce_show: true\n---"
 
         return info

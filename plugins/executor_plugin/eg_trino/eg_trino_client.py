@@ -1,4 +1,3 @@
-import requests
 import trino
 from trino.exceptions import TrinoUserError
 
@@ -84,7 +83,6 @@ class EGTrinoCursor(TrinoCursor):
         self.rows = []
         self._init_query_state_vars()
         self._request = cursor._request
-        self._execution_info = ""
         self._user = username
         self._password = password
 
@@ -96,7 +94,6 @@ class EGTrinoCursor(TrinoCursor):
             completed = self._cursor._query._finished
             if poll_result:
                 self._update_percent_complete(poll_result)
-                self._update_execution_info(poll_result)
                 self._update_tracking_url(poll_result, info_uri=self._cursor.info_uri)
 
         except TrinoUserError as e:
@@ -108,14 +105,6 @@ class EGTrinoCursor(TrinoCursor):
 
         return completed
 
-    @property
-    def execution_info(self):
-        return self._execution_info
-
-    def _update_execution_info(self, poll_result):
-        execution_info = self.get_execution_info(poll_result)
-        self._execution_info = execution_info
-
     def _update_tracking_url(self, poll_result: Dict[str, Any], info_uri=None) -> None:
         # Use the info_uri if it is available
         if self._tracking_url is None:
@@ -123,16 +112,3 @@ class EGTrinoCursor(TrinoCursor):
                 self._tracking_url = info_uri
             else:
                 self._tracking_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/query.html?{poll_result['queryId']}"
-
-    def get_execution_info(self, poll_result):
-        if not self.tracking_url:
-            return ""
-        info_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/api/query/{poll_result['queryId']}"
-        login_url = f"{self._request._http_scheme}://{self._request._host}:{self._request._port}/ui/login"
-        payload = {"username": self._user, "password": self._password}
-        with requests.session() as s:
-            r = s.post(login_url, data=payload)
-            if r.status_code != 200:
-                return ""
-            r = s.get(info_url)
-            return r.text

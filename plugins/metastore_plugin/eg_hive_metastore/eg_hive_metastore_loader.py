@@ -554,6 +554,18 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                     )
                 )
 
+            # CSV and JSON warnings for unoptimized file formats
+            if file_format in ["CSV", "JSON"]:
+                table = table._replace(
+                    warnings=(table.warnings or [])
+                    + [
+                        (
+                            DataTableWarningSeverity.WARNING,
+                            f"This table uses the unoptimized {file_format} file format. Use of non-optimized format can significantly slow down query performance. More information at: https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393153599/Parquet+vs+Json+format",
+                        )
+                    ]
+                )
+
             # Avro warning for tables with an external Avro schema
             # The Hive Metastore may not report the correct column list in this case, and it's not
             # practical to load the schema directly from S3. So we just add a warning to the table.
