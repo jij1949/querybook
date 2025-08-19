@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.121.1](https://github.com/eg-internal/querybook/compare/v0.121.0...v0.121.1) (2025-08-19)
+
+
+### Bug Fixes
+
+* Trivial change to bump version for build ([d119dbe](https://github.com/eg-internal/querybook/commit/d119dbe2795c351ae5fcef52f222e7b8c68693d1))
+
 ## [0.121.0](https://github.com/eg-internal/querybook/compare/v0.120.0...v0.121.0) (2025-08-19)
 
 
