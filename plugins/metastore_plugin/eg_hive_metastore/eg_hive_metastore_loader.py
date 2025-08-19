@@ -120,7 +120,7 @@ DATASET_TAGS = [
 
 
 #
-# Expedia-customized version of the HMSMetastoreLoader
+# Expedia-customized version of the HMSMetastoreLoader.
 #
 class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
