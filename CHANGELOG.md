@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.121.0](https://github.com/eg-internal/querybook/compare/v0.120.0...v0.121.0) (2025-08-19)
+
+
+### Features
+
+* add execute permission level for datadocs ([#441](https://github.com/eg-internal/querybook/issues/441)) ([ebb69ca](https://github.com/eg-internal/querybook/commit/ebb69cafd79e7c410a17ae115d6a240fc44399f5))
+
 ## [0.120.0](https://github.com/eg-internal/querybook/compare/v0.119.1...v0.120.0) (2025-08-12)
 
 
