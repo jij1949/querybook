@@ -80,6 +80,7 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                 cellFocus,
                 defaultCollapse,
                 isEditable,
+                isExecutable,
                 highlightCellIndex,
                 fullScreenCellIndex,
             } = useContext(DataDocContext);
@@ -168,6 +169,7 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                 const cellProps = {
                     meta: cell.meta,
                     isEditable,
+                    isExecutable,
 
                     shouldFocus: isFocused,
                     showCollapsed,

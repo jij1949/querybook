@@ -211,11 +211,33 @@ export const canCurrentUserEditSelector = createSelector(
         const permission = readWriteToPermission(
             editor ? editor.read : false,
             editor ? editor.write : false,
+            editor ? editor.execute : false,
             dataDoc.owner_uid === uid,
             dataDoc.public,
             editor ? editor.id : -1
         );
         return permissionToReadWrite(permission).write;
+    }
+);
+
+export const canCurrentUserExecuteSelector = createSelector(
+    dataDocSelector,
+    dataDocEditorByUidSelector,
+    (state: IStoreState) => state.user.myUserInfo.uid,
+    (dataDoc, editorsByUserId, uid) => {
+        if (!dataDoc) {
+            return false;
+        }
+        const editor = uid in editorsByUserId ? editorsByUserId[uid] : null;
+        const permission = readWriteToPermission(
+            editor ? editor.read : false,
+            editor ? editor.write : false,
+            editor ? editor.execute : false,
+            dataDoc.owner_uid === uid,
+            dataDoc.public,
+            editor ? editor.id : -1
+        );
+        return permissionToReadWrite(permission).execute;
     }
 );
 

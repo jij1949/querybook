@@ -741,6 +741,7 @@ const QueryComposer: React.FC = () => {
         >
             <DataDocTemplateVarForm
                 isEditable={true}
+                isExecutable={true}
                 variables={templatedVariables}
                 onSave={async (newVariables) => {
                     setTemplatedVariables(newVariables);

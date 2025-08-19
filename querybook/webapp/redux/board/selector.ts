@@ -171,6 +171,7 @@ export function getEditorInfo(
     const permission = readWriteToPermission(
         editor ? editor.read : false,
         editor ? editor.write : false,
+        false, // Execute priveleges don't apply to boards
         board.owner_uid === uid,
         board.public,
         editor ? editor.id : -1

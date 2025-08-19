@@ -24,6 +24,7 @@ export interface IDataDocTemplateVarFormProps {
     onSave: (variables: IDataDocMeta['variables']) => Promise<void>;
     variables: IDataDocMeta['variables'];
     isEditable: boolean;
+    isExecutable?: boolean; // If false, user can only edit values, not structure
 }
 
 const templatedVarSchema = Yup.object().shape({
@@ -68,7 +69,7 @@ const defaultTemplatedVariables: IDataDocMetaVariableWithId[] = [
 
 export const DataDocTemplateVarForm: React.FunctionComponent<
     IDataDocTemplateVarFormProps
-> = ({ onSave, variables, isEditable }) => {
+> = ({ onSave, variables, isEditable, isExecutable }) => {
     const initialValue = useMemo(
         () => ({
             variables: variables?.length
@@ -125,6 +126,7 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                                             name={`variables.${index}.name`}
                                             inputProps={{
                                                 placeholder: 'variable name',
+                                                disabled: !isEditable && isExecutable,
                                             }}
                                         />
                                         <SimpleField
@@ -151,6 +153,7 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                                                         value: false,
                                                     },
                                                 ]}
+                                                isDisabled={!isEditable && !isExecutable}
                                             />
                                         ) : (
                                             <SimpleField
@@ -224,13 +227,13 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                             const anyDeleted = values.variables.some(
                                 (variable) => variable.isDeleted
                             );
-                            const controlDOM = isEditable && (
+                            const controlDOM = isExecutable && (
                                 <div className="horizontal-space-between mt4">
-                                    <TextButton
-                                        icon="Plus"
-                                        title="New Variable"
-                                        onClick={() =>
-                                            {
+                                    {isEditable && (
+                                        <TextButton
+                                            icon="Plus"
+                                            title="New Variable"
+                                            onClick={() => {
                                                 arrayHelpers.push({
                                                     name: '',
                                                     type: 'string',
@@ -238,13 +241,14 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                                                     isDeleted: false,
                                                     id: uniqueId(templatedVarUniqueIdPrefix),
                                                 });
-                                            }
-                                        }
-                                    />
+                                            }}
+                                        />
+                                    )}
+                                    {!isEditable && <div />}
                                     {(dirty || anyDeleted) && (
                                         <Button
-                                            onClick={() =>
-                                                {
+                                            onClick={() => {
+                                                if (isExecutable) {
                                                     const originalLength = values.variables.length;
                                                     [...values.variables]
                                                         .reverse()
@@ -262,8 +266,9 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                                                                 }
                                                             }
                                                         );
-                                                    handleSubmit();
                                                 }
+                                                handleSubmit();
+                                            }
                                             }
                                             title="Save Changes"
                                             disabled={(isSubmitting || !isValid) && !anyDeleted}
@@ -275,7 +280,7 @@ export const DataDocTemplateVarForm: React.FunctionComponent<
                             return (
                                 <div className="DataDocTemplateVarForm-content mh4">
                                     <fieldset
-                                        disabled={!isEditable}
+                                        disabled={!isEditable && !isExecutable}
                                         className="mb4"
                                     >
                                         {fields}

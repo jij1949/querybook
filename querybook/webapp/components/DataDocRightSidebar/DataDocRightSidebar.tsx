@@ -28,6 +28,7 @@ interface IProps {
     dataDoc: IDataDoc;
     isSaving: boolean;
     isEditable: boolean;
+    isExecutable?: boolean;
     isConnected: boolean;
 
     changeDataDocMeta: (docId: number, meta: IDataDocMeta) => Promise<void>;
@@ -41,6 +42,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
 
     isSaving,
     isEditable,
+    isExecutable = false,
     isConnected,
 
     dataDoc,
@@ -75,6 +77,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
         <DataDocTemplateButton
             dataDoc={dataDoc}
             isEditable={isEditable}
+            isExecutable={isExecutable}
             changeDataDocMeta={changeDataDocMeta}
         />
     );
@@ -82,7 +85,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
         <DataDocScheduleButton isEditable={isEditable} docId={dataDoc.id} />
     );
 
-    const runAllButtonDOM = isEditable && (
+    const runAllButtonDOM = isExecutable && (
         <DataDocRunAllButton docId={dataDoc.id} />
     );
 

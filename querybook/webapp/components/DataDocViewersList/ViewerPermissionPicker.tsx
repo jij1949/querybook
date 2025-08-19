@@ -44,6 +44,15 @@ export const ViewerPermissionPicker: React.FunctionComponent<IProp> = ({
                     </MenuItem>
                 )}
                 <MenuItem
+                    onClick={() => onPermissionChange(Permission.CAN_EXECUTE)}
+                    style={{ position: 'relative' }}
+                    aria-label="Allows users to run queries and edit variable values in this DataDoc but not edit the cell content or variable structure."
+                    data-balloon-pos="left"
+                    data-balloon-length="medium"
+                >
+                    execute
+                </MenuItem>
+                <MenuItem
                     onClick={() => onPermissionChange(Permission.CAN_WRITE)}
                 >
                     edit
@@ -88,7 +97,8 @@ export const ViewerPermissionPicker: React.FunctionComponent<IProp> = ({
 
     const canShowEditMenu =
         viewerInfo.permission === Permission.CAN_READ ||
-        viewerInfo.permission === Permission.CAN_WRITE;
+        viewerInfo.permission === Permission.CAN_WRITE ||
+        viewerInfo.permission === Permission.CAN_EXECUTE;
 
     const pickerButton =
         canShowEditMenu && viewerInfo.editorId != null && !readonly ? (

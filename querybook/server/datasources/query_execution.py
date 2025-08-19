@@ -38,7 +38,7 @@ from logic import (
     user as user_logic,
     admin as admin_logic,
 )
-from logic.datadoc_permission import user_can_read
+from logic.datadoc_permission import user_can_read, assert_can_execute
 from logic.query_execution_permission import (
     get_default_user_environment_by_execution_id,
 )
@@ -86,11 +86,14 @@ def create_query_execution(
 
         data_doc = None
         if data_cell_id:
+            # Check if user has execute permission for the data doc containing this cell
+            data_cell = datadoc_logic.get_data_cell_by_id(data_cell_id, session=session)
+            data_doc = data_cell.doc
+            assert_can_execute(data_doc.id, session=session)
+            
             datadoc_logic.append_query_executions_to_data_cell(
                 data_cell_id, [query_execution.id], session=session
             )
-            data_cell = datadoc_logic.get_data_cell_by_id(data_cell_id, session=session)
-            data_doc = data_cell.doc
 
         try:
             run_query_task.apply_async(

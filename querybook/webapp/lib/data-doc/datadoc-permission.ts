@@ -5,10 +5,12 @@ import { IDataDoc, IDataDocEditor } from 'const/datadoc';
 export enum Permission {
     CAN_READ = 'read only',
     CAN_WRITE = 'edit',
+    CAN_EXECUTE = 'execute',
     OWNER = 'owner',
     NULL = 'no access',
     INHERITED_READ = '[INHERITED] read only',
     INHERITED_WRITE = '[INHERITED] edit',
+    INHERITED_EXECUTE = '[INHERITED] execute',
 }
 
 export interface IViewerInfo {
@@ -21,6 +23,7 @@ export interface IViewerInfo {
 export function readWriteToPermission(
     read: boolean,
     write: boolean,
+    execute: boolean,
     isOwner: boolean,
     publicDoc: boolean,
     id: number
@@ -34,6 +37,9 @@ export function readWriteToPermission(
     if (write) {
         return id == null ? Permission.INHERITED_WRITE : Permission.CAN_WRITE;
     }
+    if (execute) {
+        return id == null ? Permission.INHERITED_EXECUTE : Permission.CAN_EXECUTE;
+    }
     if (read) {
         return id == null ? Permission.INHERITED_READ : Permission.CAN_READ;
     }
@@ -42,6 +48,7 @@ export function readWriteToPermission(
 
 export function permissionToReadWrite(permission: Permission): {
     read: boolean;
+    execute: boolean;
     write: boolean;
 } {
     if (
@@ -50,6 +57,16 @@ export function permissionToReadWrite(permission: Permission): {
     ) {
         return {
             read: true,
+            execute: false,
+            write: false,
+        };
+    } else if (
+        permission === Permission.CAN_EXECUTE ||
+        permission === Permission.INHERITED_EXECUTE
+    ) {
+        return {
+            read: true,
+            execute: true,
             write: false,
         };
     } else if (
@@ -59,12 +76,14 @@ export function permissionToReadWrite(permission: Permission): {
     ) {
         return {
             read: true,
+            execute: true,
             write: true,
         };
     }
 
     return {
         read: false,
+        execute: false,
         write: false,
     };
 }
@@ -85,6 +104,7 @@ export function getViewerInfo(
     const permission = readWriteToPermission(
         editor ? editor.read : false,
         editor ? editor.write : false,
+        editor ? editor.execute : false,
         dataDoc.owner_uid === uid,
         dataDoc.public,
         editor ? editor.id : -1
