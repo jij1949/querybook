@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.121.2](https://github.com/eg-internal/querybook/compare/v0.121.1...v0.121.2) (2025-08-26)
+
+
+### Bug Fixes
+
+* execute error when accessing Board ([#448](https://github.com/eg-internal/querybook/issues/448)) ([5378894](https://github.com/eg-internal/querybook/commit/5378894ebc1aa974e0d81c407ab57766c1376ce7))
+
 ## [0.121.1](https://github.com/eg-internal/querybook/compare/v0.121.0...v0.121.1) (2025-08-19)
 
 
