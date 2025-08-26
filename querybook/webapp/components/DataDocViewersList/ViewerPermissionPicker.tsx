@@ -10,6 +10,7 @@ import { AccentText } from 'ui/StyledText/StyledText';
 interface IProp {
     viewerInfo: IViewerInfo;
     readonly?: boolean;
+    entityName?: string;
     publicDataDoc: boolean;
     isOwner: boolean;
 
@@ -20,6 +21,7 @@ interface IProp {
 export const ViewerPermissionPicker: React.FunctionComponent<IProp> = ({
     readonly = false,
     publicDataDoc,
+    entityName,
     viewerInfo,
     onPermissionChange,
     onRemoveEditor,
@@ -43,7 +45,7 @@ export const ViewerPermissionPicker: React.FunctionComponent<IProp> = ({
                         read only
                     </MenuItem>
                 )}
-                <MenuItem
+                {entityName === "document" && <MenuItem
                     onClick={() => onPermissionChange(Permission.CAN_EXECUTE)}
                     style={{ position: 'relative' }}
                     aria-label="Allows users to run queries and edit variable values in this DataDoc but not edit the cell content or variable structure."
@@ -51,7 +53,7 @@ export const ViewerPermissionPicker: React.FunctionComponent<IProp> = ({
                     data-balloon-length="medium"
                 >
                     execute
-                </MenuItem>
+                </MenuItem>}
                 <MenuItem
                     onClick={() => onPermissionChange(Permission.CAN_WRITE)}
                 >

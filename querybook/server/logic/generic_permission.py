@@ -33,7 +33,7 @@ def get_all_groups_and_group_members_with_access(
     elif editor_type == BoardEditor:
         # BoardEditor doesn't have execute permission, so we use False as default
         topq = session.query(
-            editor_type.id, editor_type.uid, editor_type.read, editor_type.write, func.cast(False, Boolean)
+            editor_type.id, editor_type.uid, editor_type.read, editor_type.write
         ).select_from(editor_type)
 
     if editor_type == DataDocEditor:
@@ -43,27 +43,46 @@ def get_all_groups_and_group_members_with_access(
 
     topq = topq.cte("cte", recursive=True)
 
-    bottomq = (
-        select([None, UserGroupMember.uid, topq.c.read, topq.c.write, topq.c.execute])
-        .select_from(topq)
-        .join(User, topq.c.uid == User.id)
-        .join(UserGroupMember, UserGroupMember.gid == User.id)
-        .filter(User.is_group)
-    )
+    if editor_type == DataDocEditor:
+        bottomq = (
+            select([None, UserGroupMember.uid, topq.c.read, topq.c.write, topq.c.execute])
+            .select_from(topq)
+            .join(User, topq.c.uid == User.id)
+            .join(UserGroupMember, UserGroupMember.gid == User.id)
+            .filter(User.is_group)
+        )
+    elif editor_type == BoardEditor:
+        bottomq = (
+            select([None, UserGroupMember.uid, topq.c.read, topq.c.write])
+            .select_from(topq)
+            .join(User, topq.c.uid == User.id)
+            .join(UserGroupMember, UserGroupMember.gid == User.id)
+            .filter(User.is_group)
+        )
 
     recursive_q = topq.union(bottomq)
 
     editors = recursive_q.alias()
 
-    q = select(
-        [
-            func.max(editors.c.id),
-            editors.c.uid,
-            func.max(editors.c.read),
-            func.max(editors.c.write),
-            func.max(editors.c.execute),
-        ]
-    ).group_by(editors.c.uid)
+    if editor_type == DataDocEditor:
+        q = select(
+            [
+                func.max(editors.c.id),
+                editors.c.uid,
+                func.max(editors.c.read),
+                func.max(editors.c.write),
+                func.max(editors.c.execute),
+            ]
+        ).group_by(editors.c.uid)
+    elif editor_type == BoardEditor:
+        q = select(
+            [
+                func.max(editors.c.id),
+                editors.c.uid,
+                func.max(editors.c.read),
+                func.max(editors.c.write),
+            ]
+        ).group_by(editors.c.uid)
 
     # Optionally filter by uid to get only the permissions for a specific user
     if uid is not None:
@@ -104,8 +123,13 @@ def user_has_permission(
 
     # Check the user's direct permissions
     if permission_level == Permission.READ:
-        if editor is not None and (editor.write or editor.execute or editor.read):
-            return True
+        # BoardEditor doesn't have execute permission
+        if editor_type == BoardEditor:
+            if editor is not None and (editor.write or editor.read):
+                return True
+        else:
+            if editor is not None and (editor.write or editor.execute or editor.read):
+                return True
     elif permission_level == Permission.EXECUTE:
         if editor is not None and (editor.write or editor.execute):
             return True
