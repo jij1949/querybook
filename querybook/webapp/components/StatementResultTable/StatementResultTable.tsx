@@ -180,6 +180,7 @@ export const StatementResultTable = React.forwardRef<
                 rows={filteredRows}
                 cols={columns}
                 showPagination={showPagination}
+                pageSizeOptions={[1, 5, 10, 20, 25, 50, 100]}
                 formatCell={(index, column, row) => {
                     const value = row[index];
                     if (isCellValNull(value)) {

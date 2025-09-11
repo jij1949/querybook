@@ -68,6 +68,7 @@ rows_in_query_results:
     default: 20 rows
     tab: general
     options:
+        - 1 row
         - 5 rows
         - 10 rows
         - 20 rows
