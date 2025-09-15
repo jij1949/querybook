@@ -5,8 +5,8 @@ import { IDataDoc } from 'const/datadoc';
 import { IDataTable } from 'const/metastore';
 import { IQueryExecution } from 'const/queryExecution';
 import {
+    editorToPermission,
     IViewerInfo,
-    readWriteToPermission,
 } from 'lib/data-doc/datadoc-permission';
 import { currentEnvironmentSelector } from 'redux/environment/selector';
 import { IStoreState } from 'redux/store/types';
@@ -146,7 +146,7 @@ export const boardEditorInfosSelector = createSelector(
             Object.entries(editorsByUserId).filter(
                 // Filter out any editors inherited from groups
                 // (i.e. editors with a uid but no id)
-                ([_userId, editor]) => editor.id != null || editor.uid === uid
+                ([_userId, editor]) => editor.id !== null || editor.uid === uid
             )
         );
         const allUserIds = [
@@ -167,15 +167,8 @@ export function getEditorInfo(
     editorsByUserId: Record<number, IBoardEditor>,
     board: IBoard
 ): IViewerInfo {
-    const editor = uid in editorsByUserId ? editorsByUserId[uid] : null;
-    const permission = readWriteToPermission(
-        editor ? editor.read : false,
-        editor ? editor.write : false,
-        false, // Execute priveleges don't apply to boards
-        board.owner_uid === uid,
-        board.public,
-        editor ? editor.id : -1
-    );
+    const editor = editorsByUserId[uid];
+    const permission = editorToPermission(board.owner_uid === uid, editor);
     return {
         editorId: editor?.id,
         uid,

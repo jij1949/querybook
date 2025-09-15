@@ -77,7 +77,7 @@ export const DataDocViewersList: React.FunctionComponent<
         (uid: number) => {
             if (
                 uid === dataDoc.owner_uid ||
-                (uid in editorsByUid && editorsByUid[uid].id != null)
+                (uid in editorsByUid && editorsByUid[uid].id !== null)
             ) {
                 toast.error('User already added.');
             } else {
@@ -95,7 +95,8 @@ export const DataDocViewersList: React.FunctionComponent<
             if (permission === Permission.OWNER) {
                 updateDataDocOwner(uid);
             } else {
-                const { read, write, execute } = permissionToReadWrite(permission);
+                const { read, write, execute } =
+                    permissionToReadWrite(permission);
                 if (uid in editorsByUid) {
                     updateDataDocEditors(uid, read, write, execute);
                 } else {

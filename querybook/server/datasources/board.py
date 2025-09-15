@@ -11,7 +11,12 @@ from app.auth.permission import (
 from const.datasources import RESOURCE_NOT_FOUND_STATUS_CODE
 from logic import board as logic
 from logic import user as user_logic
-from logic.board_permission import assert_can_read, assert_can_edit, assert_is_owner, assert_is_not_group
+from logic.board_permission import (
+    assert_can_read,
+    assert_can_edit,
+    assert_is_owner,
+    assert_is_not_group,
+)
 from logic.query_execution import get_environments_by_execution_id
 
 from models.board import Board, BoardItem
@@ -69,12 +74,15 @@ def get_shared_boards(environment_id, user_id):
     with DBSession() as session:
         verify_environment_permission([environment_id])
         shared_boards = logic.get_all_shared_boards(
-            environment_id=environment_id, user_id=user_id, session=session,
+            environment_id=environment_id,
+            user_id=user_id,
+            session=session,
         )
         return {
             "id": -1,
             "boards": [shared_board.id for shared_board in shared_boards],
         }
+
 
 @register(
     "/board/editable/",
@@ -83,7 +91,9 @@ def get_shared_boards(environment_id, user_id):
 def get_my_editable_boards(environment_id, user_id):
     with DBSession() as session:
         verify_environment_permission([environment_id])
-        return logic.get_my_editable_boards(environment_id=environment_id, user_id=user_id, session=session)
+        return logic.get_my_editable_boards(
+            environment_id=environment_id, user_id=user_id, session=session
+        )
 
 
 @register(

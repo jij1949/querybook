@@ -1,9 +1,9 @@
 from typing import List, Optional, Tuple, Union
 from app.db import with_session
 from models import UserGroupMember, User, DataDocEditor, BoardEditor
-from sqlalchemy import func, select, Boolean
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-from const.permissions import Permission
+from const.permissions import BoardDataDocPermission
 
 
 @with_session
@@ -28,7 +28,11 @@ def get_all_groups_and_group_members_with_access(
     """
     if editor_type == DataDocEditor:
         topq = session.query(
-            editor_type.id, editor_type.uid, editor_type.read, editor_type.write, editor_type.execute
+            editor_type.id,
+            editor_type.uid,
+            editor_type.read,
+            editor_type.write,
+            editor_type.execute,
         ).select_from(editor_type)
     elif editor_type == BoardEditor:
         # BoardEditor doesn't have execute permission, so we use False as default
@@ -45,7 +49,9 @@ def get_all_groups_and_group_members_with_access(
 
     if editor_type == DataDocEditor:
         bottomq = (
-            select([None, UserGroupMember.uid, topq.c.read, topq.c.write, topq.c.execute])
+            select(
+                [None, UserGroupMember.uid, topq.c.read, topq.c.write, topq.c.execute]
+            )
             .select_from(topq)
             .join(User, topq.c.uid == User.id)
             .join(UserGroupMember, UserGroupMember.gid == User.id)
@@ -93,8 +99,12 @@ def get_all_groups_and_group_members_with_access(
 
 @with_session
 def user_has_permission(
-    doc_or_board_id, permission_level, editor_type, uid, session=None
-):
+    doc_or_board_id: int,
+    permission_level: BoardDataDocPermission,
+    editor_type: Union[DataDocEditor, BoardEditor],
+    uid: int,
+    session: Optional[Session] = None,
+) -> bool:
     """
     Check if the user has the specified permission for the specified datadoc or board.
 
@@ -122,7 +132,7 @@ def user_has_permission(
         )
 
     # Check the user's direct permissions
-    if permission_level == Permission.READ:
+    if permission_level == BoardDataDocPermission.READ:
         # BoardEditor doesn't have execute permission
         if editor_type == BoardEditor:
             if editor is not None and (editor.write or editor.read):
@@ -130,10 +140,10 @@ def user_has_permission(
         else:
             if editor is not None and (editor.write or editor.execute or editor.read):
                 return True
-    elif permission_level == Permission.EXECUTE:
+    elif permission_level == BoardDataDocPermission.EXECUTE:
         if editor is not None and (editor.write or editor.execute):
             return True
-    elif permission_level == Permission.WRITE:
+    elif permission_level == BoardDataDocPermission.WRITE:
         if editor is not None and editor.write:
             return True
 
@@ -145,15 +155,15 @@ def user_has_permission(
         session=session,
     )
 
-    if permission_level == Permission.READ:
+    if permission_level == BoardDataDocPermission.READ:
         if len(inherited_editors) == 1:
             return True
-    elif permission_level == Permission.EXECUTE:
+    elif permission_level == BoardDataDocPermission.EXECUTE:
         if len(inherited_editors) == 1:
             # Check if the editor's execute or write privileges are true
             if inherited_editors[0][3] or inherited_editors[0][4]:  # write or execute
                 return True
-    elif permission_level == Permission.WRITE:
+    elif permission_level == BoardDataDocPermission.WRITE:
         if len(inherited_editors) == 1:
             # Check if the editor's write privileges are true
             if inherited_editors[0][3]:

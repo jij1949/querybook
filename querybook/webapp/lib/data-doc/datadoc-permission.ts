@@ -1,5 +1,6 @@
 import { sortBy } from 'lodash';
 
+import { IBoardEditor } from 'const/board';
 import { IDataDoc, IDataDocEditor } from 'const/datadoc';
 
 export enum Permission {
@@ -20,28 +21,30 @@ export interface IViewerInfo {
     editorId?: number;
 }
 
-export function readWriteToPermission(
-    read: boolean,
-    write: boolean,
-    execute: boolean,
+export function editorToPermission(
     isOwner: boolean,
-    publicDoc: boolean,
-    id: number
+    editor: IDataDocEditor | IBoardEditor | undefined | null
 ): Permission {
     if (isOwner) {
         return Permission.OWNER;
     }
-    if (id < 0) {
+    if (!editor) {
         return Permission.NULL;
     }
-    if (write) {
-        return id == null ? Permission.INHERITED_WRITE : Permission.CAN_WRITE;
+    if (editor.write) {
+        return editor.id == null
+            ? Permission.INHERITED_WRITE
+            : Permission.CAN_WRITE;
     }
-    if (execute) {
-        return id == null ? Permission.INHERITED_EXECUTE : Permission.CAN_EXECUTE;
+    if (editor['execute']) {
+        return editor.id == null
+            ? Permission.INHERITED_EXECUTE
+            : Permission.CAN_EXECUTE;
     }
-    if (read) {
-        return id == null ? Permission.INHERITED_READ : Permission.CAN_READ;
+    if (editor.read) {
+        return editor.id == null
+            ? Permission.INHERITED_READ
+            : Permission.CAN_READ;
     }
     return Permission.NULL;
 }
@@ -101,14 +104,7 @@ export function getViewerInfo(
     } else if (uid in nonExplicitEditorPermissions) {
         editor = nonExplicitEditorPermissions[uid];
     }
-    const permission = readWriteToPermission(
-        editor ? editor.read : false,
-        editor ? editor.write : false,
-        editor ? editor.execute : false,
-        dataDoc.owner_uid === uid,
-        dataDoc.public,
-        editor ? editor.id : -1
-    );
+    const permission = editorToPermission(dataDoc.owner_uid === uid, editor);
     const online = viewerIds.includes(uid);
     return {
         editorId: editor?.id,

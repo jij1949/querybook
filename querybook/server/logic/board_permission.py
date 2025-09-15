@@ -7,9 +7,8 @@ from const.datasources import (
     ACCESS_RESTRICTED_STATUS_CODE,
     RESOURCE_NOT_FOUND_STATUS_CODE,
 )
-from const.permissions import Permission
+from const.permissions import BoardDataDocPermission
 
-from models import User
 from logic.generic_permission import user_has_permission
 
 
@@ -19,7 +18,7 @@ class BoardDoesNotExist(Exception):
 
 @with_session
 def user_can_edit(board_id, uid, session=None):
-    board = session.query(Board).filter_by(id=board_id).first()
+    board = session.query(Board).get(board_id)
 
     if board is None:
         raise BoardDoesNotExist()
@@ -28,13 +27,13 @@ def user_can_edit(board_id, uid, session=None):
         return True
 
     return user_has_permission(
-        board_id, Permission.WRITE, BoardEditor, uid, session=session
+        board_id, BoardDataDocPermission.WRITE, BoardEditor, uid, session=session
     )
 
 
 @with_session
 def user_can_read(board_id, uid, session=None):
-    board = session.query(Board).filter_by(id=board_id).first()
+    board = session.query(Board).get(board_id)
 
     if board is None:
         raise BoardDoesNotExist()
@@ -43,7 +42,7 @@ def user_can_read(board_id, uid, session=None):
         return True
 
     return user_has_permission(
-        board_id, Permission.READ, BoardEditor, uid, session=session
+        board_id, BoardDataDocPermission.READ, BoardEditor, uid, session=session
     )
 
 
@@ -74,7 +73,7 @@ def assert_can_read(board_id, session=None):
 @with_session
 def assert_is_owner(board_id, session=None):
     try:
-        board = session.query(Board).filter(Board.id == board_id).first()
+        board = session.query(Board).get(board_id)
         if board is None:
             raise BoardDoesNotExist
         api_assert(
@@ -87,15 +86,12 @@ def assert_is_owner(board_id, session=None):
 
 
 @with_session
-def assert_is_not_group(id, session=None):
-    editor = session.query(BoardEditor).filter_by(id=id).first()
+def assert_is_not_group(board_editor_id, session=None):
+    editor = session.query(BoardEditor).get(board_editor_id)
     if editor is None:
         api_assert(False, "EDITOR_DNE", RESOURCE_NOT_FOUND_STATUS_CODE)
-    user = session.query(User).filter_by(id=editor.uid).first()
-    if user is None:
-        api_assert(False, "USER_DNE", RESOURCE_NOT_FOUND_STATUS_CODE)
     api_assert(
-        user.is_group is False or user.is_group is None,
+        editor.user.is_group is False or editor.user.is_group is None,
         "Group cannot be assigned as owner",
         ACCESS_RESTRICTED_STATUS_CODE,
     )

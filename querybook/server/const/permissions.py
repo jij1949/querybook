@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Permission(Enum):
+class BoardDataDocPermission(Enum):
     READ = "read"
     EXECUTE = "execute"
     WRITE = "write"
