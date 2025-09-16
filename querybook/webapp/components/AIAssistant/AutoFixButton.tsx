@@ -7,6 +7,8 @@ import { useAISocket } from 'hooks/useAISocket';
 import useNonEmptyState from 'hooks/useNonEmptyState';
 import { trackClick } from 'lib/analytics';
 import { Button } from 'ui/Button/Button';
+import { Loading, LoadingIcon } from 'ui/Loading/Loading';
+import { Markdown } from 'ui/Markdown/Markdown';
 import { Message } from 'ui/Message/Message';
 import { Modal } from 'ui/Modal/Modal';
 import { AccentText } from 'ui/StyledText/StyledText';
@@ -31,6 +33,7 @@ const useSQLFix = () => {
         data: unformattedData,
         explanation,
         fix_suggestion: suggestion,
+        diagnosis,
         fixed_query: newFixedQuery,
     } = data;
 
@@ -41,7 +44,8 @@ const useSQLFix = () => {
     return {
         socket,
         fixed: Object.keys(data).length > 0, // If has data, then it has been fixed
-        explanation: explanation || unformattedData,
+        diagnosis: diagnosis || unformattedData,
+        explanation: explanation,
         suggestion,
         fixedQuery,
     };
@@ -53,7 +57,8 @@ export const AutoFixButton = ({
     onUpdateQuery,
 }: IProps) => {
     const [showModal, setShowModal] = useState<boolean>(false);
-    const { socket, fixed, explanation, suggestion, fixedQuery } = useSQLFix();
+    const { socket, fixed, diagnosis, explanation, suggestion, fixedQuery } =
+        useSQLFix();
 
     const bottomDOM = socket.loading ? (
         <div className="right-align mb16">
@@ -65,27 +70,28 @@ export const AutoFixButton = ({
             />
         </div>
     ) : (
-        fixedQuery && (
-            <div className="right-align mb16">
-                <Button
-                    title="Reject"
-                    onClick={() => {
-                        setShowModal(false);
-                    }}
-                />
-                <Button
-                    title="Apply"
-                    color="confirm"
-                    onClick={() => {
+        <div className="right-align mb16">
+            <Button
+                title="Unhelpful"
+                onClick={() => {
+                    setShowModal(false);
+                }}
+            />
+            <Button
+                title={fixedQuery ? 'Apply' : 'Helpful'}
+                color="confirm"
+                onClick={() => {
+                    if (fixedQuery) {
                         onUpdateQuery?.(fixedQuery, false);
-                        trackClick({
-                            component: ComponentType.AI_ASSISTANT,
-                            element:
-                                ElementType.QUERY_ERROR_AUTO_FIX_APPLY_BUTTON,
-                        });
-                        setShowModal(false);
-                    }}
-                />
+                    }
+                    trackClick({
+                        component: ComponentType.AI_ASSISTANT,
+                        element: ElementType.QUERY_ERROR_AUTO_FIX_APPLY_BUTTON,
+                    });
+                    setShowModal(false);
+                }}
+            />
+            {fixedQuery && (
                 <Button
                     title="Apply and Run"
                     color="accent"
@@ -99,8 +105,8 @@ export const AutoFixButton = ({
                         setShowModal(false);
                     }}
                 />
-            </div>
-        )
+            )}
+        </div>
     );
     return (
         <>
@@ -136,6 +142,13 @@ export const AutoFixButton = ({
                         message="Note: This AI-powered auto fix may not be 100% accurate. Please use your own judgement and verify the result."
                         type="warning"
                     />
+                    {socket.loading && (
+                        <div className="flex-row">
+                            <LoadingIcon />
+                            <div>Diagnosing...</div>
+                        </div>
+                    )}
+                    {diagnosis && <Markdown>{diagnosis}</Markdown>}
                     {explanation && (
                         <div>
                             <AccentText size="med" weight="bold">

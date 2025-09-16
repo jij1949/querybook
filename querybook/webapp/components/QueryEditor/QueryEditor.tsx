@@ -1,10 +1,6 @@
-import { acceptCompletion, startCompletion } from '@codemirror/autocomplete';
 import { indentService } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
-import CodeMirror, {
-    BasicSetupOptions,
-    ReactCodeMirrorRef,
-} from '@uiw/react-codemirror';
+import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import clsx from 'clsx';
 import React, {
     useCallback,
@@ -14,6 +10,7 @@ import React, {
 } from 'react';
 import toast from 'react-hot-toast';
 
+import { CodeEditor } from 'components/CodeEditor/CodeEditor';
 import { TDataDocMetaVariables } from 'const/datadoc';
 import KeyMap from 'const/keyMap';
 import { IDataTable } from 'const/metastore';
@@ -21,12 +18,8 @@ import {
     AutoCompleteType,
     useAutoCompleteExtension,
 } from 'hooks/queryEditor/extensions/useAutoCompleteExtension';
-import { useEventsExtension } from 'hooks/queryEditor/extensions/useEventsExtension';
 import { useHoverTooltipExtension } from 'hooks/queryEditor/extensions/useHoverTooltipExtension';
-import { useKeyMapExtension } from 'hooks/queryEditor/extensions/useKeyMapExtension';
 import { useLintExtension } from 'hooks/queryEditor/extensions/useLintExtension';
-import { useOptionsExtension } from 'hooks/queryEditor/extensions/useOptionsExtension';
-import { useSearchExtension } from 'hooks/queryEditor/extensions/useSearchExtension';
 import { useSqlCompleteExtension } from 'hooks/queryEditor/extensions/useSqlCompleteExtension';
 import { useStatusBarExtension } from 'hooks/queryEditor/extensions/useStatusBarExtension';
 import { useCodeAnalysis } from 'hooks/queryEditor/useCodeAnalysis';
@@ -39,8 +32,6 @@ import { format, ISQLFormatOptions } from 'lib/sql-helper/sql-formatter';
 import { TableToken } from 'lib/sql-helper/sql-lexer';
 import { navigateWithinEnv } from 'lib/utils/query-string';
 import { IconButton } from 'ui/Button/IconButton';
-
-import { getTheme } from './themes';
 
 import './QueryEditor.scss';
 
@@ -107,7 +98,6 @@ export const QueryEditor: React.FC<
             lineWrapping = false,
             readOnly,
             language = 'hive',
-            theme = 'default',
             metastoreId,
             keyMap = {},
             className,
@@ -184,10 +174,11 @@ export const QueryEditor: React.FC<
                     );
                 }
 
-                return value;
+                // Return null when no selection so that callers can fallback to their own query text
+                return null;
             }
-            return value;
-        }, [editorRef.current?.view, value]);
+            return null;
+        }, [editorRef.current?.view]);
 
         useImperativeHandle(
             ref,
@@ -206,7 +197,7 @@ export const QueryEditor: React.FC<
             });
         }, [onFullScreen]);
 
-        const { codeAnalysis, codeAnalysisRef } = useCodeAnalysis({
+        const { codeAnalysis } = useCodeAnalysis({
             language,
             query: value,
         });
@@ -235,7 +226,6 @@ export const QueryEditor: React.FC<
                 query: value,
                 metastoreId,
                 engineId,
-                // templatedVariables: finalTemplatedVariables,
                 templatedVariables,
                 tableReferences,
                 editorView: editorRef.current?.view,
@@ -270,16 +260,6 @@ export const QueryEditor: React.FC<
         }, [tableNamesSet]);
 
         /* ---- start of CodeMirror properties ---- */
-
-        const searchExtension = useSearchExtension({
-            editorView: editorRef.current?.view,
-            cellId,
-        });
-
-        const eventsExtension = useEventsExtension({
-            onFocus,
-            onBlur,
-        });
 
         const statusBarExtension = useStatusBarExtension({
             isLinting,
@@ -325,44 +305,19 @@ export const QueryEditor: React.FC<
 
         const keyBindings = useMemo(
             () => [
-                { key: 'Tab', run: acceptCompletion },
                 {
-                    key: KeyMap.queryEditor.autocomplete.key,
-                    run: startCompletion,
-                },
-                {
-                    key: KeyMap.queryEditor.formatQuery.key,
+                    key: KeyMap.codeEditor.formatQuery.key,
                     run: () => {
                         formatQuery({ case: 'upper' });
                         return true;
                     },
                 },
                 {
-                    key: KeyMap.queryEditor.openTable.key,
+                    key: KeyMap.codeEditor.openTable.key,
                     run: openTableModalCommand,
                 },
             ],
             [formatQuery, openTableModalCommand]
-        );
-        const keyMapExtention = useKeyMapExtension({
-            keyMap,
-            keyBindings,
-        });
-
-        const optionsExtension = useOptionsExtension({
-            lineWrapping,
-            options: propOptions,
-        });
-
-        const selectionExtension = useMemo(
-            () =>
-                EditorView.updateListener.of((update) => {
-                    if (update.selectionSet) {
-                        const selection = update.state.selection.main;
-                        onSelection?.(!selection.empty);
-                    }
-                }),
-            [onSelection]
         );
 
         const sqlCompleteExtension = useSqlCompleteExtension({
@@ -374,15 +329,10 @@ export const QueryEditor: React.FC<
         const extensions = useMemo(
             () => [
                 mixedSQL(language),
-                keyMapExtention,
                 statusBarExtension,
-                eventsExtension,
                 lintExtension,
                 autoCompleteExtension,
                 hoverTooltipExtension,
-                optionsExtension,
-                searchExtension,
-                selectionExtension,
                 sqlCompleteExtension,
                 indentService.of((context, pos) => {
                     if (pos === 0) {
@@ -393,36 +343,14 @@ export const QueryEditor: React.FC<
             ],
             [
                 language,
-                keyMapExtention,
                 statusBarExtension,
-                eventsExtension,
                 lintExtension,
                 autoCompleteExtension,
                 hoverTooltipExtension,
-                optionsExtension,
-                searchExtension,
-                selectionExtension,
                 sqlCompleteExtension,
             ]
         );
 
-        const basicSetup = useMemo<BasicSetupOptions>(
-            () => ({
-                drawSelection: true,
-                highlightSelectionMatches: true,
-                searchKeymap: false,
-                foldGutter: true,
-                allowMultipleSelections: true,
-            }),
-            []
-        );
-
-        const onChangeHandler = useCallback(
-            (value, viewUpdate) => {
-                onChange?.(value);
-            },
-            [onChange]
-        );
         /* ---- end of CodeMirror properties ---- */
 
         const floatButtons = (
@@ -451,22 +379,20 @@ export const QueryEditor: React.FC<
                 }}
             >
                 {floatButtons}
-                <CodeMirror
+                <CodeEditor
                     ref={editorRef}
-                    theme={getTheme(theme)}
-                    className="ReactCodeMirror"
+                    height={height}
                     value={value}
-                    height="100%"
-                    maxHeight={height === 'auto' ? '50vh' : null}
+                    cellId={cellId}
+                    lineWrapping={lineWrapping}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    keyMap={keyMap}
+                    keyBindings={keyBindings}
                     extensions={extensions}
-                    basicSetup={basicSetup}
-                    // editable is working on the editor view. set as true to make it still respond to keymaps, e.g. search
-                    editable={true}
-                    // readonly is working on the editor state. when true, the editor content will not change anyway.
-                    readOnly={readOnly}
-                    autoFocus={false}
-                    onChange={onChangeHandler}
-                    indentWithTab={false}
+                    readonly={readOnly}
+                    onChange={onChange}
+                    onSelection={onSelection}
                 />
             </div>
         );

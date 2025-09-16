@@ -1,21 +1,18 @@
 import * as React from 'react';
+import { matchPath } from 'react-router-dom';
 
 import { ComponentType, ElementType } from 'const/analytics';
 import { trackClick } from 'lib/analytics';
 import { navigateWithinEnv } from 'lib/utils/query-string';
 import { IconButton } from 'ui/Button/IconButton';
-import {
-    Menu,
-    MenuDivider,
-    MenuInfoItem,
-    MenuItem,
-} from 'ui/Menu/Menu';
+import { Menu, MenuDivider, MenuInfoItem, MenuItem } from 'ui/Menu/Menu';
 import { Popover } from 'ui/Popover/Popover';
 
 import { QuerybookVersion } from './QuerybookVersion';
 
 export const InfoMenuButton: React.FunctionComponent = () => {
     const [showPanel, setShowPanel] = React.useState(false);
+
     const buttonRef = React.useRef<HTMLAnchorElement>();
 
     const getPanelDOM = () => {
@@ -27,7 +24,10 @@ export const InfoMenuButton: React.FunctionComponent = () => {
                 <MenuDivider />
                 <MenuItem
                     onClick={() => {
-                        window.open('https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393152283/Querybook+Change+Logs', '_blank')
+                        window.open(
+                            'https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393152283/Querybook+Change+Logs',
+                            '_blank'
+                        );
                     }}
                 >
                     Change Logs

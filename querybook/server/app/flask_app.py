@@ -1,3 +1,4 @@
+import os
 import sys
 from datetime import timedelta
 
@@ -156,9 +157,9 @@ def make_limiter(app):
             response.headers["flask-limit-amount"] = limiter.current_limit.limit.amount
             response.headers["flask-limit-key"] = limiter.current_limit.key
             response.headers["flask-limit-reset-at"] = limiter.current_limit.reset_at
-            response.headers[
-                "flask-limit-window-size"
-            ] = limiter.current_limit.limit.get_expiry()
+            response.headers["flask-limit-window-size"] = (
+                limiter.current_limit.limit.get_expiry()
+            )
         return response
 
     return limiter
@@ -188,6 +189,39 @@ def make_blue_print(app, limiter):
         static_folder=WEBAPP_DIR_PATH,
         static_url_path=BUILD_PATH,
     )
+
+    # Add cache control to the blueprint
+    @blueprint.after_request
+    def add_static_cache(response):
+        if response.status_code == 200:
+            max_age = QuerybookSettings.CACHE_CONTROL_MAX_AGE
+            stale_while_revalidate = (
+                QuerybookSettings.CACHE_CONTROL_STALE_WHILE_REVALIDATE
+            )
+            response.headers["Cache-Control"] = (
+                f"public, max-age={max_age}, stale-while-revalidate={stale_while_revalidate}"
+            )
+        return response
+
+    app.register_blueprint(blueprint)
+    limiter.exempt(blueprint)
+    return blueprint
+
+
+def make_static_plugin_blue_print(app, limiter):
+    # Serve the plugin static files from /static_plugin
+    plugin_static_path = os.path.join(
+        QuerybookSettings.QUERYBOOK_PLUGIN_PATH, "./static_plugin"
+    )
+    if not os.path.exists(plugin_static_path):
+        return None
+
+    blueprint = Blueprint(
+        "static_plugin_bp",
+        __name__,
+        static_folder=plugin_static_path,
+        static_url_path="/static_plugin",
+    )
     app.register_blueprint(blueprint)
     limiter.exempt(blueprint)
     return blueprint
@@ -197,6 +231,7 @@ validate_db()
 flask_app = make_flask_app()
 limiter = make_limiter(flask_app)
 make_blue_print(flask_app, limiter)
+make_static_plugin_blue_print(flask_app, limiter)
 cache = make_cache(flask_app)
 celery = make_celery(flask_app)
 socketio = make_socketio(flask_app)

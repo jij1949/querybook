@@ -35,7 +35,7 @@ import { QueryCellRunAllFromCellButton } from '../QueryCellRunAllFromCellButton/
 import './QueryRunButton.scss';
 
 const EXECUTE_QUERY_SHORTCUT = getShortcutSymbols(
-    KeyMap.queryEditor.runQuery.key
+    KeyMap.codeEditor.runQuery.key
 );
 
 interface IQueryRunButtonProps extends IQueryEngineSelectorProps {

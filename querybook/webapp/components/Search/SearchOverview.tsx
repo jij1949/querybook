@@ -102,7 +102,7 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
         searchOrder,
         searchType,
         searchAuthorChoices,
-        useVectorSearch,
+        isNLPSearch,
 
         searchRequest,
         queryMetastores,
@@ -144,6 +144,7 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
         if (!isLoading && searchString.length > 0 && results.length > 0) {
             const elementType = SearchTypeToElementType[searchType];
             trackView(ComponentType.SEARCH_MODAL, elementType, {
+                nlp: isNLPSearch,
                 search: searchString,
                 results: results.map((r) => r.id),
                 page: currentPage,
@@ -170,8 +171,8 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
     const updateSearchType = React.useCallback((type) => {
         dispatch(searchActions.updateSearchType(type));
     }, []);
-    const updateUseVectorSearch = React.useCallback((useVectorSearch) => {
-        dispatch(searchActions.updateUseVectorSearch(useVectorSearch));
+    const updateUseVectorSearch = React.useCallback((isNLPSearch) => {
+        dispatch(searchActions.updateUseVectorSearch(isNLPSearch));
     }, []);
     const moveToPage = React.useCallback((page) => {
         dispatch(searchActions.moveToPage(page));
@@ -282,6 +283,7 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                 component: ComponentType.SEARCH_MODAL,
                 element: elementType,
                 aux: {
+                    nlp: isNLPSearch,
                     search: searchString,
                     results: results.map((r) => r.id),
                     page: currentPage,
@@ -324,7 +326,7 @@ export const SearchOverview: React.FC<ISearchOverviewProps> = ({
                             Natural Language Search
                         </AccentText>
                         <ToggleSwitch
-                            checked={useVectorSearch}
+                            checked={isNLPSearch}
                             onChange={(val) => updateUseVectorSearch(val)}
                         />
                     </div>

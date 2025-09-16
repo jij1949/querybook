@@ -129,7 +129,7 @@ def _format_partition_filter(
             partition_filters.append(f"{column_name}=DATE '{column_val}'")
             continue
 
-        if column_type == QuerybookColumnType.String:
+        if column_type == QuerybookColumnType.String or column_type is None:
             column_quote = "'"
 
         partition_filters.append(

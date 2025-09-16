@@ -72,7 +72,7 @@ import './DataDocQueryCell.scss';
 
 const ON_CHANGE_DEBOUNCE_MS = 500;
 const FORMAT_QUERY_SHORTCUT = getShortcutSymbols(
-    KeyMap.queryEditor.formatQuery.key
+    KeyMap.codeEditor.formatQuery.key
 );
 
 type StateProps = ReturnType<typeof mapStateToProps>;
@@ -86,7 +86,8 @@ interface IOwnProps {
     docId: number;
     cellId: number;
 
-    queryIndexInDoc: number;
+    index: number;
+    codeIndexInDoc: number;
     templatedVariables: TDataDocMetaVariables;
 
     shouldFocus: boolean;
@@ -199,10 +200,10 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
     }
 
     public get defaultCellTitle() {
-        const { queryIndexInDoc } = this.props;
-        return queryIndexInDoc == null
+        const { codeIndexInDoc } = this.props;
+        return codeIndexInDoc == null
             ? 'Untitled'
-            : `Query #${queryIndexInDoc + 1}`;
+            : `Query #${codeIndexInDoc + 1}`;
     }
 
     public get dataCellTitle() {
@@ -242,8 +243,8 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
     @decorate(memoizeOne)
     public _keyMapMemo(engines: IQueryEngine[]) {
         const keyMap = {
-            [KeyMap.queryEditor.runQuery.key]: this.clickOnRunButton,
-            [KeyMap.queryEditor.focusCommandInput.key]: this.focusCommandInput,
+            [KeyMap.codeEditor.runQuery.key]: this.clickOnRunButton,
+            [KeyMap.codeEditor.focusCommandInput.key]: this.focusCommandInput,
         };
 
         for (const [index, engine] of engines.entries()) {
@@ -253,7 +254,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                 break;
             }
 
-            keyMap[KeyMap.queryEditor.changeEngine.key + '-' + String(key)] =
+            keyMap[KeyMap.codeEditor.changeEngine.key + '-' + String(key)] =
                 () => this.handleMetaChange('engine', engine.id);
         }
 
@@ -301,6 +302,17 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             if (this.props.onBlur) {
                 this.props.onBlur();
             }
+
+            trackClick({
+                component: ComponentType.DATADOC_QUERY_CELL,
+                element: ElementType.QUERY_EDITOR,
+                aux: {
+                    docId: this.props.docId,
+                    cellId: this.props.cellId,
+                    action: 'blur',
+                    query: this.state.query,
+                },
+            });
         }
     }
 
@@ -310,6 +322,17 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
             if (this.props.onFocus) {
                 this.props.onFocus();
             }
+
+            trackClick({
+                component: ComponentType.DATADOC_QUERY_CELL,
+                element: ElementType.QUERY_EDITOR,
+                aux: {
+                    docId: this.props.docId,
+                    cellId: this.props.cellId,
+                    action: 'focus',
+                    query: this.state.query,
+                },
+            });
         }
     }
 
@@ -910,7 +933,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                         <AccentText
                             className="query-title"
                             weight="bold"
-                            size="large"
+                            size="med"
                         >
                             {queryTitleDOM}
                         </AccentText>
@@ -944,8 +967,8 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                             onTableSamplingInfoClick={
                                 this.toggleShowTableSamplingInfoModal
                             }
-                            docId={this.props.docId}
-                            index={this.props.queryIndexInDoc}
+                            docId={docId}
+                            index={this.props.index}
                         />
                         {this.getAdditionalDropDownButtonDOM()}
                     </div>
@@ -956,10 +979,6 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                         queryEngine={queryEngineById[this.engineId]}
                         tablesInQuery={this.state.tableNamesInQuery}
                         onUpdateQuery={this.handleChange}
-                        onUpdateEngineId={this.handleMetaChange.bind(
-                            this,
-                            'engine'
-                        )}
                         onFormatQuery={this.formatQuery.bind(this, {
                             case: 'upper',
                         })}
@@ -1111,7 +1130,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                 docId={docId}
                 cellId={cellId}
                 isQueryCollapsed={this.queryCollapsed}
-                changeCellContext={isEditable ? this.handleChange : null}
+                onUpdateQuery={isEditable ? this.handleChange : null}
                 onSamplingInfoClick={this.toggleShowTableSamplingInfoModal}
                 hasSamplingTables={this.hasSamplingTables}
                 sampleRate={this.sampleRate}

@@ -20,6 +20,7 @@ import { DataDocCloneButton } from './DataDocCloneButton';
 import { DataDocRunAllButton } from './DataDocRunAllButton';
 import { DataDocScheduleButton } from './DataDocScheduleButton';
 import { DeleteDataDocButton } from './DeleteDataDocButton';
+import { PythonKernelButton } from '../PythonKernelButton/PythonKernelButton';
 
 import './DataDocRightSidebar.scss';
 import { DataDocJsonDownloadButton } from './DataDocJsonDownloadButton';
@@ -146,6 +147,7 @@ export const DataDocRightSidebar: React.FunctionComponent<IProps> = ({
                 />
             </div>
             <div className="DataDocRightSidebar-button-section-bottom flex-column mb8">
+                <PythonKernelButton />
                 {runAllButtonDOM}
                 {githubButtonDOM}
                 {isEditable && exporterExists && (

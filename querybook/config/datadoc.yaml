@@ -27,6 +27,18 @@ cell_types:
             limit: 0
             sample_rate: 0
             disabled: false
+    python:
+        key: 'python'
+        name: 'Python'
+        icon: 'Code'
+        meta:
+            title: ''
+            collapsed: false
+            disabled: false
+        meta_default:
+            title: ''
+            collapsed: false
+            disabled: false
     chart:
         key: 'chart'
         name: 'Chart'

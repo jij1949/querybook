@@ -1,7 +1,4 @@
-FROM artifactory-edge.expedia.biz/public-docker-virtual/python:3.9.16
-# Cannot upgrade to Python 3.10 until the following uWSGI release a new version:
-# https://github.com/unbit/uwsgi/pull/2363
-# This caused websocket to fail
+FROM artifactory-edge.expedia.biz/public-docker-virtual/python:3.10-bookworm
 
 ARG PRODUCTION=true
 ARG EXTRA_PIP_INSTALLS=""
@@ -13,7 +10,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 COPY certs/* /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 
-ENV NODE_MAJOR=16
+ENV NODE_MAJOR=18
 ENV NODE_OPTIONS=--use-openssl-ca
 
 ## Install Querybook package requirements + NodeJS

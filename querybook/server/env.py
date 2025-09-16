@@ -2,6 +2,7 @@ import sys
 import os
 import json
 
+from const.path import DEFAULT_PLUGIN_PATH
 from lib.config import get_config_value
 
 
@@ -57,6 +58,7 @@ class QuerybookSettings(object):
     FLASK_CACHE_CONFIG = get_env_config("FLASK_CACHE_CONFIG")
     WS_CORS_ALLOWED_ORIGINS = get_env_config("WS_CORS_ALLOWED_ORIGINS", optional=False)
     IFRAME_ALLOWED_ORIGINS = get_env_config("IFRAME_ALLOWED_ORIGINS")
+    QUERYBOOK_PLUGIN_PATH = get_env_config("QUERYBOOK_PLUGIN") or DEFAULT_PLUGIN_PATH
 
     # Celery
     REDIS_URL = get_env_config("REDIS_URL", optional=False)
@@ -195,3 +197,11 @@ class QuerybookSettings(object):
     GITHUB_REPO_NAME = get_env_config("GITHUB_REPO_NAME")
     GITHUB_BRANCH = get_env_config("GITHUB_BRANCH")
     GITHUB_CRYPTO_SECRET = get_env_config("GITHUB_CRYPTO_SECRET")
+
+    # Cache Control
+    CACHE_CONTROL_MAX_AGE = int(
+        get_env_config("CACHE_CONTROL_MAX_AGE") or "604800"
+    )  # 7 days
+    CACHE_CONTROL_STALE_WHILE_REVALIDATE = int(
+        get_env_config("CACHE_CONTROL_STALE_WHILE_REVALIDATE") or "86400"
+    )  # 1 day
