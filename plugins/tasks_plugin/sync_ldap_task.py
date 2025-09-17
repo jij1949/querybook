@@ -99,7 +99,7 @@ def ad_query_group(args, conn, ad_group):
     return None
 
 
-def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
+def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[], skip_service_accounts=False):
     """
     :param conn: ldap connection object
     :param ad_group: string of security group
@@ -172,7 +172,7 @@ def ad_query_group_membership(args, conn, ad_group, level=1, visited_groups=[]):
                                     )
                         # Filter out service accounts (s-*)
                         elif entry["attributes"]["sAMAccountName"] is None or (
-                            entry["attributes"]["sAMAccountName"].startswith("s-")
+                            entry["attributes"]["sAMAccountName"].startswith("s-") and skip_service_accounts
                         ):
                             LOG.debug(
                                 f"Warning - user {entry['attributes']['sAMAccountName']} is a service account, skipping."
