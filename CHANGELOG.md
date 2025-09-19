@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.122.0](https://github.com/eg-internal/querybook/compare/v0.121.2...v0.122.0) (2025-09-19)
+
+
+### Features
+
+* Add peer review system for queries ([52efbb0](https://github.com/eg-internal/querybook/commit/52efbb052dd3c2fc5fb93d11ac50d6dad86bc7f6))
+* Add peer review system for queries ([#1535](https://github.com/eg-internal/querybook/issues/1535)) ([52efbb0](https://github.com/eg-internal/querybook/commit/52efbb052dd3c2fc5fb93d11ac50d6dad86bc7f6))
+* Auto-inject DataDoc variables into Python runtime context ([#1614](https://github.com/eg-internal/querybook/issues/1614)) ([4c3d1b6](https://github.com/eg-internal/querybook/commit/4c3d1b69354487087ead6bba494f1ec1db68ea5a))
+* Merge branch 'upstream-partial' into feat/upstream-merge ([74a594d](https://github.com/eg-internal/querybook/commit/74a594d03f17abff66af6051cf260e512201ee6f))
+* Merge branch 'upstream' into feat/upstream-merge-2 ([839714d](https://github.com/eg-internal/querybook/commit/839714dbb3790d58307ebb397cf1dfbd5d5f6713))
+
+
+### Bug Fixes
+
+* add 1 row as default page size option for query results ([#451](https://github.com/eg-internal/querybook/issues/451)) ([51e54a3](https://github.com/eg-internal/querybook/commit/51e54a3664153b7de594b5406df2eb6977066554))
+* docker image build issue ([#1613](https://github.com/eg-internal/querybook/issues/1613)) ([24af817](https://github.com/eg-internal/querybook/commit/24af817105fe1f438c0f217a6fdcdef698af9249))
+* make sure the cmd-f still work on readonly docs ([#1532](https://github.com/eg-internal/querybook/issues/1532)) ([8430ef0](https://github.com/eg-internal/querybook/commit/8430ef0b974e3400140fafb935f3d120854ff4e4))
+* pin Docker base image to python:3.10-bookworm ([#1612](https://github.com/eg-internal/querybook/issues/1612)) ([81795d8](https://github.com/eg-internal/querybook/commit/81795d838a9416e0c1aa084de0133eaff9421496))
+
 ## [0.121.2](https://github.com/eg-internal/querybook/compare/v0.121.1...v0.121.2) (2025-08-26)
 
 
