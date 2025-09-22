@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.122.1](https://github.com/eg-internal/querybook/compare/v0.122.0...v0.122.1) (2025-09-22)
+
+
+### Bug Fixes
+
+* Fix pagination for Python cell results ([44ae7f8](https://github.com/eg-internal/querybook/commit/44ae7f862139e4a3d207a2f56808d4d54c7ba91a))
+* Update StarRocks executor to enable impersonation ([ff2a71d](https://github.com/eg-internal/querybook/commit/ff2a71d2ec3748c297c0d425949b96b66787a79c))
+
 ## [0.122.0](https://github.com/eg-internal/querybook/compare/v0.121.2...v0.122.0) (2025-09-19)
 
 
