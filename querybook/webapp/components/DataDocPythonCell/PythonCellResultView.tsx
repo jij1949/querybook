@@ -31,6 +31,12 @@ export const PythonCellResultView = ({
         [theme]
     );
 
+    const rowValue = useShallowSelector(
+        (state: IStoreState) =>
+            state.user.computedSettings.rows_in_query_results
+    );
+    const maxNumberOfRowsToShow = Number(rowValue.split(' ')[0]);
+
     const getTableData = useCallback((data) => {
         const columns = data['columns'];
         const records = data['records'];
@@ -48,6 +54,7 @@ export const PythonCellResultView = ({
                     <StatementResultTable
                         data={getTableData(output['data'])}
                         paginate={true}
+                        maxNumberOfRowsToShow={maxNumberOfRowsToShow}
                     />
                 );
             } else if (output['type'] === 'image') {
