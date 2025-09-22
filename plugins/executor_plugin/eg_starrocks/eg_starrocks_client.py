@@ -44,7 +44,8 @@ class EgStarRocksCursor(SqlAlchemyCursor):
         # Impersonate the proxy user if needed
         if impersonate and proxy_user:
             try:
-                self._connection.execute(f"EXECUTE AS {proxy_user} WITH NO REVERT;")
+                LOG.debug(f"StarRocks: Impersonating user {proxy_user}")
+                self._connection.execute(f"execute as external user {proxy_user} with no revert;")
             except Exception as e:
                 LOG.error(f"Failed to impersonate {proxy_user}: {e}")
                 raise
