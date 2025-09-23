@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.122.2](https://github.com/eg-internal/querybook/compare/v0.122.1...v0.122.2) (2025-09-23)
+
+
+### Bug Fixes
+
+* Improved Python print support for MultiIndex, NumPy arrays, etc ([521ffb6](https://github.com/eg-internal/querybook/commit/521ffb6fbe8d53498476f90ac68894940d98c248))
+
 ## [0.122.1](https://github.com/eg-internal/querybook/compare/v0.122.0...v0.122.1) (2025-09-22)
 
 
