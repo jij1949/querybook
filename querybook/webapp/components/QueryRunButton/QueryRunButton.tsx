@@ -54,6 +54,7 @@ interface IQueryRunButtonProps extends IQueryEngineSelectorProps {
 
     docId: number;
     index: number;
+    isEditable?: boolean;
 }
 
 export interface IQueryRunButtonHandles {
@@ -84,6 +85,7 @@ export const QueryRunButton = React.forwardRef<
 
             docId,
             index,
+            isEditable = true,
         },
         ref
     ) => {
@@ -130,7 +132,7 @@ export const QueryRunButton = React.forwardRef<
         const isRowLimitEnabled =
             queryEngineById[engineId]?.feature_params.row_limit;
         const rowLimitDOM =
-            !disabled && onRowLimitChange && isRowLimitEnabled ? (
+            !disabled && onRowLimitChange && isRowLimitEnabled && isEditable ? (
                 <QueryLimitSelector
                     rowLimit={rowLimit}
                     setRowLimit={onRowLimitChange}
@@ -141,7 +143,7 @@ export const QueryRunButton = React.forwardRef<
         return (
             <div className="QueryRunButton flex-row ml16">
                 <QueryEngineSelector
-                    disabled={disabled}
+                    disabled={disabled || !isEditable}
                     queryEngineById={queryEngineById}
                     queryEngines={queryEngines}
                     engineId={engineId}

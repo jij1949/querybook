@@ -969,6 +969,7 @@ class DataDocQueryCellComponent extends React.PureComponent<IProps, IState> {
                             }
                             docId={docId}
                             index={this.props.index}
+                            isEditable={isEditable}
                         />
                         {this.getAdditionalDropDownButtonDOM()}
                     </div>

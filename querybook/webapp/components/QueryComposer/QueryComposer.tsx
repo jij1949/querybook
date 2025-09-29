@@ -822,6 +822,7 @@ const QueryComposer: React.FC = () => {
                 }
                 docId={null}
                 index={null}
+                isEditable={true}
             />
         </div>
     );
