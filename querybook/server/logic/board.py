@@ -200,47 +200,21 @@ def update_es_boards_by_id(board_id: int):
 
 
 @with_session
-def get_all_public_boards(environment_id, session=None):
-    return (
+def get_all_public_boards(environment_id, limit=None, offset=None, session=None):
+    query = (
         session.query(Board)
         .filter(Board.public.is_(True))
         .filter(Board.environment_id == environment_id)
-        .all()
+        .filter(Board.deleted_at.is_(None))
+        .order_by(Board.updated_at.desc())
     )
 
-
-@with_session
-def get_all_shared_boards(environment_id, user_id, session=None):
-    shared_boards = (
-        session.query(Board)
-        .filter(Board.owner_uid != user_id)
-        .filter(Board.environment_id == environment_id)
-        .join(BoardEditor)
-        .filter(BoardEditor is not None)
-        .filter(BoardEditor.uid == user_id)
-        .filter(
-            or_(
-                # User has write access to the board (public or private)
-                BoardEditor.write.is_(True),
-                # User has read access to the board (public)
-                and_(
-                    Board.public.is_(False),
-                    BoardEditor.read.is_(True),
-                ),
-            )
-        )
-        .all()
-    )
-
-    extra_shared_boards = get_boards_from_user_group_access(
-        eid=environment_id, uid=user_id, session=session
-    )
-
-    for board in extra_shared_boards:
-        if board.id not in [shared_board.id for shared_board in shared_boards]:
-            shared_boards.append(board)
-
-    return shared_boards
+    if offset is not None and offset > 0:
+        query = query.offset(offset)
+    if limit is not None:
+        return query.limit(limit).all()
+    else:
+        return query.all()
 
 
 @with_session
@@ -272,6 +246,44 @@ def get_boards_from_user_group_access(eid, uid, session=None):
 
     return session.query(recursive_q).all()
 
+
+@with_session
+def get_all_shared_boards(environment_id, user_id, limit=None, offset=None, session=None):
+    shared_boards = (
+        session.query(Board)
+        .filter(Board.owner_uid != user_id)
+        .filter(Board.environment_id == environment_id)
+        .filter(Board.deleted_at.is_(None))
+        .join(BoardEditor)
+        .filter(BoardEditor.uid == user_id)
+        .filter(
+            or_(
+                # User has write access to the board (public or private)
+                BoardEditor.write.is_(True),
+                # User has read access to the board (private only)
+                BoardEditor.read.is_(True),
+            )
+        )
+        .all()
+    )
+
+    # Get boards shared through group membership
+    group_shared_boards = get_boards_from_user_group_access(eid=environment_id, uid=user_id, session=session)
+    
+    existing_board_ids = {board.id for board in shared_boards}
+    for board in group_shared_boards:
+        if board.id not in existing_board_ids:
+            shared_boards.append(board)
+            existing_board_ids.add(board.id)
+    
+    shared_boards.sort(key=lambda b: b.updated_at, reverse=True)
+
+    if offset is not None and offset > 0:
+        shared_boards = shared_boards[offset:]
+    if limit is not None:
+        shared_boards = shared_boards[:limit]
+
+    return shared_boards
 
 @with_session
 def get_my_editable_boards(environment_id, user_id, session=None):

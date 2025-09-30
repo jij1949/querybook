@@ -174,28 +174,6 @@ export function fetchBoardIfNeeded(id: number): ThunkResult<Promise<any>> {
     };
 }
 
-export function fetchSharedBoard(): ThunkResult<Promise<IBoardRaw>> {
-    return (dispatch, getState) => {
-        const state = getState();
-        return BoardResource.getShared(
-            state.environment.currentEnvironmentId,
-            state.user.myUserInfo.uid
-        ).then(({ data: board }) => {
-            receiveBoardWithItems(dispatch, board);
-            return board;
-        });
-    };
-}
-
-export function fetchSharedBoardIfNeeded(id: number): ThunkResult<Promise<any>> {
-    return async (dispatch, getState) => {
-        const state = getState();
-        if (!state.board.boardById[id]?.items) {
-            return dispatch(fetchSharedBoard());
-        }
-    };
-}
-
 export function createBoard(
     name: string,
     description: ContentState,

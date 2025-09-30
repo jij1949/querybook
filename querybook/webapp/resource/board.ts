@@ -21,10 +21,19 @@ export const BoardResource = {
             environment_id: environmentId,
         }),
 
-    getShared: (environmentId: number, userId: number) =>
-        ds.fetch<IBoardRaw>(`/board/shared/`, {
+    getAllShared: (environmentId: number, userId: number, limit: number, offset: number) =>
+        ds.fetch<IBoardRaw>(`/board/shared/all/`, {
             environment_id: environmentId,
             user_id: userId,
+            limit,
+            offset,
+        }),
+
+    getAllPublic: (environmentId: number, limit: number, offset: number) =>
+        ds.fetch<IBoardRaw>(`/board/public/all/`, {
+            environment_id: environmentId,
+            limit,
+            offset,
         }),
 
     getAllEditable: (environmentId: number, userId: number) =>
