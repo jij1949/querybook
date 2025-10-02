@@ -31,6 +31,10 @@ import './EnvironmentAppSidebar.scss';
 const SIDEBAR_WIDTH = 320;
 
 export const EnvironmentAppSidebar: React.FunctionComponent = () => {
+    const theme = useSelector(
+        (state: IStoreState) => state.user.computedSettings.theme
+    );
+
     const collapsed: boolean = useSelector(
         (state: IStoreState) => state.querybookUI.isEnvCollapsed
     );
@@ -100,7 +104,11 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
             ) : entity === 'review' ? (
                 <QueryReviewsNavigator />
             ) : entity === 'chat' ? (
-                <IFrameNavigator src="https://analytics.expedia.biz/ava?fullscreen=true&ref=querybook" />
+                <IFrameNavigator
+                    src={`https://analytics.expedia.biz/ava?fullscreen=true&ref=querybook&theme=${
+                        theme === 'dark' ? 'dark' : 'light'
+                    }`}
+                />
             ) : (
                 <div />
             );
