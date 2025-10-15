@@ -3,6 +3,7 @@ import {
     openSearchPanel,
     search,
     SearchQuery,
+    selectNextOccurrence,
     setSearchQuery,
 } from '@codemirror/search';
 import {
@@ -96,6 +97,11 @@ export const useSearchExtension = ({
                             searchContext?.showSearchAndReplace();
                             return true;
                         },
+                    },
+                    {
+                        key: 'Mod-d',
+                        run: selectNextOccurrence,
+                        preventDefault: true,
                     },
                 ])
             ),

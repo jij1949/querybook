@@ -146,6 +146,10 @@ const DEFAULT_KEY_MAP = {
             key: 'Cmd-I',
             name: 'Focus command input',
         },
+        nextOccurrence: {
+            key: 'Cmd-D',
+            name: 'Select next occurrence',
+        }
     },
 };
 
