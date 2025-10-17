@@ -28,6 +28,14 @@
         }
     }
 
+    .Landing-middle {
+        width: 100%;
+        align-items: stretch;
+        justify-content: center;
+        flex: 1;
+        margin: --margin-lg 0px;
+    }
+
     .Landing-bottom {
         align-items: flex-start;
 

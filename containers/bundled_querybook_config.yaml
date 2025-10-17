@@ -4,6 +4,9 @@ FLASK_SECRET_KEY: SOME_RANDOM_SECRET_KEY
 DATABASE_CONN: mysql+pymysql://test:passw0rd@mysql:3306/querybook2?charset=utf8mb4
 REDIS_URL: redis://redis:6379/0
 ELASTICSEARCH_HOST: http://elasticsearch:9200
+
+ANALYTICS_WORKBENCH_GRAPHQL_ENDPOINT: https://analytics.expedia.biz/api/v1/graphql
+
 # ELASTICSEARCH_CONNECTION_TYPE: aws
 # Uncomment for email
 # EMAILER_CONN: dockerhostforward

@@ -191,6 +191,11 @@ class QuerybookSettings(object):
     DD_SERVICE = get_env_config("DD_SERVICE", optional=True) or "querybook"
     DD_TAGS = get_env_config("DD_TAGS", optional=True) or []
 
+    # Expedia Custom Endpoints
+    ANALYTICS_WORKBENCH_GRAPHQL_ENDPOINT = get_env_config(
+        "ANALYTICS_WORKBENCH_GRAPHQL_ENDPOINT"
+    )
+
     # GitHub Integration
     GITHUB_CLIENT_ID = get_env_config("GITHUB_CLIENT_ID")
     GITHUB_CLIENT_SECRET = get_env_config("GITHUB_CLIENT_SECRET")

@@ -2,6 +2,7 @@ import { sample } from 'lodash';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
+import { PersonalizedCosts } from 'components/PersonalizedCosts/PersonalizedCosts';
 import { QuerybookSidebarUIGuide } from 'components/UIGuide/QuerybookSidebarUIGuide';
 import loadingHintsConfig from 'config/loading_hints.yaml';
 import { ComponentType, ElementType } from 'const/analytics';
@@ -185,10 +186,15 @@ const DefaultLanding: React.FC = ({ children }) => {
         </div>
     );
 
+    const personalizedCost = <PersonalizedCosts />;
+
     return (
         <div className="Landing flex-column">
             {LandingHeader}
-            <div className="Landing-middle">{children}</div>
+            <div className="Landing-middle flex-column">
+                {personalizedCost}
+                {children}
+            </div>
             {LandingFooter}
         </div>
     );
