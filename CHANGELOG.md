@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.123.0](https://github.com/eg-internal/querybook/compare/v0.122.2...v0.123.0) (2025-10-20)
+
+
+### Features
+
+* Add configurable sleep in presto ([#1621](https://github.com/eg-internal/querybook/issues/1621)) ([4c33785](https://github.com/eg-internal/querybook/commit/4c33785cdb11a5137493ec5620bd2b5a8b2eadf2))
+* Auto generate data doc title in AI Assistant ([#1619](https://github.com/eg-internal/querybook/issues/1619)) ([db86fd6](https://github.com/eg-internal/querybook/commit/db86fd62631dd67bbc9fd538c9a7f2ff0ebd24a1))
+* Merge branch 'upstream' ([702439e](https://github.com/eg-internal/querybook/commit/702439e9cdd7cd2b3958533b2c64fd55129e2e14))
+* Personalized Cost Dashboard from Analytics Workbench ([#465](https://github.com/eg-internal/querybook/issues/465)) ([bdbd3b8](https://github.com/eg-internal/querybook/commit/bdbd3b8faf995506c6227cd54ea47214eb4b8ad6))
+* shortcut for select next occurrence in querybook code editor ([#466](https://github.com/eg-internal/querybook/issues/466)) ([b957fd4](https://github.com/eg-internal/querybook/commit/b957fd4f255c0b5cb8e7ecde30f64d6edeaa6b9e))
+
+
+### Bug Fixes
+
+* add pagination to lists pages, fix boards from group membership on shared lists page ([#450](https://github.com/eg-internal/querybook/issues/450)) ([128eed0](https://github.com/eg-internal/querybook/commit/128eed042aa89c27ad91c9d052237e7bc747e3b6))
+* disable query limit and query engine dropdowns for execute permission level ([#462](https://github.com/eg-internal/querybook/issues/462)) ([d4e7bc9](https://github.com/eg-internal/querybook/commit/d4e7bc95421179ccd9e3f9e437e679e9c828a9f9))
+* Pass theme to Ava ([d9c24dd](https://github.com/eg-internal/querybook/commit/d9c24dd79247f27b0df5d38c6ca9b0b02a44bfda))
+
 ## [0.122.2](https://github.com/eg-internal/querybook/compare/v0.122.1...v0.122.2) (2025-09-23)
 
 
