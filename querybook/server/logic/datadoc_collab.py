@@ -9,8 +9,13 @@ from const.data_doc import DATA_DOC_NAMESPACE
 from datasources.github import with_github_client
 from logic import datadoc as logic
 from logic import user as user_logic
-from logic.datadoc_permission import assert_can_read, assert_can_write, assert_can_execute
+from logic.datadoc_permission import (
+    assert_can_read,
+    assert_can_write,
+    assert_can_execute,
+)
 from flask_login import current_user
+from lib.utils.serialize import serialize_value
 
 
 @with_session
@@ -33,14 +38,14 @@ def update_datadoc(doc_id, fields, sid="", session=None):
     else:
         # Updating other fields, require write permission
         assert_can_write(doc_id, session=session)
-    
+
     verify_data_doc_permission(doc_id, session=session)
     doc = logic.update_data_doc(
         id=doc_id,
         session=session,
         **fields,
     )
-    doc_dict = doc.to_dict()
+    doc_dict = serialize_value(doc.to_dict())
 
     socketio.emit(
         "data_doc_updated",
@@ -103,7 +108,7 @@ def insert_data_cell(
     logic.insert_data_doc_cell(
         data_doc_id=doc_id, cell_id=data_cell.id, index=index, session=session
     )
-    data_cell_dict = data_cell.to_dict()
+    data_cell_dict = serialize_value(data_cell.to_dict())
     socketio.emit(
         "data_cell_inserted",
         (
@@ -243,7 +248,7 @@ def update_data_cell(cell_id, fields, sid="", session=None):
         session=session,
         **fields,
     )
-    data_cell_dict = data_cell.to_dict()
+    data_cell_dict = serialize_value(data_cell.to_dict())
     socketio.emit(
         "data_cell_updated",
         (sid, data_cell_dict),

@@ -21,6 +21,9 @@ ai_assistant:
     sql_complete:
         enabled: true
 
+    data_doc_title_generation:
+        enabled: true
+
 survey:
     global_response_cooldown: 432000 # 5 days
     global_trigger_cooldown: 14400 # 4 hours
