@@ -7,6 +7,7 @@ export interface IPersonalizedSummaryDashboard {
     numberDataDocs?: number;
     numberDags?: number;
     numberExtracts?: number;
+    numberTeradataQueries?: number;
     numberTrinoQueries?: number;
 }
 

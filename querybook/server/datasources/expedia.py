@@ -57,6 +57,7 @@ def get_personalized_cost(username: str = None):
                     numberDataDocs
                     numberDags
                     numberExtracts
+                    numberTeradataQueries
                     numberTrinoQueries
                 }
             }

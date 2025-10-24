@@ -21,6 +21,10 @@
         &:hover {
             text-decoration: none;
         }
+
+        &:first-child {
+            flex: 2 1 400px;
+        }
     }
 
     &-card {

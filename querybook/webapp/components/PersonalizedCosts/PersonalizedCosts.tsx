@@ -182,6 +182,23 @@ export const PersonalizedCosts: React.FC = () => {
                         </div>
                     </Card>
                 </Link>
+                <Link
+                    to="https://analytics.expedia.biz/cost/user/teradata"
+                    newTab={true}
+                    className="PersonalizedCosts-card-link"
+                >
+                    <Card className="PersonalizedCosts-card">
+                        <div className="PersonalizedCosts-card-icon">
+                            <Icon name="GitPullRequest" size={24} />
+                        </div>
+                        <div className="PersonalizedCosts-card-title">
+                            Teradata Queries
+                        </div>
+                        <div className="PersonalizedCosts-card-value">
+                            {formatNumber(data.numberTeradataQueries)}
+                        </div>
+                    </Card>
+                </Link>
             </div>
 
             <div className="PersonalizedCosts-footer">
