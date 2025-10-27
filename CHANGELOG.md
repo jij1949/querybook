@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.123.1](https://github.com/eg-internal/querybook/compare/v0.123.0...v0.123.1) (2025-10-27)
+
+
+### Bug Fixes
+
+* Add Teradata count to personalized cost dashboard ([9c6424f](https://github.com/eg-internal/querybook/commit/9c6424f1fd49d3896217bbbff685020890432fb6))
+
 ## [0.123.0](https://github.com/eg-internal/querybook/compare/v0.122.2...v0.123.0) (2025-10-20)
 
 
