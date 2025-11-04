@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.123.2](https://github.com/eg-internal/querybook/compare/v0.123.1...v0.123.2) (2025-11-04)
+
+
+### Bug Fixes
+
+* Pin python-socketio to fix run_datadoc.py emit ([b89216a](https://github.com/eg-internal/querybook/commit/b89216a0bfb781c2a8a0d737b249183a2f7bfbb7))
+
 ## [0.123.1](https://github.com/eg-internal/querybook/compare/v0.123.0...v0.123.1) (2025-10-27)
 
 
