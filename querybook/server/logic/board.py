@@ -227,6 +227,7 @@ def get_boards_from_user_group_access(eid, uid, session=None):
         .join(BoardEditor, Board.id == BoardEditor.board_id)
         .join(User, User.id == BoardEditor.uid)
         .join(UserGroupMember, User.id == UserGroupMember.gid)
+        .filter(UserGroupMember.uid == uid)
     )
 
     topq = topq.cte("cte", recursive=True)
@@ -240,6 +241,7 @@ def get_boards_from_user_group_access(eid, uid, session=None):
         .filter(Board.environment_id == eid)
         .join(User, User.id == BoardEditor.uid)
         .join(UserGroupMember, User.id == UserGroupMember.gid)
+        .filter(UserGroupMember.uid == uid)
     )
 
     recursive_q = topq.union(bottomq)
@@ -254,7 +256,8 @@ def get_all_shared_boards(environment_id, user_id, limit=None, offset=None, sess
         .filter(Board.owner_uid != user_id)
         .filter(Board.environment_id == environment_id)
         .filter(Board.deleted_at.is_(None))
-        .join(BoardEditor)
+        .join(BoardEditor, Board.id == BoardEditor.board_id)
+        .join(User, User.id == BoardEditor.uid)
         .filter(BoardEditor.uid == user_id)
         .filter(
             or_(
