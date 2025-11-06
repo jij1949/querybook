@@ -1,2 +1,2 @@
-trino==0.333.0
+trino==0.316.0
 trino[sqlalchemy]
