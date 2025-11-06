@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.123.3](https://github.com/eg-internal/querybook/compare/v0.123.2...v0.123.3) (2025-11-06)
+
+
+### Bug Fixes
+
+* fix shared list page filters ([#475](https://github.com/eg-internal/querybook/issues/475)) ([bbb3000](https://github.com/eg-internal/querybook/commit/bbb300044de2aaece29e0d370070061c18a62243))
+
 ## [0.123.2](https://github.com/eg-internal/querybook/compare/v0.123.1...v0.123.2) (2025-11-04)
 
 
