@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.123.4](https://github.com/eg-internal/querybook/compare/v0.123.3...v0.123.4) (2025-11-11)
+
+
+### Bug Fixes
+
+* update trino version ([#478](https://github.com/eg-internal/querybook/issues/478)) ([ebd9d8a](https://github.com/eg-internal/querybook/commit/ebd9d8a4f46f4189f798bfef32aee30f700fe4d3))
+
 ## [0.123.3](https://github.com/eg-internal/querybook/compare/v0.123.2...v0.123.3) (2025-11-06)
 
 
