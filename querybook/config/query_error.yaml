@@ -295,3 +295,10 @@ trino:
             Querybook cannot create or modify tables in the `egdp_prod` data lake.
 
             Check out the [Data Processing knowledge base](https://expediagroup.atlassian.net/wiki/spaces/DAPS/pages/500295810/Data+Processing) or reach out to [#ask-data-processing](https://expediagroup.enterprise.slack.com/archives/C012PT76RBJ) for more information.
+
+    trino_gateway:
+        regex: 'ServletException.+?io.trino.gateway'
+        message: |
+            The Trino cluster is unhealthy and unable to process queries at this time.
+
+            You can try re-running the query after a few minutes, but if the issue persists, please report this issue to [#ask-analytics-platform](https://expedia.slack.com/archives/C031QKDF3L7) and include the Trino tracking URL for the failed query.
