@@ -22,10 +22,14 @@ class TrinoCursor(PrestoCursorMixin[trino.dbapi.Cursor, List[Any]], CursorBaseCl
 
     def poll(self):
         try:
-            self.rows.extend(self._cursor._query.fetch())
-            self._cursor._iterator = iter(self.rows)
+            # Fetch rows incrementally to keep query alive and make progress
+            # Use fetchmany to avoid blocking on large result sets
+            if self._cursor._query and not self._cursor._query._finished:
+                fetched_rows = self._cursor.fetchmany(size=1000)
+                if fetched_rows:
+                    self.rows.extend(fetched_rows)
             poll_result = self._cursor.stats
-            completed = self._cursor._query._finished
+            completed = self._cursor._query._finished if self._cursor._query else False
             if poll_result:
                 self._update_percent_complete(poll_result)
                 self._update_tracking_url(poll_result)
@@ -46,6 +50,29 @@ class TrinoCursor(PrestoCursorMixin[trino.dbapi.Cursor, List[Any]], CursorBaseCl
     def _update_percent_complete(self, poll_result: Dict[str, Any]) -> None:
         self._percent_complete = poll_result.get("progressPercentage", 0)
 
+    def get_one_row(self):
+        # Return from self.rows if available (fetched by poll), otherwise fetch from cursor
+        if self.rows:
+            row = self.rows.pop(0)
+            return self.transform_row(row, self.presto_types)
+        return self.transform_row(self._cursor.fetchone(), self.presto_types)
+    
+    def get_n_rows(self, n: int):
+        # Return from self.rows if available (fetched by poll), otherwise fetch from cursor
+        presto_types = self.presto_types
+        result = []
+        
+        # First, use rows from self.rows that were fetched by poll()
+        while len(result) < n and self.rows:
+            result.append(self.transform_row(self.rows.pop(0), presto_types))
+        
+        # If we need more rows, fetch from cursor
+        if len(result) < n:
+            remaining = n - len(result)
+            fetched = self._cursor.fetchmany(size=remaining)
+            result.extend([self.transform_row(row, presto_types) for row in fetched])
+        
+        return result
 
 class TrinoClient(ClientBaseClass):
     def __init__(

@@ -48,10 +48,14 @@ class EGStarburstCursor(EGTrinoCursor):
 
     def poll(self):
         try:
-            self.rows.extend(self._cursor._query.fetch())
-            self._cursor._iterator = iter(self.rows)
+            # Fetch rows incrementally to keep query alive and make progress
+            # Use fetchmany to avoid blocking on large result sets
+            if self._cursor._query and not self._cursor._query._finished:
+                fetched_rows = self._cursor.fetchmany(size=1000)
+                if fetched_rows:
+                    self.rows.extend(fetched_rows)
             poll_result = self._cursor.stats
-            completed = self._cursor._query._finished
+            completed = self._cursor._query._finished if self._cursor._query else False
             if poll_result:
                 self._update_percent_complete(poll_result)
                 self._update_tracking_url(poll_result, info_uri=self._cursor.info_uri)
