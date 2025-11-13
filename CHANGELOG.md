@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.124.0](https://github.com/eg-internal/querybook/compare/v0.123.4...v0.124.0) (2025-11-13)
+
+
+### Features
+
+* Add friendly Trino Gateway error message ([c8f51f8](https://github.com/eg-internal/querybook/commit/c8f51f81e8bc98e746a481e95303daa4bbbff9c8))
+
+
+### Bug Fixes
+
+* Update client logic for trino client versions &gt;= 0.326.0 ([#482](https://github.com/eg-internal/querybook/issues/482)) ([eecfbd4](https://github.com/eg-internal/querybook/commit/eecfbd46e3097e55bb0be03e9f78ed280e4ab58c))
+
 ## [0.123.4](https://github.com/eg-internal/querybook/compare/v0.123.3...v0.123.4) (2025-11-11)
 
 
