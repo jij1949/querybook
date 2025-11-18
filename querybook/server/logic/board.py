@@ -219,34 +219,59 @@ def get_all_public_boards(environment_id, limit=None, offset=None, session=None)
 
 @with_session
 def get_boards_from_user_group_access(eid, uid, session=None):
-    topq = (
+    # First check if user is in any groups at all
+    has_groups = session.query(UserGroupMember).filter(
+        UserGroupMember.uid == uid
+    ).first()
+    
+    if not has_groups:
+        return []
+    
+    # Build recursive CTE to get all groups the user belongs to
+    base_groups = (
+        session.query(UserGroupMember.gid)
+        .filter(UserGroupMember.uid == uid)
+    )
+    
+    base_groups_cte = base_groups.cte('user_groups', recursive=True)
+    
+    # Recursive case
+    recursive_groups = (
+        select(UserGroupMember.gid)
+        .select_from(base_groups_cte)
+        .join(UserGroupMember, UserGroupMember.uid == base_groups_cte.c.group_id)
+    )
+    
+    all_groups_cte = base_groups_cte.union(recursive_groups)
+    
+    # Execute the CTE query separately to get the actual group IDs as a list
+    # This (hopefully) avoids SQLAlchemy's nested subquery compilation issues
+    group_ids = [row.group_id for row in session.query(all_groups_cte).all()]
+    
+    if not group_ids:
+        return []
+    
+    boards = (
         session.query(Board)
-        .filter(Board.public == 0)
-        .filter(Board.owner_uid != uid)
         .filter(Board.environment_id == eid)
-        .join(BoardEditor, Board.id == BoardEditor.board_id)
-        .join(User, User.id == BoardEditor.uid)
-        .join(UserGroupMember, User.id == UserGroupMember.gid)
-        .filter(UserGroupMember.uid == uid)
-    )
-
-    topq = topq.cte("cte", recursive=True)
-
-    bottomq = (
-        select(Board)
-        .select_from(topq)
-        .join(BoardEditor, topq.c.id == BoardEditor.board_id)
-        .filter(Board.public == 0)
+        .filter(Board.deleted_at.is_(None))
         .filter(Board.owner_uid != uid)
-        .filter(Board.environment_id == eid)
-        .join(User, User.id == BoardEditor.uid)
-        .join(UserGroupMember, User.id == UserGroupMember.gid)
-        .filter(UserGroupMember.uid == uid)
+        .filter(
+            Board.id.in_(
+                session.query(BoardEditor.board_id)
+                .filter(BoardEditor.uid.in_(group_ids))
+                .filter(
+                    or_(
+                        BoardEditor.write.is_(True),
+                        BoardEditor.read.is_(True),
+                    )
+                )
+            )
+        )
+        .all()
     )
-
-    recursive_q = topq.union(bottomq)
-
-    return session.query(recursive_q).all()
+    
+    return boards
 
 
 @with_session
