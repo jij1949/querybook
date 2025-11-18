@@ -1,6 +1,6 @@
 from typing import Dict, Union
 
-from elasticsearch7 import Elasticsearch, RequestsHttpConnection
+from elasticsearch import Elasticsearch
 
 from env import QuerybookSettings
 from lib.config import get_config_value
@@ -32,7 +32,6 @@ def get_hosted_es():
         hosted_es = Elasticsearch(
             hosts=QuerybookSettings.ELASTICSEARCH_HOST,
             http_auth=auth,
-            connection_class=RequestsHttpConnection,
             use_ssl=True,
             verify_certs=True,
         )
