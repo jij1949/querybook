@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.125.1](https://github.com/eg-internal/querybook/compare/v0.125.0...v0.125.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* group_id error and add logs for prod/test ([#487](https://github.com/eg-internal/querybook/issues/487)) ([3583138](https://github.com/eg-internal/querybook/commit/35831389743961cb0a36f7fd0901a03bb86e8622))
+
 ## [0.125.0](https://github.com/eg-internal/querybook/compare/v0.124.0...v0.125.0) (2025-11-19)
 
 
