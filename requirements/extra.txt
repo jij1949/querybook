@@ -16,6 +16,7 @@
 # Metastores
 -r metastore/hms.txt
 -r metastore/glue.txt
+-r metastore/databricks.txt
 
 # Auth
 -r auth/oauth.txt

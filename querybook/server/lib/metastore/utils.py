@@ -15,8 +15,15 @@ class MetastoreTableACLChecker(object):
             if len(full_name) == 1:
                 full_name.insert(0, "default")
 
-            schema_name, table_name = full_name
-            tables_by_schema.setdefault(schema_name, []).append(table_name)
+            if len(full_name) == 3:
+                catalog_name, schema_name, table_name = full_name
+                tables_by_schema.setdefault(f"{catalog_name}.{schema_name}", []).append(
+                    table_name
+                )
+
+            elif len(full_name) == 2:
+                schema_name, table_name = full_name
+                tables_by_schema.setdefault(schema_name, []).append(table_name)
 
         return tables_by_schema
 
