@@ -5,11 +5,14 @@ from const.elasticsearch import ElasticsearchItem
 from models.board import Board, BoardItem, BoardEditor
 from models.access_request import AccessRequest
 from lib.sqlalchemy import update_model_fields
+from lib.logger import get_logger
 from tasks.sync_elasticsearch import sync_elasticsearch
 from sqlalchemy import and_, or_, select
 
 from models import User, UserGroupMember
 from logic.generic_permission import get_all_groups_and_group_members_with_access
+
+LOG = get_logger(__file__)
 
 
 @with_session
@@ -219,12 +222,15 @@ def get_all_public_boards(environment_id, limit=None, offset=None, session=None)
 
 @with_session
 def get_boards_from_user_group_access(eid, uid, session=None):
+    LOG.info(f"[get_boards_from_user_group_access] Starting for user_id={uid}, environment_id={eid}")
+    
     # First check if user is in any groups at all
     has_groups = session.query(UserGroupMember).filter(
         UserGroupMember.uid == uid
     ).first()
     
     if not has_groups:
+        LOG.info(f"[get_boards_from_user_group_access] User {uid} is not in any groups, returning empty list")
         return []
     
     # Build recursive CTE to get all groups the user belongs to
@@ -239,14 +245,16 @@ def get_boards_from_user_group_access(eid, uid, session=None):
     recursive_groups = (
         select(UserGroupMember.gid)
         .select_from(base_groups_cte)
-        .join(UserGroupMember, UserGroupMember.uid == base_groups_cte.c.group_id)
+        .join(UserGroupMember, UserGroupMember.uid == base_groups_cte.c.gid)
     )
     
     all_groups_cte = base_groups_cte.union(recursive_groups)
     
     # Execute the CTE query separately to get the actual group IDs as a list
     # This (hopefully) avoids SQLAlchemy's nested subquery compilation issues
-    group_ids = [row.group_id for row in session.query(all_groups_cte).all()]
+    group_ids = [row.gid for row in session.query(all_groups_cte).all()]
+    
+    LOG.info(f"[get_boards_from_user_group_access] Found {len(group_ids)} total groups for user {uid}: {group_ids}")
     
     if not group_ids:
         return []
@@ -271,11 +279,15 @@ def get_boards_from_user_group_access(eid, uid, session=None):
         .all()
     )
     
+    LOG.info(f"[get_boards_from_user_group_access] Found {len(boards)} boards shared via groups for user {uid}: board_ids=[{', '.join(str(b.id) for b in boards)}]")
+    
     return boards
 
 
 @with_session
 def get_all_shared_boards(environment_id, user_id, limit=None, offset=None, session=None):
+    LOG.info(f"[get_all_shared_boards] Starting for user_id={user_id}, environment_id={environment_id}, limit={limit}, offset={offset}")
+    
     shared_boards = (
         session.query(Board)
         .filter(Board.owner_uid != user_id)
@@ -295,8 +307,12 @@ def get_all_shared_boards(environment_id, user_id, limit=None, offset=None, sess
         .all()
     )
 
+    LOG.info(f"[get_all_shared_boards] Found {len(shared_boards)} boards shared directly with user {user_id}: board_ids=[{', '.join(str(b.id) for b in shared_boards)}]")
+
     # Get boards shared through group membership
     group_shared_boards = get_boards_from_user_group_access(eid=environment_id, uid=user_id, session=session)
+    
+    LOG.info(f"[get_all_shared_boards] Received {len(group_shared_boards)} boards from group access")
     
     existing_board_ids = {board.id for board in shared_boards}
     for board in group_shared_boards:
@@ -310,6 +326,8 @@ def get_all_shared_boards(environment_id, user_id, limit=None, offset=None, sess
         shared_boards = shared_boards[offset:]
     if limit is not None:
         shared_boards = shared_boards[:limit]
+
+    LOG.info(f"[get_all_shared_boards] Returning {len(shared_boards)} boards for user {user_id}")
 
     return shared_boards
 

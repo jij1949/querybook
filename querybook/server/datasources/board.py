@@ -9,6 +9,7 @@ from app.auth.permission import (
     get_board_environment_ids,
 )
 from const.datasources import RESOURCE_NOT_FOUND_STATUS_CODE
+from lib.logger import get_logger
 from logic import board as logic
 from logic import user as user_logic
 from logic.board_permission import (
@@ -23,6 +24,8 @@ from models.board import Board, BoardItem
 
 from env import QuerybookSettings
 from lib.notify.utils import notify_user
+
+LOG = get_logger(__file__)
 
 
 @register(
@@ -85,6 +88,7 @@ def get_all_public_boards(environment_id, limit=20, offset=0):
     methods=["GET"],
 )
 def get_all_shared_boards(environment_id, user_id, limit=20, offset=0):
+    LOG.info(f"[datasource.get_all_shared_boards] API called for user_id={user_id}, environment_id={environment_id}, limit={limit}, offset={offset}")
     with DBSession() as session:
         verify_environment_permission([environment_id])
         shared_boards = logic.get_all_shared_boards(
@@ -94,6 +98,7 @@ def get_all_shared_boards(environment_id, user_id, limit=20, offset=0):
             limit=limit,
             offset=offset,
         )
+        LOG.info(f"[datasource.get_all_shared_boards] Logic layer returned {len(shared_boards)} boards, returning response")
         return {
             "boards": [shared_board.id for shared_board in shared_boards],
         }
