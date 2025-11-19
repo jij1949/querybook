@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.125.0](https://github.com/eg-internal/querybook/compare/v0.124.0...v0.125.0) (2025-11-19)
+
+
+### Features
+
+* Create Databricks Metastore Loader ([#483](https://github.com/eg-internal/querybook/issues/483)) ([c981b20](https://github.com/eg-internal/querybook/commit/c981b20e2a18f40f1695607a5317e0de43bb5d6f))
+* Upgrade to Elasticsearch 8.18 ([05c53a3](https://github.com/eg-internal/querybook/commit/05c53a3b69beb2d3deeacb7a9bf90380971de2df))
+
+
+### Bug Fixes
+
+* separate recursive logic so sqlalchemy compiles correctly ([ec55de6](https://github.com/eg-internal/querybook/commit/ec55de68d4b747075051f1a9e7651e25fc882a40))
+
 ## [0.124.0](https://github.com/eg-internal/querybook/compare/v0.123.4...v0.124.0) (2025-11-13)
 
 
