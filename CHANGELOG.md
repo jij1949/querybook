@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.125.2](https://github.com/eg-internal/querybook/compare/v0.125.1...v0.125.2) (2025-11-21)
+
+
+### Bug Fixes
+
+* Rollback Trino client version upgrade ([e63f24b](https://github.com/eg-internal/querybook/commit/e63f24b43bc28660e9a8a315186a68cb9f264efd))
+
 ## [0.125.1](https://github.com/eg-internal/querybook/compare/v0.125.0...v0.125.1) (2025-11-19)
 
 
