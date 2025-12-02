@@ -4,6 +4,7 @@ from app.db import with_session
 
 # from lib.config import get_config_value
 from logic.user import get_user_by_id
+from logic.schedule_clean_up import clean_up_schedules_in_environment
 from models.environment import Environment, UserEnvironment
 from models.user import User
 
@@ -176,6 +177,8 @@ def remove_user_to_environment(uid, environment_id, commit=True, session=None):
             environment_id=environment_id, user_id=uid
         ).delete()
 
+        clean_up_schedules_in_environment(user_id=uid, environment_id=environment_id, session=session)
+
         if commit:
             session.commit()
         else:
@@ -184,7 +187,10 @@ def remove_user_to_environment(uid, environment_id, commit=True, session=None):
 
 @with_session
 def remove_user_from_all_environments(uid, commit=True, session=None):
+    environment_ids = session.query(UserEnvironment.environment_id).filter_by(user_id=uid).all()
     session.query(UserEnvironment).filter_by(user_id=uid).delete()
+    for (environment_id,) in environment_ids:
+        clean_up_schedules_in_environment(user_id=uid, environment_id=environment_id, session=session)
 
     if commit:
         session.commit()

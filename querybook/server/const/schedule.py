@@ -17,5 +17,6 @@ class ScheduleTaskType(Enum):
     PROD = "prod"
     USER = "user"
 
+DATADOC_SCHEDULE_PREFIX = "run_data_doc_"
 
 UserTaskNames = set(["tasks.run_datadoc.run_datadoc"])

@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import func, and_
 
 from app.flask_app import celery
 from app.db import with_session
-from const.schedule import TaskRunStatus, ScheduleTaskType, UserTaskNames
+from const.schedule import DATADOC_SCHEDULE_PREFIX, TaskRunStatus, ScheduleTaskType, UserTaskNames
 from lib.logger import get_logger
 from lib.sqlalchemy import update_model_fields
 from models.schedule import (
@@ -16,7 +16,6 @@ from logic.datadoc import update_es_data_doc_by_id
 from models.datadoc import DataDoc
 from models.board import BoardItem
 
-DATADOC_SCHEDULE_PREFIX = "run_data_doc_"
 
 LOG = get_logger(__file__)
 
