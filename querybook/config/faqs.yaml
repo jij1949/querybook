@@ -83,10 +83,10 @@ faqs:
     - q: 'I found a bug! How do I report it?'
       a: |
           <p>
-              Please report bugs <i><a href="https://jira.expedia.biz/servicedesk/customer/portal/483">here</a></i>
+              Please report bugs <i><a href="https://expediagroup.atlassian.net/servicedesk/customer/portal/3/group/16/create/72">here</a></i>
           </p>
     - q: 'How do I make a feature request?'
       a: |
           <p>
-              Please make feature requests <i><a href="https://jira.expedia.biz/servicedesk/customer/portal/483">here</a></i>
+              Please make feature requests <i><a href="https://expediagroup.atlassian.net/servicedesk/customer/portal/3/group/16/create/72">here</a></i>
           </p>
