@@ -31,6 +31,7 @@ from .poll_engine_status import poll_engine_status
 from .presto_hive_function_scrapper import presto_hive_function_scrapper
 from .db_clean_up_jobs import run_all_db_clean_up_jobs
 from .disable_scheduled_docs import disable_scheduled_docs
+from .cleanup_orphaned_schedules import cleanup_orphaned_schedules
 from logic.schedule import get_schedule_task_type
 
 LOG = get_logger(__file__)
@@ -54,6 +55,7 @@ presto_hive_function_scrapper
 run_all_db_clean_up_jobs
 run_sample_query
 disable_scheduled_docs
+cleanup_orphaned_schedules
 
 LOG = get_task_logger(__name__)
 
