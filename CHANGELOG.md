@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.126.0](https://github.com/eg-internal/querybook/compare/v0.125.2...v0.126.0) (2025-12-11)
+
+
+### Features
+
+* add task to cleanup orphaned schedules ([#494](https://github.com/eg-internal/querybook/issues/494)) ([a6c4bc7](https://github.com/eg-internal/querybook/commit/a6c4bc7c154623ece3d08e3da4c5aa0b435e7030))
+* added cleanup tasks for users removed from environments ([#491](https://github.com/eg-internal/querybook/issues/491)) ([ce01052](https://github.com/eg-internal/querybook/commit/ce010527a5848747399bed01990cb252180e5443))
+
+
+### Bug Fixes
+
+* Update JIRA links ([2a66396](https://github.com/eg-internal/querybook/commit/2a66396f0afc6992074803cb6d5c8ca29490c54c))
+* use correct indexing for 'Run All From Here', and update when it changes ([#495](https://github.com/eg-internal/querybook/issues/495)) ([270fa28](https://github.com/eg-internal/querybook/commit/270fa282e7272651123aa217f5c0f81118f57320))
+
 ## [0.125.2](https://github.com/eg-internal/querybook/compare/v0.125.1...v0.125.2) (2025-11-21)
 
 
