@@ -1,17 +1,17 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import toast from 'react-hot-toast';
-
 import { ComponentType, ElementType } from 'const/analytics';
 import { useQueryCells } from 'hooks/dataDoc/useQueryCells';
 import { useMakeSelector } from 'hooks/redux/useMakeSelector';
 import { trackClick } from 'lib/analytics';
 import { sendConfirm } from 'lib/querybookUI';
+import React, { useCallback, useMemo, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { makeLatestQueryExecutionsSelector } from 'redux/queryExecutions/selector';
 import { DataDocResource } from 'resource/dataDoc';
-
 import { AsyncButton } from '../../ui/AsyncButton/AsyncButton';
 import { Icon } from '../../ui/Icon/Icon';
 import { DataDocRunAllButtonConfirm } from '../DataDocRightSidebar/DataDocRunAllButtonConfirm';
+
+
 
 interface IProps {
     docId: number;
@@ -72,7 +72,7 @@ export const QueryCellRunAllFromCellButton: React.FunctionComponent<IProps> = ({
             confirmText: 'Run',
         });
         return null;
-    }, [docId, hasQueryRunning, notification, queryCells]);
+    }, [docId, hasQueryRunning, index, queryCells, title]);
 
     return (
         enabled && (
