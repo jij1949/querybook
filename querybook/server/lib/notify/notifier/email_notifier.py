@@ -37,8 +37,10 @@ class EmailNotifier(BaseNotifier):
 
             smtp = smtplib.SMTP(QuerybookSettings.EMAILER_CONN)
             smtp.sendmail(msg["From"], recipients, msg.as_string())
+            LOG.debug(f"Email notification sent successfully to {recipients} with subject: {subject}")
         except Exception as e:
-            LOG.info(e)
+            LOG.error(f"Error sending email notification to {recipients}: {str(e)}")
+            raise
 
     def notify(self, user, message):
         self.notify_recipients(recipients=[user.email], message=message)

@@ -1,11 +1,15 @@
 from typing import Dict, List
+import json
 
 from app.db import DBSession, with_session
 from const.schedule import NotifyOn
 from env import QuerybookSettings
+from lib.logger import get_logger
 from lib.notify.utils import notify_recipients, notify_user
 from logic.datadoc import get_data_doc_by_id
 from models.user import User
+
+LOG = get_logger(__file__)
 
 
 def notifiy_on_datadoc_complete(
@@ -27,25 +31,48 @@ def notifiy_on_datadoc_complete(
                     doc_id, is_success, error_msg, export_urls, session=session
                 )
 
+                # Log notification attempt
+                log_data = {
+                    "event": "scheduled_datadoc_notification",
+                    "doc_id": doc_id,
+                    "doc_title": notification_params.get("doc_title"),
+                    "doc_url": notification_params.get("doc_url"),
+                    "is_success": is_success,
+                    "notification_type": notify_with,
+                    "recipients": notify_to_recipients,
+                    "users": notify_to_users
+                }
+
+                if not is_success and error_msg:
+                    log_data["failure_reason"] = error_msg
+
                 # notify recipients in config.to
                 if notify_to_recipients:
-                    notify_recipients(
-                        recipients=notify_to_recipients,
-                        template_name="datadoc_completion_notification",
-                        template_params=notification_params,
-                        notifier_name=notify_with,
-                    )
+                    try:
+                        notify_recipients(
+                            recipients=notify_to_recipients,
+                            template_name="datadoc_completion_notification",
+                            template_params=notification_params,
+                            notifier_name=notify_with,
+                        )
+                        LOG.info(f"Scheduled DataDoc notification sent: {json.dumps(log_data)}")
+                    except Exception as e:
+                        LOG.error(f"Scheduled DataDoc notification failed: {json.dumps(log_data)}")
 
                 # notify users(user_id) in config.to_user
                 for user_id in notify_to_users:
-                    user = User.get(id=user_id, session=session)
-                    notify_user(
-                        user=user,
-                        template_name="datadoc_completion_notification",
-                        template_params=notification_params,
-                        notifier_name=notify_with,
-                        session=session,
-                    )
+                    try:
+                        user = User.get(id=user_id, session=session)
+                        notify_user(
+                            user=user,
+                            template_name="datadoc_completion_notification",
+                            template_params=notification_params,
+                            notifier_name=notify_with,
+                            session=session,
+                        )
+                        LOG.info(f"Scheduled DataDoc notification sent: {json.dumps(log_data)}")
+                    except Exception as e:
+                        LOG.error(f"Scheduled DataDoc notification failed: {json.dumps(log_data)}")
 
 
 def _should_notify(notify_with: str, notify_on: NotifyOn, is_success: bool):

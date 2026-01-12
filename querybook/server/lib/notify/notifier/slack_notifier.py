@@ -1,6 +1,9 @@
 import requests
 from env import QuerybookSettings
 from lib.notify.base_notifier import BaseNotifier
+from lib.logger import get_logger
+
+LOG = get_logger(__file__)
 
 
 class SlackNotifier(BaseNotifier):
@@ -32,7 +35,19 @@ class SlackNotifier(BaseNotifier):
         headers = {"Authorization": "Bearer {}".format(self.token)}
         for recipient in recipients:
             data = {"text": message, "channel": recipient}
-            requests.post(url, json=data, headers=headers, timeout=30)
+            try:
+                response = requests.post(url, json=data, headers=headers, timeout=30)
+                response_json = response.json()
+                
+                if response.status_code == 200 and response_json.get("ok"):
+                    LOG.debug(f"Slack notification sent successfully to {recipient}")
+                else:
+                    error_msg = response_json.get("error", "Unknown error")
+                    LOG.error(f"Slack API error sending to {recipient}: {error_msg} (HTTP {response.status_code})")
+                    raise Exception(f"Slack API error: {error_msg}")
+            except Exception as e:
+                LOG.error(f"Error sending Slack notification to {recipient}: {str(e)}")
+                raise
 
     def notify(self, user, message):
         self.notify_recipients(recipients=[f"@{user.username}"], message=message)
