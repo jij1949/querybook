@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.128.0](https://github.com/eg-internal/querybook/compare/v0.127.0...v0.128.0) (2026-02-17)
+
+
+### Features
+
+* Add EGMP and EG Pulse to Landing page ([238881b](https://github.com/eg-internal/querybook/commit/238881bbbcaa468213ea057509cd37349800c1eb))
+
 ## [0.127.0](https://github.com/eg-internal/querybook/compare/v0.126.0...v0.127.0) (2026-02-17)
 
 
