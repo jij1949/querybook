@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.127.0](https://github.com/eg-internal/querybook/compare/v0.126.0...v0.127.0) (2026-02-17)
+
+
+### Features
+
+* Revert "feat: Disable UI access to create API tokens" ([116d21e](https://github.com/eg-internal/querybook/commit/116d21e86ade418452b7591b1ea41ececad946ec))
+* Upgrade EG internal certificates ([951ad4e](https://github.com/eg-internal/querybook/commit/951ad4e3c3a448e791402e9062a5cda7d3169826))
+
+
+### Bug Fixes
+
+* add logging for datadoc schedule execution notifications ([#497](https://github.com/eg-internal/querybook/issues/497)) ([5aec0a7](https://github.com/eg-internal/querybook/commit/5aec0a7f1aeb9912e12d0e86ea81a488c906b04a))
+* Fix issue with square UserAvatars in Firefox ([b72c107](https://github.com/eg-internal/querybook/commit/b72c107a9ac6cad9530c50b9881f2b5f69b2590f))
+
 ## [0.126.0](https://github.com/eg-internal/querybook/compare/v0.125.2...v0.126.0) (2025-12-11)
 
 
