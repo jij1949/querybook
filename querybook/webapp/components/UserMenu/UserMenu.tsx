@@ -121,9 +121,9 @@ export const UserMenu: React.FC<IUserMenuProps> = ({
                 {editorThemeToggle}
                 <MenuItem onClick={goToUserSettingsMenu}>Settings</MenuItem>
                 <MenuDivider />
-                {/* <MenuItem onClick={toggleShowTokenModal}>
+                <MenuItem onClick={toggleShowTokenModal}>
                     API Access Token
-                </MenuItem> */}
+                </MenuItem>
                 {userInfo.isAdmin && (
                     <MenuItem>
                         <Link className="flex1" to="/admin">
