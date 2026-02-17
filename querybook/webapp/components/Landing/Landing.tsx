@@ -103,25 +103,29 @@ const DefaultLanding: React.FC = ({ children }) => {
 
     const LandingFooter = (
         <div className="Landing-bottom flex-column">
-            <div style={{ marginLeft: '-8px' }}>
-                <Message type="tip">
-                    <div className="flex-row">
-                        <img
-                            src="/static/workbench.png"
-                            style={{
-                                width: '24px',
-                                marginRight: '4px',
-                            }}
-                        />{' '}
-                        Try out Ava, our new AI Agent! Now available in the
-                        sidebar or on{' '}
-                        <Link to="https://analytics.expedia.biz/" newTab={true}>
-                            Analytics Workbench
-                        </Link>{' '}
-                        🎉
+            <Columns>
+                <Column>
+                    <div className="Landing-section-title">Other Tools ✨</div>
+                    <div className="Landing-list">
+                        <div>
+                            <Link
+                                to="https://metrics-platform-ui.rcp.data.dw.exp-aws.net/prod"
+                                newTab={true}
+                            >
+                                EG Metrics Platform 📊
+                            </Link>
+                        </div>
+                        <div>
+                            <Link
+                                to="https://eg-pulse.expedia.biz/"
+                                newTab={true}
+                            >
+                                EG Pulse 💖
+                            </Link>
+                        </div>
                     </div>
-                </Message>
-            </div>
+                </Column>
+            </Columns>
             <Columns>
                 <Column>
                     <div className="Landing-section-title">Documentation</div>
@@ -160,6 +164,32 @@ const DefaultLanding: React.FC = ({ children }) => {
                                 Browse the Data Lake in Analytics Workbench 🎉
                             </Link>
                         </div>
+                    </div>
+                </Column>
+            </Columns>
+            <Columns>
+                <Column>
+                    <div style={{ marginLeft: '-8px' }}>
+                        <Message type="tip">
+                            <div className="flex-row">
+                                <img
+                                    src="/static/workbench.png"
+                                    style={{
+                                        width: '24px',
+                                        marginRight: '4px',
+                                    }}
+                                />{' '}
+                                Try out Ava, our new AI Agent! Now available in
+                                the sidebar or on{' '}
+                                <Link
+                                    to="https://analytics.expedia.biz/"
+                                    newTab={true}
+                                >
+                                    Analytics Workbench
+                                </Link>{' '}
+                                🎉
+                            </div>
+                        </Message>
                     </div>
                 </Column>
             </Columns>
