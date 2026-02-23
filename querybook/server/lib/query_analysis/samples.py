@@ -5,6 +5,7 @@ from typing import Dict, Tuple, List, Union
 
 from app.db import with_session
 from logic.metastore import get_table_by_id
+from lib.table_name_formatter import format_table_name_for_display
 
 
 class QuerybookColumnType(Enum):
@@ -61,7 +62,17 @@ def make_samples_query(
             order_by, "ASC" if order_by_asc else "DESC"
         )
 
-    full_name = "{}.{}".format(table.data_schema.name, table.name)
+    # Get catalog name if it exists
+    catalog_name = table.data_schema.catalog.name if table.data_schema.catalog else None
+
+    # Format table name based on metastore settings
+    full_name = format_table_name_for_display(
+        table_name=table.name,
+        schema_name=table.data_schema.name,
+        catalog_name=catalog_name,
+        metastore_id=table.data_schema.metastore_id
+    )
+
     query = """
 SELECT
     *

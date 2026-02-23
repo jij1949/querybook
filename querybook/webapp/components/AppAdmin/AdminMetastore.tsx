@@ -13,6 +13,8 @@ import { AdminMetastoreResource } from 'resource/admin/metastore';
 import { TextButton } from 'ui/Button/Button';
 import { InfoButton } from 'ui/Button/InfoButton';
 import { Card } from 'ui/Card/Card';
+import { DebouncedInput } from 'ui/DebouncedInput/DebouncedInput';
+import { FormField } from 'ui/Form/FormField';
 import { SimpleField } from 'ui/FormikField/SimpleField';
 import { GenericCRUD } from 'ui/GenericCRUD/GenericCRUD';
 import { Icon } from 'ui/Icon/Icon';
@@ -26,6 +28,7 @@ import {
     validateForm,
 } from 'ui/SmartForm/SmartForm';
 import { Tabs } from 'ui/Tabs/Tabs';
+import { ToggleSwitch } from 'ui/ToggleSwitch/ToggleSwitch';
 
 import { AdminDeletedList } from './AdminDeletedList';
 
@@ -227,6 +230,84 @@ export const AdminMetastore: React.FunctionComponent<IProps> = ({
         );
     };
 
+    const getMetastoreCatalogDisplaySettingsDOM = (
+        catalogDisplayConfig: {
+            enable_catalog_support: boolean;
+            show_catalog_in_ui: boolean;
+            catalog_display_name?: string
+        },
+        onChange: (fieldName: string, fieldValue: any) => void
+    ) => {
+        // Ensure we have a valid config object
+        const config = catalogDisplayConfig || {
+            enable_catalog_support: false,
+            show_catalog_in_ui: false
+        };
+
+        const handleEnableCatalogChange = (checked: boolean) => {
+            const newConfig = {
+                ...config,
+                enable_catalog_support: checked,
+            };
+            onChange('catalog_display_config', newConfig);
+        };
+
+        const handleShowCatalogChange = (checked: boolean) => {
+            const newConfig = {
+                ...config,
+                show_catalog_in_ui: checked,
+            };
+            onChange('catalog_display_config', newConfig);
+        };
+
+        const handleDisplayNameChange = (value: string) => {
+            const newConfig = {
+                ...config,
+                catalog_display_name: value,
+            };
+            onChange('catalog_display_config', newConfig);
+        };
+
+        return (
+            <>
+                <FormField
+                    stacked
+                    label="Enable Catalog Support"
+                    help="When enabled, catalogs will be synced from the metastore. When disabled, no catalogs are created (schemas only)."
+                >
+                    <ToggleSwitch
+                        checked={config?.enable_catalog_support ?? false}
+                        onChange={handleEnableCatalogChange}
+                    />
+                </FormField>
+                <FormField
+                    stacked
+                    label="Show Catalog in UI"
+                    help="When enabled, catalog names will be shown in table displays throughout the UI (e.g., catalog.schema.table)"
+                >
+                    <ToggleSwitch
+                        checked={config?.show_catalog_in_ui ?? false}
+                        onChange={handleShowCatalogChange}
+                    />
+                </FormField>
+                <FormField
+                    stacked
+                    label="Default Catalog Name"
+                    help="Used only when 'Enable Catalog Support' is on and the loader doesn't provide a catalog name. Leave empty to use 'default'."
+                >
+                    <DebouncedInput
+                        value={config?.catalog_display_name ?? ''}
+                        onChange={handleDisplayNameChange}
+                        inputProps={{
+                            className: 'input',
+                            placeholder: "default"
+                        }}
+                    />
+                </FormField>
+            </>
+        );
+    };
+
     const renderMetastoreItem = (
         item: IAdminMetastore,
         onChange: (fieldName: string, fieldValue: any) => void
@@ -306,6 +387,35 @@ export const AdminMetastore: React.FunctionComponent<IProps> = ({
                         <div className="AdminForm-section">
                             <div className="AdminForm-section-top flex-row horizontal-space-between">
                                 <div className="AdminForm-section-title">
+                                    Catalog Settings
+                                </div>
+                                <InfoButton layout={['bottom', 'right']}>
+                                    <Markdown>{`Control how catalog support works in this metastore.
+
+**Enable Catalog Support**: Controls whether catalogs are synced from the metastore at all.
+- When ON: If the metastore provides catalogs (Databricks, Glue), they are synced. If not (SQLAlchemy, Hive), a default catalog is created.
+- When OFF: No catalogs are created, only schemas (backward compatible mode).
+
+**Show Catalog in UI**: Controls display of catalogs in the UI.
+- When ON: Table names shown as \`catalog.schema.table\`
+- When OFF: Table names shown as \`schema.table\`
+
+**Default Catalog Name**: Used only when "Enable Catalog Support" is ON and the loader doesn't provide catalog names (e.g., SQLAlchemy, Hive). Defaults to "default" if empty.
+
+For Databricks and Glue, this field is ignored as they provide their own catalog names.`}</Markdown>
+                                </InfoButton>
+                            </div>
+                            <div className="AdminForm-section-content">
+                                {getMetastoreCatalogDisplaySettingsDOM(
+                                    item.catalog_display_config,
+                                    onChange
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="AdminForm-section">
+                            <div className="AdminForm-section-top flex-row horizontal-space-between">
+                                <div className="AdminForm-section-title">
                                     ACL Control
                                 </div>
                                 <InfoButton layout={['bottom', 'right']}>
@@ -318,6 +428,9 @@ Each value in the list should be in one of the following formats:
 - \`schema.*\`: Allow or deny all tables in a schema
 - \`schema.table*\`: Allow or deny all tables in a schema matching a prefix
 - \`schema.table\`: Allow or deny a specific table
+- \`catalog.schema.*\`: Allow or deny all tables in a catalog schema
+- \`catalog.schema.table\`: Allow or deny a specific table with catalog
+- \`catalog.*\`: Allow or deny all schemas and tables in a catalog
 
 This feature affects both the metastore sync and the query engine.`}</Markdown>
                                 </InfoButton>
@@ -392,6 +505,11 @@ This feature affects both the metastore sync and the query engine.`}</Markdown>
                     defaultLoader.template
                 ) as Record<string, unknown>,
                 acl_control: {},
+                catalog_display_config: {
+                    enable_catalog_support: false,
+                    show_catalog_in_ui: false,
+                    catalog_display_name: '',
+                },
             };
             return (
                 <div className="AdminMetastore">

@@ -70,7 +70,7 @@ export const BoardExpandableList: React.FunctionComponent<
                         const table = itemData as IDataTable;
                         key = `table-${table.id}`;
                         icon = 'Database';
-                        title = table.name;
+                        title = table.full_name || table.name;
                         itemUrl = `/table/${table.id}/`;
                     } else if (itemType === 'board') {
                         const board = itemData as IBoard;

@@ -122,8 +122,24 @@ def _assert_safe_query(query, engine_id, session=None):
         acl_checker = MetastoreTableACLChecker(metastore.acl_control)
 
         for table in all_tables:
-            schema_name, table_name = table.split(".")
-            if not acl_checker.is_table_valid(schema_name, table_name):
+            # Handle both 2-level (schema.table) and 3-level (catalog.schema.table) naming
+            parts = table.split(".")
+
+            if len(parts) == 3:
+                # 3-level: catalog.schema.table
+                catalog_name, schema_name, table_name = parts
+                qualified_schema_name = f"{catalog_name}.{schema_name}"
+            elif len(parts) == 2:
+                # 2-level: schema.table
+                schema_name, table_name = parts
+                qualified_schema_name = schema_name
+            else:
+                # Invalid table name format
+                raise InvalidQueryExecution(
+                    f"Invalid table name format: {table}"
+                )
+
+            if not acl_checker.is_table_valid(qualified_schema_name, table_name):
                 raise InvalidQueryExecution(
                     f"Table {table} is not allowed by metastore"
                 )

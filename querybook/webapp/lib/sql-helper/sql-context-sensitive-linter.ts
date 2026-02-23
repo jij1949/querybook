@@ -1,12 +1,14 @@
 import { ILinterWarning, TableToken } from './sql-lexer';
 
 import { DataTableWarningSeverity } from 'const/metastore';
+import { getTableTokenDisplayName } from 'lib/utils/table-identifier';
 import { reduxStore } from 'redux/store';
 
 export function getContextSensitiveWarnings(
     metastoreId: number,
     tableReferences: TableToken[],
-    ignoreTableNotExistWarnings: boolean
+    ignoreTableNotExistWarnings: boolean,
+    showCatalog: boolean,
 ) {
     const contextSensitiveWarnings: ILinterWarning[] = [];
 
@@ -14,7 +16,8 @@ export function getContextSensitiveWarnings(
         reduxStore.getState().dataSources;
     for (const table of tableReferences) {
         const implicitSchema = table.end - table.start === table.name.length;
-        const fullName = `${table.schema}.${table.name}`;
+        // Build fullName with catalog if present
+        const fullName = getTableTokenDisplayName(table, showCatalog);
         const tableExists = fullName in (dataTableNameToId[metastoreId] || {});
 
         if (!tableExists) {

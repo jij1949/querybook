@@ -2,6 +2,7 @@ import { Diagnostic } from '@codemirror/lint';
 import { EditorView } from '@uiw/react-codemirror';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { useSelector } from 'react-redux';
 
 import { LintTooltip } from 'components/CodeMirrorTooltip/LintTooltip';
 import { TDataDocMetaVariables } from 'const/datadoc';
@@ -12,6 +13,7 @@ import { getTokenAtOffset, posToOffset } from 'lib/codemirror/utils';
 import { getContextSensitiveWarnings } from 'lib/sql-helper/sql-context-sensitive-linter';
 import { ILinterWarning, TableToken } from 'lib/sql-helper/sql-lexer';
 import { TemplatedQueryResource } from 'resource/queryExecution';
+import { IStoreState } from 'redux/store/types';
 
 const getDiagnosticRenderer =
     ({
@@ -186,6 +188,12 @@ const useTableLintDiagnostics = ({
 }) => {
     const [tableDiagnostics, setTableDiagnostics] = useState<Diagnostic[]>([]);
 
+    // Get metastore to check catalog display settings
+    const metastore = useSelector((state: IStoreState) =>
+        metastoreId ? state.dataSources.queryMetastoreById[metastoreId] : null
+    );
+    const showCatalog = metastore?.catalog_display_config?.show_catalog_in_ui ?? false;
+
     const runLint = useCallback(() => {
         if (!view) {
             return [];
@@ -194,12 +202,13 @@ const useTableLintDiagnostics = ({
         const contextSensitiveWarnings = getContextSensitiveWarnings(
             metastoreId,
             tableReferences,
-            hasQueryLint
+            hasQueryLint,
+            showCatalog
         );
         setTableDiagnostics(
             lintWarningsToDiagnostics(view, contextSensitiveWarnings)
         );
-    }, [view, metastoreId, tableReferences, hasQueryLint]);
+    }, [view, metastoreId, tableReferences, hasQueryLint, showCatalog]);
 
     useEffect(() => {
         runLint();

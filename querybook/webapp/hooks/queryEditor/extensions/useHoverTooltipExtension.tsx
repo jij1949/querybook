@@ -5,14 +5,16 @@ import {
 } from '@uiw/react-codemirror';
 import React, { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 
 import { FunctionDocumentationTooltipByName } from 'components/CodeMirrorTooltip/FunctionDocumentationTooltip';
 import { TableColumnTooltip } from 'components/CodeMirrorTooltip/TableColumnTooltip';
 import { TableTooltipByName } from 'components/CodeMirrorTooltip/TableTooltip';
 import { getTokenAtOffset, offsetToPos } from 'lib/codemirror/utils';
 import { SqlParser } from 'lib/sql-helper/sql-parser';
+import { getTableTokenDisplayName } from 'lib/utils/table-identifier';
 import { reduxStore } from 'redux/store';
+import { IStoreState } from 'redux/store/types';
 
 export const useHoverTooltipExtension = ({
     sqlParserRef,
@@ -25,6 +27,12 @@ export const useHoverTooltipExtension = ({
     language: string;
     hidePin?: boolean;
 }) => {
+    // Get metastore to check catalog display settings
+    const metastore = useSelector((state: IStoreState) =>
+        metastoreId ? state.dataSources.queryMetastoreById[metastoreId] : null
+    );
+    const showCatalog = metastore?.catalog_display_config?.show_catalog_in_ui ?? false;
+
     const getTableAtCursor = useCallback(
         (editorView: EditorView) => {
             const selection = editorView.state.selection.main;
@@ -60,10 +68,12 @@ export const useHoverTooltipExtension = ({
             } else if (context === 'table') {
                 table = sqlParserRef.current.getTableAtPos(v5Pos);
                 if (table) {
+                    // Support catalog-aware tables
+                    const tableFullName = getTableTokenDisplayName(table, showCatalog);
                     tooltipComponent = (
                         <TableTooltipByName
                             metastoreId={metastoreId}
-                            tableFullName={`${table.schema}.${table.name}`}
+                            tableFullName={tableFullName}
                             hidePinItButton={hidePin ?? false}
                         />
                     );

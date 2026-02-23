@@ -150,13 +150,11 @@ def suggest_tables(metastore_id, prefix, limit=10):
 
     query = construct_suggest_table_query(prefix, limit, metastore_id)
     options = get_matching_suggestions(query, ES_CONFIG["tables"]["index_name"])
-    texts = [
-        "{}.{}".format(
-            option.get("_source", {}).get("schema", ""),
-            option.get("_source", {}).get("name", ""),
-        )
-        for option in options
-    ]
+    texts = []
+
+    for option in options:
+        full_name = option.get("_source", {}).get("full_name", "")
+        texts.append(full_name)
     return texts
 
 

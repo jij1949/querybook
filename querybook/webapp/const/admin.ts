@@ -57,6 +57,12 @@ export interface IAdminACLControl {
     tables?: string[];
 }
 
+export interface ICatalogDisplayConfig {
+    enable_catalog_support: boolean;
+    show_catalog_in_ui: boolean;
+    catalog_display_name?: string;
+}
+
 export interface IAdminMetastore {
     id: number;
     created_at: number;
@@ -66,6 +72,7 @@ export interface IAdminMetastore {
     metastore_params: Record<string, unknown>;
     loader: string;
     acl_control: IAdminACLControl;
+    catalog_display_config: ICatalogDisplayConfig;
 }
 
 export interface IMetastoreLoader {

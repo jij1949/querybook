@@ -11,6 +11,7 @@ import { Mention, MentionsInput } from 'react-mentions';
 import { IQueryCellCommand } from 'const/command';
 import { useForwardedRef } from 'hooks/useForwardedRef';
 import { KeyMap, matchKeyMap, matchKeyPress } from 'lib/utils/keyboard';
+import { getTableDisplayName } from 'lib/utils/table-identifier';
 import { SearchTableResource } from 'resource/search';
 import { Button } from 'ui/Button/Button';
 import { Icon } from 'ui/Icon/Icon';
@@ -214,15 +215,13 @@ export const AICommandInput: React.FC<AICommandInputProps> = forwardRef(
                     const filteredTableNames = data.results.filter(
                         (result) =>
                             !mentionedTables.includes(
-                                `${result.schema}.${result.name}`
+                                getTableDisplayName(result)
                             )
                     );
-                    const tableNameOptions = filteredTableNames.map(
-                        ({ schema, name }) => ({
-                            id: `${schema}.${name}`,
-                            display: `${schema}.${name}`,
-                        })
-                    );
+                    const tableNameOptions = filteredTableNames.map((result) => ({
+                        id: getTableDisplayName(result),
+                        display: getTableDisplayName(result),
+                    }));
                     callback(tableNameOptions);
                 });
             },

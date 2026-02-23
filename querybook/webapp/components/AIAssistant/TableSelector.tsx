@@ -7,6 +7,7 @@ import {
     asyncReactSelectStyles,
     makeReactSelectStyle,
 } from 'lib/utils/react-select';
+import { getTableDisplayName } from 'lib/utils/table-identifier';
 import { SearchTableResource } from 'resource/search';
 import { overlayRoot } from 'ui/Overlay/Overlay';
 import { Popover } from 'ui/Popover/Popover';
@@ -60,14 +61,12 @@ export const TableSelector: React.FunctionComponent<ITableSelectProps> = ({
             });
             const filteredTableNames = data.results.filter(
                 (result) =>
-                    tableNames.indexOf(`${result.schema}.${result.name}`) === -1
+                    tableNames.indexOf(getTableDisplayName(result)) === -1
             );
-            const tableNameOptions = filteredTableNames.map(
-                ({ id, schema, name }) => ({
-                    value: `${schema}.${name}`,
-                    label: `${schema}.${name}`,
-                })
-            );
+            const tableNameOptions = filteredTableNames.map((result) => ({
+                value: getTableDisplayName(result),
+                label: getTableDisplayName(result),
+            }));
             return tableNameOptions;
         },
         [metastoreId, tableNames]

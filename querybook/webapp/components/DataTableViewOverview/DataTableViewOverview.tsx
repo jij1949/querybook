@@ -20,9 +20,11 @@ import { PartitionList } from 'components/PartitionList/PartitionList';
 import {
     DataTableWarningSeverity,
     IDataColumn,
+    IDataSchema,
     IDataTable,
     IDataTableWarning,
     IPaginatedQuerySampleFilters,
+    IQueryMetastore,
 } from 'const/metastore';
 import { useMounted } from 'hooks/useMounted';
 import { Nullable } from 'lib/typescript';
@@ -49,6 +51,7 @@ import { DataTableViewOverviewSection } from './DataTableViewOverviewSection';
 import './DataTableViewOverview.scss';
 
 const dataTableDetailsRows = [
+    'catalog',
     'type',
     'owner',
     'table_created_at',
@@ -104,9 +107,11 @@ function useRefreshMetastore(table: IDataTable) {
 
 export interface IQuerybookTableViewOverviewProps {
     table: IDataTable;
+    schema: IDataSchema;
     tableName: string;
     tableColumns: IDataColumn[];
     tableWarnings: IDataTableWarning[];
+    metastore: IQueryMetastore;
 
     onEditTableDescriptionRedirect?: Nullable<() => Promise<void>>;
     onTabSelected: (key: string) => any;
@@ -121,8 +126,10 @@ export const DataTableViewOverview: React.FC<
     IQuerybookTableViewOverviewProps
 > = ({
     table,
+    schema,
     tableName,
     tableWarnings,
+    metastore,
     onExampleFilter,
     updateDataTableDescription,
     onEditTableDescriptionRedirect,
@@ -178,10 +185,22 @@ export const DataTableViewOverview: React.FC<
     ));
 
     const detailsDOM = dataTableDetailsRows
-        .filter((row) => table[row] != null && table[row] !== '[]')
+        .filter((row) => {
+            if (row === 'catalog') {
+                return (
+                    schema?.catalog?.name != null &&
+                    metastore?.catalog_display_config?.show_catalog_in_ui === true
+                );
+            }
+            return table[row] != null && table[row] !== '[]';
+        })
         .map((row) => {
             let value: string | JSX.Element = '';
             switch (row) {
+                case 'catalog': {
+                    value = schema?.catalog?.name ?? '';
+                    break;
+                }
                 case 'table_created_at':
                 case 'table_updated_at': {
                     value = table[row] ? generateFormattedDate(table[row]) : '';

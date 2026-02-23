@@ -93,8 +93,16 @@ def _get_table_schema(
     if not table:
         return None
 
+    # Use catalog.schema.table if catalog exists
+    catalog = getattr(table.data_schema, "catalog", None)
+    schema_name = table.data_schema.name
+    if catalog:
+        table_name = f"{catalog.name}.{schema_name}.{table.name}"
+    else:
+        table_name = f"{schema_name}.{table.name}"
+
     table_schema: TableSchema = {
-        "table_name": f"{table.data_schema.name}.{table.name}",
+        "table_name": table_name,
         "table_description": table.information.description,
         "latest_partitions": table.information.latest_partitions,
         "column_info": table.information.column_info,
@@ -175,22 +183,26 @@ def get_table_schemas_by_names(
     if not full_table_names or not session:
         return []
 
-    # Parse table names
+    # Parse table names (support catalog.schema.table and schema.table)
     parsed_tables = []
     for full_table_name in full_table_names:
         parts = full_table_name.split(".")
-        if len(parts) == 2:
-            parsed_tables.append((parts[0], parts[1]))
+        if len(parts) == 3:
+            # catalog, schema, table
+            parsed_tables.append((parts[0], parts[1], parts[2]))
+        elif len(parts) == 2:
+            parsed_tables.append((None, parts[0], parts[1]))  # schema, table
 
     if not parsed_tables:
         return []
 
-    # Create filters for each schema+table combination
+    # Create filters for each catalog+schema+table combination
     conditions = []
-    for schema_name, table_name in parsed_tables:
-        conditions.append(
-            and_(DataSchema.name == schema_name, DataTable.name == table_name)
-        )
+    for catalog_name, schema_name, table_name in parsed_tables:
+        cond = [DataSchema.name == schema_name, DataTable.name == table_name]
+        if catalog_name:
+            cond.append(DataSchema.catalog.has(name=catalog_name))
+        conditions.append(and_(*cond))
 
     # STEP 1: Get just the basic table data with schema and information
     tables = (

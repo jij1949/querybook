@@ -200,7 +200,15 @@ tables:
                     type: long
                 metastore_id:
                     type: long
+                catalog_id:
+                    type: long
+                catalog:
+                    type: keyword
+                    normalizer: case_insensitive
                 schema:
+                    type: keyword
+                    normalizer: case_insensitive
+                schema_table_name:
                     type: keyword
                     normalizer: case_insensitive
                 name:

@@ -15,6 +15,7 @@ import { useUser } from 'hooks/redux/useUser';
 import history from 'lib/router-history';
 import { generateFormattedDate } from 'lib/utils/datetime';
 import { stopPropagation } from 'lib/utils/noop';
+import { getTableDisplayName } from 'lib/utils/table-identifier';
 import { queryEngineByIdEnvSelector } from 'redux/queryEngine/selector';
 import { Button } from 'ui/Button/Button';
 import { IconButton } from 'ui/Button/IconButton';
@@ -367,10 +368,8 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
         golden,
         description,
         created_at: createdAt,
-        name,
-        schema,
         tags,
-        id,
+        id
     } = preview;
     const handleClick = React.useCallback(
         (e) => {
@@ -406,6 +405,8 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
         </div>
     ) : null;
 
+    // Use full_name if available, otherwise fallback to schema.name
+    const tableFullName = getTableDisplayName(preview);
     return (
         <div className="SearchResultItemContainer">
             <div
@@ -417,7 +418,7 @@ export const DataTableItem: React.FunctionComponent<IDataTableItemProps> = ({
                     <div className="result-items-top horizontal-space-between">
                         <div className="flex-row">
                             <HighlightTitle
-                                title={`${schema}.${name}`}
+                                title={tableFullName}
                                 searchString={searchString}
                             />
                             {goldenIcon}

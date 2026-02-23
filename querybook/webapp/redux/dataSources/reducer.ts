@@ -49,9 +49,18 @@ function dataTableNameToIdReducer(
                     if (schema) {
                         draft[schema.metastore_id] =
                             draft[schema.metastore_id] || {};
-                        draft[schema.metastore_id][
-                            `${schema.name}.${table.name}`
-                        ] = Number(id);
+                        const catalogName = schema.catalog?.name;
+                        
+                        // For tables with a catalog, store with catalog prefix
+                        if (catalogName) {
+                            const tableFullName = `${catalogName}.${schema.name}.${table.name}`;
+                            draft[schema.metastore_id][tableFullName] = Number(id);
+                        }
+                        
+                        // Always store with schema.table format for lookup compatibility
+                        // This allows both catalog.schema.table and schema.table to work
+                        const tableNameWithoutCatalog = `${schema.name}.${table.name}`;
+                        draft[schema.metastore_id][tableNameWithoutCatalog] = Number(id);
                     }
                 }
                 return;

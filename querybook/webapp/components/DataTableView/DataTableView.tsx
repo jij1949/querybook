@@ -272,9 +272,11 @@ export const DataTableView: React.FC<IDataTableViewProps> = ({ tableId }) => {
     const makeOverviewDOM = () => (
         <DataTableViewOverview
             table={table}
+            schema={schema}
             tableName={tableName}
             tableColumns={tableColumns}
             tableWarnings={tableWarnings}
+            metastore={metastore}
             onTabSelected={handleTabSelected}
             updateDataTableDescription={updateDataTableDescription}
             onExampleFilter={handleExampleFilter}

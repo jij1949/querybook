@@ -6,12 +6,22 @@ from app.db import with_session
 class MetastoreTableACLChecker(object):
     def __init__(self, acl_config: Dict):
         self._type = acl_config.get("type")
+        self._catalog_wildcards = set()  # Store catalog.* patterns
         self._tables_by_schema = self.process_tables(acl_config.get("tables", []))
 
     def process_tables(self, tables: List[str]):
         tables_by_schema = {}
         for table in tables:
             full_name = table.split(".")
+
+            # Detect catalog.* pattern (2 parts with second part = *)
+            # Also add to _catalog_wildcards for catalog-level matching
+            if len(full_name) == 2 and full_name[1] == "*":
+                catalog_name = full_name[0]
+                self._catalog_wildcards.add(catalog_name)
+                # Let it fall through to be added to tables_by_schema too
+                # This allows X.* to work as both a schema wildcard and catalog wildcard
+
             if len(full_name) == 1:
                 full_name.insert(0, "default")
 
@@ -32,12 +42,33 @@ class MetastoreTableACLChecker(object):
         schema,
         table,
     ):
+        # Check catalog wildcards first
+        if "." in schema:  # This is catalog.schema format
+            catalog = schema.split(".")[0]
+            if catalog in self._catalog_wildcards:
+                return True
+
+        # Check with the full schema name first
         if schema in self._tables_by_schema:
             for schema_table in self._tables_by_schema[schema]:
                 if schema_table == table or schema_table == "*":
                     return True
                 elif schema_table.endswith("*") and table.startswith(schema_table[:-1]):
                     return True
+
+        # Backward compatibility: if schema contains catalog prefix (catalog.schema),
+        # also check with just the schema name
+        if "." in schema:
+            schema_parts = schema.split(".")
+            if len(schema_parts) == 2:
+                schema_only = schema_parts[1]
+                if schema_only in self._tables_by_schema:
+                    for schema_table in self._tables_by_schema[schema_only]:
+                        if schema_table == table or schema_table == "*":
+                            return True
+                        elif schema_table.endswith("*") and table.startswith(schema_table[:-1]):
+                            return True
+
         return False
 
     def is_table_valid(
@@ -54,7 +85,25 @@ class MetastoreTableACLChecker(object):
     def is_schema_valid(self, schema):
         if self._type != "allowlist" and self._type != "denylist":
             return True
+
+        # Check catalog wildcards first
+        if "." in schema:  # This is catalog.schema format
+            catalog = schema.split(".")[0]
+            if catalog in self._catalog_wildcards:
+                # Catalog wildcard matched
+                return True if self._type == "allowlist" else False
+
+        # Check if the full qualified name is in the list
         schema_in_list = schema in self._tables_by_schema
+
+        # If not found and schema contains a catalog prefix (catalog.schema),
+        # also check for just the schema name (for backward compatibility)
+        if not schema_in_list and "." in schema:
+            schema_parts = schema.split(".")
+            if len(schema_parts) == 2:
+                # Get just the schema name without catalog
+                schema_only = schema_parts[1]
+                schema_in_list = schema_only in self._tables_by_schema
         return schema_in_list if self._type == "allowlist" else not schema_in_list
 
 

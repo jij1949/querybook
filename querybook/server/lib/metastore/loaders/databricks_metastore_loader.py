@@ -2,10 +2,10 @@
 Databricks Unity Catalog Metastore Loader
 This loader integrates Databricks Unity Catalog with Querybook's metastore system.
 """
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from clients.databricks_client import DatabricksUnityCatalogClient
-from const.metastore import DataColumn, DataTable
+from const.metastore import DataCatalog, DataColumn, DataSchema, DataTable
 from lib.form import FormField, FormFieldType, StructFormField
 from lib.metastore.base_metastore_loader import BaseMetastoreLoader
 from lib.metastore.loaders.form_fileds import load_partitions_field
@@ -102,57 +102,109 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
             ("load_partitions", load_partitions_field),
         )
 
-    def get_all_schema_names(self) -> List[str]:
+    def get_all_schema_names(self) -> List[DataSchema]:
         """
-        Get all schema (database) names from the Databricks catalog.
+        Get all schemas from the Databricks catalog with their catalog information.
 
         Returns:
-            List of schema names in the format 'catalog.schema'
+            List of DataSchema NamedTuples with separated catalog and schema names
         """
         try:
+            result = []
+
             if self.catalog_name:
                 # If a specific catalog is configured, get schemas from that catalog
                 schemas = self.databricks_client.get_all_schema_names(self.catalog_name)
-                # Prefix with catalog name to create fully qualified names
-                return [f"{self.catalog_name}.{schema}" for schema in schemas]
+
+                # Get catalog info
+                catalog_info = self.get_catalog_info(self.catalog_name)
+
+                # Create DataSchema objects with catalog information
+                for schema in schemas:
+                    result.append(DataSchema(
+                        name=schema,
+                        catalog=catalog_info
+                    ))
             else:
                 # If no catalog is specified, get schemas from all catalogs
-                all_schemas = []
                 catalogs = self.databricks_client.get_all_catalogs()
 
-                for catalog in catalogs:
-                    schemas = self.databricks_client.get_all_schema_names(catalog)
-                    # Prefix with catalog name to create fully qualified names
-                    all_schemas.extend([f"{catalog}.{schema}" for schema in schemas])
+                for catalog_name in catalogs:
+                    schemas = self.databricks_client.get_all_schema_names(catalog_name)
 
-                return all_schemas
+                    # Get catalog info
+                    catalog_info = self.get_catalog_info(catalog_name)
+
+                    # Create DataSchema objects with catalog information
+                    for schema in schemas:
+                        result.append(DataSchema(
+                            name=schema,
+                            catalog=catalog_info
+                        ))
+
+            return result
         except Exception as e:
             LOG.error(f"Error fetching schema names from Databricks: {e}")
             return []
 
-    def get_all_table_names_in_schema(self, schema_name: str) -> List[str]:
+    def get_catalog_info(self, catalog_name: str) -> DataCatalog:
+        """
+        Get catalog metadata from Databricks.
+
+        Args:
+            catalog_name: The catalog name
+
+        Returns:
+            DataCatalog NamedTuple with catalog metadata
+        """
+        try:
+            catalog_info = self.databricks_client.get_catalog_info(catalog_name)
+
+            if not catalog_info:
+                LOG.warning(f"Catalog {catalog_name} not found in Databricks")
+                return DataCatalog(name=catalog_name)
+
+            return DataCatalog(
+                name=catalog_info.get("name"),
+                description=catalog_info.get("comment"),
+                owner=catalog_info.get("owner"),
+                properties=catalog_info.get("properties", {}),
+            )
+        except Exception as e:
+            LOG.error(f"Error fetching catalog info for {catalog_name}: {e}")
+            # Return a basic DataCatalog with just the name on error
+            return DataCatalog(name=catalog_name)
+
+    def get_all_table_names_in_schema(
+        self, schema_name: str, catalog_name: Optional[str] = None
+    ) -> List[str]:
         """
         Get all table names in a specific schema.
 
         Args:
-            schema_name: The schema name in format 'catalog.schema'
+            schema_name: The schema name
+            catalog_name: Optional explicit catalog name
 
         Returns:
             List of table names
         """
         try:
-            # Parse catalog and schema from the fully qualified name
-            parts = schema_name.split(".")
-            if len(parts) == 2:
-                catalog_name, actual_schema = parts
+            # Determine catalog to use
+            if catalog_name:
+                actual_catalog = catalog_name
+                actual_schema = schema_name
             else:
                 # Fallback if only schema name is provided
-                catalog_name = self.catalog_name
+                actual_catalog = self.catalog_name
                 actual_schema = schema_name
+
+            if not actual_catalog:
+                LOG.warning(f"No catalog determined for schema {schema_name}")
+                return []
 
             tables = self.databricks_client.get_all_table_names(
                 schema_name=actual_schema,
-                catalog_name=catalog_name,
+                catalog_name=actual_catalog,
             )
             return tables
         except Exception as e:
@@ -160,33 +212,39 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
             return []
 
     def get_table_and_columns(
-        self, schema_name: str, table_name: str
+        self, schema_name: str, table_name: str, catalog_name: Optional[str] = None
     ) -> Tuple[DataTable, List[DataColumn]]:
         """
         Get detailed table metadata and column information.
 
         Args:
-            schema_name: The schema name in format 'catalog.schema'
+            schema_name: The schema name
             table_name: The table name
+            catalog_name: Optional explicit catalog name
 
         Returns:
             Tuple of (DataTable, List[DataColumn])
         """
         try:
-            # Parse catalog and schema from the fully qualified name
-            parts = schema_name.split(".")
-            if len(parts) == 2:
-                catalog_name, actual_schema = parts
+            # Determine catalog to use
+            if catalog_name:
+                actual_catalog = catalog_name
+                actual_schema = schema_name
             else:
                 # Fallback if only schema name is provided
-                catalog_name = self.catalog_name
+                actual_catalog = self.catalog_name
                 actual_schema = schema_name
+
+            if not actual_catalog:
+                LOG.warning(
+                    f"No catalog determined for table {schema_name}.{table_name}")
+                return None, []
 
             # Fetch table
             table_obj = self.databricks_client.get_table(
                 schema_name=actual_schema,
                 table_name=table_name,
-                catalog_name=catalog_name,
+                catalog_name=actual_catalog,
             )
 
             if not table_obj:

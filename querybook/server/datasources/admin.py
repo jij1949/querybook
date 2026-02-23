@@ -332,7 +332,13 @@ def update_metastore(
         metastore = QueryMetastore.update(
             id=id,
             fields=fields,
-            field_names=["name", "loader", "metastore_params", "acl_control"],
+            field_names=[
+                "name",
+                "loader",
+                "metastore_params",
+                "acl_control",
+                "catalog_display_config",
+            ],
             update_callback=lambda m: logic.sync_metastore_schedule_job(
                 m.id, session=session
             ),

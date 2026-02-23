@@ -8,9 +8,15 @@ _LOG = get_logger(__file__)
 
 
 class GlueDataCatalogClient:
-    def __init__(self, catalog_id, region=QuerybookSettings.AWS_REGION):
+    def __init__(self, catalog_id, region=QuerybookSettings.AWS_REGION, aws_profile=None):
         self.catalog_id = catalog_id
-        self._glue_client = boto3.client("glue", region_name=region)
+        if aws_profile:
+            # Create a session with the specified profile
+            session = boto3.Session(profile_name=aws_profile)
+            self._glue_client = session.client("glue", region_name=region)
+        else:
+            # Use default credentials (from AWS_PROFILE env var or default profile)
+            self._glue_client = boto3.client("glue", region_name=region)
 
     def __del__(self):
         del self._glue_client

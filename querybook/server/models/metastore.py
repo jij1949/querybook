@@ -120,6 +120,65 @@ class DataJobMetadata(Base):
         return complete_dict
 
 
+class DataCatalog(CRUDMixin, TruncateString("name"), Base):
+    __tablename__ = "data_catalog"
+    __table_args__ = (
+        sql.UniqueConstraint("metastore_id", "name", name="idx_catalog_metastore_name"),
+        {"mysql_engine": "InnoDB", "mysql_charset": "utf8mb4"},
+    )
+
+    id = sql.Column(sql.Integer, primary_key=True)
+    created_at = sql.Column(sql.DateTime, default=now)
+    updated_at = sql.Column(sql.DateTime, default=now)
+
+    name = sql.Column(sql.String(length=name_length), nullable=False, index=True)
+    description = sql.Column(sql.Text(length=mediumtext_length))
+    metastore_id = sql.Column(
+        sql.Integer,
+        sql.ForeignKey("query_metastore.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    owner = sql.Column(sql.String(length=name_length))
+    created_by = sql.Column(
+        sql.Integer, sql.ForeignKey("user.id", ondelete="SET NULL")
+    )
+    properties = sql.Column(sql.JSON)
+
+    metastore = relationship(
+        "QueryMetastore",
+        backref=backref("catalogs", cascade="all, delete", passive_deletes=True),
+    )
+    schemas = relationship(
+        "DataSchema",
+        backref="catalog",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+
+    def to_dict(self, include_metastore=False, include_schemas=False):
+        catalog_dict = {
+            "id": self.id,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "name": self.name,
+            "description": self.description,
+            "metastore_id": self.metastore_id,
+            "owner": self.owner,
+            "created_by": self.created_by,
+            "properties": self.properties,
+        }
+
+        if include_metastore:
+            catalog_dict["metastore"] = self.metastore.to_dict()
+        if include_schemas:
+            catalog_dict["schemas"] = [s.to_dict() for s in self.schemas]
+
+        return catalog_dict
+
+    def get_schema_count(self):
+        return len(self.schemas)
+
+
 class DataSchema(TruncateString("name"), Base):
     __tablename__ = "data_schema"
 
@@ -128,6 +187,9 @@ class DataSchema(TruncateString("name"), Base):
     updated_at = sql.Column(sql.DateTime, default=now)
 
     name = sql.Column(sql.String(length=name_length), index=True)
+    catalog_id = sql.Column(
+        sql.Integer, sql.ForeignKey("data_catalog.id", ondelete="CASCADE"), nullable=True
+    )
     table_count = sql.Column(sql.Integer)
     description = sql.Column(sql.Text(length=mediumtext_length))
 
@@ -143,13 +205,14 @@ class DataSchema(TruncateString("name"), Base):
         "DataTable", backref="data_schema", cascade="all, delete", passive_deletes=True
     )
 
-    def to_dict(self, include_metastore=False, include_table=False):
+    def to_dict(self, include_metastore=False, include_table=False, include_catalog=False):
         schema_dict = {
             "id": self.id,
             "name": self.name,
             "table_count": self.table_count,
             "description": self.description,
             "metastore_id": self.metastore_id,
+            "catalog_id": self.catalog_id,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
@@ -158,8 +221,20 @@ class DataSchema(TruncateString("name"), Base):
             schema_dict["metastore"] = self.metastore.to_dict()
         if include_table:
             schema_dict["table"] = [s.to_dict() for s in self.tables]
+        if include_catalog and self.catalog:
+            schema_dict["catalog"] = self.catalog.to_dict()
 
         return schema_dict
+
+    def get_full_name(self):
+        """Get full schema name including catalog if present."""
+        if self.catalog:
+            return f"{self.catalog.name}.{self.name}"
+        return self.name
+
+    def get_catalog_name(self):
+        """Get catalog name if catalog exists."""
+        return self.catalog.name if self.catalog else None
 
 
 class DataTable(CRUDMixin, TruncateString("name", "type", "location"), Base):
@@ -213,6 +288,22 @@ class DataTable(CRUDMixin, TruncateString("name", "type", "location"), Base):
         include_column=False,
         include_warnings=False,
     ):
+        # Get catalog information for full_name generation
+        catalog_name = None
+        if self.data_schema and self.data_schema.catalog:
+            catalog_name = self.data_schema.catalog.name
+
+        # This import is placed here to avoid circular imports
+        from lib.table_name_formatter import format_table_name_for_display
+
+        # Generate full_name using the same logic as Elasticsearch
+        full_name = format_table_name_for_display(
+            table_name=self.name,
+            schema_name=self.data_schema.name,
+            catalog_name=catalog_name,
+            metastore_id=self.data_schema.metastore_id,
+        )
+
         table = {
             "id": self.id,
             "created_at": self.created_at,
@@ -228,6 +319,7 @@ class DataTable(CRUDMixin, TruncateString("name", "type", "location"), Base):
             "column_count": self.column_count,
             "schema_id": self.schema_id,
             "golden": self.golden,
+            "full_name": full_name,
         }
 
         if self.ownership:
@@ -236,7 +328,7 @@ class DataTable(CRUDMixin, TruncateString("name", "type", "location"), Base):
         table.update(self.information.to_dict())
 
         if include_schema:
-            table["schema"] = self.data_schema.to_dict()
+            table["schema"] = self.data_schema.to_dict(include_catalog=True)
 
         if include_column:
             table["column"] = [s.to_dict() for s in self.columns]

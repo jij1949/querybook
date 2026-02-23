@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { SchemaTableSortKey } from 'const/metastore';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
+import { getSchemaDisplayName } from 'lib/utils/table-identifier';
 import {
     changeTableSort,
     searchSchemas,
@@ -32,6 +33,13 @@ export const SchemaTableView: React.FunctionComponent<{
     const schemas = useSelector(
         (state: IStoreState) => state.dataTableSearch.schemas
     );
+    const metastoreId = useSelector(
+        (state: IStoreState) => state.dataTableSearch.metastoreId
+    );
+    const metastore = useSelector(
+        (state: IStoreState) =>
+            state.dataSources.queryMetastoreById[metastoreId]
+    );
 
     const dispatch: Dispatch = useDispatch();
     const [intersectElement, setIntersectElement] =
@@ -53,10 +61,20 @@ export const SchemaTableView: React.FunctionComponent<{
                 const schemaSortOrder =
                     schemas.schemaSortByIds[schemaId] ??
                     defaultSortSchemaTableBy;
+                
+                // Determine if we should show catalog based on metastore settings
+                const showCatalog =
+                    metastore?.catalog_display_config?.show_catalog_in_ui ??
+                    false;
+                const schemaDisplayName = getSchemaDisplayName(
+                    schema,
+                    showCatalog
+                );
+
                 return (
                     <SchemaTableItem
-                        key={schema.name}
-                        name={schema.name}
+                        key={`${schema.id}-${schemaDisplayName}`}
+                        name={schemaDisplayName}
                         total={schema.count}
                         tables={schema.tables}
                         sortOrder={schemaSortOrder}
@@ -72,7 +90,11 @@ export const SchemaTableView: React.FunctionComponent<{
                         }
                         onLoadMore={() =>
                             dispatch(
-                                searchTableBySchema(schema.name, schema.id)
+                                searchTableBySchema(
+                                    schema.name,
+                                    schema.id,
+                                    schema.catalog?.name
+                                )
                             )
                         }
                     />

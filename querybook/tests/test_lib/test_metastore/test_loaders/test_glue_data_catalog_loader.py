@@ -5,6 +5,7 @@ from unittest import TestCase
 import boto3
 from const.metastore import DataColumn, DataTable
 from lib.metastore.loaders.glue_data_catalog_loader import GlueDataCatalogLoader
+from lib.utils import json as ujson
 
 moto_import_failed = False
 try:
@@ -134,7 +135,9 @@ class GlueDataCatalogLoaderTestCase(TestCase):
 
         result = self.loader.get_all_schema_names()
 
-        self.assertEqual(result, [DB_NAME_A, DB_NAME_B])
+        # get_all_schema_names now returns DataSchema objects, extract names
+        schema_names = [schema.name for schema in result]
+        self.assertEqual(schema_names, [DB_NAME_A, DB_NAME_B])
 
     @mock_glue
     def test_get_all_table_names_in_schema(self):
@@ -162,6 +165,12 @@ class GlueDataCatalogLoaderTestCase(TestCase):
             PartitionInput=PARTITION_INPUT_A_2,
         )
 
+        # Get the glue table to compute expected raw_description
+        glue_table_response = self.client.get_table(
+            DatabaseName=DB_NAME_A, Name=TABLE_NAME_A_1
+        )
+        glue_table = glue_table_response.get("Table")
+
         table = DataTable(
             name=TABLE_NAME_A_1,
             type=TABLE_INPUT_A_1.get("TableType"),
@@ -173,7 +182,7 @@ class GlueDataCatalogLoaderTestCase(TestCase):
                 "partition_date=2021-01-01/partition_hour=15",
                 "partition_date=2021-03-03/partition_hour=20",
             ],
-            raw_description=TABLE_INPUT_A_1.get("Description"),
+            raw_description=ujson.pdumps(glue_table, default=str),
         )
 
         columns = [

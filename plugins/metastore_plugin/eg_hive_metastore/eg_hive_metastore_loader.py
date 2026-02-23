@@ -3,7 +3,7 @@ import re
 
 from enum import Enum
 import time
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from app.db import get_session, with_session
 from env import QuerybookSettings
@@ -312,6 +312,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
         columns=None,
         from_batch=False,
         session=None,
+        catalog_name=None,
     ):
         """
         Override the base method to filter out tables we don't want to refresh.
@@ -340,6 +341,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             columns=columns,
             from_batch=from_batch,
             session=session,
+            catalog_name=catalog_name,
         )
 
     def get_all_schema_names(self) -> List[str]:

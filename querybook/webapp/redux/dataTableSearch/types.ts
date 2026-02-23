@@ -14,6 +14,8 @@ export interface ITableSearchResult {
     id: number;
     schema: string;
     name: string;
+    catalog?: string;
+    full_name?: string;
     golden?: boolean;
     tags: string[];
 }
@@ -23,6 +25,7 @@ export interface ITableSearchFilters {
     tags?: string[];
     startDate?: number;
     endDate?: number;
+    catalog?: string;
     schema?: string;
     data_elements?: string[];
 }

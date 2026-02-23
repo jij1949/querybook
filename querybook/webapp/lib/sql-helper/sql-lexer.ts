@@ -250,13 +250,15 @@ export interface IToken {
 }
 
 export class TableToken {
+    public catalog: string;
     public schema: string;
     public name: string;
     public line: number;
     public start: number;
     public end: number;
 
-    public constructor(schema: string, table: string, token: IToken) {
+    public constructor(catalog: string, schema: string, table: string, token: IToken) {
+        this.catalog = catalog;
         this.schema = schema;
         this.name = table;
         this.line = token.line;
@@ -290,16 +292,24 @@ function sanitizeTable(tableToken: IToken, defaultSchema: string) {
         }
     }
 
+    let catalog: string = null;
     let schema: string = null;
     let table: string = null;
     let success = true;
 
     if (parts.length === 1) {
+        // table only
         schema = defaultSchema;
         table = parts[0];
     } else if (parts.length === 2) {
+        // schema.table
         schema = parts[0];
         table = parts[1];
+    } else if (parts.length === 3) {
+        // catalog.schema.table
+        catalog = parts[0];
+        schema = parts[1];
+        table = parts[2];
     } else {
         console.error('Erroneous Input');
         console.error(tableToken);
@@ -307,6 +317,7 @@ function sanitizeTable(tableToken: IToken, defaultSchema: string) {
     }
 
     return {
+        catalog: (catalog || '').toLowerCase(),
         schema: (schema || '').toLowerCase(),
         table: (table || '').toLowerCase(),
         success,
@@ -778,13 +789,13 @@ export function findTableReferenceAndAlias(statements: IToken[][]) {
             // Post Process Tables to find the correct name
             const processedTables = [];
             tables.forEach((tableToken) => {
-                const { schema, table, success } = sanitizeTable(
+                const { catalog, schema, table, success } = sanitizeTable(
                     tableToken,
                     defaultSchema
                 );
                 if (success) {
                     processedTables.push(
-                        new TableToken(schema, table, tableToken)
+                        new TableToken(catalog, schema, table, tableToken)
                     );
                 }
             });
@@ -794,12 +805,13 @@ export function findTableReferenceAndAlias(statements: IToken[][]) {
             const processedAlias: Record<string, TableToken> = {};
             Object.keys(tableAlias).forEach((alias) => {
                 const tableToken = tableAlias[alias];
-                const { schema, table, success } = sanitizeTable(
+                const { catalog, schema, table, success } = sanitizeTable(
                     tableToken,
                     defaultSchema
                 );
                 if (success) {
                     processedAlias[alias] = new TableToken(
+                        catalog,
                         schema,
                         table,
                         tableToken

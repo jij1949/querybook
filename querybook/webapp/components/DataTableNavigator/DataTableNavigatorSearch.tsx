@@ -80,6 +80,7 @@ export const DataTableNavigatorSearch: React.FC<{
     // Since Data Elements are stored per-metastore, the default behavior doesn't work
     // if the same Data Elements are used across metastores
     const queryMetastoreHasDataElements = true; // !!queryMetastore.flags?.has_data_element;
+    const showCatalogFilter = queryMetastore?.catalog_display_config?.show_catalog_in_ui ?? false;
 
     const searchFiltersPickerDOM = showSearchFilter && (
         <Popover
@@ -112,6 +113,20 @@ export const DataTableNavigatorSearch: React.FC<{
                             <TrendingFlame className="ml4" />
                         </div>
                     </SearchFilterRow>
+                    {showCatalogFilter && (
+                        <SearchFilterRow title="Catalog">
+                            <SearchBar
+                                value={searchFilters?.catalog ?? ''}
+                                onSearch={(s: string) =>
+                                    updateSearchFilter(
+                                        'catalog',
+                                        s.length ? s : null
+                                    )
+                                }
+                                placeholder="Full catalog name"
+                            />
+                        </SearchFilterRow>
+                    )}
                     <SearchFilterRow title="Schema">
                         <SearchBar
                             value={searchFilters?.schema ?? ''}

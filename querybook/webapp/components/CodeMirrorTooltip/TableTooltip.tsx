@@ -7,6 +7,7 @@ import { IDataColumn, IDataSchema, IDataTable } from 'const/metastore';
 import { useShallowSelector } from 'hooks/redux/useShallowSelector';
 import { setSidebarTableId } from 'lib/querybookUI';
 import { navigateWithinEnv } from 'lib/utils/query-string';
+import { getTableDisplayName } from 'lib/utils/table-identifier';
 import * as dataSourcesActions from 'redux/dataSources/action';
 import { IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
@@ -28,8 +29,12 @@ export const TableTooltip: React.FunctionComponent<IProps> = ({
     hidePinItButton = false,
     openTableModal,
 }) => {
-    const tableName =
-        table && schema ? `${schema.name}.${table.name}` : table.name;
+    const tableName = getTableDisplayName({
+            schema: schema.name,
+            name: table.name,
+            full_name: table?.full_name,
+            catalog: schema?.catalog?.name
+        });
     const description = table.description
         ? (table.description as ContentState).getPlainText()
         : '';
@@ -146,15 +151,28 @@ export const TableTooltipByName: React.FunctionComponent<{
     useEffect(() => {
         const fetchTable = async () => {
             try {
-                const [schemaName, tableName] = tableFullName.split('.');
-                const table: any = await dispatch(
+                const parts = tableFullName.split('.');
+                let catalogName = null;
+                let schemaName = null;
+                let tableName = null;
+                if (parts.length === 3) {
+                    // catalog.schema.table
+                    [catalogName, schemaName, tableName] = parts;
+                } else if (parts.length === 2) {
+                    // schema.table (default catalog)
+                    [schemaName, tableName] = parts;
+                } else {
+                    throw new Error('Invalid tableFullName format');
+                }
+                const table = await dispatch(
                     dataSourcesActions.fetchDataTableByNameIfNeeded(
                         schemaName,
                         tableName,
-                        metastoreId
+                        metastoreId,
+                        catalogName
                     )
-                );
-                if (table) {
+                ) as unknown as IDataTable;
+                if (table?.id) {
                     setTableId(table.id);
                 }
             } catch (error) {

@@ -25,6 +25,7 @@ export interface ITablePreview {
     id: number;
     schema: string;
     name: string;
+    full_name?: string;
     created_at: number;
     description: string;
     golden: boolean;

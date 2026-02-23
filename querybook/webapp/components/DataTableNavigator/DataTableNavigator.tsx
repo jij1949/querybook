@@ -12,6 +12,7 @@ import {
 import { SurveySurfaceType } from 'const/survey';
 import { useShallowSelector } from 'hooks/redux/useShallowSelector';
 import { useSurveyTrigger } from 'hooks/ui/useSurveyTrigger';
+import { getTableDisplayName } from 'lib/utils/table-identifier';
 import { queryMetastoresSelector } from 'redux/dataSources/selector';
 import * as dataTableSearchActions from 'redux/dataTableSearch/action';
 import {
@@ -246,7 +247,7 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
     const dataTablesWithSelection: ITableResultWithSelection[] = dataTables.map(
         (table) => ({
             ...table,
-            displayName: `${table.schema}.${table.name}`,
+            displayName: getTableDisplayName(table),
             selected: selectedTableId === table.id,
         })
     );
@@ -308,10 +309,7 @@ const TableRow: React.FC<{
         (event: React.MouseEvent) => handleTableRowClick(table.id, event),
         [handleTableRowClick, table.id]
     );
-    const tableFullName = useMemo(
-        () => `${table.schema}.${table.name}`,
-        [table]
-    );
+    const tableFullName = useMemo(() => getTableDisplayName(table), [table]);
     const { isDragging, dragProps } = useTableNameDrag(tableFullName);
 
     const icons = [];

@@ -10,6 +10,7 @@ from lib.ai_assistant import ai_assistant
 from lib.elasticsearch.search_table import construct_tables_query_by_table_names
 from lib.elasticsearch.search_utils import ES_CONFIG, get_matching_objects
 from lib.logger import get_logger
+from lib.table_name_formatter import format_table_name_for_display
 from lib.vector_store import get_vector_store
 from logic.admin import get_query_engine_by_id
 from logic.elasticsearch import get_sample_query_cells_by_table_name
@@ -112,7 +113,17 @@ def record_table(
             return
 
         metastore_id = table.data_schema.metastore_id
-        full_table_name = f"{table.data_schema.name}.{table.name}"
+
+        # Get catalog name if it exists
+        catalog_name = table.data_schema.catalog.name if table.data_schema.catalog else None
+
+        # Format table name based on metastore settings
+        full_table_name = format_table_name_for_display(
+            table_name=table.name,
+            schema_name=table.data_schema.name,
+            catalog_name=catalog_name,
+            metastore_id=metastore_id
+        )
 
         sample_query_cells = get_sample_query_cells_by_table_name(
             table_name=full_table_name
@@ -236,7 +247,19 @@ def ingest_vector_index(batch_size=100, session=None):
         )
 
         for table in tables:
-            full_table_name = f"{table.data_schema.name}.{table.name}"
+            # Get catalog name if it exists
+            catalog_name = table.data_schema.catalog.name if table.data_schema.catalog else None
+
+            # Format table name based on metastore settings
+            # TODO: Investigate - Ensure this matches the format used when indexing
+            # queries. If show_catalog_in_ui=false, this returns 2-part name even when
+            # catalog exists. Verify consistency with query indexing format.
+            full_table_name = format_table_name_for_display(
+                table_name=table.name,
+                schema_name=table.data_schema.name,
+                catalog_name=catalog_name,
+                metastore_id=table.data_schema.metastore_id
+            )
             LOG.info(f"Ingesting table: {full_table_name}")
             record_table(table=table, ingest_sample_queries=True, session=session)
 

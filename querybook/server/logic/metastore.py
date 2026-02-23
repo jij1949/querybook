@@ -2,13 +2,14 @@ import datetime
 
 from app.db import with_session
 from const.elasticsearch import ElasticsearchItem
-from const.metastore import DataOwner, DataTableWarningSeverity
+from const.metastore import DataCatalog as DataCatalogTuple, DataOwner, DataTableWarningSeverity
 from lib.logger import get_logger
 from lib.sqlalchemy import update_model_fields
 from logic import data_element as data_element_logic
 from logic.user import create_user, get_user_by_name
 from models.admin import QueryEngineEnvironment
 from models.metastore import (
+    DataCatalog,
     DataJobMetadata,
     DataSchema,
     DataTable,
@@ -22,10 +23,189 @@ from models.metastore import (
 )
 from models.query_execution import QueryExecution
 from sqlalchemy import and_, func
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, joinedload
 from tasks.sync_elasticsearch import sync_elasticsearch
 
 LOG = get_logger(__file__)
+
+
+# ============= Catalog Functions =============
+
+
+@with_session
+def get_catalog_by_id(catalog_id, session=None):
+    """Get catalog by id"""
+    return session.query(DataCatalog).filter(DataCatalog.id == catalog_id).first()
+
+
+@with_session
+def get_catalog_by_name(catalog_name, metastore_id, session=None):
+    """Get catalog by name and metastore id"""
+    return (
+        session.query(DataCatalog)
+        .filter_by(metastore_id=metastore_id, name=catalog_name)
+        .first()
+    )
+
+
+@with_session
+def get_all_catalogs(metastore_id, session=None):
+    """Get all catalogs for a metastore"""
+    return (
+        session.query(DataCatalog)
+        .filter(DataCatalog.metastore_id == metastore_id)
+        .all()
+    )
+
+
+@with_session
+def create_catalog(
+    name,
+    description=None,
+    metastore_id=None,
+    owner=None,
+    created_by=None,
+    properties=None,
+    commit=True,
+    session=None,
+):
+    """Create or update a catalog"""
+    catalog = get_catalog_by_name(name, metastore_id, session=session)
+    new_catalog = DataCatalog(
+        name=name,
+        description=description,
+        metastore_id=metastore_id,
+        owner=owner,
+        created_by=created_by,
+        properties=properties,
+    )
+
+    if not catalog:
+        session.add(new_catalog)
+    else:
+        new_catalog.id = catalog.id
+        session.merge(new_catalog)
+
+    if commit:
+        session.commit()
+    else:
+        session.flush()
+
+    return new_catalog
+
+
+@with_session
+def delete_catalog(catalog_id, commit=True, session=None):
+    """Delete a catalog by id"""
+    catalog = get_catalog_by_id(catalog_id, session=session)
+    if not catalog:
+        return
+
+    session.delete(catalog)
+
+    if commit:
+        session.commit()
+    else:
+        session.flush()
+
+
+@with_session
+def update_catalog(
+    catalog_id,
+    description=None,
+    owner=None,
+    properties=None,
+    session=None,
+):
+    """Update catalog metadata"""
+    catalog = get_catalog_by_id(catalog_id, session=session)
+    if not catalog:
+        return None
+
+    if description is not None:
+        catalog.description = description
+    if owner is not None:
+        catalog.owner = owner
+    if properties is not None:
+        catalog.properties = properties
+    catalog.updated_at = datetime.datetime.now()
+    session.commit()
+    return catalog
+
+
+@with_session
+def get_schemas_by_catalog(catalog_id, session=None):
+    """Get all schemas in a catalog"""
+    return (
+        session.query(DataSchema)
+        .filter(DataSchema.catalog_id == catalog_id)
+        .all()
+    )
+
+
+@with_session
+def get_schema_by_name_and_catalog(
+    schema_name, catalog_id, metastore_id, session=None
+):
+    """Get schema by name, catalog_id, and metastore_id"""
+    query = session.query(DataSchema).filter(
+        DataSchema.name == schema_name,
+        DataSchema.metastore_id == metastore_id
+    )
+    if catalog_id is None:
+        query = query.filter(DataSchema.catalog_id.is_(None))
+    else:
+        query = query.filter(DataSchema.catalog_id == catalog_id)
+    return query.first()
+
+
+@with_session
+def parse_schema_identifier(full_schema_name, metastore_id, session=None):
+    """
+    Parse schema identifier into catalog and schema components.
+    Args:
+        full_schema_name: Can be "schema" or "catalog.schema"
+        metastore_id: The metastore ID
+        session: Database session
+    Returns:
+        Tuple of (DataCatalog NamedTuple or None, schema_name, DataSchema ORM object or None)
+    """
+    parts = full_schema_name.split(".")
+    if len(parts) == 1:
+        # Simple schema name without catalog
+        schema_name = parts[0]
+        catalog_tuple = None
+        db_schema = get_schema_by_name_and_catalog(
+            schema_name, None, metastore_id, session=session
+        )
+        return (catalog_tuple, schema_name, db_schema)
+    elif len(parts) == 2:
+        # catalog.schema format
+        catalog_name = parts[0]
+        schema_name = parts[1]
+        # Check if catalog exists in DB to get metadata
+        db_catalog = get_catalog_by_name(catalog_name, metastore_id, session=session)
+        # Create DataCatalog NamedTuple
+        if db_catalog:
+            catalog_tuple = DataCatalogTuple(
+                name=db_catalog.name,
+                description=db_catalog.description,
+                owner=db_catalog.owner,
+                properties=db_catalog.properties,
+            )
+            db_schema = get_schema_by_name_and_catalog(
+                schema_name, db_catalog.id, metastore_id, session=session
+            )
+        else:
+            # Catalog doesn't exist yet, create minimal NamedTuple with just the name
+            catalog_tuple = DataCatalogTuple(name=catalog_name)
+            db_schema = None
+        return (catalog_tuple, schema_name, db_schema)
+    else:
+        raise ValueError(f"Invalid schema identifier: {full_schema_name}")
+
+
+# ============= Schema Functions =============
 
 
 @with_session
@@ -95,12 +275,35 @@ def get_schemas_by_metastore(metastore_id, session=None):
 
 @with_session
 def get_schema_by_name(schema_name, metastore_id, session=None):
-    """Get schema by name"""
-    return (
+    """
+    Note: Only used on deprecated methods for backward compatibility.
+    New code should use get_schema_by_name_and_catalog or parse_schema_identifier instead.
+
+    Get schema by name (backward compatible).
+    First tries to find schema with catalog_id = None,
+    then falls back to any schema with matching name.
+    """
+    # First try to find schema without catalog
+    schema = (
+        session.query(DataSchema)
+        .filter_by(metastore_id=metastore_id, name=schema_name)
+        .filter(DataSchema.catalog_id.is_(None))
+        .first()
+    )
+    if schema:
+        return schema
+    # Fallback: return any schema with matching name (log warning)
+    schema = (
         session.query(DataSchema)
         .filter_by(metastore_id=metastore_id, name=schema_name)
         .first()
     )
+    if schema and schema.catalog_id is not None:
+        LOG.debug(
+            f"Schema '{schema_name}' found with catalog '{schema.catalog.name}'. "
+            "Consider using catalog.schema format for unambiguous lookup."
+        )
+    return schema
 
 
 @with_session
@@ -109,15 +312,21 @@ def create_schema(
     table_count=None,
     description=None,
     metastore_id=None,
+    catalog_id=None,
     commit=True,
     session=None,
 ):
-    schema = get_schema_by_name(name, metastore_id, session=session)
+    """Create or update a schema"""
+    # Look up existing schema by name, catalog_id, and metastore_id
+    schema = get_schema_by_name_and_catalog(
+        name, catalog_id, metastore_id, session=session
+    )
     new_schema = DataSchema(
         name=name,
         table_count=table_count,
         description=description,
         metastore_id=metastore_id,
+        catalog_id=catalog_id,
     )
 
     if not schema:
@@ -154,16 +363,22 @@ def get_all_table(offset=0, limit=100, session=None):
 
 
 @with_session
-def get_table_by_name(schema_name, name, metastore_id, session=None):
+def get_table_by_name(schema_name, name, metastore_id, catalog_name=None, session=None):
     """Get an table by its name"""
-    return (
+    query = (
         session.query(DataTable)
         .join(DataSchema)
+        .options(joinedload(DataTable.data_schema).joinedload(DataSchema.catalog))
         .filter(DataTable.name == name)
         .filter(DataSchema.name == schema_name)
         .filter(DataSchema.metastore_id == metastore_id)
-        .first()
     )
+
+    if catalog_name:
+        # Join with DataCatalog to filter by catalog name
+        query = query.join(DataCatalog).filter(DataCatalog.name == catalog_name)
+
+    return query.first()
 
 
 @with_session

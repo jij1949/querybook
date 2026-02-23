@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useDispatch } from 'react-redux';
 
 import { useShallowSelector } from 'hooks/redux/useShallowSelector';
+import { getTableDisplayName } from 'lib/utils/table-identifier';
 import { fetchDataTableIfNeeded } from 'redux/dataSources/action';
 import { Dispatch, IStoreState } from 'redux/store/types';
 
@@ -40,7 +41,12 @@ export const BoardDataTableItem: React.FunctionComponent<IProps> = ({
             boardItemId={itemId}
             itemId={table.id}
             itemType="table"
-            title={`${schema?.name}.${table.name}`}
+            title={getTableDisplayName({
+                schema: schema?.name,
+                name: table.name,
+                full_name: table.full_name,
+                catalog: schema?.catalog?.name
+            })}
             titleUrl={`/table/${table.id}/`}
             description={table.description as ContentState}
         />

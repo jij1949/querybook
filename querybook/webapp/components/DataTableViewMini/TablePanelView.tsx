@@ -32,13 +32,19 @@ export const TablePanelView: React.FunctionComponent<ITablePanelViewProps> = ({
     onColumnRowClick,
     columnId,
 }) => {
-    const { table, schema, tableColumns, getTable } = useDataTable(tableId);
+    const { table, schema, tableColumns, metastore, getTable } = useDataTable(tableId);
 
     const renderPanelView = () => {
         const partitionKeyList = table.column_info?.partition_keys ?? [];
 
         const overviewSection = (
             <PanelSection title="table">
+                {schema?.catalog?.name != null &&
+                    metastore?.catalog_display_config?.show_catalog_in_ui === true && (
+                        <SubPanelSection title="catalog">
+                            {schema.catalog.name}
+                        </SubPanelSection>
+                    )}
                 <SubPanelSection title="schema">{schema.name}</SubPanelSection>
                 <SubPanelSection title="name">
                     <span className="flex-row">

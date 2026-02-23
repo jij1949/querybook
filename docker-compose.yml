@@ -17,6 +17,8 @@ x-querybook-volumes: &querybook-volumes
     # Make sure the build files don't leak back
     - /opt/querybook/dist/
     - $PWD/containers/bundled_querybook_config.yaml:/opt/querybook/querybook/config/querybook_config.yaml
+    # Mount AWS credentials for Glue metastore access
+    - $HOME/.aws:/root/.aws:ro
     # - file:/opt/store/
 
 services:

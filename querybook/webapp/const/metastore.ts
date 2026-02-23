@@ -26,6 +26,11 @@ export interface IDataOwnerType {
     description?: string;
 }
 
+export interface ICatalogDisplayConfig {
+    show_catalog_in_ui: boolean;
+    catalog_display_name?: string;
+}
+
 export interface IQueryMetastore {
     id: number;
     name: string;
@@ -34,6 +39,7 @@ export interface IQueryMetastore {
     flags?: {
         has_data_element: boolean;
     };
+    catalog_display_config: ICatalogDisplayConfig;
 }
 
 export interface IDataSchema {
@@ -45,6 +51,12 @@ export interface IDataSchema {
     table_count: number;
     title?: string;
     metastore_id: number;
+    catalog_id?: number;
+    catalog?: {
+        id: number;
+        name: string;
+        metastore_id: number;
+    };
 }
 
 export interface IDataTableLink {
@@ -84,6 +96,7 @@ export interface IDataTable {
     schema_id: number;
     warnings: number[];
     golden: boolean;
+    full_name?: string;
 }
 
 // Keep it the same as server/const.py
@@ -237,4 +250,18 @@ export interface ITableColumnStats {
 export type SchemaSortKey = 'name' | 'table_count';
 export type SchemaTableSortKey = 'name' | 'relevance';
 export const tableNameDraggableType = 'TableName-';
+
+/**
+ * Get the catalog display name based on metastore settings.
+ * Returns null if catalog should be hidden, custom name if set, or actual catalog name as fallback.
+ */
+export function getCatalogDisplayName(
+    metastore: IQueryMetastore,
+    catalogName?: string
+): string | null {
+    if (!metastore.catalog_display_config?.show_catalog_in_ui) {
+        return null;
+    }
+    return metastore.catalog_display_config.catalog_display_name || catalogName || null;
+}
 export const tableNameDataTransferName = 'tableName';

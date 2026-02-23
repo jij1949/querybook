@@ -11,7 +11,7 @@ import { IStoreState } from 'redux/store/types';
  * @param tableId the id of a data table
  */
 export function useDataTable(tableId: number) {
-    const { table, schema, tableColumns } = useSelector((state: IStoreState) =>
+    const { table, schema, tableColumns, metastore } = useSelector((state: IStoreState) =>
         fullTableSelector(state, tableId)
     );
 
@@ -27,5 +27,6 @@ export function useDataTable(tableId: number) {
         table,
         schema,
         tableColumns,
+        metastore,
     };
 }

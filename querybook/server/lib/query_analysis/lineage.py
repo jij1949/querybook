@@ -36,6 +36,7 @@ def process_query(query, language=None):
         default_schema = "main"
     else:
         default_schema = "default"
+    default_catalog = None  # New: allow passing catalog
 
     lineage_per_statement = []
     table_per_statement = []
@@ -46,8 +47,9 @@ def process_query(query, language=None):
     for statement in statements:
         default_schema = get_statement_schema(statement, default_schema)
         placeholder_tables = get_statement_placeholders(statement)
+        # Pass default_catalog to get_table_list
         table_list, from_list = get_table_list(
-            statement, placeholder_tables, default_schema
+            statement, placeholder_tables, default_schema, default_catalog
         )
         table_per_statement.append(list(set(table_list + from_list)))
         lineage_per_statement.append(compute_lineage(table_list, from_list))
@@ -152,9 +154,14 @@ def get_statement_schema(statement, current_schema) -> str:
 
 
 def sanitize_table_name(name, default_schema):
-    if "." in name:
+    # Support catalog.schema.table
+    parts = name.split(".")
+    if len(parts) == 3:
         return name.lower()
-    return f"{default_schema}.{name}".lower()
+    elif len(parts) == 2:
+        return name.lower()
+    else:
+        return f"{default_schema}.{name}".lower()
 
 
 def get_full_table_name(statement, index):
@@ -170,7 +177,7 @@ def get_full_table_name(statement, index):
     return full_name
 
 
-def get_table_list(statement, placeholders, default_schema):
+def get_table_list(statement, placeholders, default_schema, default_catalog=None):
     """
     Finds the actual lineage of a table in a query.
     Returns:
@@ -203,6 +210,11 @@ def get_table_list(statement, placeholders, default_schema):
             if table_search_mode:
                 table_name = get_full_table_name(flattened_statement, index)
                 if table_name not in placeholders:
+                    # If default_catalog is set, prepend to schema.table
+                    if default_schema and default_catalog:
+                        parts = table_name.split(".")
+                        if len(parts) == 2:
+                            table_name = f"{default_catalog}.{table_name}"
                     if table_search_keyword in ["TABLE", "INTO"]:
                         table_list.append(
                             sanitize_table_name(table_name, default_schema)

@@ -173,7 +173,8 @@ export function searchSchemas(): ThunkResult<Promise<IDataSchema[]>> {
 
 export function searchTableBySchema(
     schemaName: string,
-    id: number
+    id: number,
+    catalogName?: string
 ): ThunkResult<Promise<ITableSearchResult[]>> {
     return async (dispatch, getState) => {
         const state = getState().dataTableSearch;
@@ -194,6 +195,7 @@ export function searchTableBySchema(
                     searchFilters: {
                         ...state.searchFilters,
                         schema: schemaName,
+                        ...(catalogName && { catalog: catalogName }),
                     },
                 }),
                 sort_key: orderBy.key === 'relevance' ? '_score' : orderBy.key,
@@ -211,7 +213,7 @@ export function searchTableBySchema(
                 payload: {
                     results: data.results,
                     count: data.count,
-                    id,
+                    id: id,
                 },
             });
 

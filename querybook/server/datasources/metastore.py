@@ -53,7 +53,8 @@ def get_schema(schema_id, include_metastore=False, include_table=False):
         api_assert(schema, "Invalid schema")
         verify_metastore_permission(schema.metastore_id, session=session)
 
-        schema_dict = schema.to_dict(include_metastore, include_table)
+        schema_dict = schema.to_dict(
+            include_metastore, include_table, include_catalog=True)
         return schema_dict
 
 
@@ -104,13 +105,14 @@ def get_table_by_name(
     schema_name,
     table_name,
     metastore_id,
+    catalog_name=None,
     with_schema=True,
     with_column=True,
     with_warnings=True,
 ):
     with DBSession() as session:
         table = logic.get_table_by_name(
-            schema_name, table_name, metastore_id, session=session
+            schema_name, table_name, metastore_id, catalog_name=catalog_name, session=session
         )
         if not table:
             return None
@@ -240,7 +242,7 @@ def sync_table_by_table_id(table_id):
 
         metastore_id = schema.metastore_id
         metastore_loader = get_metastore_loader(metastore_id, session=session)
-        table_id = metastore_loader.sync_table(schema.name, table.name, session=session)
+        table_id = metastore_loader.sync_table(schema.get_full_name(), table.name, session=session)
         if table_id == -1:
             return None
 
@@ -637,7 +639,10 @@ def get_schemas(
         metastore_id, offset, limit, sort_key, sort_order, name
     )
 
-    return {"results": schemas, "done": len(schemas) < limit}
+    return {
+        "results": [schema.to_dict(include_catalog=True) for schema in schemas],
+        "done": len(schemas) < limit,
+    }
 
 
 @register(

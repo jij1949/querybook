@@ -13,16 +13,31 @@ from lib.elasticsearch.search_utils import (
 FILTERS_TO_AND = ["tags", "data_elements"]
 
 
-def _get_potential_exact_schema_table_name(keywords):
-    """Get the schema and table name from a full table name.
+def _parse_table_identifier(table_name):
+    """Parse table identifier into catalog, schema, and table components.
 
-    E.g. "default.table_a", will return (default, table_a)
+    Args:
+        table_name: Can be "table", "schema.table", or "catalog.schema.table"
+
+    Returns:
+        Tuple of (catalog, schema, table)
+        - 1 part: (None, None, table)
+        - 2 parts: (None, schema, table)
+        - 3 parts: (catalog, schema, table)
+
+    Raises:
+        ValueError: If more than 3 parts
     """
-    dot_index = keywords.find(".")
-    if dot_index == -1:
-        return None, keywords
+    parts = table_name.split(".")
 
-    return keywords[:dot_index], keywords[dot_index + 1 :]
+    if len(parts) == 1:
+        return None, None, parts[0]
+    elif len(parts) == 2:
+        return None, parts[0], parts[1]
+    elif len(parts) == 3:
+        return parts[0], parts[1], parts[2]
+    else:
+        raise ValueError(f"Invalid table identifier: {table_name}. Must be 1-3 parts.")
 
 
 def _match_table_word_fields(fields):
@@ -43,6 +58,7 @@ def _match_table_phrase_queries(fields, keywords):
     # boos score for phrase match
     return [
         {"match_phrase": {"full_name": {"query": keywords, "boost": 1}}},
+        {"match_phrase": {"schema_table_name": {"query": keywords, "boost": 1}}},
         {"match_phrase": {"description": {"query": keywords, "boost": 1}}},
         {"match_phrase": {"column_descriptions": {"query": keywords, "boost": 1}}},
         {
@@ -67,13 +83,27 @@ def construct_tables_query(
     if keywords:
         should_clause = _match_table_phrase_queries(fields, keywords)
 
-        table_schema, table_name = _get_potential_exact_schema_table_name(keywords)
+        # Parse table identifier to support catalog.schema.table format
+        catalog, table_schema, table_name = _parse_table_identifier(keywords)
+
+        # Add catalog filter if present
+        if catalog:
+            filters.append(["catalog", catalog])
+
+        # Add schema filter if present
         if table_schema:
             filters.append(["schema", table_schema])
 
         # boost score for table name exact match
         if table_name:
-            boost_score = 100 if table_schema else 10
+            # Higher boost for 3-part names (most specific), then 2-part, then 1-part
+            if catalog and table_schema:
+                boost_score = 100
+            elif table_schema:
+                boost_score = 50
+            else:
+                boost_score = 10
+
             should_clause.append(
                 {"term": {"name": {"value": table_name, "boost": boost_score}}},
             )
@@ -116,7 +146,8 @@ def construct_tables_query(
     }
 
     if concise:
-        query["_source"] = ["id", "schema", "name", "golden", "tags"]
+        query["_source"] = ["id", "schema", "name",
+                            "catalog", "golden", "tags", "full_name"]
 
     query.update(order_by_fields(sort_key, sort_order))
     query.update(
@@ -148,23 +179,30 @@ def construct_tables_query_by_table_names(
     limit,
 ):
     """This query is used to get table information by table names."""
-    should_clause = []
+    should_clauses = []
+
     for table_name in table_names:
-        schema, name = table_name.split(".")
-        should_clause.append(
-            {
-                "bool": {
-                    "must": [
-                        {"term": {"schema": schema}},
-                        {"term": {"name": name}},
-                    ],
-                }
+        # Parse each table name to support catalog.schema.table format
+        catalog, schema, table = _parse_table_identifier(table_name)
+
+        # Build bool query matching all components
+        must_clauses = [{"term": {"name": table}}]
+
+        if schema:
+            must_clauses.append({"term": {"schema": schema}})
+
+        if catalog:
+            must_clauses.append({"term": {"catalog": catalog}})
+
+        should_clauses.append({
+            "bool": {
+                "must": must_clauses
             }
-        )
+        })
 
     bool_query = {
         "must": [{"term": {"metastore_id": metastore_id}}],
-        "should": should_clause,
+        "should": should_clauses,
         "minimum_should_match": 1,
     }
 
@@ -187,17 +225,24 @@ def get_column_name_suggestion(
     the correctly-spelled column name"""
     should_clause = []
     for full_table_name in full_table_names:
-        schema_name, table_name = full_table_name.split(".")
-        should_clause.append(
-            {
-                "bool": {
-                    "must": [
-                        {"match": {"name": table_name}},
-                        {"match": {"schema": schema_name}},
-                    ]
-                }
+        # Parse table name to support catalog.schema.table format
+        catalog, schema_name, table_name = _parse_table_identifier(full_table_name)
+
+        must_clauses = [
+            {"match": {"name": table_name}},
+        ]
+
+        if schema_name:
+            must_clauses.append({"match": {"schema": schema_name}})
+
+        if catalog:
+            must_clauses.append({"match": {"catalog": catalog}})
+
+        should_clause.append({
+            "bool": {
+                "must": must_clauses
             }
-        )
+        })
 
     search_query = {
         "query": {
@@ -222,10 +267,8 @@ def get_table_name_suggestion(
 ) -> Tuple[Dict, int]:
     """Given an invalid table name use fuzzy search to search the correctly-spelled table name"""
 
-    schema_name, fuzzy_name = None, fuzzy_table_name
-    fuzzy_table_name_parts = fuzzy_table_name.split(".")
-    if len(fuzzy_table_name_parts) == 2:
-        schema_name, fuzzy_name = fuzzy_table_name_parts
+    # Parse table identifier to support catalog.schema.table format
+    catalog, schema_name, fuzzy_name = _parse_table_identifier(fuzzy_table_name)
 
     must_clause = [
         {
@@ -241,6 +284,9 @@ def get_table_name_suggestion(
     ]
     if schema_name:
         must_clause.append({"match": {"schema": schema_name}})
+
+    if catalog:
+        must_clause.append({"match": {"catalog": catalog}})
 
     search_query = {
         "query": {"bool": {"must": must_clause}},

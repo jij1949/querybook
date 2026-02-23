@@ -142,14 +142,16 @@ export function refreshDataTableInMetastore(
 export function fetchDataTableByName(
     schemaName: string,
     tableName: string,
-    metastoreId: number
+    metastoreId: number,
+    catalogName?: string
 ): ThunkResult<Promise<IDataTable>> {
     return async (dispatch) => {
         try {
             const { data } = await TableResource.getByName(
                 metastoreId,
                 schemaName,
-                tableName
+                tableName,
+                catalogName
             );
 
             if (!data) {
@@ -181,10 +183,13 @@ export function fetchDataTableByName(
 export function fetchDataTableByNameIfNeeded(
     schemaName: string,
     tableName: string,
-    metastoreId: number
+    metastoreId: number,
+    catalogName?: string
 ): ThunkResult<Promise<IDataTable>> {
     return async (dispatch, getState) => {
-        const fullName = `${schemaName}.${tableName}`;
+        const fullName = catalogName
+            ? `${catalogName}.${schemaName}.${tableName}`
+            : `${schemaName}.${tableName}`;
         const state = getState();
         const tableId = (state.dataSources.dataTableNameToId[metastoreId] ||
             {})[fullName];
@@ -195,7 +200,7 @@ export function fetchDataTableByNameIfNeeded(
             }
         }
         return dispatch(
-            fetchDataTableByName(schemaName, tableName, metastoreId)
+            fetchDataTableByName(schemaName, tableName, metastoreId, catalogName)
         );
     };
 }

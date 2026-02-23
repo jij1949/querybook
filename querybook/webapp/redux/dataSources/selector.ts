@@ -55,7 +55,10 @@ export const fullTableSelector = createSelector(
 
         const tableNameFromState =
             tableFromState && schemaFromState
-                ? `${schemaFromState.name}.${tableFromState.name}`
+                ? schemaFromState.catalog?.name != null &&
+                  queryMetastoreById[schemaFromState.metastore_id]?.catalog_display_config?.show_catalog_in_ui === true
+                    ? `${schemaFromState.catalog.name}.${schemaFromState.name}.${tableFromState.name}`
+                    : `${schemaFromState.name}.${tableFromState.name}`
                 : '';
 
         return {

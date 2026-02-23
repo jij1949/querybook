@@ -7,6 +7,7 @@ import {
     asyncReactSelectStyles,
     makeReactSelectStyle,
 } from 'lib/utils/react-select';
+import { getTableDisplayName } from 'lib/utils/table-identifier';
 import { queryMetastoresSelector } from 'redux/dataSources/selector';
 import { IStoreState } from 'redux/store/types';
 import { SearchTableResource } from 'resource/search';
@@ -60,14 +61,12 @@ export const TableSelect: React.FunctionComponent<ITableSelectProps> = ({
             });
             const filteredTableNames = data.results.filter(
                 (result) =>
-                    tableNames.indexOf(`${result.schema}.${result.name}`) === -1
+                    tableNames.indexOf(getTableDisplayName(result)) === -1
             );
-            const tableNameOptions = filteredTableNames.map(
-                ({ id, schema, name }) => ({
-                    value: id,
-                    label: `${schema}.${name}`,
-                })
-            );
+            const tableNameOptions = filteredTableNames.map((result) => ({
+                value: result.id,
+                label: getTableDisplayName(result),
+            }));
             return tableNameOptions;
         },
         [metastoreId, tableNames]

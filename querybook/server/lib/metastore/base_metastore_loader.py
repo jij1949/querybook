@@ -1,14 +1,17 @@
+import inspect
 import math
 import traceback
 from abc import ABCMeta, abstractclassmethod, abstractmethod
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, overload
 
 import gevent
 from app.db import DBSession, with_session
 from const.data_element import DataElementTuple, DataElementAssociationTuple
 from const.metastore import (
+    DataCatalog,
     DataColumn,
     DataOwnerType,
+    DataSchema,
     DataTable,
     MetadataType,
     MetastoreLoaderConfig,
@@ -21,6 +24,7 @@ from logic.data_element import create_column_data_element_association
 from logic.elasticsearch import delete_es_table_by_id, update_table_by_id
 from logic.metastore import (
     count_data_schema,
+    create_catalog,
     create_column,
     create_schema,
     create_table,
@@ -30,11 +34,14 @@ from logic.metastore import (
     delete_column,
     delete_schema,
     delete_table,
+    get_catalog_by_id,
+    get_catalog_by_name,
     get_column_by_table_id,
     get_schema_by_name,
     get_table_by_schema_id,
     get_table_by_schema_id_and_name,
     iterate_data_schema,
+    parse_schema_identifier,
 )
 from logic.tag import create_column_tags, create_table_tags
 
@@ -46,9 +53,89 @@ LOG = get_logger(__name__)
 class BaseMetastoreLoader(metaclass=ABCMeta):
     loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig({})
 
+    def _method_accepts_param(self, method_name: str, param_name: str) -> bool:
+        """Check if a method accepts a specific parameter using runtime introspection.
+
+        This method uses Python's inspect module to examine method signatures at runtime.
+        Results could be cached for performance, but we start without caching to measure
+        the raw overhead.
+
+        Args:
+            method_name: Name of the method to check
+            param_name: Name of the parameter to look for
+
+        Returns:
+            True if the method accepts the parameter (explicitly or via **kwargs)
+            False otherwise
+        """
+        try:
+            method = getattr(self, method_name)
+            sig = inspect.signature(method)
+            return param_name in sig.parameters
+        except (AttributeError, ValueError):
+            # If inspection fails (method doesn't exist or signature unavailable),
+            # assume parameter is not supported
+            return False
+
     def __init__(self, metastore_dict: Dict):
         self.metastore_id = metastore_dict["id"]
         self.acl_checker = MetastoreTableACLChecker(metastore_dict["acl_control"])
+        self.catalog_display_config = metastore_dict.get("catalog_display_config", {})
+        self.enable_catalog_support = self.catalog_display_config.get(
+            "enable_catalog_support", False)
+
+    def get_catalog_display_name(self, catalog_name: str = None) -> str:
+        """Get the display name for a catalog in this metastore.
+
+        Args:
+            catalog_name: The actual catalog name from the metastore. 
+                         If None, returns the configured display name or None.
+
+        Returns:
+            The display name if configured, otherwise returns the catalog_name as-is.
+        """
+        if not self.catalog_display_config:
+            return catalog_name
+
+        configured_display_name = self.catalog_display_config.get(
+            "catalog_display_name")
+        if configured_display_name:
+            return configured_display_name
+
+        return catalog_name
+
+    def _apply_catalog_settings(self, schema: DataSchema) -> DataSchema:
+        """
+        Apply catalog support settings to a schema.
+
+        Logic:
+        - If enable_catalog_support is False: return schema with catalog=None
+        - If enable_catalog_support is True and schema has no catalog: create default catalog
+        - If enable_catalog_support is True and schema has catalog: return as-is
+
+        Args:
+            schema: DataSchema from loader
+
+        Returns:
+            DataSchema with catalog settings applied
+        """
+        if not self.enable_catalog_support:
+            # Catalog support disabled - strip any catalog information
+            return DataSchema(name=schema.name, catalog=None)
+
+        # Catalog support enabled
+        if schema.catalog:
+            # Loader provided a catalog, use it
+            return schema
+
+        # Loader didn't provide a catalog, create default
+        default_catalog_name = self.catalog_display_config.get(
+            "catalog_display_name", "default")
+        default_catalog = DataCatalog(
+            name=default_catalog_name,
+            description="Default catalog"
+        )
+        return DataSchema(name=schema.name, catalog=default_catalog)
 
     @classmethod
     def get_table_metastore_link(
@@ -108,6 +195,57 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             )
         ]
 
+    def _ensure_catalog_exists(self, catalog_tuple: DataCatalog, session=None):
+        """
+        Ensure catalog exists in database, create if not found.
+
+        Args:
+            catalog_tuple: DataCatalog NamedTuple with catalog metadata (minimally just name)
+            session: Database session
+
+        Returns:
+            DataCatalog ORM object
+        """
+        if not catalog_tuple:
+            LOG.warning("No catalog information provided to ensure_catalog_exists")
+            return None
+
+        catalog_name = catalog_tuple.name
+        db_catalog = get_catalog_by_name(
+            catalog_name, self.metastore_id, session=session
+        )
+
+        if db_catalog:
+            LOG.info(
+                f"Found existing catalog: id={db_catalog.id}, name={db_catalog.name}")
+        else:
+            LOG.info(
+                f"Catalog '{catalog_name}' not found in database, creating new one")
+
+            # Try to get more detailed catalog info if the loader supports it
+            detailed_catalog = catalog_tuple
+            if hasattr(self, 'get_catalog_info'):
+                try:
+                    fetched_catalog = self.get_catalog_info(catalog_name)
+                    if fetched_catalog:
+                        detailed_catalog = fetched_catalog
+                except Exception as e:
+                    LOG.error(
+                        f"Could not get detailed catalog info for '{catalog_name}': {e}")
+
+            db_catalog = create_catalog(
+                name=detailed_catalog.name,
+                description=detailed_catalog.description if detailed_catalog.description else None,
+                metastore_id=self.metastore_id,
+                owner=detailed_catalog.owner if detailed_catalog.owner else None,
+                properties=detailed_catalog.properties if detailed_catalog.properties else None,
+                commit=False,
+                session=session,
+            )
+            # Flush to ensure the catalog gets an ID and is available in this transaction
+            session.flush()
+        return db_catalog
+
     @with_session
     def sync_table(
         self, schema_name: str, table_name: str, session=None
@@ -129,17 +267,45 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             Optional[int] -- None | table id | -1
         """
         try:
+            LOG.info("Syncing table %s.%s" % (schema_name, table_name))
+
+            # Parse schema identifier to extract catalog and schema first
+            catalog_tuple, parsed_schema_name, db_schema = parse_schema_identifier(
+                schema_name, self.metastore_id, session=session
+            )
+
+            # Build qualified schema name for ACL checking
+            qualified_schema_name = (
+                f"{catalog_tuple.name}.{parsed_schema_name}"
+                if catalog_tuple
+                else parsed_schema_name
+            )
+
             # return None if the table is not in the allow list or in the deny list
-            if not self.acl_checker.is_table_valid(schema_name, table_name):
+            if not self.acl_checker.is_table_valid(qualified_schema_name, table_name):
                 return None
 
             # get table from metastore
-            table, columns = self.get_table_and_columns(schema_name, table_name)
+            if self._method_accepts_param('get_table_and_columns', 'catalog_name'):
+                table, columns = self.get_table_and_columns(
+                    parsed_schema_name,
+                    table_name,
+                    catalog_name=catalog_tuple.name if catalog_tuple else None,
+                )
+            else:
+                # Fallback for loaders without catalog_name parameter
+                table, columns = self.get_table_and_columns(
+                    parsed_schema_name,
+                    table_name,
+                )
 
-            # get schema and table from querybook database
-            db_schema = get_schema_by_name(
-                schema_name, self.metastore_id, session=session
-            )
+            # Handle catalog if present
+            catalog_id = None
+            if catalog_tuple:
+                db_catalog = self._ensure_catalog_exists(catalog_tuple, session=session)
+                catalog_id = db_catalog.id if db_catalog else None
+
+            # get table from querybook database
             db_table = None
             if db_schema:
                 db_table = get_table_by_schema_id_and_name(
@@ -164,7 +330,8 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
                 # Create the schema first if doesn't exist in database
                 schema_is_newly_created = True
                 db_schema = create_schema(
-                    name=schema_name,
+                    name=parsed_schema_name,
+                    catalog_id=catalog_id,
                     table_count=1,
                     metastore_id=self.metastore_id,
                     commit=False,
@@ -172,7 +339,13 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
                 )
 
             table_id = self._create_table_table(
-                db_schema.id, schema_name, table_name, table, columns, session=session
+                db_schema.id,
+                parsed_schema_name,
+                table_name,
+                table,
+                columns,
+                session=session,
+                catalog_name=catalog_tuple.name if catalog_tuple else None,
             )
             # Remove creation of new schema if we failed to create table
             if table_id is None and schema_is_newly_created:
@@ -273,41 +446,78 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         """Similar to above, but only checks if schema exists in DB
 
         Args:
-            schema_name (str): Name of schema
+            schema_name (str): Name of schema (may be 'catalog.schema' or just 'schema')
 
         Returns:
             bool: True if exists
         """
-        schema_names = self.get_all_schema_names()
-        return schema_name in schema_names
+        schemas = self.get_all_schema_names()
+        # Check both the schema name directly and catalog.schema format
+        for schema in schemas:
+            # Backward compatibility: convert string schema names to DataSchema objects
+            if isinstance(schema, str):
+                schema = DataSchema(name=schema, catalog=None)
+
+            if schema.name == schema_name:
+                return True
+            if schema.catalog:
+                if f"{schema.catalog.name}.{schema.name}" == schema_name:
+                    return True
+        return False
 
     def load(self):
         schema_tables = []
-        schema_names = set(self._get_all_filtered_schema_names())
+        schemas = self._get_all_filtered_schemas()
 
         with DBSession() as session:
             current_schema_count = count_data_schema(self.metastore_id, session=session)
             LOG.info(
-                f"Found {len(schema_names)} schemas in metastore {self.metastore_id}, local schema count: {current_schema_count}"
+                f"Found {len(schemas)} schemas in metastore {self.metastore_id}, local schema count: {current_schema_count}"
             )
 
             self.delete_schema_not_in_metastore(
-                self.metastore_id, schema_names, session=session
+                self.metastore_id, schemas, session=session
             )
-            for schema_name in schema_names:
-                table_names = self._get_all_filtered_table_names(schema_name)
+            for schema in schemas:
+                # Get filtered table names for the schema
+                # The method handles both catalog extraction for qualified names (ACL checking)
+                # and simple schema name for metastore API calls
+                table_names = self._get_all_filtered_table_names(schema)
+
+                LOG.info(
+                    f"Processing schema '{schema.name}' (catalog={schema.catalog.name if schema.catalog else None}) with {len(table_names)} tables")
+
+                # Handle catalog if present
+                catalog_id = None
+                if schema.catalog:
+                    db_catalog = self._ensure_catalog_exists(
+                        schema.catalog, session=session)
+                    catalog_id = db_catalog.id if db_catalog else None
+
+                # Create or update schema with catalog_id
                 schema_id = create_schema(
-                    name=schema_name,
+                    name=schema.name,
+                    catalog_id=catalog_id,
                     table_count=len(table_names),
                     metastore_id=self.metastore_id,
                     session=session,
                 ).id
+
                 self.delete_table_not_in_metastore(
                     schema_id, table_names, session=session
                 )
+                # Use just the schema name (not qualified) for table operations
+                # The metastore APIs expect the simple schema/database name
+                # Extract catalog name from DataSchema object to pass explicitly
+                catalog_name = schema.catalog.name if schema.catalog else None
                 schema_tables += [
-                    (schema_id, schema_name, table_name) for table_name in table_names
+                    (schema_id, schema.name, table_name, catalog_name)
+                    for table_name in table_names
                 ]
+
+            # Commit all catalog and schema changes before proceeding to table creation
+            session.commit()
+
         self._create_tables_batched(schema_tables)
 
     def get_latest_partition(
@@ -328,7 +538,7 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         thread_num = 0
         while True:
             table_batch = schema_tables[
-                (thread_num * batch_size) : ((thread_num + 1) * batch_size)
+                (thread_num * batch_size): ((thread_num + 1) * batch_size)
             ]
             thread_num += 1
 
@@ -340,9 +550,14 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
 
     def _create_tables(self, schema_tables):
         with DBSession() as session:
-            for schema_id, schema_name, table in schema_tables:
+            for schema_id, schema_name, table, catalog_name in schema_tables:
                 self._create_table_table(
-                    schema_id, schema_name, table, from_batch=True, session=session
+                    schema_id,
+                    schema_name,
+                    table,
+                    from_batch=True,
+                    session=session,
+                    catalog_name=catalog_name,
                 )
 
     @with_session
@@ -355,6 +570,7 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         columns=None,
         from_batch=False,
         session=None,
+        catalog_name: Optional[str] = None,
     ):
         """Create or update a table.
         If detailed table info is given (parameter table and columns), it will just use
@@ -363,7 +579,15 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         """
         if not table:
             try:
-                table, columns = self.get_table_and_columns(schema_name, table_name)
+                if self._method_accepts_param('get_table_and_columns', 'catalog_name'):
+                    table, columns = self.get_table_and_columns(
+                        schema_name, table_name, catalog_name
+                    )
+                else:
+                    # Fallback for loaders without catalog_name parameter
+                    table, columns = self.get_table_and_columns(
+                        schema_name, table_name
+                    )
             except Exception:
                 LOG.error(traceback.format_exc())
 
@@ -503,19 +727,43 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         )
 
     @with_exception
-    def _get_all_filtered_schema_names(self) -> List[str]:
-        return [
-            schema_name
-            for schema_name in self.get_all_schema_names()
-            if self.acl_checker.is_schema_valid(schema_name)
-        ]
+    def _get_all_filtered_schemas(self) -> List["DataSchema"]:
+        all_schemas = self.get_all_schema_names()
+        filtered = []
+        for schema in all_schemas:
+            # Backward compatibility: convert string schema names to DataSchema objects
+            if isinstance(schema, str):
+                schema = DataSchema(name=schema, catalog=None)
+
+            # Apply catalog settings BEFORE filtering
+            schema = self._apply_catalog_settings(schema)
+
+            # Build qualified name for ACL checking
+            qualified_name = f"{schema.catalog.name}.{schema.name}" if schema.catalog else schema.name
+            if self.acl_checker.is_schema_valid(qualified_name):
+                filtered.append(schema)
+        return filtered
 
     @with_exception
-    def _get_all_filtered_table_names(self, schema_name: str) -> List[str]:
+    def _get_all_filtered_table_names(self, schema: DataSchema) -> List[str]:
+        # Build qualified name from DataSchema object for ACL checking
+        qualified_schema_name = (
+            f"{schema.catalog.name}.{schema.name}" if schema.catalog else schema.name
+        )
+
+        # Extract catalog name to pass explicitly
+        catalog_name = schema.catalog.name if schema.catalog else None
+
+        if self._method_accepts_param('get_all_table_names_in_schema', 'catalog_name'):
+            table_names = self.get_all_table_names_in_schema(schema.name, catalog_name)
+        else:
+            # Fallback for loaders without catalog_name parameter
+            table_names = self.get_all_table_names_in_schema(schema.name)
+
         return [
             table_name
-            for table_name in self.get_all_table_names_in_schema(schema_name)
-            if self.acl_checker.is_table_valid(schema_name, table_name)
+            for table_name in table_names
+            if self.acl_checker.is_table_valid(qualified_schema_name, table_name)
         ]
 
     def _get_batch_size(self, num_tables: int):
@@ -538,35 +786,67 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         return None
 
     @abstractmethod
-    def get_all_schema_names(self) -> List[str]:
-        """Override this to get a list of all schema names
+    def get_all_schema_names(self) -> List["DataSchema"] | List[str]:
+        """Override this to get a list of all schemas with their catalog information
 
         Returns:
-            List[str] -- [schema name]
+            List[DataSchema] -- List of DataSchema NamedTuples with name and optional catalog
         """
         pass
 
+    @overload
+    def get_all_table_names_in_schema(
+        self, schema_name: str
+    ) -> List[str]:
+        """Get table names using 2-level naming (schema.table)"""
+        pass
+
+    @overload
+    def get_all_table_names_in_schema(
+        self, schema_name: str, catalog_name: Optional[str]
+    ) -> List[str]:
+        """Get table names using 3-level naming (catalog.schema.table)"""
+        pass
+
     @abstractmethod
-    def get_all_table_names_in_schema(self, schema_name: str) -> List[str]:
+    def get_all_table_names_in_schema(
+        self, schema_name: str, catalog_name: Optional[str] = None
+    ) -> List[str]:
         """Override this to get a list of all table names under given schema
 
         Arguments:
             schema_name {str}
+            catalog_name {Optional[str]}
 
         Returns:
             List[str] -- [A list of tbale names]
         """
         pass
 
-    @abstractmethod
+    @overload
     def get_table_and_columns(
         self, schema_name: str, table_name: str
+    ) -> Tuple[DataTable, List[DataColumn]]:
+        """Get table metadata using 2-level naming (schema.table)"""
+        pass
+
+    @overload
+    def get_table_and_columns(
+        self, schema_name: str, table_name: str, catalog_name: Optional[str]
+    ) -> Tuple[DataTable, List[DataColumn]]:
+        """Get table metadata using 3-level naming (catalog.schema.table)"""
+        pass
+
+    @abstractmethod
+    def get_table_and_columns(
+        self, schema_name: str, table_name: str, catalog_name: Optional[str] = None
     ) -> Tuple[DataTable, List[DataColumn]]:
         """Override this to get the table given by schema name and table name, and a list of its columns
 
         Arguments:
             schema_name {[str]}
             table_name {[str]}
+            catalog_name {Optional[str]}
 
         Returns:
             Tuple[DataTable, List[DataColumn]] -- Return [null, null] if not found
@@ -613,10 +893,35 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         }
 
     @with_session
-    def delete_schema_not_in_metastore(self, metastore_id, schema_names, session=None):
+    def delete_schema_not_in_metastore(self, metastore_id, schemas, session=None):
+        """
+        Delete schemas from DB that are not in the metastore.
+
+        Args:
+            metastore_id: The metastore ID
+            schemas: List of DataSchema NamedTuples from metastore
+            session: DB session
+        """
+        # Build a set of expected (catalog_name, schema_name) tuples from metastore
+        expected_schemas = set()
+        for schema in schemas:
+            catalog_name = schema.catalog.name if schema.catalog else None
+            expected_schemas.add((catalog_name, schema.name))
+
+        # Check each schema in DB
         for data_schema in iterate_data_schema(metastore_id, session=session):
             LOG.info("checking schema %d" % data_schema.id)
-            if data_schema.name not in schema_names:
+
+            # Get catalog name for this schema
+            catalog_name = None
+            if data_schema.catalog_id:
+                db_catalog = get_catalog_by_id(data_schema.catalog_id, session=session)
+                catalog_name = db_catalog.name if db_catalog else None
+
+            # Check if (catalog_name, schema_name) pair exists in expected set
+            schema_key = (catalog_name, data_schema.name)
+
+            if schema_key not in expected_schemas:
                 # We delete table 1 by 1 since we need to delete it for elasticsearch
                 # Maybe we can optimize it to allow batch deletion
                 for table in data_schema.tables:
@@ -625,6 +930,7 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
                     delete_es_table_by_id(table_id)
                 delete_schema(id=data_schema.id, commit=False, session=session)
                 LOG.info(f"Deleted schema {data_schema.name} ({data_schema.id})")
+
         session.commit()
 
     @with_session

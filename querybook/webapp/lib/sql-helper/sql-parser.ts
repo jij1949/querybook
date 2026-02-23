@@ -164,8 +164,15 @@ export class SqlParser {
         if (tokenText.includes('.')) {
             const tableNames: Array<Partial<TableToken>> = [];
             const context = tokenText.split('.');
-            // for the case of schema.table.column
-            if (context.length === 3) {
+            // for the case of catalog.schema.table.column
+            if (context.length === 4) {
+                tableNames.push({
+                    catalog: context[0],
+                    schema: context[1],
+                    name: context[2],
+                });
+            } else if (context.length === 3) {
+                // for the case of schema.table.column
                 tableNames.push({
                     schema: context[0],
                     name: context[1],
@@ -242,10 +249,10 @@ export class SqlParser {
             prefix
         );
 
-        // Filter out table names that are not in the format of schema.table
+        // Filter out table names that are in the format of schema.table or catalog.schema.table
         return tableNames.filter((tableName) => {
-            const schemaTableNames = tableName.split('.');
-            return schemaTableNames.length === 2;
+            const parts = tableName.split('.');
+            return parts.length === 2 || parts.length === 3;
         });
     }
 
@@ -299,7 +306,14 @@ export class SqlParser {
         const { dataSources } = reduxStore.getState();
 
         const dataTables = tableNames
-            .map((table) => `${table.schema}.${table.name}`)
+            .map((table) => {
+                // Build table name with catalog if present
+                if (table.catalog) {
+                    return `${table.catalog}.${table.schema}.${table.name}`;
+                } else {
+                    return `${table.schema}.${table.name}`;
+                }
+            })
             .filter(
                 (tableName) =>
                     tableName in

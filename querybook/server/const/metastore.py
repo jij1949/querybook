@@ -4,8 +4,16 @@ from typing import NamedTuple, TypedDict
 from .data_element import DataElementAssociationTuple
 
 
+class DataCatalog(NamedTuple):
+    name: str
+    description: str = None
+    owner: str = None
+    properties: dict = None
+
+
 class DataSchema(NamedTuple):
     name: str
+    catalog: DataCatalog = None
 
 
 class DataTableLink(TypedDict):

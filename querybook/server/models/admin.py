@@ -177,6 +177,34 @@ class QueryMetastore(CRUDMixin, Base):
 
     acl_control = sql.Column(sql.JSON, default={}, nullable=False)
 
+    # Catalog display settings stored as JSON
+    catalog_display_config = sql.Column(
+        sql.JSON,
+        default={"show_catalog_in_ui": False, "enable_catalog_support": False},
+        nullable=False
+    )
+
+    @property
+    def show_catalog_in_ui(self):
+        """Get the show_catalog_in_ui setting from config."""
+        if not self.catalog_display_config:
+            return False
+        return self.catalog_display_config.get("show_catalog_in_ui", False)
+
+    @property
+    def catalog_display_name(self):
+        """Get the catalog_display_name setting from config."""
+        if not self.catalog_display_config:
+            return None
+        return self.catalog_display_config.get("catalog_display_name")
+
+    @property
+    def enable_catalog_support(self):
+        """Get the enable_catalog_support setting from config."""
+        if not self.catalog_display_config:
+            return False
+        return self.catalog_display_config.get("enable_catalog_support", False)
+
     def to_dict(self, with_flags=False):
         from lib.metastore import get_metastore_loader_class_by_name
 
@@ -186,6 +214,7 @@ class QueryMetastore(CRUDMixin, Base):
             "name": self.name,
             "config": loader_class.loader_config.to_dict(),
             "owner_types": [t._asdict() for t in loader_class.get_table_owner_types()],
+            "catalog_display_config": self.catalog_display_config,
         }
 
         if with_flags:
@@ -207,7 +236,28 @@ class QueryMetastore(CRUDMixin, Base):
             "loader": self.loader,
             "metastore_params": self.metastore_params,
             "acl_control": self.acl_control,
+            "catalog_display_config": self.catalog_display_config,
         }
+
+    def get_catalog_display_name(self, catalog_name=None):
+        """
+        Get the display name for a catalog in this metastore.
+
+        Args:
+            catalog_name: Optional catalog name. If None, returns metastore display name.
+
+        Returns:
+            Display name string, or None if catalog should be hidden
+        """
+        if not self.show_catalog_in_ui:
+            return None
+
+        # Use custom display name if set
+        if self.catalog_display_name:
+            return self.catalog_display_name
+
+        # Otherwise use actual catalog name
+        return catalog_name
 
 
 class APIAccessToken(CRUDMixin, Base):

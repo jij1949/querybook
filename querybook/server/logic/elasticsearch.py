@@ -19,6 +19,7 @@ from lib.logger import get_logger
 from lib.query_analysis import lineage as lineage_lib
 from lib.query_analysis.lineage import get_table_statement_type
 from lib.richtext import richtext_to_plaintext
+from lib.table_name_formatter import format_table_name_for_display
 from lib.utils.utils import DATETIME_TO_UTC, with_exception
 from logic import admin as admin_logic
 from logic import datadoc as datadoc_logic
@@ -570,7 +571,23 @@ def table_to_es(table, fields=None, session=None):
     schema = table.data_schema
     schema_name = schema.name
     table_name = table.name
-    full_name = "{}.{}".format(schema_name, table_name)
+
+    # Get catalog information
+    catalog = schema.catalog
+    catalog_name = catalog.name if catalog else None
+    catalog_id = catalog.id if catalog else None
+
+    # Build full name with catalog-aware display logic
+    full_name = format_table_name_for_display(
+        table_name=table_name,
+        schema_name=schema_name,
+        catalog_name=catalog_name,
+        metastore_id=schema.metastore_id,
+        session=session,
+    )
+
+    # Keep schema_table_name for autocomplete
+    schema_table_name = f"{schema_name}.{table_name}"
 
     # columns may be associated with the same data element
     data_elements = {d.name: d for c in table.columns for d in c.data_elements}.values()
@@ -601,11 +618,16 @@ def table_to_es(table, fields=None, session=None):
         return weight
 
     def get_completion_name():
+        input_list = [
+            full_name,
+            table_name,
+        ]
+        # Add schema.table format for autocomplete if catalog present
+        if catalog_name:
+            input_list.append(schema_table_name)
+
         return {
-            "input": [
-                full_name,
-                table_name,
-            ],
+            "input": input_list,
             "weight": compute_weight(),
             "contexts": {
                 "metastore_id": schema.metastore_id,
@@ -615,7 +637,10 @@ def table_to_es(table, fields=None, session=None):
     field_to_getter = {
         "id": table.id,
         "metastore_id": schema.metastore_id,
+        "catalog_id": catalog_id,
+        "catalog": catalog_name,
         "schema": schema_name,
+        "schema_table_name": schema_table_name,
         "name": table_name,
         "full_name": full_name,
         "full_name_ngram": full_name,

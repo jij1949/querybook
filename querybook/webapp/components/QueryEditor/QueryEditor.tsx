@@ -8,6 +8,7 @@ import React, {
     useMemo,
     useState,
 } from 'react';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 
 import { CodeEditor } from 'components/CodeEditor/CodeEditor';
@@ -31,6 +32,8 @@ import { mixedSQL } from 'lib/codemirror/codemirror-mixed';
 import { format, ISQLFormatOptions } from 'lib/sql-helper/sql-formatter';
 import { TableToken } from 'lib/sql-helper/sql-lexer';
 import { navigateWithinEnv } from 'lib/utils/query-string';
+import { getTableTokenDisplayName } from 'lib/utils/table-identifier';
+import { IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
 
 import './QueryEditor.scss';
@@ -128,6 +131,12 @@ export const QueryEditor: React.FC<
         const editorRef = React.useRef<ReactCodeMirrorRef>();
         const [fullScreen, setFullScreen] = useState(false);
 
+        // Get metastore to check catalog display settings
+        const metastore = useSelector((state: IStoreState) =>
+            metastoreId ? state.dataSources.queryMetastoreById[metastoreId] : null
+        );
+        const showCatalog = metastore?.catalog_display_config?.show_catalog_in_ui ?? false;
+
         const formatQuery = useCallback(
             (options: ISQLFormatOptions) => {
                 options = {
@@ -214,11 +223,11 @@ export const QueryEditor: React.FC<
         const tableNamesSet = useMemo(
             () =>
                 new Set(
-                    tableReferences.map(
-                        (table) => `${table.schema}.${table.name}`
+                    tableReferences.map((table) =>
+                        getTableTokenDisplayName(table, showCatalog)
                     )
                 ),
-            [tableReferences]
+            [tableReferences, showCatalog]
         );
 
         const { isLinting, lintDiagnostics, lintSummary, forceTableLint } =
@@ -247,7 +256,8 @@ export const QueryEditor: React.FC<
                 const tablesMap = tableReferences.reduce(
                     (obj, tableRef, index) => {
                         if (tables[index]) {
-                            const fullTableName = `${tableRef.schema}.${tableRef.name}`;
+                            const fullTableName =
+                                getTableTokenDisplayName(tableRef, showCatalog);
                             return { ...obj, [fullTableName]: tables[index] };
                         } else {
                             return obj;

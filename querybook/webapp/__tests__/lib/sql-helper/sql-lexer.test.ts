@@ -104,6 +104,7 @@ WHERE table_2.field_1 = (
 
 test('findTableReferenceAndAlias', () => {
     const tokenTableA = {
+        catalog: '',
         end: 9,
         line: 5,
         name: 'table_a',
@@ -111,6 +112,7 @@ test('findTableReferenceAndAlias', () => {
         start: 2,
     };
     const tokenTableB = {
+        catalog: '',
         end: 14,
         line: 6,
         name: 'table_b',
@@ -146,6 +148,7 @@ AND extract(YEAR FROM field_1_date) = t2.field_year`
         aliases: {
             0: {
                 t2: {
+                    catalog: '',
                     end: 12,
                     line: 2,
                     name: 'table_2',
@@ -157,6 +160,7 @@ AND extract(YEAR FROM field_1_date) = t2.field_year`
         references: {
             0: [
                 {
+                    catalog: '',
                     end: 12,
                     line: 2,
                     name: 'table_2',
@@ -164,6 +168,7 @@ AND extract(YEAR FROM field_1_date) = t2.field_year`
                     start: 5,
                 },
                 {
+                    catalog: '',
                     end: 12,
                     line: 3,
                     name: 'table_1',
@@ -196,6 +201,7 @@ WHERE table_2.field_1 = (
         aliases: {
             0: {
                 t2: {
+                    catalog: '',
                     end: 12,
                     line: 5,
                     name: 'table_2',
@@ -207,6 +213,7 @@ WHERE table_2.field_1 = (
         references: {
             0: [
                 {
+                    catalog: '',
                     end: 25,
                     line: 2,
                     name: 'table_4',
@@ -214,6 +221,7 @@ WHERE table_2.field_1 = (
                     start: 18,
                 },
                 {
+                    catalog: '',
                     end: 12,
                     line: 5,
                     name: 'table_2',
@@ -221,6 +229,7 @@ WHERE table_2.field_1 = (
                     start: 5,
                 },
                 {
+                    catalog: '',
                     end: 16,
                     line: 8,
                     name: 'table_1',

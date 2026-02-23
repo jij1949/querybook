@@ -352,6 +352,7 @@ class TableTestCase(TestCase):
     def _get_data_schema_mock(self):
         mock_data_schema = MagicMock(metastore_id=self.METASTORE_ID)
         mock_data_schema.name = self.SCHEMA_NAME
+        mock_data_schema.catalog = None
         return mock_data_schema
 
     def _get_data_element_mock(self, name: str, description: str):
@@ -406,7 +407,10 @@ class TableTestCase(TestCase):
         expected_result = {
             "id": self.TABLE_ID,
             "metastore_id": self.METASTORE_ID,
+            "catalog_id": None,
+            "catalog": None,
             "schema": self.SCHEMA_NAME,
+            "schema_table_name": self.FULL_NAME,
             "name": self.TABLE_NAME,
             "full_name": self.FULL_NAME,
             "full_name_ngram": self.FULL_NAME,

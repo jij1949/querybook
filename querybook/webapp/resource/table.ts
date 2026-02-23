@@ -127,10 +127,13 @@ export const QueryMetastoreResource = {
 
 export const TableResource = {
     get: (tableId: number) => ds.fetch<IDataTable>(`/table/${tableId}/`),
-    getByName: (metastoreId: number, schemaName: string, tableName: string) =>
-        ds.fetch<IDataTable>(`/table_name/${schemaName}/${tableName}/`, {
-            metastore_id: metastoreId,
-        }),
+    getByName: (metastoreId: number, schemaName: string, tableName: string, catalogName?: string) => {
+        const params: any = { metastore_id: metastoreId };
+        if (catalogName) {
+            params.catalog_name = catalogName;
+        }
+        return ds.fetch<IDataTable>(`/table_name/${schemaName}/${tableName}/`, params);
+    },
     getColumnDetails: (tableId: number) =>
         ds.fetch<IDetailedDataColumn[]>(`/table/${tableId}/detailed_column/`),
 
