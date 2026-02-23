@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.129.0](https://github.com/eg-internal/querybook/compare/v0.128.0...v0.129.0) (2026-02-23)
+
+
+### Features
+
+* Catalog Implementation ([#496](https://github.com/eg-internal/querybook/issues/496)) ([e18fc46](https://github.com/eg-internal/querybook/commit/e18fc465850e53e883620029740bf9231535c0d9))
+
 ## [0.128.0](https://github.com/eg-internal/querybook/compare/v0.127.0...v0.128.0) (2026-02-17)
 
 
