@@ -214,7 +214,10 @@ class QueryMetastore(CRUDMixin, Base):
             "name": self.name,
             "config": loader_class.loader_config.to_dict(),
             "owner_types": [t._asdict() for t in loader_class.get_table_owner_types()],
-            "catalog_display_config": self.catalog_display_config,
+            "catalog_display_config": self.catalog_display_config or {
+                "show_catalog_in_ui": False,
+                "enable_catalog_support": False
+            },
         }
 
         if with_flags:
@@ -236,7 +239,10 @@ class QueryMetastore(CRUDMixin, Base):
             "loader": self.loader,
             "metastore_params": self.metastore_params,
             "acl_control": self.acl_control,
-            "catalog_display_config": self.catalog_display_config,
+            "catalog_display_config": self.catalog_display_config or {
+                "show_catalog_in_ui": False,
+                "enable_catalog_support": False
+            },
         }
 
     def get_catalog_display_name(self, catalog_name=None):

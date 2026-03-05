@@ -40,8 +40,7 @@ def upgrade():
             "UPDATE query_metastore "
             "SET catalog_display_config = :config "
             "WHERE catalog_display_config IS NULL"
-        ),
-        {"config": '{"show_catalog_in_ui": false}'}
+        ).bindparams(config='{"show_catalog_in_ui": false}')
     )
 
     # Step 3: Make the column NOT NULL
