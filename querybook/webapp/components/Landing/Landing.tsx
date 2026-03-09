@@ -129,7 +129,18 @@ const DefaultLanding: React.FC = ({ children }) => {
                                 to="https://metrics-platform-ui.rcp.data.dw.exp-aws.net/prod"
                                 newTab
                             >
-                                Open EGMP <Icon name="ExternalLink" size={14} />
+                                <span
+                                    onClick={() =>
+                                        trackClick({
+                                            component:
+                                                ComponentType.LANDING_PAGE,
+                                            element: ElementType.EGMP_LINK,
+                                        })
+                                    }
+                                >
+                                    Open EGMP{' '}
+                                    <Icon name="ExternalLink" size={14} />
+                                </span>
                             </Link>
                         </Message>
                         <Message
@@ -151,8 +162,18 @@ const DefaultLanding: React.FC = ({ children }) => {
                             Explore key business insights on Expedia Group's
                             performance.{' '}
                             <Link to="https://eg-pulse.expedia.biz/" newTab>
-                                Open EG Pulse{' '}
-                                <Icon name="ExternalLink" size={14} />
+                                <span
+                                    onClick={() =>
+                                        trackClick({
+                                            component:
+                                                ComponentType.LANDING_PAGE,
+                                            element: ElementType.EG_PULSE_LINK,
+                                        })
+                                    }
+                                >
+                                    Open EG Pulse{' '}
+                                    <Icon name="ExternalLink" size={14} />
+                                </span>
                             </Link>
                         </Message>
                     </div>
