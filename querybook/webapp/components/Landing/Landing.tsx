@@ -20,6 +20,7 @@ import {
 import { currentEnvironmentSelector } from 'redux/environment/selector';
 import { IStoreState } from 'redux/store/types';
 import { Column, Columns } from 'ui/Column/Column';
+import { Icon } from 'ui/Icon/Icon';
 import { Link } from 'ui/Link/Link';
 import { Markdown } from 'ui/Markdown/Markdown';
 import { Message } from 'ui/Message/Message';
@@ -103,26 +104,57 @@ const DefaultLanding: React.FC = ({ children }) => {
 
     const LandingFooter = (
         <div className="Landing-bottom flex-column">
-            <Columns>
+            <Columns style={{ alignSelf: 'stretch' }}>
                 <Column>
-                    <div className="Landing-section-title">Other Tools ✨</div>
-                    <div className="Landing-list">
-                        <div>
+                    <div className="Landing-section-title">Other Tools</div>
+                    <div style={{ marginLeft: '-8px' }}>
+                        <Message
+                            type="info"
+                            title={
+                                <div className="flex-row">
+                                    <img
+                                        src="/static/egmp.svg"
+                                        style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            marginRight: '8px',
+                                        }}
+                                    />
+                                    EG Metrics Platform
+                                </div>
+                            }
+                        >
+                            The single source-of-truth for metrics across EG.{' '}
                             <Link
                                 to="https://metrics-platform-ui.rcp.data.dw.exp-aws.net/prod"
-                                newTab={true}
+                                newTab
                             >
-                                EG Metrics Platform 📊
+                                Open EGMP <Icon name="ExternalLink" size={14} />
                             </Link>
-                        </div>
-                        <div>
-                            <Link
-                                to="https://eg-pulse.expedia.biz/"
-                                newTab={true}
-                            >
-                                EG Pulse 💖
+                        </Message>
+                        <Message
+                            type="info"
+                            title={
+                                <div className="flex-row">
+                                    <img
+                                        src="/static/egpulse.svg"
+                                        style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            marginRight: '8px',
+                                        }}
+                                    />
+                                    EG Pulse
+                                </div>
+                            }
+                        >
+                            Explore key business insights on Expedia Group's
+                            performance.{' '}
+                            <Link to="https://eg-pulse.expedia.biz/" newTab>
+                                Open EG Pulse{' '}
+                                <Icon name="ExternalLink" size={14} />
                             </Link>
-                        </div>
+                        </Message>
                     </div>
                 </Column>
             </Columns>
