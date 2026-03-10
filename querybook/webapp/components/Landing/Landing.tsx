@@ -220,28 +220,34 @@ const DefaultLanding: React.FC = ({ children }) => {
                     </div>
                 </Column>
             </Columns>
-            <Columns>
+            <Columns style={{ alignSelf: 'stretch' }}>
                 <Column>
                     <div style={{ marginLeft: '-8px' }}>
-                        <Message type="tip">
-                            <div className="flex-row">
-                                <img
-                                    src="/static/workbench.png"
-                                    style={{
-                                        width: '24px',
-                                        marginRight: '4px',
-                                    }}
-                                />{' '}
-                                Try out Ava, our new AI Agent! Now available in
-                                the sidebar or on{' '}
-                                <Link
-                                    to="https://analytics.expedia.biz/"
-                                    newTab={true}
-                                >
-                                    Analytics Workbench
-                                </Link>{' '}
-                                🎉
-                            </div>
+                        <Message
+                            type="tip"
+                            title={
+                                <div className="flex-row">
+                                    <img
+                                        src="/static/workbench.png"
+                                        style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            marginRight: '8px',
+                                        }}
+                                    />
+                                    Ava &mdash; Analytics Virtual Agent
+                                </div>
+                            }
+                        >
+                            Try out Ava, our new AI Agent! Now available in the
+                            sidebar or on{' '}
+                            <Link
+                                to="https://analytics.expedia.biz/"
+                                newTab={true}
+                            >
+                                Analytics Workbench
+                            </Link>{' '}
+                            🎉
                         </Message>
                     </div>
                 </Column>
