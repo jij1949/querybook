@@ -38,16 +38,19 @@ elasticsearch==8.18.1
 sqlglot[rs]==22.1.1
 sqlparse==0.2.3
 beautifulsoup4==4.8.2
-markdown2
+markdown2==2.5.4
 
 # Utils
 pandas==1.5.3
-typing-extensions>=4.11,<5
+typing-extensions==4.15.0
 setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
 numpy>=1.22.2,<2.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
 
 # Excel export
 openpyxl==3.1.2
+
+# MCP server
+fastmcp==3.0.2
 
 # Query engine - PostgreSQL
 #psycopg2==2.9.5 # it's installed in engine/postgres.txt

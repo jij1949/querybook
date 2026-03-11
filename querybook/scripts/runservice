@@ -41,6 +41,9 @@ case "$SERVICE_NAME" in
 "flower")
     COMMAND="celery -A tasks.all_tasks flower"
     ;;
+"mcp")
+    COMMAND="watchmedo auto-restart -d querybook -p '*.py' -R -- python3 querybook/server/run_mcp.py"
+    ;;
 esac
 
 if [ -z "$COMMAND" ]; then

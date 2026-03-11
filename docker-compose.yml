@@ -58,6 +58,7 @@ services:
         profiles:
             - all
             - worker
+            - mcp
     scheduler:
         container_name: querybook_scheduler
         image: *querybook-image
@@ -89,6 +90,7 @@ services:
             - all
             - infra
             - redis
+            - mcp
     mysql:
         container_name: querybook_mysql
         image: mysql:8.0
@@ -123,6 +125,7 @@ services:
             - all
             - infra
             - mysql
+            - mcp
     elasticsearch:
         container_name: querybook_elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:8.18.1 # EG QB version
@@ -157,6 +160,7 @@ services:
             - all
             - infra
             - elasticsearch
+            - mcp
 
     #
     # Kibana - Elasticsearch visualization
@@ -178,6 +182,28 @@ services:
         profiles:
             - extras
             - kibana
+
+    #
+    # MCP Server
+    #
+    mcp:
+        container_name: querybook_mcp
+        image: *querybook-image
+        tty: true
+        stdin_open: true
+        command: './querybook/scripts/runservice mcp'
+        ports:
+            - '${MCP_PORT:-8771}:${MCP_PORT:-8771}'
+        expose:
+            - '${MCP_PORT:-8771}'
+        environment:
+            MCP_PORT: '${MCP_PORT:-8771}'
+        env_file:
+            - ./.env.local
+        volumes: *querybook-volumes
+        profiles:
+            - all
+            - mcp
 
     #
     # Flower - Celery monitoring

@@ -52,3 +52,6 @@ querybook/webapp/coverage/
 build
 
 requirements/local.txt
+
+
+.claude/settings.local.json
