@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.130.0](https://github.com/eg-internal/querybook/compare/v0.129.0...v0.130.0) (2026-03-12)
+
+
+### Features
+
+* Add Catalog Strict Filter Pattern to ACL ([#511](https://github.com/eg-internal/querybook/issues/511)) ([a58f26f](https://github.com/eg-internal/querybook/commit/a58f26f22ff9d98c6bebe50913e2f252c8817ac9))
+* EG Specific Databricks and Glue Metastore Loaders ([#506](https://github.com/eg-internal/querybook/issues/506)) ([c7624f6](https://github.com/eg-internal/querybook/commit/c7624f627e24b28a648b04fe3b93d27b349d17cc))
+* Querybook MCP Server ([#505](https://github.com/eg-internal/querybook/issues/505)) ([f30c629](https://github.com/eg-internal/querybook/commit/f30c6292558ebc2f8c9acbb2f417c7e172d02ff9))
+
+
+### Bug Fixes
+
+* Add CLAUDE.md and .claude/context/ files ([#507](https://github.com/eg-internal/querybook/issues/507)) ([5b1f88d](https://github.com/eg-internal/querybook/commit/5b1f88db0fbbe9b264e728d4c78c925aecec85b2))
+* Fix catalog support migration issues ([#508](https://github.com/eg-internal/querybook/issues/508)) ([46d69a3](https://github.com/eg-internal/querybook/commit/46d69a3a6a539e51f2e535cc5695210d022efd80))
+* Track EGMP / Pulse clicks ([51b9bf0](https://github.com/eg-internal/querybook/commit/51b9bf01e170cd852b184f8626c6eacd8faa767e))
+* Update Ava branding to match ([1626ea8](https://github.com/eg-internal/querybook/commit/1626ea85956ddc0590c4baa518bf95e6e06acbbf))
+* Update EGMP/Pulse branding on landing page ([7811254](https://github.com/eg-internal/querybook/commit/78112544c0dd90d683e561be998565fe4cbd8a5c))
+
 ## [0.129.0](https://github.com/eg-internal/querybook/compare/v0.128.0...v0.129.0) (2026-02-23)
 
 
