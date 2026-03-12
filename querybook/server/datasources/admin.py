@@ -302,6 +302,7 @@ def create_metastore(
     metastore_params,
     loader,
     acl_control=None,
+    catalog_display_config=None,
 ):
     with DBSession() as session:
         # TODO: validate executor params
@@ -311,6 +312,7 @@ def create_metastore(
                 "metastore_params": metastore_params,
                 "loader": loader,
                 "acl_control": acl_control,
+                "catalog_display_config": catalog_display_config,
             },
             session=session,
         )

@@ -55,3 +55,4 @@ requirements/local.txt
 
 
 .claude/settings.local.json
+docs/superpowers/

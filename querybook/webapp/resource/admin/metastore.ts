@@ -16,13 +16,15 @@ export const AdminMetastoreResource = {
         name: IAdminMetastore['name'],
         metastoreParams: IAdminMetastore['metastore_params'],
         loader: IAdminMetastore['loader'],
-        aclControl: IAdminMetastore['acl_control']
+        aclControl: IAdminMetastore['acl_control'],
+        catalogDisplayConfig: IAdminMetastore['catalog_display_config']
     ) =>
         ds.save<IAdminMetastore>(`/admin/query_metastore/`, {
             name,
             metastore_params: metastoreParams,
             loader,
             acl_control: aclControl,
+            catalog_display_config: catalogDisplayConfig,
         }),
 
     update: (metastoreId: number, metastore: Partial<IAdminMetastore>) =>

@@ -73,7 +73,8 @@ export const AdminMetastore: React.FunctionComponent<IProps> = ({
                 metastore.name,
                 metastore.metastore_params,
                 metastore.loader,
-                metastore.acl_control
+                metastore.acl_control,
+                metastore.catalog_display_config
             );
 
             await loadMetastores();
@@ -171,31 +172,69 @@ export const AdminMetastore: React.FunctionComponent<IProps> = ({
             );
         }
 
+        const helpContent = `
+### ACL Pattern Syntax
+
+**Catalog-level wildcards (all schemas/tables in catalog):**
+- \`catalog.*.*\` - Explicit form (recommended)
+- \`catalog.*\` - Shorthand form
+
+**Schema-level wildcards:**
+- \`schema.*\` - All tables in schema (2-level)
+- \`catalog.schema.*\` - All tables in schema (3-level)
+
+**Exact table matches:**
+- \`table_name\` - Single table in default schema
+- \`schema.table_name\` - Specific table (2-level)
+- \`catalog.schema.table_name\` - Specific table (3-level)
+
+**Prefix wildcards:**
+- \`schema.prefix_*\` - Tables starting with prefix (2-level)
+- \`catalog.schema.prefix_*\` - Tables starting with prefix (3-level)
+
+**Examples:**
+- \`production.*.*\` - All production catalog data
+- \`staging.analytics.*\` - All tables in staging.analytics
+- \`dev.test.temp_*\` - All temp tables in dev.test
+
+**Note:** Patterns are case-sensitive and matched at sync time.
+`.trim();
+
         const tablesDOM = (
-            <SmartForm
-                formField={{
-                    field_type: 'list',
-                    of: {
-                        description:
-                            aclControl.type === 'denylist'
-                                ? 'Table to Denylist'
-                                : 'Table to Allowlist',
-                        field_type: 'string',
-                        helper: '',
-                        hidden: false,
-                        required: true,
-                    },
-                    max: null,
-                    min: 1,
-                }}
-                value={aclControl.tables}
-                onChange={(path, value) =>
-                    onChange(
-                        `acl_control.tables`,
-                        updateValue(aclControl.tables, path, value)
-                    )
-                }
-            />
+            <div>
+                <div className="flex-row" style={{ alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ marginRight: '8px' }}>
+                        {aclControl.type === 'denylist' ? 'Tables to Denylist' : 'Tables to Allowlist'}
+                    </span>
+                    <InfoButton layout={['right']}>
+                        <Markdown>{helpContent}</Markdown>
+                    </InfoButton>
+                </div>
+                <SmartForm
+                    formField={{
+                        field_type: 'list',
+                        of: {
+                            description:
+                                aclControl.type === 'denylist'
+                                    ? 'Table to Denylist'
+                                    : 'Table to Allowlist',
+                            field_type: 'string',
+                            helper: '',
+                            hidden: false,
+                            required: true,
+                        },
+                        max: null,
+                        min: 1,
+                    }}
+                    value={aclControl.tables}
+                    onChange={(path, value) =>
+                        onChange(
+                            `acl_control.tables`,
+                            updateValue(aclControl.tables, path, value)
+                        )
+                    }
+                />
+            </div>
         );
         return (
             <>

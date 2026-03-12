@@ -4,6 +4,39 @@ from app.db import with_session
 
 
 class MetastoreTableACLChecker(object):
+    """
+    ACL checker for filtering metastore tables and schemas.
+
+    Supported pattern types:
+
+    Catalog wildcards (all schemas/tables in catalog):
+        - catalog.*.* (explicit 3-part form, recommended)
+        - catalog.* (2-part shorthand form)
+
+    Schema wildcards:
+        - schema.* (2-level: all tables in schema)
+        - catalog.schema.* (3-level: all tables in catalog.schema)
+
+    Exact matches:
+        - table_name (defaults to default.table_name)
+        - schema.table_name (2-level)
+        - catalog.schema.table_name (3-level)
+
+    Prefix wildcards:
+        - schema.prefix_* (2-level)
+        - catalog.schema.prefix_* (3-level)
+
+    Pattern matching is position-aware:
+        - catalog.*.* only matches when the catalog name is at position 0
+        - catalog_2.catalog_1.* does NOT match catalog_1.*.* pattern
+
+    Examples:
+        allowlist with ["production.*.*", "staging.analytics.*"]
+        - Syncs all of production catalog
+        - Syncs only staging.analytics schema
+        - Blocks everything else
+    """
+
     def __init__(self, acl_config: Dict):
         self._type = acl_config.get("type")
         self._catalog_wildcards = set()  # Store catalog.* patterns
@@ -13,6 +46,15 @@ class MetastoreTableACLChecker(object):
         tables_by_schema = {}
         for table in tables:
             full_name = table.split(".")
+
+            # Detect catalog.*.* pattern (3 parts, both wildcards)
+            # This is the explicit form for catalog-level wildcarding.
+            # Example: "production.*.*" matches all schemas and tables in production catalog.
+            # Note: This is position-aware - only matches when catalog name is at position 0.
+            if len(full_name) == 3 and full_name[1] == "*" and full_name[2] == "*":
+                catalog_name = full_name[0]
+                self._catalog_wildcards.add(catalog_name)
+                continue  # Skip adding to tables_by_schema
 
             # Detect catalog.* pattern (2 parts with second part = *)
             # Also add to _catalog_wildcards for catalog-level matching

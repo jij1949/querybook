@@ -800,3 +800,97 @@ class TestThreeLevelPrefixPatterns:
 
         # Other locations - blocked
         assert not checker.is_table_valid("dev.sales", "orders")
+
+
+class TestCatalogTripleWildcard:
+    """Test catalog.*.* pattern (explicit 3-part catalog wildcard)"""
+
+    def test_allowlist_triple_wildcard_allows_all_tables(self):
+        """Test that catalog.*.* in allowlist allows all tables in that catalog"""
+        acl_config = {"type": "allowlist", "tables": ["production.*.*"]}
+        checker = MetastoreTableACLChecker(acl_config)
+
+        # Should allow any table in production catalog
+        assert checker.is_table_valid("production.sales", "orders")
+        assert checker.is_table_valid("production.hr", "employees")
+
+        # Should block tables in other catalogs
+        assert not checker.is_table_valid("staging.sales", "orders")
+
+    def test_allowlist_triple_wildcard_allows_all_schemas(self):
+        """Test that catalog.*.* in allowlist allows all schemas in that catalog"""
+        acl_config = {"type": "allowlist", "tables": ["production.*.*"]}
+        checker = MetastoreTableACLChecker(acl_config)
+
+        # Should allow any schema in production catalog
+        assert checker.is_schema_valid("production.sales")
+        assert checker.is_schema_valid("production.hr")
+
+        # Should block schemas in other catalogs
+        assert not checker.is_schema_valid("staging.sales")
+
+    def test_triple_wildcard_catalog_isolation(self):
+        """Test catalog.*.* only matches when catalog name is at position 0"""
+        acl_config = {"type": "allowlist", "tables": ["catalog_1.*.*"]}
+        checker = MetastoreTableACLChecker(acl_config)
+
+        # Should match when catalog_1 is the catalog
+        assert checker.is_table_valid("catalog_1.sales", "orders")
+        assert checker.is_table_valid("catalog_1.catalog_2", "data")
+
+        # Should NOT match when catalog_1 is a schema under different catalog
+        assert not checker.is_table_valid("catalog_2.catalog_1", "orders")
+
+    def test_triple_wildcard_same_names_different_catalogs(self):
+        """Test name collision across catalogs with catalog.*.* pattern"""
+        acl_config = {"type": "allowlist", "tables": ["catalog_1.*.*"]}
+        checker = MetastoreTableACLChecker(acl_config)
+
+        # Same schema/table names in different catalogs
+        assert checker.is_table_valid("catalog_1.sales", "orders")
+        assert not checker.is_table_valid("catalog_2.sales", "orders")
+
+    def test_denylist_triple_wildcard_blocks_all(self):
+        """Test catalog.*.* in denylist blocks entire catalog"""
+        acl_config = {"type": "denylist", "tables": ["sensitive.*.*"]}
+        checker = MetastoreTableACLChecker(acl_config)
+
+        # Should block entire catalog
+        assert not checker.is_table_valid("sensitive.pii", "users")
+        assert not checker.is_schema_valid("sensitive.anything")
+
+        # Should allow other catalogs
+        assert checker.is_table_valid("production.sales", "orders")
+
+
+class TestCatalogWildcardCoexistence:
+    """Test catalog.* and catalog.*.* patterns work together"""
+
+    def test_both_patterns_same_behavior(self):
+        """Verify catalog.* and catalog.*.* have identical behavior"""
+        config1 = {"type": "allowlist", "tables": ["production.*"]}
+        config2 = {"type": "allowlist", "tables": ["production.*.*"]}
+
+        checker1 = MetastoreTableACLChecker(config1)
+        checker2 = MetastoreTableACLChecker(config2)
+
+        # Both should match identically
+        assert checker1.is_table_valid("production.sales", "orders") == \
+               checker2.is_table_valid("production.sales", "orders")
+        assert checker1.is_schema_valid("production.sales") == \
+               checker2.is_schema_valid("production.sales")
+
+    def test_mixed_patterns_in_same_acl(self):
+        """Test using both catalog.* and catalog.*.* in same ACL"""
+        acl_config = {
+            "type": "allowlist",
+            "tables": [
+                "catalog_1.*",      # Old style
+                "catalog_2.*.*",    # New style
+            ]
+        }
+        checker = MetastoreTableACLChecker(acl_config)
+
+        # Both catalogs allowed
+        assert checker.is_table_valid("catalog_1.schema", "table")
+        assert checker.is_table_valid("catalog_2.schema", "table")
