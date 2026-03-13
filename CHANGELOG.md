@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.130.1](https://github.com/eg-internal/querybook/compare/v0.130.0...v0.130.1) (2026-03-13)
+
+
+### Bug Fixes
+
+* Add prod_mcp service without watchmedo ([d24c816](https://github.com/eg-internal/querybook/commit/d24c816c8744b378b6e294fe0fd0fc703110c4cb))
+
 ## [0.130.0](https://github.com/eg-internal/querybook/compare/v0.129.0...v0.130.0) (2026-03-12)
 
 
