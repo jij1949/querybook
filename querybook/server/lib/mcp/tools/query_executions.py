@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastmcp import FastMCP
 from fastmcp.server.auth import AccessToken
@@ -6,8 +6,11 @@ from fastmcp.server.dependencies import CurrentAccessToken
 
 from app.db import DBSession
 from const.query_execution import QueryExecutionStatus, QueryExecutionType
-from lib.mcp.lib.query_executions import serialize_query_execution
-from lib.mcp.utils import CREATE_ANNOTATIONS
+from lib.mcp.lib.query_executions import (
+    serialize_query_execution,
+    serialize_query_execution_summary,
+)
+from lib.mcp.utils import CREATE_ANNOTATIONS, READ_ONLY_ANNOTATIONS
 from logic import admin as admin_logic
 from logic import query_execution as logic
 from logic import datadoc as datadoc_logic
@@ -16,6 +19,63 @@ from logic.datadoc_permission import user_can_execute, DocDoesNotExist
 
 def register(mcp: FastMCP) -> None:
     """Register query execution tools on the given MCP server."""
+
+    @mcp.tool(
+        title="List Query Executions",
+        annotations=READ_ONLY_ANNOTATIONS,
+    )
+    def list_query_executions(
+        environment_id: Annotated[int, "Environment ID from list_environments"],
+        engine_id: Annotated[
+            int | None,
+            "Filter by query engine ID from list_query_engines",
+        ] = None,
+        status: Annotated[
+            Literal[
+                "INITIALIZED",
+                "DELIVERED",
+                "RUNNING",
+                "DONE",
+                "ERROR",
+                "CANCEL",
+                "PENDING_REVIEW",
+                "REJECTED",
+            ]
+            | None,
+            "Filter by execution status",
+        ] = None,
+        running: Annotated[
+            bool | None,
+            "If true, show only active executions (INITIALIZED, DELIVERED, RUNNING)",
+        ] = None,
+        limit: Annotated[int, "Maximum results, max 100"] = 20,
+        offset: Annotated[int, "Pagination offset"] = 0,
+        token: AccessToken = CurrentAccessToken(),
+    ) -> list[dict]:
+        """List query executions for the current user. Returns summaries only."""
+        if limit > 100:
+            raise ValueError("limit must be 100 or less")
+
+        uid = token.claims["creator_uid"]
+
+        filters = {"user": uid}
+        if engine_id is not None:
+            filters["engine"] = engine_id
+        if status is not None:
+            filters["status"] = QueryExecutionStatus[status].value
+        if running is not None:
+            filters["running"] = running
+
+        with DBSession() as session:
+            executions = logic.search_query_execution(
+                environment_id=environment_id,
+                filters=filters,
+                orderBy="created_at",
+                limit=limit,
+                offset=offset,
+                session=session,
+            )
+            return [serialize_query_execution_summary(e) for e in executions]
 
     @mcp.tool(
         title="Run DataDoc Cell",
@@ -132,3 +192,53 @@ def register(mcp: FastMCP) -> None:
                 "start_index": start_index,
                 "message": "DataDoc execution queued. Use get_datadoc_cell_executions to check progress.",
             }
+
+    @mcp.tool(
+        title="Execute Ad-Hoc Query",
+        annotations=CREATE_ANNOTATIONS,
+    )
+    def execute_ad_hoc_query(
+        query: Annotated[str, "SQL query to execute"],
+        engine_id: Annotated[int, "Query engine ID from list_query_engines"],
+        metadata: Annotated[dict | None, "Optional metadata for the execution"] = None,
+        token: AccessToken = CurrentAccessToken(),
+    ) -> dict:
+        """Execute an ad-hoc SQL query without creating a DataDoc. Returns execution details with query_execution_resource_uri for polling and results_resource_uri for each statement."""
+        uid = token.claims["creator_uid"]
+
+        with DBSession() as session:
+            # Verify engine permission
+            accessible_engine_ids = (
+                admin_logic.get_all_accessible_query_engine_ids_by_uid(
+                    uid, session=session
+                )
+            )
+            if engine_id not in accessible_engine_ids:
+                raise ValueError(f"You do not have access to query engine {engine_id}.")
+
+            # Create query execution
+            query_execution = logic.create_query_execution(
+                query=query,
+                engine_id=engine_id,
+                uid=uid,
+                status=QueryExecutionStatus.INITIALIZED,
+                session=session,
+            )
+
+            # Add metadata if provided
+            if metadata:
+                logic.create_query_execution_metadata(
+                    query_execution.id, metadata, session=session
+                )
+
+            # Initiate execution (queues to Celery)
+            from datasources.query_execution import initiate_query_execution
+
+            initiate_query_execution(
+                query_execution=query_execution,
+                uid=uid,
+                peer_review_params=None,
+                session=session,
+            )
+
+            return serialize_query_execution(query_execution)

@@ -9,6 +9,7 @@ from lib.mcp.resources import (
     environments as environments_resources,
     lists as lists_resources,
     query_engines as query_engines_resources,
+    query_executions as query_executions_resources,
     schedules as schedules_resources,
     statement_executions as statement_executions_resources,
     users as users_resources,
@@ -48,6 +49,7 @@ datadocs_resources.register(mcp)
 environments_resources.register(mcp)
 lists_resources.register(mcp)
 query_engines_resources.register(mcp)
+query_executions_resources.register(mcp)
 schedules_resources.register(mcp)
 statement_executions_resources.register(mcp)
 users_resources.register(mcp)
