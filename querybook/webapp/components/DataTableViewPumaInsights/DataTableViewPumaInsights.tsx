@@ -15,10 +15,11 @@ interface IProps {
 
 export const DataTableViewPumaInsights: React.FC<IProps> = ({ table }) => {
     if (
-        !table.custom_properties['table_purpose'] &&
-        !table.custom_properties['business_value'] &&
-        !table.custom_properties['key_characteristics'] &&
-        !table.custom_properties['partition_information']
+        !table.custom_properties ||
+        (!table.custom_properties['table_purpose'] &&
+            !table.custom_properties['business_value'] &&
+            !table.custom_properties['key_characteristics'] &&
+            !table.custom_properties['partition_information'])
     ) {
         return (
             <EmptyText className="m24">
@@ -27,10 +28,10 @@ export const DataTableViewPumaInsights: React.FC<IProps> = ({ table }) => {
         );
     }
 
-    const tablePurposeMarkdown = 
+    const tablePurposeMarkdown =
         table.custom_properties['table_purpose'] ||
         'No table purpose provided.';
-        
+
     const businessValueMarkdown =
         table.custom_properties['business_value'] ||
         'No business value provided.';
@@ -57,14 +58,13 @@ export const DataTableViewPumaInsights: React.FC<IProps> = ({ table }) => {
 
     return (
         <div className="DataTableViewPumaInsights">
-            <Message 
-                icon='Info'
-                iconSize={16}
-                type="info"
-            >PUMA (Platform Usage Metrics and Analytics) is a data product to track usage across different tools under EGAP.{' '}
-                <Link 
-                    newTab 
-                    to="https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393151452/PUMA">
+            <Message icon="Info" iconSize={16} type="info">
+                PUMA (Platform Usage Metrics and Analytics) is a data product to
+                track usage across different tools under EGAP.{' '}
+                <Link
+                    newTab
+                    to="https://expediagroup.atlassian.net/wiki/spaces/DSPKB/pages/393151452/PUMA"
+                >
                     Check out the KB here
                 </Link>
             </Message>

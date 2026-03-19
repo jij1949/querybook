@@ -1,14 +1,21 @@
 from typing import Dict, List
+import logging
 
 import boto3
 from env import QuerybookSettings
 from lib.logger import get_logger
 
+# Flatten boto3 logs
+logging.getLogger("boto3").setLevel(logging.INFO)
+logging.getLogger("botocore").setLevel(logging.INFO)
+
 _LOG = get_logger(__file__)
 
 
 class GlueDataCatalogClient:
-    def __init__(self, catalog_id, region=QuerybookSettings.AWS_REGION, aws_profile=None):
+    def __init__(
+        self, catalog_id, region=QuerybookSettings.AWS_REGION, aws_profile=None
+    ):
         self.catalog_id = catalog_id
         if aws_profile:
             # Create a session with the specified profile

@@ -10,6 +10,7 @@ The mixin is designed to be metastore-agnostic by using adapter methods to
 extract parameters and storage descriptors from different table formats.
 """
 import base64
+import hashlib
 import re
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
@@ -268,24 +269,33 @@ class EgEnrichmentMixin:
         redundant parsing when the same table object is processed multiple times
         during enrichment operations.
 
+        The cache key is an MD5 hash of the raw_description content to avoid:
+        - Memory overhead from storing large raw_description strings as keys
+        - Cache collisions from using object id() (Python reuses memory addresses)
+
         Args:
             table: Table object with raw_description attribute
 
         Returns:
             Parsed and normalized description (dict or object), or None if parsing fails
         """
-        # Use object identity as cache key (DataTable contains lists, so not hashable)
-        table_id = id(table)
+        if not hasattr(table, "raw_description") or not table.raw_description:
+            return None
+
+        # Create cache key using MD5 hash of raw_description
+        # This gives us a fixed-length (32 char) key regardless of content size
+        raw_desc_str = str(table.raw_description)
+        cache_key = hashlib.md5(raw_desc_str.encode('utf-8')).hexdigest()
 
         # Check cache first
-        if table_id in self._parsed_description_cache:
-            return self._parsed_description_cache[table_id]
+        if cache_key in self._parsed_description_cache:
+            return self._parsed_description_cache[cache_key]
 
         # Parse and normalize (first time for this table)
         description = self._do_parse_and_normalize(table)
 
         # Cache result
-        self._parsed_description_cache[table_id] = description
+        self._parsed_description_cache[cache_key] = description
         return description
 
     def _do_parse_and_normalize(self, table):
@@ -611,8 +621,7 @@ class EgEnrichmentMixin:
             ]
             table = table._replace(tags=tags)
 
-        if custom_properties:
-            table = table._replace(custom_properties=custom_properties)
+        table = table._replace(custom_properties=custom_properties)
 
         return table, columns
 

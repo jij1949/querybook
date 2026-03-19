@@ -2,6 +2,7 @@
 Databricks Unity Catalog Client
 This client wraps the Databricks SDK to fetch metadata about schemas, tables, and columns.
 """
+
 from typing import Dict, List, Optional
 from lib.logger import get_logger
 
@@ -9,15 +10,19 @@ from databricks.sdk import WorkspaceClient
 from databricks.sdk.core import Config
 from databricks.sdk.service.catalog import TableInfo
 
-from databricks.sdk import AccountClient
-
 LOG = get_logger(__name__)
 
 
 class DatabricksUnityCatalogClient:
     """Client for interacting with Databricks Unity Catalog using the Databricks SDK."""
 
-    def __init__(self, workspace_url: str, token: str, catalog_name: Optional[str] = None, warehouse_id: Optional[str] = None):
+    def __init__(
+        self,
+        workspace_url: str,
+        token: str,
+        catalog_name: Optional[str] = None,
+        warehouse_id: Optional[str] = None,
+    ):
         """
         Initialize the Databricks Unity Catalog client.
 
@@ -53,6 +58,28 @@ class DatabricksUnityCatalogClient:
             LOG.error(f"Error fetching catalogs: {e}")
             return []
 
+    def get_catalog_info(self, catalog_name: str) -> Optional[Dict]:
+        """
+        Get metadata for a specific catalog.
+
+        Args:
+            catalog_name: Name of the catalog
+
+        Returns:
+            Dictionary with catalog metadata (name, comment, owner, properties), or None
+        """
+        try:
+            catalog = self.workspace_client.catalogs.get(catalog_name)
+            return {
+                "name": catalog.name,
+                "comment": catalog.comment,
+                "owner": catalog.owner,
+                "properties": catalog.properties,
+            }
+        except Exception as e:
+            LOG.error(f"Error fetching catalog info for {catalog_name}: {e}")
+            return None
+
     def get_all_schema_names(self, catalog_name: Optional[str] = None) -> List[str]:
         """
         Get all schemas from a specific catalog.
@@ -76,7 +103,9 @@ class DatabricksUnityCatalogClient:
             LOG.error(f"Error fetching schemas for catalog {catalog}: {e}")
             return []
 
-    def get_all_table_names(self, schema_name: str, catalog_name: Optional[str] = None) -> List[str]:
+    def get_all_table_names(
+        self, schema_name: str, catalog_name: Optional[str] = None
+    ) -> List[str]:
         """
         Get all tables in a specific schema.
 
@@ -91,7 +120,8 @@ class DatabricksUnityCatalogClient:
 
         if not catalog:
             LOG.warning(
-                f"No catalog name provided for get_all_table_names in schema {schema_name}")
+                f"No catalog name provided for get_all_table_names in schema {schema_name}"
+            )
             return []
 
         try:
@@ -106,7 +136,9 @@ class DatabricksUnityCatalogClient:
             LOG.error(f"Error fetching tables for schema {catalog}.{schema_name}: {e}")
             return []
 
-    def get_table(self, schema_name: str, table_name: str, catalog_name: Optional[str] = None) -> Optional[TableInfo]:
+    def get_table(
+        self, schema_name: str, table_name: str, catalog_name: Optional[str] = None
+    ) -> Optional[TableInfo]:
         """
         Get detailed information about a specific table.
 
@@ -123,7 +155,8 @@ class DatabricksUnityCatalogClient:
 
         if not catalog:
             LOG.warning(
-                f"No catalog name provided for get_table: {schema_name}.{table_name}")
+                f"No catalog name provided for get_table: {schema_name}.{table_name}"
+            )
             return None
 
         try:
@@ -133,7 +166,9 @@ class DatabricksUnityCatalogClient:
             LOG.error(f"Error fetching table {full_table_name}: {e}")
             return None
 
-    def get_columns(self, schema_name: str, table_name: str, catalog_name: Optional[str] = None) -> List[Dict]:
+    def get_columns(
+        self, schema_name: str, table_name: str, catalog_name: Optional[str] = None
+    ) -> List[Dict]:
         """
         Get column information for a specific table.
 
@@ -162,7 +197,9 @@ class DatabricksUnityCatalogClient:
             for col in columns
         ]
 
-    def get_table_properties(self, schema_name: str, table_name: str, catalog_name: Optional[str] = None) -> Dict:
+    def get_table_properties(
+        self, schema_name: str, table_name: str, catalog_name: Optional[str] = None
+    ) -> Dict:
         """
         Get table properties including owner, creation time, and other metadata.
 
@@ -176,18 +213,20 @@ class DatabricksUnityCatalogClient:
         """
         if not self.warehouse_id:
             LOG.warning(
-                f"No warehouse_id provided for get_table_properties: {schema_name}.{table_name}")
+                f"No warehouse_id provided for get_table_properties: {schema_name}.{table_name}"
+            )
             return {}
 
         response = self.workspace_client.statement_execution.execute_statement(
             warehouse_id=self.warehouse_id,
             statement=f"DESCRIBE EXTENDED {catalog_name}.{schema_name}.{table_name}",
-            wait_timeout="30s"
+            wait_timeout="30s",
         )
 
         if response.status.state == "SUCCEEDED":
             LOG.info(
-                f"Statement executed successfully for table {schema_name}.{table_name}")
+                f"Statement executed successfully for table {schema_name}.{table_name}"
+            )
 
             # Parse the data_array
             table_properties = {}
@@ -221,5 +260,6 @@ class DatabricksUnityCatalogClient:
             return table_properties
 
         LOG.error(
-            f"Statement execution failed: {response.status.error if response.status.error else 'Unknown error'}")
+            f"Statement execution failed: {response.status.error if response.status.error else 'Unknown error'}"
+        )
         return {}

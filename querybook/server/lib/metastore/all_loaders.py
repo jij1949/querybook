@@ -17,6 +17,10 @@ PROVIDED_METASTORE_LOADERS = import_modules(
             "lib.metastore.loaders.databricks_metastore_loader",
             "DatabricksMetastoreLoader",
         ),
+        (
+            "lib.metastore.loaders.combo_metastore_loader",
+            "ComboMetastoreLoader",
+        ),
     ]
 )
 
