@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.131.0](https://github.com/eg-internal/querybook/compare/v0.130.1...v0.131.0) (2026-03-19)
+
+
+### Features
+
+* Add ad hoc executions & downloads to MCP server ([f8205f5](https://github.com/eg-internal/querybook/commit/f8205f5de605a5a0b68894e5393ef950196795b6))
+* Combo Metastore Loader ([#514](https://github.com/eg-internal/querybook/issues/514)) ([7ac1c65](https://github.com/eg-internal/querybook/commit/7ac1c65f1db43d8eec23887e0bee7433b21bb4e0))
+
 ## [0.130.1](https://github.com/eg-internal/querybook/compare/v0.130.0...v0.130.1) (2026-03-13)
 
 
