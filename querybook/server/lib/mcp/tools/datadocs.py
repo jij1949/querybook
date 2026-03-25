@@ -61,6 +61,40 @@ class DataDocInput(BaseModel):
     data: DataDocData
 
 
+VALID_VARIABLE_TYPES = {"string", "number", "boolean"}
+VARIABLE_TYPE_CHECKS = {
+    "string": lambda v: isinstance(v, str),
+    "number": lambda v: isinstance(v, (int, float)) and not isinstance(v, bool),
+    "boolean": lambda v: isinstance(v, bool),
+}
+
+
+def validate_variables(variables: list[dict]) -> None:
+    """Validate template variables before passing to the data layer."""
+    seen_names = set()
+    for i, var in enumerate(variables):
+        name = var.get("name")
+        var_type = var.get("type")
+
+        if not name or not name.strip():
+            raise ValueError(f"Variable at index {i} has an empty or missing name.")
+
+        if var_type not in VALID_VARIABLE_TYPES:
+            raise ValueError(
+                f"Variable '{name}' has invalid type '{var_type}'. "
+                f"Must be one of: {', '.join(sorted(VALID_VARIABLE_TYPES))}."
+            )
+
+        if not VARIABLE_TYPE_CHECKS[var_type](var.get("value")):
+            raise ValueError(
+                f"Variable '{name}' has type '{var_type}' but value is not a {var_type}."
+            )
+
+        if name in seen_names:
+            raise ValueError(f"Duplicate variable name '{name}'.")
+        seen_names.add(name)
+
+
 def register(mcp: FastMCP) -> None:
     """Register datadoc tools on the given MCP server."""
 
@@ -189,10 +223,19 @@ def register(mcp: FastMCP) -> None:
         favorite: Annotated[
             bool, "Whether to favorite this DataDoc immediately"
         ] = False,
+        variables: Annotated[
+            list[dict] | None,
+            "Template variables as list of {name, type, value} objects. "
+            "type must be 'string', 'number', or 'boolean'. "
+            "value must match the declared type.",
+        ] = None,
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
         """Create a new empty DataDoc."""
         owner_uid = token.claims["creator_uid"]
+        if variables is not None:
+            validate_variables(variables)
+        meta = {"variables": variables} if variables else {}
 
         with DBSession() as session:
             data_doc = create_data_doc(
@@ -200,7 +243,7 @@ def register(mcp: FastMCP) -> None:
                 owner_uid=owner_uid,
                 cells=[],
                 title=title,
-                meta={},
+                meta=meta,
                 public=public,
                 archived=False,
                 session=session,
@@ -227,9 +270,17 @@ def register(mcp: FastMCP) -> None:
         favorite: Annotated[
             bool | None, "Favorite (true) or unfavorite (false) this DataDoc"
         ] = None,
+        variables: Annotated[
+            list[dict] | None,
+            "Template variables as list of {name, type, value} objects. "
+            "type must be 'string', 'number', or 'boolean'. "
+            "value must match the declared type. Replaces all existing variables.",
+        ] = None,
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
         """Update DataDoc properties. Only non-null fields are updated."""
+        if variables is not None:
+            validate_variables(variables)
         uid = token.claims["creator_uid"]
         with DBSession() as session:
             try:
@@ -248,6 +299,8 @@ def register(mcp: FastMCP) -> None:
                 fields["archived"] = archived
             if environment_id is not None:
                 fields["environment_id"] = environment_id
+            if variables is not None:
+                fields["meta"] = {"variables": variables}
 
             update_data_doc(id=datadoc_id, commit=True, session=session, **fields)
 

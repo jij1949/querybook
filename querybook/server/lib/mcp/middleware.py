@@ -10,6 +10,7 @@ a decorator pattern since on_read_resource() is not supported.
 import functools
 import time
 
+from fastmcp.server.dependencies import get_access_token
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 
 from const.event_log import EventType
@@ -77,7 +78,11 @@ class MCPEventLoggingMiddleware(Middleware):
             raise
 
     def _get_user_id(self, context: MiddlewareContext) -> int:
-        """Extract user ID from FastMCP context.
+        """Extract user ID from the current request's access token.
+
+        Uses FastMCP's get_access_token() which reads from the HTTP request
+        scope or SDK context var, matching how CurrentAccessToken() resolves
+        in tool/resource handlers.
 
         Args:
             context: FastMCP middleware context
@@ -86,8 +91,9 @@ class MCPEventLoggingMiddleware(Middleware):
             User ID from access token claims, or 0 if not available
         """
         try:
-            if context.fastmcp_context and context.fastmcp_context.access_token:
-                return context.fastmcp_context.access_token.claims.get("creator_uid", 0)
+            token = get_access_token()
+            if token:
+                return token.claims.get("creator_uid", 0)
         except Exception as e:
             LOG.warning(f"Failed to extract user ID from MCP context: {e}")
 
