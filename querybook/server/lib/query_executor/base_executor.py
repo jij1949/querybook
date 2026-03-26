@@ -534,11 +534,10 @@ class QueryExecutorBaseClass(metaclass=ABCMeta):
             )
         )
         if query_execution_metadata:
-            self._used_api_token = query_execution_metadata.execution_metadata.get(
-                "used_api_token", False
-            )
+            self._execution_metadata = query_execution_metadata.execution_metadata or {}
         else:
-            self._used_api_token = False
+            self._execution_metadata = {}
+        self._used_api_token = self._execution_metadata.get("used_api_token", False)
 
     def __del__(self):
         del self._logger

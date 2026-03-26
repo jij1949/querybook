@@ -43,6 +43,12 @@ class EGTrinoQueryExecutor(TrinoQueryExecutor):
 
         self._get_datadoc_info(query_execution_id)
 
+        extra_client_tags = []
+        if self._execution_metadata.get("source") == "mcp":
+            extra_client_tags.append("ai-tool:querybook-mcp")
+        if extra_client_tags:
+            self._client_setting = self._client_setting | {'extra_client_tags': extra_client_tags}
+
     @classmethod
     def _get_client(cls, client_setting):
         return EGTrinoClient(**client_setting)

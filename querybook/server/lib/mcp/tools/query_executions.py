@@ -17,6 +17,13 @@ from logic import datadoc as datadoc_logic
 from logic.datadoc_permission import user_can_execute, DocDoesNotExist
 
 
+def _build_mcp_metadata(user_metadata: dict | None) -> dict:
+    """Build execution metadata with MCP source marker."""
+    metadata = dict(user_metadata) if user_metadata else {}
+    metadata["source"] = "mcp"
+    return metadata
+
+
 def register(mcp: FastMCP) -> None:
     """Register query execution tools on the given MCP server."""
 
@@ -132,6 +139,11 @@ def register(mcp: FastMCP) -> None:
                 session=session,
             )
 
+            # Mark execution as originating from MCP
+            logic.create_query_execution_metadata(
+                query_execution.id, _build_mcp_metadata(None), session=session
+            )
+
             # Associate with the data cell
             datadoc_logic.append_query_executions_to_data_cell(
                 cell_id, [query_execution.id], session=session
@@ -183,6 +195,7 @@ def register(mcp: FastMCP) -> None:
                     "user_id": uid,
                     "execution_type": QueryExecutionType.ADHOC.value,
                     "notifications": [],
+                    "metadata": {"source": "mcp"},
                 },
             )
 
@@ -225,11 +238,11 @@ def register(mcp: FastMCP) -> None:
                 session=session,
             )
 
-            # Add metadata if provided
-            if metadata:
-                logic.create_query_execution_metadata(
-                    query_execution.id, metadata, session=session
-                )
+            # Always create metadata with MCP source marker
+            mcp_metadata = _build_mcp_metadata(metadata)
+            logic.create_query_execution_metadata(
+                query_execution.id, mcp_metadata, session=session
+            )
 
             # Initiate execution (queues to Celery)
             from datasources.query_execution import initiate_query_execution

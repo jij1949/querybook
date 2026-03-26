@@ -8,7 +8,6 @@ from const.db import (
     description_length,
 )
 from const.query_execution import (
-    QueryExecutionErrorType,
     QueryExecutionStatus,
     QueryExecutionType,
 )
@@ -84,6 +83,7 @@ def run_datadoc_with_config(
     exports=[],
     retry={"delay_sec": 0, "max_retries": 0, "enabled": False},
     disable_if_running_doc=False,
+    metadata=None,
     *args,
     **kwargs,
 ):
@@ -174,12 +174,14 @@ def run_datadoc_with_config(
                     previous_query_result=(QueryExecutionStatus.DONE.value, 0),
                     execution_type=execution_type,
                     retry=retry,
+                    metadata=metadata,
                 )
                 if len(tasks_to_run) == 0
                 else _run_datadoc_cell.s(
                     **start_query_execution_kwargs,
                     execution_type=execution_type,
                     retry=retry,
+                    metadata=metadata,
                 )
             )
 
@@ -200,6 +202,7 @@ def _run_datadoc_cell(
     data_doc_id,
     execution_type,
     retry,
+    metadata=None,
 ):
     previous_query_status, previous_query_execution_id = previous_query_result
     if previous_query_status != QueryExecutionStatus.DONE.value:
@@ -209,6 +212,10 @@ def _run_datadoc_cell(
         query_execution = qe_logic.create_query_execution(
             **query_execution_params, session=session
         )
+        if metadata:
+            qe_logic.create_query_execution_metadata(
+                query_execution.id, metadata, session=session
+            )
         datadoc_logic.append_query_executions_to_data_cell(
             cell_id,
             [query_execution.id],
