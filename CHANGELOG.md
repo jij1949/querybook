@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.131.2](https://github.com/eg-internal/querybook/compare/v0.131.1...v0.131.2) (2026-03-26)
+
+
+### Bug Fixes
+
+* Add MCP execution metadata and Client Tagging ([42dd970](https://github.com/eg-internal/querybook/commit/42dd970872e19b0d2ba9d085b5c8d354b45a3fb9))
+* MCP tools for DataDoc cells now return the cell contents only ([549907c](https://github.com/eg-internal/querybook/commit/549907ca88d6a863a1219a72cc6d6cade3e7e105))
+
 ## [0.131.1](https://github.com/eg-internal/querybook/compare/v0.131.0...v0.131.1) (2026-03-26)
 
 
