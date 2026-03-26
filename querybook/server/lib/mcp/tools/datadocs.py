@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from app.db import DBSession
 from lib.mcp.lib.datadocs import (
     serialize_datadoc,
+    serialize_datadoc_cell,
     serialize_datadoc_editor,
     get_datadoc_data,
 )
@@ -396,9 +397,9 @@ def register(mcp: FastMCP) -> None:
                 session=session,
             )
 
-            # Return the updated doc
-            session.refresh(doc)
-            return serialize_datadoc(doc, session, uid=uid, with_cells=True)
+            return serialize_datadoc_cell(
+                data_cell.to_dict(), session, datadoc_id=datadoc_id
+            )
 
     @mcp.tool(
         title="Update DataDoc Cell",
@@ -465,9 +466,13 @@ def register(mcp: FastMCP) -> None:
 
             update_data_cell(cell_id, session=session, **fields)
 
-            # Return the updated doc
-            doc = get_data_doc_by_id(datadoc_id, session=session)
-            return serialize_datadoc(doc, session, uid=uid, with_cells=True)
+            session.refresh(cell)
+            return serialize_datadoc_cell(
+                cell.to_dict(),
+                session,
+                with_latest_execution=True,
+                datadoc_id=datadoc_id,
+            )
 
     @mcp.tool(
         title="Delete DataDoc Cell",
@@ -509,9 +514,11 @@ def register(mcp: FastMCP) -> None:
                 data_doc_id=datadoc_id, data_cell_id=cell_id, session=session
             )
 
-            # Return the updated doc
-            doc = get_data_doc_by_id(datadoc_id, session=session)
-            return serialize_datadoc(doc, session, uid=uid, with_cells=True)
+            return {
+                "deleted": cell_id,
+                "datadoc_id": datadoc_id,
+                "datadoc_resource_uri": f"querybook://datadoc/{datadoc_id}",
+            }
 
     @mcp.tool(
         title="Add DataDoc Editor",
