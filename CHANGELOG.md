@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.131.1](https://github.com/eg-internal/querybook/compare/v0.131.0...v0.131.1) (2026-03-26)
+
+
+### Bug Fixes
+
+* Fix MCP Event Logging and add DataDoc variable support ([bfcb1c7](https://github.com/eg-internal/querybook/commit/bfcb1c768397c2bace64907009109fd7725c8c0d))
+
 ## [0.131.0](https://github.com/eg-internal/querybook/compare/v0.130.1...v0.131.0) (2026-03-19)
 
 
