@@ -38,17 +38,14 @@ def get_table_names(schema_id: int) -> List[str]:
     return [table.name for table in DataTable.query.filter_by(schema_id=schema_id).all()]
 ```
 
-### Formatting
-- **Black**: Auto-format Python code
-- **isort**: Sort imports
-- **mypy**: Type checking
+### Formatting & Linting
 
-Run formatters:
-```bash
-black querybook/server/
-isort querybook/server/
-mypy querybook/server/
-```
+Pre-commit hooks enforce code standards:
+- **Black**: Auto-format Python code (spacing, line length)
+- **Flake8**: Lint Python code (report issues)
+- **Prettier**: Format TypeScript/JavaScript
+
+See the /lint skill for running linters locally.
 
 ### Imports Organization
 ```python
