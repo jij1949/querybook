@@ -77,6 +77,10 @@ def register(mcp: FastMCP) -> None:
                 )
 
             # Read result data
+            # Check if result_path exists (can be None for failed queries)
+            if statement_execution.result_path is None:
+                return [ResourceContent({"columns": [], "data": []})]
+
             try:
                 with GenericReader(statement_execution.result_path) as reader:
                     rows = reader.read_csv(number_of_lines=limit + 1)
