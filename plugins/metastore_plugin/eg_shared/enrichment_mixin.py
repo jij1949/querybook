@@ -83,40 +83,47 @@ DATASET_TAGS = [
         "meta": {"rank": 59},
     },
     {
+        "name": "eg-data-product",
+        "label": "Data Product",
+        "mandatory": False,
+        "tag": True,
+        "meta": {"rank": 58},
+    },
+    {
         "name": "eg-domain",
         "label": "Domain",
         "mandatory": False,
         "tag": True,
-        "meta": {"rank": 58},
+        "meta": {"rank": 57},
     },
     {
         "name": "eg-application-name",
         "label": "Application",
         "mandatory": True,
         "tag": True,
-        "meta": {"rank": 57},
+        "meta": {"rank": 56},
     },
     {
         "name": "eg-origin-location",
         "label": "Origin Location",
         "mandatory": True,
         "tag": True,
-        "meta": {"rank": 56},
+        "meta": {"rank": 55},
     },
     {
         "name": "eg-storage-location",
         "label": "Storage Location",
         "mandatory": True,
         "tag": True,
-        "meta": {"rank": 55},
+        "meta": {"rank": 54},
     },
     {
         "name": "eg-partner-data",
         "label": "Partner Data",
         "mandatory": False,
         "tag": True,
-        "meta": {"rank": 54},
-    },
+        "meta": {"rank": 53},
+    }
 ]
 
 
