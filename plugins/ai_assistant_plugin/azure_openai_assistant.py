@@ -1,4 +1,7 @@
+import os
+
 import tiktoken
+from langchain_openai import ChatOpenAI
 
 from lib.logger import get_logger
 from ai_assistant_plugin.eg_openai_assistant import EgOpenAIAssistant
@@ -13,6 +16,9 @@ AZURE_OPENAI_MODEL_CONTEXT_WINDOW_SIZE = {
     "gpt-4": 8192,
     "gpt-4-32k": 32768,
     "gpt-4o-2024-05-13": 32768,  # actually 128,000 but we're limiting to 32k
+    "gpt-5.1-codex-mini-2025-11-13": 32768, # same here..
+    "gpt-5.2": 32768,
+    "gpt-5.2-2025-12-11": 32768,
 }
 DEFAULT_MODEL_NAME = "gpt-35-turbo"
 
@@ -22,6 +28,24 @@ DEFAULT_MODEL_NAME = "gpt-35-turbo"
 AZURE_MODEL_TO_OPENAI_MODEL = {
     "gpt-35-turbo": "gpt-3.5-turbo",
     "gpt-35-turbo-16k": "gpt-3.5-turbo-16k",
+    "gpt-5.1-codex-mini-2025-11-13": "gpt-4",
+    "gpt-5.2": "gpt-5",
+    "gpt-5.2-2025-12-11": "gpt-5"
+}
+
+# Some models (e.g. Codex) don't support the Chat Completions API and require using the separate Responses API.
+# Most new models do support the Responses API, but for now we're only enabling it as needed for new models.
+# See https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/reasoning?tabs=csharp%2Cgpt-5#api--feature-support
+RESPONSES_API_MODELS = {
+    "gpt-5.1-codex-mini-2025-11-13",
+}
+
+# Quick model overrides for testing — takes precedence over YAML config
+# Comment out or clear when done testing
+MODEL_OVERRIDES = {
+    #"data_doc_title": "gpt-4o-2024-05-13",
+    #"table_summary": "gpt-4o-mini-2024-07-18",
+    #"text_to_sql": "gpt-5.1-codex-mini-2025-11-13",
 }
 
 
@@ -43,6 +67,27 @@ class AzureOpenAIAssistant(EgOpenAIAssistant):
     @property
     def name(self) -> str:
         return "azure_openai"
+
+    def _get_llm(self, ai_command: str, prompt_length: int):
+        config = self._get_llm_config(ai_command)
+        if ai_command in MODEL_OVERRIDES:
+            config["model_name"] = MODEL_OVERRIDES[ai_command]
+        model_name = config.get("model_name", DEFAULT_MODEL_NAME)
+
+        if model_name in RESPONSES_API_MODELS:
+            config["use_responses_api"] = True
+            # The Responses API endpoint lives under an extra /v1 path segment
+            # e.g. /v1/proxy/azure-openai/v1/responses
+            base_url = config.get("base_url") or os.environ.get("OPENAI_API_BASE", "")
+            config["base_url"] = base_url.rstrip("/") + "/v1"
+            # Codex models don't support temperature
+            if "codex" in model_name:
+                config.pop("temperature", None)
+            LOG.debug(f"Using Responses API for model: {model_name}")
+        else:
+            LOG.debug(f"Using Chat Completions API for model: {model_name}")
+
+        return ChatOpenAI(**config)
 
     def _get_context_length_by_model(self, model_name: str) -> int:
         return (
