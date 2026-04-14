@@ -71,8 +71,8 @@ def register(mcp: FastMCP) -> None:
             filters["engine"] = engine_id
         if status is not None:
             filters["status"] = QueryExecutionStatus[status].value
-        if running is not None:
-            filters["running"] = running
+        if running:
+            filters["running"] = True
 
         with DBSession() as session:
             executions = logic.search_query_execution(
