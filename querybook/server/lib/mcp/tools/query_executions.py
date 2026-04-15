@@ -11,6 +11,7 @@ from lib.mcp.lib.query_executions import (
     serialize_query_execution_summary,
 )
 from lib.mcp.utils import CREATE_ANNOTATIONS, READ_ONLY_ANNOTATIONS
+from lib.query_analysis.templating import render_templated_query
 from logic import admin as admin_logic
 from logic import query_execution as logic
 from logic import datadoc as datadoc_logic
@@ -130,9 +131,18 @@ def register(mcp: FastMCP) -> None:
             if engine_id not in accessible_engine_ids:
                 raise ValueError(f"You do not have access to query engine {engine_id}.")
 
+            # Render query with datadoc variables
+            query = render_templated_query(
+                cell.context,
+                data_doc.meta_variables,
+                engine_id,
+                uid,
+                session=session,
+            )
+
             # Create and run the query execution
             query_execution = logic.create_query_execution(
-                query=cell.context,
+                query=query,
                 engine_id=engine_id,
                 uid=uid,
                 status=QueryExecutionStatus.INITIALIZED,
