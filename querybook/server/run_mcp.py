@@ -7,6 +7,7 @@ from lib.mcp.resources import (
     comments as comments_resources,
     datadocs as datadocs_resources,
     environments as environments_resources,
+    guide as guide_resources,
     lists as lists_resources,
     query_engines as query_engines_resources,
     query_executions as query_executions_resources,
@@ -44,6 +45,7 @@ schedules.register(mcp)
 users.register(mcp)
 
 # Register resources
+guide_resources.register(mcp)
 comments_resources.register(mcp)
 datadocs_resources.register(mcp)
 environments_resources.register(mcp)
