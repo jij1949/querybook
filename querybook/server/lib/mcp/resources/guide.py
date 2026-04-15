@@ -1,4 +1,6 @@
 from fastmcp import FastMCP
+from fastmcp.server.auth import AccessToken
+from fastmcp.server.dependencies import CurrentAccessToken
 
 from lib.mcp.utils import RESOURCE_ANNOTATIONS
 
@@ -84,6 +86,8 @@ def register(mcp: FastMCP) -> None:
         mime_type="text/markdown",
         annotations=RESOURCE_ANNOTATIONS,
     )
-    def get_resource_guide() -> str:
+    def get_resource_guide(
+        token: AccessToken = CurrentAccessToken(),
+    ) -> str:
         """Returns a Markdown document describing all available resource templates."""
         return RESOURCE_GUIDE
