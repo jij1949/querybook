@@ -1,6 +1,12 @@
 """Query execution utility functions for MCP tools."""
 
-from const.query_execution import QueryExecutionStatus, StatementExecutionStatus
+import json
+
+from const.query_execution import (
+    QueryExecutionErrorType,
+    QueryExecutionStatus,
+    StatementExecutionStatus,
+)
 
 
 def serialize_query_execution_summary(execution) -> dict:
@@ -106,5 +112,32 @@ def serialize_query_execution(execution) -> dict:
             # Remove internal result_path and log_path fields
             stmt.pop("result_path", None)
             stmt.pop("log_path", None)
+
+    # Include error details for failed executions
+    if execution.error:
+        error = execution.error
+
+        # Add human-readable error type name
+        error_type_name = None
+        if error.error_type is not None:
+            try:
+                error_type_name = QueryExecutionErrorType(error.error_type).name
+            except (ValueError, KeyError):
+                pass
+
+        # Try to parse JSON-encoded error messages (e.g. SYNTAX errors)
+        error_message = error.error_message
+        if error_message:
+            try:
+                error_message = json.loads(error_message)
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        execution_dict["error"] = {
+            "error_type": error.error_type,
+            "error_type_name": error_type_name,
+            "error_message_extracted": error.error_message_extracted,
+            "error_message": error_message,
+        }
 
     return execution_dict
