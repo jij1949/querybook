@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.132.0](https://github.com/eg-internal/querybook/compare/v0.131.2...v0.132.0) (2026-04-15)
+
+
+### Features
+
+* AI Assistant updates for newer models. ([72fdbea](https://github.com/eg-internal/querybook/commit/72fdbea873efbacf91a57fd996d705d3ac412e77))
+* **mcp:** Add static resource guide for discovering resource templates ([e4f05bb](https://github.com/eg-internal/querybook/commit/e4f05bb1c758bc18b778c1314e3a92b14e505111))
+
+
+### Bug Fixes
+
+* Add eg-data-product as Dataset Tags ([#523](https://github.com/eg-internal/querybook/issues/523)) ([2cdd0eb](https://github.com/eg-internal/querybook/commit/2cdd0ebeb4cbbe289e232bdc28e21c06b1dc1fe3))
+* Handle statement-execution resource with no data ([47d4205](https://github.com/eg-internal/querybook/commit/47d4205fed8a70c706d453e675069d468a2b73f9))
+* **mcp:** Include query execution errors in MCP resource responses ([5c749eb](https://github.com/eg-internal/querybook/commit/5c749ebe01af9089815d3b9195ffa31ba4463706))
+* **mcp:** Log correct uid for resource-guide reads ([9228daf](https://github.com/eg-internal/querybook/commit/9228dafce6e0a23c8f55665b055b322c9981f39a))
+* **mcp:** Only apply running filter when running=true in list_query_executions ([f26468c](https://github.com/eg-internal/querybook/commit/f26468cd7ea35fcc261d18d44982935757d30781))
+* Template query variables in MCP run_datadoc_cell ([#528](https://github.com/eg-internal/querybook/issues/528)) ([8a03ef0](https://github.com/eg-internal/querybook/commit/8a03ef0ffb5f3a438d3103fef54067fb8fb9bee4))
+
 ## [0.131.2](https://github.com/eg-internal/querybook/compare/v0.131.1...v0.131.2) (2026-03-26)
 
 
