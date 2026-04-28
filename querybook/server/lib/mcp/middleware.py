@@ -44,18 +44,25 @@ class AuthDeprecationNoticeMiddleware(Middleware):
         tools = await call_next(context)
         if date.today() <= _AUTH_DEPRECATION_DEADLINE:
             for tool in tools:
-                tool.description = f"{_AUTH_DEPRECATION_NOTICE}\n\n" + (tool.description or "")
+                tool.description = f"{_AUTH_DEPRECATION_NOTICE}\n\n" + (
+                    tool.description or ""
+                )
         return tools
 
     async def on_call_tool(self, context: MiddlewareContext, call_next):
         result = await call_next(context)
-        if date.today() <= _AUTH_DEPRECATION_DEADLINE and result.structured_content is not None:
+        if (
+            date.today() <= _AUTH_DEPRECATION_DEADLINE
+            and result.structured_content is not None
+        ):
             notes = result.structured_content.get("notes", [])
-            notes.append({
-                "level": "warning",
-                "code": "AUTH_DEPRECATION",
-                "message": _AUTH_DEPRECATION_NOTICE,
-            })
+            notes.append(
+                {
+                    "level": "warning",
+                    "code": "AUTH_DEPRECATION",
+                    "message": _AUTH_DEPRECATION_NOTICE,
+                }
+            )
             result.structured_content["notes"] = notes
         return result
 
@@ -79,17 +86,18 @@ class MCPEventLoggingMiddleware(Middleware):
         start_time = time.perf_counter()
         tool_name = context.message.name
         user_id = self._get_user_id(context)
+        auth_method = self._get_auth_method()
 
         try:
             result = await call_next(context)
             duration_ms = (time.perf_counter() - start_time) * 1000
 
-            # Log successful tool execution
             _log_mcp_event(
                 user_id=user_id,
                 event_data={
                     "operation_type": "tool",
                     "tool": tool_name,
+                    "auth_method": auth_method,
                     "status": "success",
                     "duration_ms": round(duration_ms, 2),
                     "parameters": self._sanitize_params(context.message.arguments),
@@ -100,12 +108,12 @@ class MCPEventLoggingMiddleware(Middleware):
         except Exception as e:
             duration_ms = (time.perf_counter() - start_time) * 1000
 
-            # Log failed tool execution
             _log_mcp_event(
                 user_id=user_id,
                 event_data={
                     "operation_type": "tool",
                     "tool": tool_name,
+                    "auth_method": auth_method,
                     "status": "error",
                     "error": str(e)[:MAX_STR_PARAM_LENGTH],
                     "duration_ms": round(duration_ms, 2),
@@ -133,8 +141,16 @@ class MCPEventLoggingMiddleware(Middleware):
                 return token.claims.get("creator_uid", 0)
         except Exception as e:
             LOG.warning(f"Failed to extract user ID from MCP context: {e}")
-
         return 0
+
+    def _get_auth_method(self) -> str:
+        try:
+            token = get_access_token()
+            if token:
+                return token.claims.get("auth_method", "unknown")
+        except Exception:
+            pass
+        return "unknown"
 
     def _sanitize_params(self, params: dict) -> dict:
         """Sanitize parameters by trimming long strings.
@@ -224,8 +240,10 @@ def wrap_mcp_resources(mcp):
                     token = kwargs.get("token")
 
                 user_id = 0
+                auth_method = "unknown"
                 if token and hasattr(token, "claims"):
                     user_id = token.claims.get("creator_uid", 0)
+                    auth_method = token.claims.get("auth_method", "unknown")
 
                 # Extract resource URI from decorator kwargs if available
                 resource_uri = decorator_kwargs.get(
@@ -251,6 +269,7 @@ def wrap_mcp_resources(mcp):
                         event_data={
                             "operation_type": "resource",
                             "resource_uri": resource_uri,
+                            "auth_method": auth_method,
                             "status": "success",
                             "duration_ms": round(duration_ms, 2),
                         },
@@ -266,6 +285,7 @@ def wrap_mcp_resources(mcp):
                         event_data={
                             "operation_type": "resource",
                             "resource_uri": resource_uri,
+                            "auth_method": auth_method,
                             "status": "error",
                             "error": str(e)[:MAX_STR_PARAM_LENGTH],
                             "duration_ms": round(duration_ms, 2),

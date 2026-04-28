@@ -7,6 +7,11 @@ ELASTICSEARCH_HOST: http://elasticsearch:9200
 
 ANALYTICS_WORKBENCH_GRAPHQL_ENDPOINT: https://analytics.expedia.biz/api/v1/graphql
 
+# MCP
+MCP_AUTH_MODE: dual
+MCP_OAUTH_BASE_URL: http://localhost:8771
+MCP_OIDC_CONFIG_URL: https://expediagroup.oktapreview.com/.well-known/openid-configuration
+
 # ELASTICSEARCH_CONNECTION_TYPE: aws
 # Uncomment for email
 # EMAILER_CONN: dockerhostforward

@@ -25,5 +25,8 @@ class QuerybookTokenVerifier(TokenVerifier):
                 client_id=str(api_token.creator_uid),
                 scopes=[],
                 expires_at=None,
-                claims={"creator_uid": api_token.creator_uid},
+                claims={
+                    "creator_uid": api_token.creator_uid,
+                    "auth_method": "api_token",
+                },
             )

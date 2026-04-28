@@ -205,6 +205,21 @@ class QuerybookSettings(object):
 
     # MCP Server
     MCP_PORT = int(get_env_config("MCP_PORT") or 8771)
+    MCP_AUTH_MODE = get_env_config("MCP_AUTH_MODE") or "token"
+    MCP_AUTH_SECRET = get_env_config("MCP_AUTH_SECRET")
+    MCP_OAUTH_BASE_URL = get_env_config("MCP_OAUTH_BASE_URL")
+    MCP_OIDC_CONFIG_URL = get_env_config("MCP_OIDC_CONFIG_URL")
+    # Accepts JSON array, comma-separated string, or YAML list.
+    # e.g. '["http://localhost:*"]' or 'http://localhost:*,http://127.0.0.1:*'
+    _raw_redirect_uris = get_env_config("MCP_OAUTH_ALLOWED_REDIRECT_URIS")
+    if isinstance(_raw_redirect_uris, str):
+        _raw_redirect_uris = [
+            u.strip() for u in _raw_redirect_uris.split(",") if u.strip()
+        ]
+    MCP_OAUTH_ALLOWED_REDIRECT_URIS = _raw_redirect_uris or [
+        "http://localhost:*",
+        "http://127.0.0.1:*",
+    ]
 
     # Cache Control
     CACHE_CONTROL_MAX_AGE = int(
