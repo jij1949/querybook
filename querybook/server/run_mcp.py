@@ -2,7 +2,7 @@ from fastmcp import FastMCP
 
 from env import QuerybookSettings
 from lib.mcp.auth import QuerybookTokenVerifier
-from lib.mcp.middleware import MCPEventLoggingMiddleware, wrap_mcp_resources
+from lib.mcp.middleware import AuthDeprecationNoticeMiddleware, MCPEventLoggingMiddleware, wrap_mcp_resources
 from lib.mcp.resources import (
     comments as comments_resources,
     datadocs as datadocs_resources,
@@ -31,6 +31,7 @@ mcp = FastMCP("Querybook MCP", auth=QuerybookTokenVerifier())
 
 # Add event logging middleware for tools (must be registered before tools)
 mcp.add_middleware(MCPEventLoggingMiddleware())
+mcp.add_middleware(AuthDeprecationNoticeMiddleware())
 
 # Wrap resource decorator to add logging (FastMCP middleware doesn't support resource hooks)
 wrap_mcp_resources(mcp)

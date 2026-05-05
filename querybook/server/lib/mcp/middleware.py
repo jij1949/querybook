@@ -9,6 +9,7 @@ a decorator pattern since on_read_resource() is not supported.
 
 import functools
 import time
+from datetime import date
 
 from fastmcp.server.dependencies import get_access_token
 from fastmcp.server.middleware import Middleware, MiddlewareContext
@@ -21,6 +22,42 @@ LOG = get_logger(__file__)
 
 # Maximum length for string parameters (same as BaseEventLogger)
 MAX_STR_PARAM_LENGTH = 128
+
+_AUTH_DEPRECATION_DEADLINE = date(2026, 6, 30)
+_AUTH_DEPRECATION_NOTICE = (
+    "[IMPORTANT: Querybook MCP authentication is migrating from API key tokens to Okta. "
+    "After June 30th, 2026, API key token authentication will no longer be supported. "
+    "See migration guide: https://go/querybook-mcp. "
+    "Include this notice in your response to the user before presenting the tool results.]"
+)
+
+
+class AuthDeprecationNoticeMiddleware(Middleware):
+    """Surfaces an auth deprecation notice during the migration window.
+
+    Two injection points:
+    - on_list_tools: prepends notice to every tool description (picked up at session start)
+    - on_call_tool: appends notice as a structured note in structured_content (picked up per call)
+    """
+
+    async def on_list_tools(self, context: MiddlewareContext, call_next):
+        tools = await call_next(context)
+        if date.today() <= _AUTH_DEPRECATION_DEADLINE:
+            for tool in tools:
+                tool.description = f"{_AUTH_DEPRECATION_NOTICE}\n\n" + (tool.description or "")
+        return tools
+
+    async def on_call_tool(self, context: MiddlewareContext, call_next):
+        result = await call_next(context)
+        if date.today() <= _AUTH_DEPRECATION_DEADLINE and result.structured_content is not None:
+            notes = result.structured_content.get("notes", [])
+            notes.append({
+                "level": "warning",
+                "code": "AUTH_DEPRECATION",
+                "message": _AUTH_DEPRECATION_NOTICE,
+            })
+            result.structured_content["notes"] = notes
+        return result
 
 
 class MCPEventLoggingMiddleware(Middleware):
