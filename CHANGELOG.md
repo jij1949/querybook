@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.133.0](https://github.com/eg-internal/querybook/compare/v0.132.0...v0.133.0) (2026-05-07)
+
+
+### Features
+
+* Add auth deprecation notice to Querybook MCP server ([1c05276](https://github.com/eg-internal/querybook/commit/1c052763437022b5beec012033878a3f2818d89d))
+* **databricks:** add OIDC workload identity federation auth support ([#533](https://github.com/eg-internal/querybook/issues/533)) ([faa0bac](https://github.com/eg-internal/querybook/commit/faa0bac1040a7996d4acc95b92ea37f9ff0f3a2f))
+
 ## [0.132.0](https://github.com/eg-internal/querybook/compare/v0.131.2...v0.132.0) (2026-04-15)
 
 
