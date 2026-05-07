@@ -42,11 +42,13 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
         self.catalog_name = metastore_params.get("catalog_name")
         self.warehouse_id = metastore_params.get("warehouse_id")
         self.load_partitions = metastore_params.get("load_partitions", False)
+        self.client_id = metastore_params.get("client_id")
 
         # Initialize the Databricks client
         self.databricks_client = DatabricksUnityCatalogClient(
             workspace_url=self.workspace_url,
             token=self.token,
+            client_id=self.client_id,
             catalog_name=self.catalog_name,
             warehouse_id=self.warehouse_id,
         )
@@ -74,11 +76,20 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
             (
                 "token",
                 FormField(
-                    required=True,
+                    required=False,
                     hidden=True,
                     description="Databricks Personal Access Token (PAT) or Service Principal Token",
                     field_type=FormFieldType.String,
-                    helper="Token for authenticating with the Databricks API.",
+                    helper="Required unless using OIDC. Leave empty when using client_id for EKS workload identity auth.",
+                ),
+            ),
+            (
+                "client_id",
+                FormField(
+                    required=False,
+                    description="Service Principal Application ID for OIDC workload identity authentication",
+                    field_type=FormFieldType.String,
+                    helper="Required unless using token auth. Use when running on EKS with a projected service account token at /var/run/secrets/databricks/token.",
                 ),
             ),
             (

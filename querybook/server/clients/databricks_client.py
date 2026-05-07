@@ -19,7 +19,8 @@ class DatabricksUnityCatalogClient:
     def __init__(
         self,
         workspace_url: str,
-        token: str,
+        token: Optional[str] = None,
+        client_id: Optional[str] = None,
         catalog_name: Optional[str] = None,
         warehouse_id: Optional[str] = None,
     ):
@@ -28,19 +29,36 @@ class DatabricksUnityCatalogClient:
 
         Args:
             workspace_url: The Databricks workspace URL
-            token: Personal access token or service principal token for authentication
-            catalog_name: Optional catalog name to use. If not provided, will use the default catalog
+            token: Personal access token or service principal token. Takes precedence
+                   over client_id when both are provided.
+            client_id: Service Principal Application ID for OIDC workload identity
+                       federation. Requires DATABRICKS_OIDC_TOKEN_FILE env var pointing
+                       to a Kubernetes-projected service account token file.
+            catalog_name: Optional catalog name to use.
+            warehouse_id: Optional SQL warehouse ID.
         """
+        if not token and not client_id:
+            raise ValueError(
+                "Either 'token' or 'client_id' must be provided to authenticate with Databricks."
+            )
+
         self.workspace_url = workspace_url.rstrip("/")
         self.token = token
+        self.client_id = client_id
         self.catalog_name = catalog_name
         self.warehouse_id = warehouse_id
 
-        # Initialize the Databricks SDK WorkspaceClient
-        config = Config(
-            host=self.workspace_url,
-            token=self.token,
-        )
+        if token:
+            config = Config(
+                host=self.workspace_url,
+                token=self.token,
+            )
+        else:
+            config = Config(
+                host=self.workspace_url,
+                client_id=self.client_id,
+                auth_type="file-oidc",
+            )
 
         self.workspace_client = WorkspaceClient(config=config)
 
