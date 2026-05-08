@@ -89,7 +89,7 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
                     required=False,
                     description="Service Principal Application ID for OIDC workload identity authentication",
                     field_type=FormFieldType.String,
-                    helper="Required unless using token auth. Use when running on EKS with a projected service account token at /var/run/secrets/databricks/token.",
+                    helper="Required unless using token auth. Use when running on EKS with a projected service account token (path set via QUERYBOOK_DATABRICKS_TOKEN_PATH env var).",
                 ),
             ),
             (

@@ -51,6 +51,7 @@ class TestDatabricksClientAuthSelection(TestCase):
             host="https://example.databricks.com",
             client_id="test-sp-application-id",
             auth_type="file-oidc",
+            oidc_token_filepath="/var/run/secrets/databricks/token",
         )
 
     @patch("clients.databricks_client.WorkspaceClient")

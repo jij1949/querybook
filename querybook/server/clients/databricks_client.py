@@ -3,6 +3,7 @@ Databricks Unity Catalog Client
 This client wraps the Databricks SDK to fetch metadata about schemas, tables, and columns.
 """
 
+import os
 from typing import Dict, List, Optional
 from lib.logger import get_logger
 
@@ -32,8 +33,8 @@ class DatabricksUnityCatalogClient:
             token: Personal access token or service principal token. Takes precedence
                    over client_id when both are provided.
             client_id: Service Principal Application ID for OIDC workload identity
-                       federation. Requires DATABRICKS_OIDC_TOKEN_FILE env var pointing
-                       to a Kubernetes-projected service account token file.
+                       federation. Reads token path from QUERYBOOK_DATABRICKS_TOKEN_PATH
+                       env var (defaults to /var/run/secrets/databricks/token).
             catalog_name: Optional catalog name to use.
             warehouse_id: Optional SQL warehouse ID.
         """
@@ -54,10 +55,15 @@ class DatabricksUnityCatalogClient:
                 token=self.token,
             )
         else:
+            oidc_token_filepath = os.environ.get(
+                "QUERYBOOK_DATABRICKS_TOKEN_PATH",
+                "/var/run/secrets/databricks/token",
+            )
             config = Config(
                 host=self.workspace_url,
                 client_id=self.client_id,
                 auth_type="file-oidc",
+                oidc_token_filepath=oidc_token_filepath,
             )
 
         self.workspace_client = WorkspaceClient(config=config)
