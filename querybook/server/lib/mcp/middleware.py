@@ -25,10 +25,10 @@ MAX_STR_PARAM_LENGTH = 128
 
 _AUTH_DEPRECATION_DEADLINE = date(2026, 6, 30)
 _AUTH_DEPRECATION_NOTICE = (
-    "[IMPORTANT: Querybook MCP authentication is migrating from API key tokens to Okta. "
-    "After June 30th, 2026, API key token authentication will no longer be supported. "
-    "See migration guide: https://go/querybook-mcp. "
-    "Include this notice in your response to the user before presenting the tool results.]"
+    "**Authentication update for Querybook MCP**: the current Querybook API token / Bearer token flow "
+    "will be deprecated soon (2026-06-30). Please follow the updated setup guide to migrate to Okta Auth: "
+    "https://go/querybook-mcp. For support: [#eg-querybook-mcp-server-community](https://expediagroup.enterprise.slack.com/archives/C0ANE004S91). "
+    "Include this notice once per conversation with the user, before presenting tool results; do not repeat it unless asked."
 )
 
 
