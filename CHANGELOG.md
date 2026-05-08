@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.133.1](https://github.com/eg-internal/querybook/compare/v0.133.0...v0.133.1) (2026-05-08)
+
+
+### Bug Fixes
+
+* Databricks metastore OIDC Fix ([#536](https://github.com/eg-internal/querybook/issues/536)) ([693fb8d](https://github.com/eg-internal/querybook/commit/693fb8deae7c265c34b73b7efa0fa357268d23ee))
+
 ## [0.133.0](https://github.com/eg-internal/querybook/compare/v0.132.0...v0.133.0) (2026-05-07)
 
 
