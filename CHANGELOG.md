@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.134.0](https://github.com/eg-internal/querybook/compare/v0.133.1...v0.134.0) (2026-05-11)
+
+
+### Features
+
+* **mcp:** Add OAuth/OIDC authentication via Okta ([3cb51b0](https://github.com/eg-internal/querybook/commit/3cb51b061f7256bae3439d7d9f4278fc22ef9cde))
+
+
+### Bug Fixes
+
+* Querybook MCP - Update the Auth Deprecation Notice ([#535](https://github.com/eg-internal/querybook/issues/535)) ([5b79f39](https://github.com/eg-internal/querybook/commit/5b79f39717f9f98d8c118b8c8eb2663a1033a7fd))
+
 ## [0.133.1](https://github.com/eg-internal/querybook/compare/v0.133.0...v0.133.1) (2026-05-08)
 
 
