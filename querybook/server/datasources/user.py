@@ -1,4 +1,3 @@
-from flask import abort
 from flask_login import current_user
 
 from app.auth import get_login_config

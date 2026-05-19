@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 from const.metastore import (
     DataCatalog,
     DataColumn,
@@ -285,6 +285,25 @@ class ComboMetastoreLoader(BaseMetastoreLoader):
                 schema_name, table_name, catalog_name=catalog_name
             )
         return loader.get_table_and_columns(schema_name, table_name)
+
+    @classmethod
+    def get_sandbox_catalog_names(cls, metastore_dict: Dict) -> List[str]:
+        """Aggregate sandbox catalog names from all child metastores."""
+        from logic import admin as admin_logic
+
+        names: Set[str] = set()
+        params = metastore_dict.get("metastore_params") or {}
+        for sub in params.get("sub_loaders", []):
+            child_id = sub.get("metastore_id")
+            if child_id:
+                child = admin_logic.get_query_metastore_by_id(child_id)
+                if child:
+                    child_dict = child.to_dict_admin()
+                    from lib.metastore import get_metastore_loader_class_by_name
+
+                    child_cls = get_metastore_loader_class_by_name(child_dict["loader"])
+                    names.update(child_cls.get_sandbox_catalog_names(child_dict))
+        return list(names)
 
     @classmethod
     def get_metastore_params_template(cls):

@@ -2,7 +2,11 @@ import datetime
 
 from app.db import with_session
 from const.elasticsearch import ElasticsearchItem
-from const.metastore import DataCatalog as DataCatalogTuple, DataOwner, DataTableWarningSeverity
+from const.metastore import (
+    DataCatalog as DataCatalogTuple,
+    DataOwner,
+    DataTableWarningSeverity,
+)
 from lib.logger import get_logger
 from lib.sqlalchemy import update_model_fields
 from logic import data_element as data_element_logic
@@ -136,21 +140,14 @@ def update_catalog(
 @with_session
 def get_schemas_by_catalog(catalog_id, session=None):
     """Get all schemas in a catalog"""
-    return (
-        session.query(DataSchema)
-        .filter(DataSchema.catalog_id == catalog_id)
-        .all()
-    )
+    return session.query(DataSchema).filter(DataSchema.catalog_id == catalog_id).all()
 
 
 @with_session
-def get_schema_by_name_and_catalog(
-    schema_name, catalog_id, metastore_id, session=None
-):
+def get_schema_by_name_and_catalog(schema_name, catalog_id, metastore_id, session=None):
     """Get schema by name, catalog_id, and metastore_id"""
     query = session.query(DataSchema).filter(
-        DataSchema.name == schema_name,
-        DataSchema.metastore_id == metastore_id
+        DataSchema.name == schema_name, DataSchema.metastore_id == metastore_id
     )
     if catalog_id is None:
         query = query.filter(DataSchema.catalog_id.is_(None))
@@ -216,9 +213,16 @@ def get_all_schemas(
     sort_key="name",
     sort_order="desc",
     name=None,
+    sandbox_user_schema=None,
+    sandbox_catalog_names=None,
     session=None,
 ):
-    """Get all the schemas."""
+    """Get all the schemas.
+
+    When both sandbox_user_schema and sandbox_catalog_names are provided,
+    schemas in those catalogs are filtered to only the user's own schema.
+    Non-sandbox catalogs are unaffected.
+    """
     query = session.query(DataSchema)
 
     col = getattr(DataSchema, sort_key)
@@ -229,13 +233,28 @@ def get_all_schemas(
     if name:
         query = query.filter(DataSchema.name.like("%" + name + "%"))
 
-    result = (
-        query.order_by(col)
-        .filter(DataSchema.metastore_id == metastore_id)
-        .offset(offset)
-        .limit(limit)
-        .all()
-    )
+    query = query.filter(DataSchema.metastore_id == metastore_id)
+
+    if sandbox_user_schema is not None and sandbox_catalog_names:
+        sandbox_catalog_ids = [
+            row[0]
+            for row in session.query(DataCatalog.id)
+            .filter(
+                DataCatalog.metastore_id == metastore_id,
+                DataCatalog.name.in_(sandbox_catalog_names),
+            )
+            .all()
+        ]
+        if sandbox_catalog_ids:
+            query = query.filter(
+                ~DataSchema.catalog_id.in_(sandbox_catalog_ids)
+                | (
+                    DataSchema.catalog_id.in_(sandbox_catalog_ids)
+                    & (DataSchema.name == sandbox_user_schema)
+                )
+            )
+
+    result = query.order_by(col).offset(offset).limit(limit).all()
     return result
 
 

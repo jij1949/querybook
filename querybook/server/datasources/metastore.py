@@ -18,6 +18,7 @@ from const.time import seconds_in_a_day
 from flask_login import current_user
 from lib.lineage.utils import lineage
 from lib.metastore import get_metastore_loader
+from lib.metastore.sandbox import get_sandbox_context
 from lib.metastore.utils import DataTableFinder
 from lib.query_analysis.samples import make_samples_query
 from lib.utils import mysql_cache
@@ -54,7 +55,8 @@ def get_schema(schema_id, include_metastore=False, include_table=False):
         verify_metastore_permission(schema.metastore_id, session=session)
 
         schema_dict = schema.to_dict(
-            include_metastore, include_table, include_catalog=True)
+            include_metastore, include_table, include_catalog=True
+        )
         return schema_dict
 
 
@@ -112,7 +114,11 @@ def get_table_by_name(
 ):
     with DBSession() as session:
         table = logic.get_table_by_name(
-            schema_name, table_name, metastore_id, catalog_name=catalog_name, session=session
+            schema_name,
+            table_name,
+            metastore_id,
+            catalog_name=catalog_name,
+            session=session,
         )
         if not table:
             return None
@@ -242,7 +248,9 @@ def sync_table_by_table_id(table_id):
 
         metastore_id = schema.metastore_id
         metastore_loader = get_metastore_loader(metastore_id, session=session)
-        table_id = metastore_loader.sync_table(schema.get_full_name(), table.name, session=session)
+        table_id = metastore_loader.sync_table(
+            schema.get_full_name(), table.name, session=session
+        )
         if table_id == -1:
             return None
 
@@ -635,8 +643,22 @@ def get_schemas(
     metastore_id, limit=5, offset=0, sort_key="name", sort_order="desc", name=None
 ):
     verify_metastore_permission(metastore_id)
+
+    sandbox_user_schema = None
+    sandbox_catalog_names = None
+    ctx = get_sandbox_context(metastore_id)
+    if ctx:
+        sandbox_catalog_names, sandbox_user_schema = ctx
+
     schemas = logic.get_all_schemas(
-        metastore_id, offset, limit, sort_key, sort_order, name
+        metastore_id,
+        offset,
+        limit,
+        sort_key,
+        sort_order,
+        name,
+        sandbox_user_schema=sandbox_user_schema,
+        sandbox_catalog_names=sandbox_catalog_names,
     )
 
     return {

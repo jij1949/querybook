@@ -2,6 +2,7 @@
 Databricks Unity Catalog Metastore Loader
 This loader integrates Databricks Unity Catalog with Querybook's metastore system.
 """
+
 from typing import Dict, List, Optional, Tuple
 
 from clients.databricks_client import DatabricksUnityCatalogClient
@@ -111,6 +112,15 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
                 ),
             ),
             ("load_partitions", load_partitions_field),
+            (
+                "sandbox_catalog_names",
+                FormField(
+                    required=False,
+                    description="Sandbox catalog names (comma-separated)",
+                    field_type=FormFieldType.String,
+                    helper="UC catalogs treated as user sandboxes. Users will only see their own schema in these catalogs.",
+                ),
+            ),
         )
 
     def get_all_schema_names(self) -> List[DataSchema]:
@@ -132,10 +142,7 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
 
                 # Create DataSchema objects with catalog information
                 for schema in schemas:
-                    result.append(DataSchema(
-                        name=schema,
-                        catalog=catalog_info
-                    ))
+                    result.append(DataSchema(name=schema, catalog=catalog_info))
             else:
                 # If no catalog is specified, get schemas from all catalogs
                 catalogs = self.databricks_client.get_all_catalogs()
@@ -148,10 +155,7 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
 
                     # Create DataSchema objects with catalog information
                     for schema in schemas:
-                        result.append(DataSchema(
-                            name=schema,
-                            catalog=catalog_info
-                        ))
+                        result.append(DataSchema(name=schema, catalog=catalog_info))
 
             return result
         except Exception as e:
@@ -248,7 +252,8 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
 
             if not actual_catalog:
                 LOG.warning(
-                    f"No catalog determined for table {schema_name}.{table_name}")
+                    f"No catalog determined for table {schema_name}.{table_name}"
+                )
                 return None, []
 
             # Fetch table
@@ -276,8 +281,14 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
                 "name": table_obj.name,
                 "catalog_name": table_obj.catalog_name,
                 "schema_name": table_obj.schema_name,
-                "table_type": table_obj.table_type.value if table_obj.table_type else None,
-                "data_source_format": table_obj.data_source_format.value if table_obj.data_source_format else None,
+                "table_type": (
+                    table_obj.table_type.value if table_obj.table_type else None
+                ),
+                "data_source_format": (
+                    table_obj.data_source_format.value
+                    if table_obj.data_source_format
+                    else None
+                ),
                 "storage_location": table_obj.storage_location,
                 "owner": table_obj.owner,
                 "comment": table_obj.comment,
@@ -306,15 +317,22 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
 
             # Databricks timestamps are in milliseconds, convert to seconds
             if created_at:
-                created_at = int(
-                    created_at / 1000) if created_at > 10000000000 else int(created_at)
+                created_at = (
+                    int(created_at / 1000)
+                    if created_at > 10000000000
+                    else int(created_at)
+                )
             if updated_at:
-                updated_at = int(
-                    updated_at / 1000) if updated_at > 10000000000 else int(updated_at)
+                updated_at = (
+                    int(updated_at / 1000)
+                    if updated_at > 10000000000
+                    else int(updated_at)
+                )
 
             try:
                 raw_description = ujson.pdumps(
-                    table_obj.as_dict(), default=lambda o: o.__dict__)
+                    table_obj.as_dict(), default=lambda o: o.__dict__
+                )
             except Exception as e:
                 LOG.warning(f"Could not create raw_description: {e}")
                 raw_description = ujson.pdumps(table_obj, default=str)
@@ -347,11 +365,13 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
         except Exception as e:
             LOG.error(
                 f"Error fetching table and columns for {schema_name}.{table_name}: {e}",
-                exc_info=True
+                exc_info=True,
             )
             return None, []
 
-    def get_table_properties(self, schema_name: str, table_name: str, catalog_name: str) -> Dict:
+    def get_table_properties(
+        self, schema_name: str, table_name: str, catalog_name: str
+    ) -> Dict:
         """
         Get table properties for additional table metadata.
 
@@ -368,7 +388,8 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
         )
 
         LOG.debug(
-            f"Fetched table properties for {schema_name}.{table_name}: {table_properties_obj}")
+            f"Fetched table properties for {schema_name}.{table_name}: {table_properties_obj}"
+        )
         return table_properties_obj
 
     # TODO: Implement partition loading in the next phase, for now we can leave it empty or None

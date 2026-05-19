@@ -21,6 +21,36 @@ from lib.elasticsearch.search_utils import ES_CONFIG
 LOG = get_logger(__file__)
 
 
+def _apply_sandbox_filter(results, metastore_id, result_key=None):
+    """Post-filter ES results to hide sandbox schemas the user doesn't own.
+
+    result_key: if set, each element is a dict and the catalog/schema live
+                under element[result_key]; otherwise they live at the top level.
+
+    Returns (filtered_results, was_filtered) so callers can correct the ES
+    count — which reflects pre-filter totals and would otherwise cause the
+    frontend to keep paginating and accumulate duplicates.
+    """
+    from lib.metastore.sandbox import get_sandbox_context
+
+    ctx = get_sandbox_context(metastore_id)
+    if not ctx:
+        return results, False
+
+    sandbox_catalog_names, user_schema = ctx
+    sandbox_catalogs = set(sandbox_catalog_names)
+
+    def _keep(item):
+        src = item[result_key] if result_key else item
+        catalog = src.get("catalog") or ""
+        schema = src.get("schema") or ""
+        if catalog not in sandbox_catalogs:
+            return True
+        return schema == user_schema
+
+    return [item for item in results if _keep(item)], True
+
+
 @register("/search/datadoc/", methods=["GET"])
 def search_datadoc(
     environment_id,
@@ -127,6 +157,11 @@ def search_tables(
         query, ES_CONFIG["tables"]["index_name"], True
     )
 
+    results, was_filtered = _apply_sandbox_filter(results, metastore_id)
+    # ES count reflects pre-filter totals; replace with filtered length so the
+    # frontend doesn't paginate beyond what the user can see and accumulate duplicates.
+    if was_filtered:
+        count = len(results)
     return {"count": count, "results": results}
 
 
@@ -150,6 +185,8 @@ def suggest_tables(metastore_id, prefix, limit=10):
 
     query = construct_suggest_table_query(prefix, limit, metastore_id)
     options = get_matching_suggestions(query, ES_CONFIG["tables"]["index_name"])
+
+    options, _ = _apply_sandbox_filter(options, metastore_id, result_key="_source")
     texts = []
 
     for option in options:
