@@ -640,9 +640,22 @@ def delete_table_warning(warning_id):
 
 @register("/schemas/", methods=["GET"])
 def get_schemas(
-    metastore_id, limit=5, offset=0, sort_key="name", sort_order="desc", name=None
+    metastore_id,
+    limit=5,
+    offset=0,
+    sort_key="name",
+    sort_order="desc",
+    name=None,
+    catalog_id=None,
 ):
     verify_metastore_permission(metastore_id)
+
+    # Validate catalog_id: must be None, "none", or a valid integer string
+    if catalog_id is not None and catalog_id != "none":
+        try:
+            catalog_id = int(catalog_id)
+        except (TypeError, ValueError):
+            api_assert(False, "catalog_id must be an integer or 'none'", 400)
 
     sandbox_user_schema = None
     sandbox_catalog_names = None
@@ -657,6 +670,7 @@ def get_schemas(
         sort_key,
         sort_order,
         name,
+        catalog_id=catalog_id,
         sandbox_user_schema=sandbox_user_schema,
         sandbox_catalog_names=sandbox_catalog_names,
     )
@@ -664,6 +678,31 @@ def get_schemas(
     return {
         "results": [schema.to_dict(include_catalog=True) for schema in schemas],
         "done": len(schemas) < limit,
+    }
+
+
+@register("/catalogs/", methods=["GET"])
+def get_catalogs(
+    metastore_id,
+    limit=30,
+    offset=0,
+    sort_key="name",
+    sort_order="asc",
+):
+    verify_metastore_permission(metastore_id)
+    rows = logic.get_all_catalogs_paginated(
+        metastore_id, offset, limit, sort_key, sort_order
+    )
+
+    results = []
+    for catalog, schema_count in rows:
+        d = catalog.to_dict()
+        d["schema_count"] = schema_count
+        results.append(d)
+
+    return {
+        "results": results,
+        "done": len(rows) < limit,
     }
 
 

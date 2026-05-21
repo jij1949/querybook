@@ -8,6 +8,7 @@ import { IQueryMetastore } from 'const/metastore';
 import { useToggleState } from 'hooks/useToggleState';
 import { trackClick } from 'lib/analytics';
 import {
+    changeCatalogsSort,
     changeSchemasSort,
     updateTableSort,
 } from 'redux/dataTableSearch/action';
@@ -37,6 +38,9 @@ export const DataTableNavigatorSearch: React.FC<{
     resetSearchFilter: () => void;
 
     showTableSearchResult: boolean;
+    showCatalogView: boolean;
+    hideEmptySchemas: boolean;
+    onHideEmptySchemasChange: (v: boolean) => void;
 }> = ({
     queryMetastore,
     searchString,
@@ -46,6 +50,9 @@ export const DataTableNavigatorSearch: React.FC<{
     resetSearchFilter,
 
     showTableSearchResult,
+    showCatalogView,
+    hideEmptySchemas,
+    onHideEmptySchemasChange,
 }) => {
     const [showSearchFilter, , toggleSearchFilter] = useToggleState(false);
     const filterButtonRef = useRef<HTMLAnchorElement>();
@@ -65,6 +72,10 @@ export const DataTableNavigatorSearch: React.FC<{
 
     const { key: sortSchemaKey, asc: sortSchemaAsc } = useSelector(
         (state: IStoreState) => state.dataTableSearch.schemas.sortSchemasBy
+    );
+
+    const { key: sortCatalogKey, asc: sortCatalogAsc } = useSelector(
+        (state: IStoreState) => state.dataTableSearch.catalogs.sortCatalogsBy
     );
 
     const updateTags = useCallback(
@@ -127,6 +138,15 @@ export const DataTableNavigatorSearch: React.FC<{
                             />
                         </SearchFilterRow>
                     )}
+                    <SearchFilterRow
+                        title="Hide empty schemas"
+                        className="toggle-padding"
+                    >
+                        <ToggleSwitch
+                            checked={hideEmptySchemas}
+                            onChange={onHideEmptySchemasChange}
+                        />
+                    </SearchFilterRow>
                     <SearchFilterRow title="Schema">
                         <SearchBar
                             value={searchFilters?.schema ?? ''}
@@ -205,7 +225,26 @@ export const DataTableNavigatorSearch: React.FC<{
                 />
             )}
 
-            {!showTableSearchResult && (
+            {!showTableSearchResult && showCatalogView && (
+                <OrderByButton
+                    className="mr4"
+                    asc={sortCatalogAsc}
+                    orderByField={sortCatalogKey === 'name' ? 'Name' : 'Schema Count'}
+                    orderByFieldSymbol={sortCatalogKey === 'name' ? 'Aa' : 'Sc'}
+                    onAscToggle={() => {
+                        dispatch(changeCatalogsSort(null, !sortCatalogAsc));
+                    }}
+                    onOrderByFieldToggle={() => {
+                        dispatch(
+                            changeCatalogsSort(
+                                sortCatalogKey === 'name' ? 'schema_count' : 'name'
+                            )
+                        );
+                    }}
+                />
+            )}
+
+            {!showTableSearchResult && !showCatalogView && (
                 <OrderByButton
                     className="mr4"
                     asc={sortSchemaAsc}

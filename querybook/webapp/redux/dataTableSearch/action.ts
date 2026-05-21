@@ -2,10 +2,11 @@ import {
     IDataSchema,
     SchemaSortKey,
     SchemaTableSortKey,
+    CatalogSortKey,
 } from 'const/metastore';
 import { Nullable } from 'lib/typescript';
 import { queryMetastoresSelector } from 'redux/dataSources/selector';
-import { SearchSchemaResource, SearchTableResource } from 'resource/search';
+import { SearchCatalogResource, SearchSchemaResource, SearchTableResource } from 'resource/search';
 
 import { defaultSortSchemaBy, defaultSortSchemaTableBy } from './const';
 import {
@@ -14,6 +15,8 @@ import {
     IDataTableSearchState,
     ISchemasSortChangedAction,
     ISchemaTableSortChangedAction,
+    ICatalogsSortChangedAction,
+    ICatalogSchemaSortChangedAction,
     ITableSearchFilters,
     ITableSearchResult,
     ThunkResult,
@@ -359,5 +362,141 @@ export function selectMetastore(
             },
         });
         return dispatch(searchDataTable());
+    };
+}
+
+export function changeCatalogSchemaSort(
+    catalogId: number,
+    sortKey?: SchemaSortKey | null,
+    sortAsc?: boolean | null
+): ICatalogSchemaSortChangedAction {
+    return {
+        type: '@@dataTableSearch/CATALOG_SCHEMA_SORT_CHANGED',
+        payload: { catalogId, sortKey, sortAsc },
+    };
+}
+
+export function changeCatalogsSort(
+    sortKey?: CatalogSortKey | null,
+    sortAsc?: boolean | null
+): ICatalogsSortChangedAction {
+    return {
+        type: '@@dataTableSearch/CATALOGS_SORT_CHANGED',
+        payload: {
+            sortKey,
+            sortAsc,
+        },
+    };
+}
+
+export function searchCatalogs(): ThunkResult<Promise<void>> {
+    return async (dispatch, getState) => {
+        try {
+            const state = getState().dataTableSearch;
+            if (state.catalogs.done) {
+                return;
+            }
+            const offset = state.catalogs.catalogIds.length;
+            const { key, asc } = state.catalogs.sortCatalogsBy;
+            dispatch({ type: '@@dataTableSearch/CATALOG_SEARCH_STARTED' });
+
+            const { data } = await SearchCatalogResource.getMore({
+                metastore_id: state.metastoreId,
+                offset,
+                limit: 30,
+                sort_key: key,
+                sort_order: asc ? 'asc' : 'desc',
+            });
+
+            dispatch({
+                type: '@@dataTableSearch/CATALOG_SEARCH_DONE',
+                payload: data,
+            });
+        } catch (error) {
+            console.error(error);
+            dispatch({
+                type: '@@dataTableSearch/CATALOG_SEARCH_FAILED',
+                payload: { error },
+            });
+        }
+    };
+}
+
+export function searchUncategorizedSchemas(): ThunkResult<Promise<void>> {
+    return async (dispatch, getState) => {
+        try {
+            const state = getState().dataTableSearch;
+            if (state.schemas.done) {
+                return;
+            }
+            // Count only uncategorized schemas already loaded to compute offset
+            const offset = state.schemas.schemaIds.filter(
+                (id) => !state.schemas.schemaResultById[id]?.catalog_id
+            ).length;
+            dispatch({ type: '@@dataTableSearch/SCHEMA_SEARCH_STARTED' });
+
+            const { data } = await SearchSchemaResource.getMore({
+                metastore_id: state.metastoreId,
+                catalog_id: 'none',
+                offset,
+                limit: 30,
+                sort_key: 'name',
+                sort_order: 'asc',
+            });
+
+            dispatch({
+                type: '@@dataTableSearch/SCHEMA_SEARCH_DONE',
+                payload: data,
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+}
+
+export function searchSchemasByCatalog(
+    catalogId: number
+): ThunkResult<Promise<void>> {
+    return async (dispatch, getState) => {
+        try {
+            const state = getState().dataTableSearch;
+            const catalog = state.catalogs.catalogResultById[catalogId];
+            if (!catalog || catalog.schemasDone || catalog.schemasLoading) {
+                return;
+            }
+            const offset = catalog.schemas?.length ?? 0;
+            const schemaSortOrder = state.catalogs.catalogSchemaSortByIds[catalogId] ?? {
+                key: 'name' as SchemaSortKey,
+                asc: true,
+            };
+            dispatch({
+                type: '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_STARTED',
+                payload: { catalogId },
+            });
+
+            const { data } = await SearchSchemaResource.getMore({
+                metastore_id: state.metastoreId,
+                catalog_id: catalogId,
+                offset,
+                limit: 30,
+                sort_key: schemaSortOrder.key as 'name' | 'table_count',
+                sort_order: schemaSortOrder.asc ? 'asc' : 'desc',
+            });
+
+            dispatch({
+                type: '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_DONE',
+                payload: {
+                    catalogId,
+                    results: data.results,
+                    done: data.done,
+                },
+            });
+        } catch (error) {
+            console.error(error);
+            dispatch({
+                type: '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_FAILED',
+                payload: { catalogId, error },
+            });
+        }
     };
 }

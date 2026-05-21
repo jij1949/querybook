@@ -29,7 +29,8 @@ const IntersectionElement = styled.div`
 export const SchemaTableView: React.FunctionComponent<{
     tableRowRenderer: (table: ITableSearchResult) => React.ReactNode;
     selectedTableId: number;
-}> = ({ tableRowRenderer, selectedTableId }) => {
+    hideEmptySchemas: boolean;
+}> = ({ tableRowRenderer, selectedTableId, hideEmptySchemas }) => {
     const schemas = useSelector(
         (state: IStoreState) => state.dataTableSearch.schemas
     );
@@ -43,7 +44,7 @@ export const SchemaTableView: React.FunctionComponent<{
 
     const dispatch: Dispatch = useDispatch();
     const [intersectElement, setIntersectElement] =
-        useState<HTMLDivElement>(null);
+        useState<HTMLDivElement | null>(null);
 
     useIntersectionObserver({
         intersectElement,
@@ -56,50 +57,47 @@ export const SchemaTableView: React.FunctionComponent<{
 
     return (
         <SchemasList>
-            {schemas.schemaIds.map((schemaId) => {
-                const schema = schemas.schemaResultById[schemaId];
-                const schemaSortOrder =
-                    schemas.schemaSortByIds[schemaId] ??
-                    defaultSortSchemaTableBy;
-                
-                // Determine if we should show catalog based on metastore settings
-                const showCatalog =
-                    metastore?.catalog_display_config?.show_catalog_in_ui ??
-                    false;
-                const schemaDisplayName = getSchemaDisplayName(
-                    schema,
-                    showCatalog
-                );
+            {schemas.schemaIds
+                .map((schemaId) => schemas.schemaResultById[schemaId])
+                .filter((schema) => !hideEmptySchemas || schema.table_count > 0)
+                .map((schema) => {
+                    const schemaSortOrder =
+                        schemas.schemaSortByIds[schema.id] ??
+                        defaultSortSchemaTableBy;
+                    const showCatalog =
+                        metastore?.catalog_display_config?.show_catalog_in_ui ??
+                        false;
+                    const schemaDisplayName = getSchemaDisplayName(
+                        schema,
+                        showCatalog
+                    );
 
-                return (
-                    <SchemaTableItem
-                        key={`${schema.id}-${schemaDisplayName}`}
-                        name={schemaDisplayName}
-                        total={schema.count}
-                        tables={schema.tables}
-                        sortOrder={schemaSortOrder}
-                        selectedTableId={selectedTableId}
-                        tableRowRenderer={tableRowRenderer}
-                        onSortChanged={(
-                            sortKey?: SchemaTableSortKey | null,
-                            sortAsc?: boolean | null
-                        ) =>
-                            dispatch(
-                                changeTableSort(schema.id, sortKey, sortAsc)
-                            )
-                        }
-                        onLoadMore={() =>
-                            dispatch(
-                                searchTableBySchema(
-                                    schema.name,
-                                    schema.id,
-                                    schema.catalog?.name
+                    return (
+                        <SchemaTableItem
+                            key={`${schema.id}-${schemaDisplayName}`}
+                            name={schemaDisplayName}
+                            total={schema.count}
+                            tables={schema.tables}
+                            sortOrder={schemaSortOrder}
+                            selectedTableId={selectedTableId}
+                            tableRowRenderer={tableRowRenderer}
+                            onSortChanged={(sortKey, sortAsc) =>
+                                dispatch(
+                                    changeTableSort(schema.id, sortKey, sortAsc)
                                 )
-                            )
-                        }
-                    />
-                );
-            })}
+                            }
+                            onLoadMore={() =>
+                                dispatch(
+                                    searchTableBySchema(
+                                        schema.name,
+                                        schema.id,
+                                        schema.catalog?.name
+                                    )
+                                )
+                            }
+                        />
+                    );
+                })}
 
             <IntersectionElement ref={setIntersectElement} />
         </SchemasList>

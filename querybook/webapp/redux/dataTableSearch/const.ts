@@ -20,3 +20,15 @@ export const defaultSortSearchTableBy: SchemaSortByIds[keyof SchemaSortByIds] =
         key: 'relevance',
         asc: true, // Ignored for relevance, but when user switch to name asc would be true
     };
+
+export const defaultSortCatalogsBy: IDataTableSearchPaginationState['catalogs']['sortCatalogsBy'] =
+    {
+        asc: true,
+        key: 'name',
+    };
+
+export const defaultCatalogSchemaSortBy: IDataTableSearchPaginationState['catalogs']['catalogSchemaSortByIds'][number] =
+    {
+        asc: true,
+        key: 'name',
+    };

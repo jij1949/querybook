@@ -249,6 +249,14 @@ export interface ITableColumnStats {
 
 export type SchemaSortKey = 'name' | 'table_count';
 export type SchemaTableSortKey = 'name' | 'relevance';
+export type CatalogSortKey = 'name' | 'schema_count';
+
+export interface ICatalogSearchResult {
+    id: number;
+    name: string;
+    schema_count: number;
+    schemas?: IDataSchema[];
+}
 export const tableNameDraggableType = 'TableName-';
 
 /**

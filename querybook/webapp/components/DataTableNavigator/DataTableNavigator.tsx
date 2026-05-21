@@ -28,6 +28,7 @@ import { Popover } from 'ui/Popover/Popover';
 import { PopoverHoverWrapper } from 'ui/Popover/PopoverHoverWrapper';
 import { makeSelectOptions, Select } from 'ui/Select/Select';
 
+import { CatalogTableView } from './CatalogTableView/CatalogTableView';
 import { DataTableHoverContent } from './DataTableHoverContent';
 import { DataTableNavigatorSearch } from './DataTableNavigatorSearch';
 import { SchemaTableView } from './SchemaTableView/SchemaTableView';
@@ -218,6 +219,11 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
         [searchString, searchFilters]
     );
 
+    const [hideEmptySchemas, setHideEmptySchemas] = React.useState(false);
+
+    const showCatalogView =
+        queryMetastore?.catalog_display_config?.show_catalog_in_ui ?? false;
+
     const metastorePicker = (
         <div className="navigator-metastore-picker horizontal-space-between pt12 pr8 pl4">
             <Select
@@ -255,12 +261,23 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
     let tablesDOM = null;
 
     if (!showTableSearchResult) {
-        tablesDOM = (
-            <SchemaTableView
-                tableRowRenderer={tableRowRenderer}
-                selectedTableId={selectedTableId}
-            />
-        );
+        if (showCatalogView) {
+            tablesDOM = (
+                <CatalogTableView
+                    tableRowRenderer={tableRowRenderer}
+                    selectedTableId={selectedTableId}
+                    hideEmptySchemas={hideEmptySchemas}
+                />
+            );
+        } else {
+            tablesDOM = (
+                <SchemaTableView
+                    tableRowRenderer={tableRowRenderer}
+                    selectedTableId={selectedTableId}
+                    hideEmptySchemas={hideEmptySchemas}
+                />
+            );
+        }
     } else {
         tablesDOM = (
             <div className="table-scroll-wrapper">
@@ -288,6 +305,9 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
                         updateSearchFilter={updateSearchFilter}
                         resetSearchFilter={resetSearchFilter}
                         showTableSearchResult={showTableSearchResult}
+                        showCatalogView={showCatalogView}
+                        hideEmptySchemas={hideEmptySchemas}
+                        onHideEmptySchemasChange={setHideEmptySchemas}
                     />
                 )}
             </div>

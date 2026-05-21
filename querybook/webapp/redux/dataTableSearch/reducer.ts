@@ -4,6 +4,8 @@ import {
     defaultSortSchemaBy,
     defaultSortSearchTableBy,
     defaultSortSchemaTableBy,
+    defaultSortCatalogsBy,
+    defaultCatalogSchemaSortBy,
 } from './const';
 import {
     DataTableSearchAction,
@@ -19,6 +21,13 @@ const initialResultState: IDataTableSearchPaginationState = {
         schemaResultById: {},
         schemaSortByIds: {},
         sortSchemasBy: defaultSortSchemaBy,
+        done: false,
+    },
+    catalogs: {
+        catalogIds: [],
+        catalogResultById: {},
+        catalogSchemaSortByIds: {},
+        sortCatalogsBy: defaultSortCatalogsBy,
         done: false,
     },
 };
@@ -171,6 +180,98 @@ export default function dataTableSearch(
                     ...initialResultState.schemas,
                     sortSchemasBy: draft.schemas.sortSchemasBy,
                 };
+                return;
+            }
+
+            case '@@dataTableSearch/CATALOG_SEARCH_DONE': {
+                for (const catalog of action.payload.results) {
+                    draft.catalogs.catalogIds.push(catalog.id);
+                    draft.catalogs.catalogResultById[catalog.id] = {
+                        ...catalog,
+                        schemasDone: false,
+                        schemasLoading: false,
+                    };
+                }
+                draft.catalogs.done = action.payload.done;
+                return;
+            }
+
+            case '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_STARTED': {
+                const { catalogId: loadingCatalogId } = action.payload;
+                if (draft.catalogs.catalogResultById[loadingCatalogId]) {
+                    draft.catalogs.catalogResultById[loadingCatalogId].schemasLoading = true;
+                }
+                return;
+            }
+
+            case '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_DONE': {
+                const { catalogId, results, done } = action.payload;
+                const existing =
+                    draft.catalogs.catalogResultById[catalogId]?.schemas ?? [];
+                draft.catalogs.catalogResultById[catalogId].schemas = [
+                    ...existing,
+                    ...results,
+                ];
+                draft.catalogs.catalogResultById[catalogId].schemasDone = done;
+                draft.catalogs.catalogResultById[catalogId].schemasLoading = false;
+
+                // Register schemas in schemaResultById so existing table-loading
+                // and sort logic (searchTableBySchema, SEARCH_TABLE_BY_SORT_CHANGED) works
+                for (const schema of results) {
+                    if (!draft.schemas.schemaResultById[schema.id]) {
+                        draft.schemas.schemaResultById[schema.id] = {
+                            ...schema,
+                            tables: [],
+                            count: schema.table_count,
+                        };
+                        draft.schemas.schemaIds.push(schema.id);
+                    }
+                }
+                return;
+            }
+
+            case '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_FAILED': {
+                const failedCatalogId = action.payload?.catalogId;
+                if (failedCatalogId != null && draft.catalogs.catalogResultById[failedCatalogId]) {
+                    draft.catalogs.catalogResultById[failedCatalogId].schemasLoading = false;
+                }
+                return;
+            }
+
+            case '@@dataTableSearch/CATALOGS_SORT_CHANGED': {
+                const { sortKey, sortAsc } = action.payload;
+                if (sortKey != null) {
+                    draft.catalogs.sortCatalogsBy.key = sortKey;
+                }
+                if (sortAsc != null) {
+                    draft.catalogs.sortCatalogsBy.asc = sortAsc;
+                }
+                // Reset catalog list so it reloads with new sort
+                draft.catalogs = {
+                    ...initialResultState.catalogs,
+                    sortCatalogsBy: draft.catalogs.sortCatalogsBy,
+                };
+                return;
+            }
+
+            case '@@dataTableSearch/CATALOG_SCHEMA_SORT_CHANGED': {
+                const { catalogId, sortKey, sortAsc } = action.payload;
+                const existing = draft.catalogs.catalogSchemaSortByIds[catalogId] || {
+                    ...defaultCatalogSchemaSortBy,
+                };
+                if (sortKey != null) {
+                    existing.key = sortKey;
+                }
+                if (sortAsc != null) {
+                    existing.asc = sortAsc;
+                }
+                draft.catalogs.catalogSchemaSortByIds[catalogId] = existing;
+                // Reset schemas for this catalog so they reload with the new sort
+                if (draft.catalogs.catalogResultById[catalogId]) {
+                    draft.catalogs.catalogResultById[catalogId].schemas = [];
+                    draft.catalogs.catalogResultById[catalogId].schemasDone = false;
+                    draft.catalogs.catalogResultById[catalogId].schemasLoading = false;
+                }
                 return;
             }
         }

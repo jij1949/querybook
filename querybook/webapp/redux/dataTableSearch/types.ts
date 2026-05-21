@@ -5,6 +5,8 @@ import {
     IDataSchema,
     SchemaSortKey,
     SchemaTableSortKey,
+    CatalogSortKey,
+    ICatalogSearchResult,
 } from 'const/metastore';
 import { ICancelablePromise } from 'lib/datasource';
 
@@ -20,6 +22,11 @@ export interface ITableSearchResult {
     tags: string[];
 }
 
+export interface ICatalogSearchState extends ICatalogSearchResult {
+    schemasDone: boolean;
+    schemasLoading: boolean;
+}
+
 export interface ITableSearchFilters {
     golden?: true;
     tags?: string[];
@@ -30,7 +37,7 @@ export interface ITableSearchFilters {
     data_elements?: string[];
 }
 
-interface ISchemaTableSearch extends IDataSchema {
+export interface ISchemaTableSearch extends IDataSchema {
     tables?: ITableSearchResult[];
     count?: number;
 }
@@ -165,6 +172,66 @@ export interface ISchemasSortChangedAction extends Action {
     };
 }
 
+export interface ICatalogSearchStartedAction extends Action {
+    type: '@@dataTableSearch/CATALOG_SEARCH_STARTED';
+}
+
+export interface ICatalogSearchDoneAction extends Action {
+    type: '@@dataTableSearch/CATALOG_SEARCH_DONE';
+    payload: {
+        results: ICatalogSearchResult[];
+        done: boolean;
+    };
+}
+
+export interface ICatalogSearchFailedAction extends Action {
+    type: '@@dataTableSearch/CATALOG_SEARCH_FAILED';
+    payload: {
+        error: any;
+    };
+}
+
+export interface ISearchSchemaByCatalogStartedAction extends Action {
+    type: '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_STARTED';
+    payload: {
+        catalogId: number;
+    };
+}
+
+export interface ISearchSchemaByCatalogDoneAction extends Action {
+    type: '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_DONE';
+    payload: {
+        results: IDataSchema[];
+        catalogId: number;
+        done: boolean;
+    };
+}
+
+export interface ISearchSchemaByCatalogFailedAction extends Action {
+    type: '@@dataTableSearch/SEARCH_SCHEMA_BY_CATALOG_FAILED';
+    payload: {
+        catalogId: number;
+        error: any;
+    };
+}
+
+export interface ICatalogsSortChangedAction extends Action {
+    type: '@@dataTableSearch/CATALOGS_SORT_CHANGED';
+    payload: {
+        sortKey?: CatalogSortKey;
+        sortAsc?: boolean;
+    };
+}
+
+export interface ICatalogSchemaSortChangedAction extends Action {
+    type: '@@dataTableSearch/CATALOG_SCHEMA_SORT_CHANGED';
+    payload: {
+        catalogId: number;
+        sortKey?: SchemaSortKey;
+        sortAsc?: boolean;
+    };
+}
+
 export type DataTableSearchAction =
     | IDataTableSearchResultResetAction
     | IDataTableSearchResultClearAction
@@ -184,7 +251,15 @@ export type DataTableSearchAction =
     | ISchemaSearchFailedAction
     | ISearchTableBySchemaFailedAction
     | ISchemaTableSortChangedAction
-    | ISchemasSortChangedAction;
+    | ISchemasSortChangedAction
+    | ICatalogSearchStartedAction
+    | ICatalogSearchDoneAction
+    | ICatalogSearchFailedAction
+    | ISearchSchemaByCatalogStartedAction
+    | ISearchSchemaByCatalogDoneAction
+    | ISearchSchemaByCatalogFailedAction
+    | ICatalogsSortChangedAction
+    | ICatalogSchemaSortChangedAction;
 
 export interface IDataTableSearchPaginationState {
     results: ITableSearchResult[];
@@ -201,6 +276,16 @@ export interface IDataTableSearchPaginationState {
         sortSchemasBy: {
             asc: boolean;
             key: SchemaSortKey;
+        };
+    };
+    catalogs: {
+        done: boolean;
+        catalogIds: number[];
+        catalogResultById: Record<number, ICatalogSearchState>;
+        catalogSchemaSortByIds: Record<number, { asc: boolean; key: SchemaSortKey }>;
+        sortCatalogsBy: {
+            asc: boolean;
+            key: CatalogSortKey;
         };
     };
 }

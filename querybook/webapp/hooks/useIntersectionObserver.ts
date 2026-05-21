@@ -6,12 +6,12 @@ export function useIntersectionObserver({
     deps,
     disabled,
 }: {
-    intersectElement: HTMLElement;
+    intersectElement: HTMLElement | null;
     onIntersect: () => void;
     deps: any[];
     disabled: boolean;
 }) {
-    const interseptor = useRef<IntersectionObserver>(null);
+    const interseptor = useRef<IntersectionObserver | null>(null);
     const rootElement = intersectElement?.parentElement;
 
     const intersectCallback = useCallback(() => {

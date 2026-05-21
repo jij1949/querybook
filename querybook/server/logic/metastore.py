@@ -63,6 +63,50 @@ def get_all_catalogs(metastore_id, session=None):
 
 
 @with_session
+def get_all_catalogs_paginated(
+    metastore_id,
+    offset=0,
+    limit=30,
+    sort_key="name",
+    sort_order="asc",
+    session=None,
+):
+    """Get catalogs for a metastore with pagination and sorting.
+
+    Returns list of (DataCatalog, schema_count) tuples to avoid N+1 queries.
+    sort_order defaults to 'asc' (alphabetical catalog listing).
+    """
+    VALID_CATALOG_SORT_KEYS = {"name", "schema_count"}
+    if sort_key not in VALID_CATALOG_SORT_KEYS:
+        raise ValueError(f"Invalid sort_key: {sort_key}")
+
+    schema_count_subq = (
+        session.query(func.count(DataSchema.id))
+        .filter(DataSchema.catalog_id == DataCatalog.id)
+        .correlate(DataCatalog)
+        .scalar_subquery()
+    )
+
+    if sort_key == "schema_count":
+        col = schema_count_subq.label("schema_count")
+    else:
+        col = getattr(DataCatalog, sort_key)
+
+    if sort_order == "desc":
+        col = col.desc()
+
+    rows = (
+        session.query(DataCatalog, schema_count_subq.label("schema_count"))
+        .filter(DataCatalog.metastore_id == metastore_id)
+        .order_by(col)
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return rows
+
+
+@with_session
 def create_catalog(
     name,
     description=None,
@@ -213,11 +257,16 @@ def get_all_schemas(
     sort_key="name",
     sort_order="desc",
     name=None,
+    catalog_id=None,
     sandbox_user_schema=None,
     sandbox_catalog_names=None,
     session=None,
 ):
-    """Get all the schemas.
+    """Get all the schemas, optionally filtered by catalog_id.
+
+    Pass catalog_id='none' to get schemas with no catalog (uncategorized).
+    Pass catalog_id=<int> to get schemas belonging to that catalog.
+    Omit catalog_id to get all schemas (backward-compatible default).
 
     When both sandbox_user_schema and sandbox_catalog_names are provided,
     schemas in those catalogs are filtered to only the user's own schema.
@@ -226,12 +275,16 @@ def get_all_schemas(
     query = session.query(DataSchema)
 
     col = getattr(DataSchema, sort_key)
-
     if sort_order == "desc":
         col = col.desc()
 
     if name:
         query = query.filter(DataSchema.name.like("%" + name + "%"))
+
+    if catalog_id == "none":
+        query = query.filter(DataSchema.catalog_id.is_(None))
+    elif catalog_id is not None:
+        query = query.filter(DataSchema.catalog_id == catalog_id)
 
     query = query.filter(DataSchema.metastore_id == metastore_id)
 

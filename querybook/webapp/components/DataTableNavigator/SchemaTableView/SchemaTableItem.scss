@@ -1,5 +1,9 @@
 .SchemaTableItem {
     .schema-name {
         overflow: hidden;
+
+        .Icon {
+            flex-shrink: 0;
+        }
     }
 }

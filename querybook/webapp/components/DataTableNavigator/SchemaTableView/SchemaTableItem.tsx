@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { SchemaTableSortKey } from 'const/metastore';
 import type { ITableSearchResult } from 'redux/dataTableSearch/types';
 import { IconButton } from 'ui/Button/IconButton';
+import { Icon } from 'ui/Icon/Icon';
 import { InfinityScroll } from 'ui/InfinityScroll/InfinityScroll';
 import { OrderByButton } from 'ui/OrderByButton/OrderByButton';
 import { Title } from 'ui/Title/Title';
@@ -39,7 +40,7 @@ function prepareSchemaNames(
     return tables.map((table) => ({
         ...table,
         selected: table.id === selectedTableId,
-        displayName: table.name,
+        displayName: table.name
     }));
 }
 
@@ -66,7 +67,7 @@ export const SchemaTableItem: React.FC<{
     total,
     tableRowRenderer,
     onSortChanged,
-    sortOrder,
+    sortOrder
 }) => {
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
     const data = useMemo(
@@ -81,7 +82,8 @@ export const SchemaTableItem: React.FC<{
                     className="schema-name flex1 flex-row"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
-                    <Title size="small" className="one-line-ellipsis">
+                    <Icon name="Database" size={14} />
+                    <Title size="small" className="one-line-ellipsis ml4">
                         {name}
                     </Title>
                 </div>
@@ -121,7 +123,7 @@ export const SchemaTableItem: React.FC<{
                             itemHeight={TABLE_ITEM_HEIGHT}
                             defaultListHeight={calculateMaxHeight(total)}
                             autoSizerStyles={{
-                                height: `${calculateMaxHeight(total)}px`,
+                                height: `${calculateMaxHeight(total)}px`
                             }}
                         />
                     )}
