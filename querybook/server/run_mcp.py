@@ -27,6 +27,7 @@ from lib.mcp.tools import (
     comments,
     datadocs,
     environments,
+    github_integration,
     lists,
     query_engines,
     query_executions,
@@ -102,6 +103,7 @@ wrap_mcp_resources(mcp)
 comments.register(mcp)
 datadocs.register(mcp)
 environments.register(mcp)
+github_integration.register(mcp)
 lists.register(mcp)
 query_engines.register(mcp)
 query_executions.register(mcp)

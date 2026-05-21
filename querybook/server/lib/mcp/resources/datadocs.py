@@ -10,6 +10,7 @@ from lib.mcp.lib.datadocs import (
     get_datadoc_data,
     get_datadoc_cell_data,
     get_datadoc_cell_executions_data,
+    get_datadoc_github_history_data,
 )
 from lib.mcp.utils import RESOURCE_ANNOTATIONS
 
@@ -71,3 +72,24 @@ def register(mcp: FastMCP) -> None:
                 cell_id, uid, session, limit, offset
             )
             return [ResourceContent({"executions": result})]
+
+    @mcp.resource(
+        uri="querybook://datadoc/{datadoc_id}/github-history{?limit,offset}",
+        name="DataDoc GitHub History",
+        description="Get GitHub commit history for a DataDoc with pagination",
+        mime_type="application/json",
+        annotations=RESOURCE_ANNOTATIONS,
+    )
+    def get_datadoc_github_history_resource(
+        datadoc_id: Annotated[int, "DataDoc ID"],
+        limit: Annotated[int, "Maximum number of commits to return"] = 20,
+        offset: Annotated[int, "Number of commits to skip for pagination"] = 0,
+        token: AccessToken = CurrentAccessToken(),
+    ) -> list[ResourceContent]:
+        """Get GitHub commit history for a DataDoc."""
+        uid = token.claims["creator_uid"]
+        with DBSession() as session:
+            result = get_datadoc_github_history_data(
+                datadoc_id, uid, session, limit, offset
+            )
+            return [ResourceContent(result)]

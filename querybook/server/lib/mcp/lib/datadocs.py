@@ -89,6 +89,7 @@ def serialize_datadoc(
     with_editors: bool = False,
     with_schedule: bool = False,
     with_comments: bool = False,
+    with_github: bool = False,
 ) -> dict:
     """Serialize a DataDoc model to dict with all fields, resource_uri, and URL.
 
@@ -197,8 +198,61 @@ def serialize_datadoc(
         for cell in result["cells"]:
             cell["comments"] = comments_by_cell.get(cell["id"], [])
 
+    if with_github:
+        from logic.github import get_repo_link
+        from lib.mcp.lib.github import serialize_github_status
+        from clients.github_client import GitHubClient
+        from lib.github.github import github_manager
+        from env import QuerybookSettings
+        from lib.logger import get_logger
+
+        LOG = get_logger(__name__)
+
+        github_link = get_repo_link(doc.id, session=session)
+
+        if github_link:
+            # Try to get last commit info
+            last_commit_info = None
+            notes = None
+            if uid is not None:
+                try:
+                    access_token = github_manager.get_github_token(uid=uid)
+                    github_client = GitHubClient(
+                        access_token=access_token,
+                        repo_name=QuerybookSettings.GITHUB_REPO_NAME,
+                        branch=QuerybookSettings.GITHUB_BRANCH,
+                        github_link=github_link,
+                    )
+                    commits = github_client.get_datadoc_versions(page=1)
+                    if commits:
+                        last_commit = commits[0]
+                        last_commit_info = {
+                            "sha": last_commit["sha"],
+                            "message": last_commit["commit"]["message"],
+                            "author": last_commit["commit"]["author"]["name"],
+                            "date": last_commit["commit"]["author"]["date"],
+                            "url": last_commit["html_url"],
+                        }
+                except Exception as e:
+                    LOG.debug(f"Could not fetch GitHub commit info for datadoc {doc.id}: {e}")
+                    notes = "Could not fetch GitHub commit info"
+
+            result["github"] = serialize_github_status(
+                github_link=github_link,
+                last_commit_info=last_commit_info,
+                repo_name=QuerybookSettings.GITHUB_REPO_NAME,
+                branch=QuerybookSettings.GITHUB_BRANCH,
+                notes=notes
+            )
+        else:
+            result["github"] = {
+                "linked": False,
+                "message": "DataDoc is not linked to GitHub"
+            }
+
     # Add resource_uri and URL
     result["resource_uri"] = f"querybook://datadoc/{doc.id}"
+    result["github_history_uri"] = f"querybook://datadoc/{doc.id}/github-history?limit=&offset="
 
     environment = session.query(Environment).get(doc.environment_id)
     if environment:
@@ -238,6 +292,7 @@ def get_datadoc_data(datadoc_id: int, uid: int, session) -> dict:
         with_editors=True,
         with_schedule=True,
         with_comments=True,
+        with_github=True,
     )
 
 
@@ -280,6 +335,74 @@ def get_datadoc_cell_data(cell_id: int, uid: int, session) -> dict:
         datadoc_id=doc_cell.data_doc_id,
     )
     return result
+
+
+def get_datadoc_github_history_data(
+    datadoc_id: int, uid: int, session, limit: int = 20, offset: int = 0
+) -> dict:
+    """Get GitHub commit history for a DataDoc with permission checking.
+
+    Args:
+        datadoc_id: DataDoc ID
+        uid: User ID for permission checking
+        session: Database session
+        limit: Maximum number of commits to return
+        offset: Number of commits to skip
+
+    Returns:
+        Dict with commits list and pagination info
+
+    Raises:
+        ValueError: If datadoc not found, user lacks permission, or not linked to GitHub
+    """
+    from logic.github import get_repo_link
+    from clients.github_client import GitHubClient
+    from lib.github.github import github_manager
+    from env import QuerybookSettings
+    from lib.mcp.lib.github import serialize_commit
+
+    # Check permission
+    try:
+        if not user_can_read(datadoc_id, uid, session=session):
+            raise ValueError("You do not have access to this DataDoc.")
+    except DocDoesNotExist:
+        raise ValueError(f"DataDoc {datadoc_id} not found.")
+
+    # Check if linked to GitHub
+    github_link = get_repo_link(datadoc_id, session=session)
+    if not github_link:
+        raise ValueError(
+            f"DataDoc {datadoc_id} is not linked to GitHub. "
+            "Use link_datadoc_github to set up version control first."
+        )
+
+    # Get GitHub client
+    access_token = github_manager.get_github_token(uid=uid)
+    github_client = GitHubClient(
+        access_token=access_token,
+        repo_name=QuerybookSettings.GITHUB_REPO_NAME,
+        branch=QuerybookSettings.GITHUB_BRANCH,
+        github_link=github_link,
+    )
+
+    # Get commits with pagination
+    page = (offset // limit) + 1
+    commits = github_client.get_datadoc_versions(page=page)
+
+    # Serialize commits
+    serialized_commits = [serialize_commit(commit) for commit in commits]
+
+    return {
+        "datadoc_id": datadoc_id,
+        "file_path": github_client.file_path,
+        "commits": serialized_commits,
+        "count": len(serialized_commits),
+        "limit": limit,
+        "offset": offset,
+        "has_more": len(serialized_commits) == limit,
+        "repository": QuerybookSettings.GITHUB_REPO_NAME,
+        "branch": QuerybookSettings.GITHUB_BRANCH,
+    }
 
 
 def get_datadoc_cell_executions_data(

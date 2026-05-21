@@ -53,6 +53,10 @@ function getDevServerSettings(env) {
                 target: QUERYBOOK_UPSTREAM,
                 changeOrigin: true,
             },
+            '/github/mcp-oauth-initiate': {
+                target: QUERYBOOK_UPSTREAM,
+                changeOrigin: true,
+            },
         },
         publicPath: '/build/',
         onListening: (server) => {

@@ -1,16 +1,20 @@
 from functools import wraps
+from typing import Dict, List, Optional
+from urllib.parse import quote
+
+from app.auth.permission import verify_data_doc_permission
 from app.datasource import api_assert, register
 from clients.github_client import GitHubClient
-from env import QuerybookSettings
-from lib.github.github import github_manager
-from typing import Dict, List, Optional
-from lib.github.serializers import serialize_datadoc_to_markdown
-from logic import github as logic
-from logic import datadoc as datadoc_logic
+from clients.redis_client import get_redis
 from const.datasources import RESOURCE_NOT_FOUND_STATUS_CODE
-from logic.datadoc_permission import assert_can_read, assert_can_write
-from app.auth.permission import verify_data_doc_permission
+from env import QuerybookSettings
+from flask import request
 from flask_login import current_user
+from lib.github.github import github_manager, MCP_OAUTH_SESSION_TTL
+from lib.github.serializers import serialize_datadoc_to_markdown
+from logic import datadoc as datadoc_logic
+from logic import github as logic
+from logic.datadoc_permission import assert_can_read, assert_can_write
 
 
 def with_github_client(f):
@@ -33,6 +37,60 @@ def with_github_client(f):
 @register("/github/auth/", methods=["GET"])
 def connect_github() -> Dict[str, str]:
     return github_manager.initiate_github_integration()
+
+
+@register("/github/mcp-oauth-initiate/", methods=["GET"], require_auth=False)
+def mcp_oauth_initiate_endpoint() -> Dict[str, str]:
+    """
+    Initiate OAuth flow from MCP context via datasource endpoint.
+    This endpoint validates the session_id, generates OAuth URL, and returns it.
+    Unlike the Flask route version, this returns JSON for the MCP client to open.
+    """
+    session_id = request.args.get("session_id")
+    if not session_id:
+        raise Exception("Missing session_id parameter")
+
+    redis_client = get_redis()
+
+    # Validate session exists
+    pending_key = f"github_oauth_pending:{session_id}"
+    user_id_bytes = redis_client.get(pending_key)
+
+    if not user_id_bytes:
+        raise Exception("OAuth session not found or expired. Please try again.")
+
+    # Race condition protection: mark session as "initiated" atomically
+    initiated_key = f"github_oauth_initiated:{session_id}"
+    was_first = redis_client.set(
+        initiated_key,
+        "1",
+        ex=MCP_OAUTH_SESSION_TTL,
+        nx=True  # Only set if key doesn't exist (atomic operation)
+    )
+
+    if not was_first:
+        raise Exception("This authorization link has already been used. Please generate a new one.")
+
+    # Generate OAuth URL with custom state containing session_id
+    github = github_manager.oauth_session
+
+    # Include session_id in state parameter (format: "oauth_state|mcp:session_id")
+    authorization_url, oauth_state = github.authorization_url(
+        github_manager.oauth_config["authorization_url"]
+    )
+
+    # Embed session_id in the state parameter with proper URL encoding
+    combined_state = f"{oauth_state}|mcp:{session_id}"
+    encoded_combined_state = quote(combined_state, safe='')
+    authorization_url = authorization_url.replace(
+        f"state={oauth_state}", f"state={encoded_combined_state}"
+    )
+
+    # Store OAuth state in Redis (keyed by session_id)
+    state_key = f"github_oauth_state:{session_id}"
+    redis_client.setex(state_key, MCP_OAUTH_SESSION_TTL, oauth_state)
+
+    return {"url": authorization_url, "session_id": session_id}
 
 
 @register("/github/is_authorized/", methods=["GET"])

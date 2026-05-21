@@ -16,7 +16,8 @@ by substituting the appropriate ID.
 ### DataDocs
 | URI | Description |
 |-----|-------------|
-| `querybook://datadoc/{datadoc_id}` | DataDoc with its cells and editors |
+| `querybook://datadoc/{datadoc_id}` | DataDoc with its cells, editors, schedule, comments, and GitHub status |
+| `querybook://datadoc/{datadoc_id}/github-history{?limit,offset}` | GitHub commit history for a DataDoc (default limit=20, offset=0) |
 | `querybook://datadoc-cell/{cell_id}` | Single DataDoc cell content and metadata |
 | `querybook://datadoc-cell/{cell_id}/executions{?limit,offset}` | Query execution history for a cell (default limit=20, offset=0) |
 
