@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.135.0](https://github.com/eg-internal/querybook/compare/v0.134.0...v0.135.0) (2026-05-21)
+
+
+### Features
+
+* add github sync with authorization through MCP ([#543](https://github.com/eg-internal/querybook/issues/543)) ([122e51d](https://github.com/eg-internal/querybook/commit/122e51df4d39adeb70160118fed7e184d7e68387))
+* **metastore:** UC sandbox schema filter with per-user scoping ([#541](https://github.com/eg-internal/querybook/issues/541)) ([241de17](https://github.com/eg-internal/querybook/commit/241de1721051f191210f14fcaeb5bb3c0ba13f4e))
+* **tables:** catalog-grouped table menu with 3-level tree view ([#542](https://github.com/eg-internal/querybook/issues/542)) ([5c3d00c](https://github.com/eg-internal/querybook/commit/5c3d00c93042eb165ce758f5b270c3c70f669e81))
+
+
+### Bug Fixes
+
+* Fix null and empty catalogs ([#544](https://github.com/eg-internal/querybook/issues/544)) ([f3c829a](https://github.com/eg-internal/querybook/commit/f3c829a9d87ebad69e56c7c70c0ede7ef56d0b44))
+
 ## [0.134.0](https://github.com/eg-internal/querybook/compare/v0.133.1...v0.134.0) (2026-05-11)
 
 
