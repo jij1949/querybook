@@ -31,9 +31,11 @@ from logic.metastore import (
     create_table_information,
     create_table_ownerships,
     create_table_warnings,
+    delete_catalog,
     delete_column,
     delete_schema,
     delete_table,
+    get_all_catalogs,
     get_catalog_by_id,
     get_catalog_by_name,
     get_column_by_table_id,
@@ -503,6 +505,9 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             self.delete_schema_not_in_metastore(
                 self.metastore_id, schemas, session=session
             )
+            self.delete_catalog_not_in_metastore(
+                self.metastore_id, schemas, session=session
+            )
             for schema in schemas:
                 # Get filtered table names for the schema
                 # The method handles both catalog extraction for qualified names (ACL checking)
@@ -957,6 +962,29 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
                     delete_es_table_by_id(table_id)
                 delete_schema(id=data_schema.id, commit=False, session=session)
                 LOG.info(f"Deleted schema {data_schema.name} ({data_schema.id})")
+
+        session.commit()
+
+    @with_session
+    def delete_catalog_not_in_metastore(self, metastore_id, schemas, session=None):
+        """
+        Delete catalogs from DB that are no longer present in the metastore.
+
+        Must be called after delete_schema_not_in_metastore so child schemas
+        are already removed before the catalog row is deleted.
+        """
+        expected_catalogs = {
+            schema.catalog.name
+            for schema in schemas
+            if schema.catalog is not None
+        }
+
+        for db_catalog in get_all_catalogs(metastore_id, session=session):
+            if db_catalog.name not in expected_catalogs:
+                delete_catalog(catalog_id=db_catalog.id, commit=False, session=session)
+                LOG.info(
+                    f"Deleted orphaned catalog {db_catalog.name} ({db_catalog.id})"
+                )
 
         session.commit()
 

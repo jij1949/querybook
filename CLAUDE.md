@@ -76,6 +76,22 @@ Querybook supports both `schema.table` and `catalog.schema.table` naming. `DataS
 3. Override `get_table_display_name()` for custom naming (e.g., catalog support)
 4. Register in `server/lib/metastore/__init__.py`
 
+## Local Development: AWS Authentication (Glue Metastore)
+
+When connecting to a Glue metastore locally, authenticate using `okta-aws-cli` with a profile configured in `~/.okta/okta.yaml`.
+
+Log in to the dataplatform test profile:
+```bash
+okta-aws-cli --profile egdataplatform-test-pwu
+```
+
+Verify the credentials work:
+```bash
+aws --profile egdataplatform-test-pwu s3 ls
+```
+
+More documentation: https://expediagroup.atlassian.net/wiki/spaces/IAM/pages/560567507/AWS+CLI
+
 ## Detailed Context
 
 -   `.claude/context/architecture.md`: Detailed architecture overview, data models, and development patterns

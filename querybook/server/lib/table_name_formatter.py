@@ -42,11 +42,8 @@ def format_table_name_for_display(
             return f"{catalog_name}.{schema_name}.{table_name}"
         return f"{schema_name}.{table_name}"
 
-    # Get catalog support settings
-    enable_catalog_support = metastore.catalog_display_config.get(
-        "enable_catalog_support", False)
-    show_catalog_in_ui = metastore.catalog_display_config.get(
-        "show_catalog_in_ui", False)
+    enable_catalog_support = metastore.enable_catalog_support
+    show_catalog_in_ui = metastore.show_catalog_in_ui
 
     # Only show catalog if BOTH settings are true
     if not enable_catalog_support or not show_catalog_in_ui or not catalog_name:
