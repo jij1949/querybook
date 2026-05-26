@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.136.0](https://github.com/eg-internal/querybook/compare/v0.135.0...v0.136.0) (2026-05-26)
+
+
+### Features
+
+* Langsmith Implementation - AI Assistant ([#547](https://github.com/eg-internal/querybook/issues/547)) ([e83f300](https://github.com/eg-internal/querybook/commit/e83f3004bac32659388fd9f620b6ba77d5bc3d3b))
+* Remove Partition Information section from PUMA Insights tab ([fb9629e](https://github.com/eg-internal/querybook/commit/fb9629e8c67ab150e2c19ed833c63f430084290b))
+
 ## [0.135.0](https://github.com/eg-internal/querybook/compare/v0.134.0...v0.135.0) (2026-05-21)
 
 
