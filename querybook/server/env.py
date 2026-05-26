@@ -171,6 +171,11 @@ class QuerybookSettings(object):
     AI_ASSISTANT_PROVIDER = get_env_config("AI_ASSISTANT_PROVIDER")
     AI_ASSISTANT_CONFIG = get_env_config("AI_ASSISTANT_CONFIG") or {}
 
+    # LangSmith tracing
+    LANGSMITH_TRACING = str(get_env_config("LANGSMITH_TRACING")).lower() == "true"
+    LANGSMITH_API_KEY = get_env_config("LANGSMITH_API_KEY")
+    LANGSMITH_PROJECT = get_env_config("LANGSMITH_PROJECT")
+
     VECTOR_STORE_PROVIDER = get_env_config("VECTOR_STORE_PROVIDER")
     VECTOR_STORE_CONFIG = get_env_config("VECTOR_STORE_CONFIG") or {}
     EMBEDDINGS_PROVIDER = get_env_config("EMBEDDINGS_PROVIDER")

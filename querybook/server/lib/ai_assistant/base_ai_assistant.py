@@ -5,6 +5,7 @@ from typing import Optional
 from langchain_core.language_models.base import BaseLanguageModel
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from pydantic import ValidationError
+from langsmith import traceable
 
 from app.db import with_session
 from const.ai_assistant import (
@@ -217,6 +218,7 @@ class BaseAIAssistant(ABC):
             socket.send_data(response)
             socket.close()
 
+    @traceable(run_type="chain", name="generate_sql_query", metadata={"ai_command": "text_to_sql"})
     @catch_error
     @with_session
     @with_ai_socket(command_type=AICommandType.TEXT_TO_SQL)
@@ -302,6 +304,7 @@ class BaseAIAssistant(ABC):
             prompt_text=prompt,
         )
 
+    @traceable(run_type="chain", name="generate_title_from_query", metadata={"ai_command": "sql_title"})
     @catch_error
     @with_ai_socket(command_type=AICommandType.SQL_TITLE)
     def generate_title_from_query(self, query, socket=None):
@@ -323,6 +326,7 @@ class BaseAIAssistant(ABC):
             prompt_text=prompt,
         )
 
+    @traceable(run_type="chain", name="query_auto_fix", metadata={"ai_command": "sql_fix"})
     @catch_error
     @with_session
     @with_ai_socket(command_type=AICommandType.SQL_FIX)
@@ -393,6 +397,7 @@ class BaseAIAssistant(ABC):
             prompt_text=prompt,
         )
 
+    @traceable(run_type="chain", name="summarize_table", metadata={"ai_command": "table_summary"})
     @catch_error
     @with_session
     def summarize_table(
@@ -429,6 +434,7 @@ class BaseAIAssistant(ABC):
         chain = llm | StrOutputParser()
         return chain.invoke(prompt)
 
+    @traceable(run_type="chain", name="summarize_query", metadata={"ai_command": "sql_summary"})
     @catch_error
     @with_session
     def summarize_query(
@@ -457,6 +463,7 @@ class BaseAIAssistant(ABC):
         chain = llm | StrOutputParser()
         return chain.invoke(prompt)
 
+    @traceable(run_type="chain", name="find_tables", metadata={"ai_command": "table_select"})
     @with_session
     def find_tables(self, metastore_id, question, session=None):
         """Find relevant tables for the provided question.
@@ -523,6 +530,7 @@ class BaseAIAssistant(ABC):
             LOG.error(e, exc_info=True)
             return []
 
+    @traceable(run_type="chain", name="get_sql_completion", metadata={"ai_command": "sql_complete"})
     @catch_error
     @with_session
     @with_ai_socket(command_type=AICommandType.SQL_COMPLETE)
@@ -565,6 +573,7 @@ class BaseAIAssistant(ABC):
         socket.send_data(response)
         socket.close()
 
+    @traceable(run_type="chain", name="generate_data_doc_title_from_query", metadata={"ai_command": "data_doc_title"})
     @catch_error
     @with_ai_socket(command_type=AICommandType.DATA_DOC_TITLE)
     def generate_data_doc_title_from_query(
