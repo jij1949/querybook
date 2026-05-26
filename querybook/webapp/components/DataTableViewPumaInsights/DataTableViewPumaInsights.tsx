@@ -18,8 +18,7 @@ export const DataTableViewPumaInsights: React.FC<IProps> = ({ table }) => {
         !table.custom_properties ||
         (!table.custom_properties['table_purpose'] &&
             !table.custom_properties['business_value'] &&
-            !table.custom_properties['key_characteristics'] &&
-            !table.custom_properties['partition_information'])
+            !table.custom_properties['key_characteristics'])
     ) {
         return (
             <EmptyText className="m24">
@@ -39,10 +38,6 @@ export const DataTableViewPumaInsights: React.FC<IProps> = ({ table }) => {
     const keyCharacteristicsMarkdown =
         table.custom_properties['key_characteristics'] ||
         'No key characteristics provided.';
-
-    const partitionInformationMarkdown =
-        table.custom_properties['partition_information'] ||
-        'No partition information provided.';
 
     const AITooltipTitle = (title: string) => (
         <AccentText size="med" color="text" weight="bold" className="mt16">
@@ -95,8 +90,6 @@ export const DataTableViewPumaInsights: React.FC<IProps> = ({ table }) => {
             </Markdown>
             {AITooltipTitle('Key Characteristics')}
             <Markdown>{keyCharacteristicsMarkdown as string}</Markdown>
-            {AITooltipTitle('Partition Information')}
-            <Markdown>{partitionInformationMarkdown as string}</Markdown>
         </div>
     );
 };
