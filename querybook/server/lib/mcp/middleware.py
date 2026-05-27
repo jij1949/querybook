@@ -11,6 +11,7 @@ import functools
 import time
 from datetime import date
 
+import langsmith
 from fastmcp.server.dependencies import get_access_token
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 
@@ -19,6 +20,18 @@ from lib.event_logger import event_logger
 from lib.logger import get_logger
 
 LOG = get_logger(__file__)
+
+
+def _get_user_id_from_token() -> int:
+    """Extract user ID from the current request's access token."""
+    try:
+        token = get_access_token()
+        if token:
+            return token.claims.get("creator_uid", 0)
+    except Exception as e:
+        LOG.warning(f"Failed to extract user ID from MCP context: {e}")
+    return 0
+
 
 # Maximum length for string parameters (same as BaseEventLogger)
 MAX_STR_PARAM_LENGTH = 128
@@ -123,25 +136,7 @@ class MCPEventLoggingMiddleware(Middleware):
             raise
 
     def _get_user_id(self, context: MiddlewareContext) -> int:
-        """Extract user ID from the current request's access token.
-
-        Uses FastMCP's get_access_token() which reads from the HTTP request
-        scope or SDK context var, matching how CurrentAccessToken() resolves
-        in tool/resource handlers.
-
-        Args:
-            context: FastMCP middleware context
-
-        Returns:
-            User ID from access token claims, or 0 if not available
-        """
-        try:
-            token = get_access_token()
-            if token:
-                return token.claims.get("creator_uid", 0)
-        except Exception as e:
-            LOG.warning(f"Failed to extract user ID from MCP context: {e}")
-        return 0
+        return _get_user_id_from_token()
 
     def _get_auth_method(self) -> str:
         try:
@@ -203,6 +198,30 @@ class MCPEventLoggingMiddleware(Middleware):
         return sanitized
 
 
+class LangSmithTracingMiddleware(Middleware):
+    """Middleware that traces MCP tool calls in LangSmith."""
+
+    async def on_call_tool(self, context: MiddlewareContext, call_next):
+        tool_name = context.message.name
+        user_id = _get_user_id_from_token()
+
+        async with langsmith.trace(
+            name=tool_name,
+            run_type="tool",
+            inputs={"arguments": context.message.arguments},
+            metadata={"user_id": user_id},
+            tags=["mcp", "querybook"],
+        ) as run:
+            try:
+                result = await call_next(context)
+                outputs = result.structured_content if result.structured_content is not None else {"status": "success"}
+                run.end(outputs=outputs)
+                return result
+            except Exception as e:
+                run.end(error=str(e))
+                raise
+
+
 def wrap_mcp_resources(mcp):
     """Wrap FastMCP's resource decorator to add logging.
 
@@ -259,39 +278,45 @@ def wrap_mcp_resources(mcp):
                 # Remove query string template from URI
                 resource_uri = resource_uri.split("{?")[0]
 
-                try:
-                    result = func(*args, **kwargs)
-                    duration_ms = (time.perf_counter() - start_time) * 1000
+                with langsmith.trace(
+                    name=resource_uri,
+                    run_type="tool",
+                    inputs={"uri": resource_uri, "user_id": user_id},
+                    tags=["mcp", "querybook"],
+                ) as ls_run:
+                    try:
+                        result = func(*args, **kwargs)
+                        duration_ms = (time.perf_counter() - start_time) * 1000
 
-                    # Log successful resource read
-                    _log_mcp_event(
-                        user_id=user_id,
-                        event_data={
-                            "operation_type": "resource",
-                            "resource_uri": resource_uri,
-                            "auth_method": auth_method,
-                            "status": "success",
-                            "duration_ms": round(duration_ms, 2),
-                        },
-                    )
-                    return result
+                        _log_mcp_event(
+                            user_id=user_id,
+                            event_data={
+                                "operation_type": "resource",
+                                "resource_uri": resource_uri,
+                                "auth_method": auth_method,
+                                "status": "success",
+                                "duration_ms": round(duration_ms, 2),
+                            },
+                        )
+                        ls_run.end(outputs={"status": "success"})
+                        return result
 
-                except Exception as e:
-                    duration_ms = (time.perf_counter() - start_time) * 1000
+                    except Exception as e:
+                        duration_ms = (time.perf_counter() - start_time) * 1000
 
-                    # Log failed resource read
-                    _log_mcp_event(
-                        user_id=user_id,
-                        event_data={
-                            "operation_type": "resource",
-                            "resource_uri": resource_uri,
-                            "auth_method": auth_method,
-                            "status": "error",
-                            "error": str(e)[:MAX_STR_PARAM_LENGTH],
-                            "duration_ms": round(duration_ms, 2),
-                        },
-                    )
-                    raise
+                        _log_mcp_event(
+                            user_id=user_id,
+                            event_data={
+                                "operation_type": "resource",
+                                "resource_uri": resource_uri,
+                                "auth_method": auth_method,
+                                "status": "error",
+                                "error": str(e)[:MAX_STR_PARAM_LENGTH],
+                                "duration_ms": round(duration_ms, 2),
+                            },
+                        )
+                        ls_run.end(error=str(e))
+                        raise
 
             # Apply original resource decorator to wrapped function
             return original_resource(*decorator_args, **decorator_kwargs)(wrapper)

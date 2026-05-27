@@ -8,6 +8,7 @@ from env import QuerybookSettings
 from lib.mcp.auth import QuerybookTokenVerifier
 from lib.mcp.middleware import (
     AuthDeprecationNoticeMiddleware,
+    LangSmithTracingMiddleware,
     MCPEventLoggingMiddleware,
     wrap_mcp_resources,
 )
@@ -93,7 +94,8 @@ mcp = FastMCP(
     icons=[Icon(src=_build_logo_data_uri(), mimeType="image/svg+xml")],
 )
 
-# Add event logging middleware for tools (must be registered before tools)
+# Add tracing and event logging middleware for tools (must be registered before tools)
+mcp.add_middleware(LangSmithTracingMiddleware())
 mcp.add_middleware(MCPEventLoggingMiddleware())
 mcp.add_middleware(AuthDeprecationNoticeMiddleware())
 
