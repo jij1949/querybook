@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.137.0](https://github.com/eg-internal/querybook/compare/v0.136.0...v0.137.0) (2026-05-27)
+
+
+### Features
+
+* MCP Langsmith Implementation ([#550](https://github.com/eg-internal/querybook/issues/550)) ([740aa2e](https://github.com/eg-internal/querybook/commit/740aa2e4590566ae9772fa9de77c216cc268c8b9))
+
 ## [0.136.0](https://github.com/eg-internal/querybook/compare/v0.135.0...v0.136.0) (2026-05-26)
 
 
