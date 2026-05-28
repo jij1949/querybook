@@ -4,6 +4,7 @@ from cryptography.fernet import Fernet
 from fastmcp.server.auth import AccessToken
 from fastmcp.server.auth.jwt_issuer import derive_jwt_key
 from fastmcp.server.auth.oidc_proxy import OIDCProxy
+from pydantic import AnyHttpUrl
 from key_value.aio.stores.redis import RedisStore
 from key_value.aio.wrappers.encryption import FernetEncryptionWrapper
 
@@ -88,6 +89,14 @@ class OktaOIDCProvider(OIDCProxy):
         )
         self._allow_api_tokens = allow_api_tokens
         self._token_verifier = QuerybookTokenVerifier() if allow_api_tokens else None
+
+    def _get_resource_url(self, path: str | None = None) -> AnyHttpUrl | None:
+        if self.base_url is None:
+            return None
+        base = str(self.base_url).rstrip("/")
+        if not base.endswith("/mcp"):
+            base = f"{base}/mcp"
+        return AnyHttpUrl(base)
 
     async def verify_token(self, token: str) -> AccessToken | None:
         if _is_api_token(token):

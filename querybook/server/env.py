@@ -224,6 +224,7 @@ class QuerybookSettings(object):
     MCP_OAUTH_ALLOWED_REDIRECT_URIS = _raw_redirect_uris or [
         "http://localhost:*",
         "http://127.0.0.1:*",
+        "cursor://anysphere.cursor-mcp/*",
     ]
 
     # Cache Control
