@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.137.1](https://github.com/eg-internal/querybook/compare/v0.137.0...v0.137.1) (2026-05-28)
+
+
+### Bug Fixes
+
+* **mcp:** fix OAuth protected resource URL doubling /mcp path ([76122fb](https://github.com/eg-internal/querybook/commit/76122fb47c65cc17fadd48d262f38fdd48db5671))
+
 ## [0.137.0](https://github.com/eg-internal/querybook/compare/v0.136.0...v0.137.0) (2026-05-27)
 
 
