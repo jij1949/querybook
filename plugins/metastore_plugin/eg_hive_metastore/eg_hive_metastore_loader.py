@@ -28,7 +28,10 @@ from const.metastore import (
     MetadataMode,
 )
 
-from hmsclient.genthrift.hive_metastore.ttypes import NoSuchObjectException
+from hmsclient.genthrift.hive_metastore.ttypes import (
+    MetaException,
+    NoSuchObjectException,
+)
 
 from logic.admin import get_query_metastore_by_id
 from logic.elasticsearch import delete_es_table_by_id
@@ -215,9 +218,11 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
 
     # Custom implementation to double-check before deleting schemas
     @with_session
-    def delete_schema_not_in_metastore(self, metastore_id, schema_names, session=None):
+    def delete_schema_not_in_metastore(self, metastore_id, schemas, session=None):
         checked_count = 0
         deleted_count = 0
+
+        schema_names = {schema.name for schema in schemas}
 
         for data_schema in iterate_data_schema(metastore_id, session=session):
             checked_count += 1
@@ -248,7 +253,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             except Exception as e:
                 LOG.error(
                     f"Error deleting schema, skipping deletion: {data_schema.id}, {data_schema.name}",
-                    e,
+                    exc_info=e,
                 )
 
         session.commit()
@@ -294,7 +299,7 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
                 except Exception as e:
                     LOG.error(
                         f"Error deleting table, skipping deletion: {data_table.id}, {data_table.data_schema.name}.{data_table.name}",
-                        e,
+                        exc_info=e,
                     )
             session.commit()
 
@@ -367,6 +372,13 @@ class EgHMSMetastoreLoader(HMSMetastoreLoader):
             return self.hmc.get_table(schema_name, table_name)
         except NoSuchObjectException:
             return None
+        except MetaException as e:
+            if "Insufficient Lake Formation permission(s): Required Describe" in str(e) and "AccessDeniedException" in str(e):
+                LOG.warning(
+                    f"LakeFormation AccessDeniedException for {schema_name}.{table_name}, treating as not found"
+                )
+                return None
+            raise
 
     def get_table_and_columns(
         self, schema_name, table_name
