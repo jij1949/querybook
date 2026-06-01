@@ -118,6 +118,10 @@ class HiveMetastoreClient:
                 InvalidObjectException,
                 SocketError,
             ) as ex:
+                # LakeFormation returns AccessDeniedException as a MetaException
+                # for deleted tables — don't retry, it's not a connection issue
+                if isinstance(ex, MetaException) and "AccessDeniedException" in str(ex):
+                    raise ex
                 _LOG.warning(
                     "Failed to connect to hive metastore at %s"
                     % function_for_node_info()
