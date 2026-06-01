@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.137.2](https://github.com/eg-internal/querybook/compare/v0.137.1...v0.137.2) (2026-06-01)
+
+
+### Bug Fixes
+
+* **metastore:** don't retry MetaException with AccessDeniedException ([0fadd50](https://github.com/eg-internal/querybook/commit/0fadd506d419c289ca42f33438e7f60e68098bfb))
+* **metastore:** handle LakeFormation AccessDeniedException and fix schema comparison in sync ([a8e90a9](https://github.com/eg-internal/querybook/commit/a8e90a95a174be0a684b835f6d317e02beca7555))
+
 ## [0.137.1](https://github.com/eg-internal/querybook/compare/v0.137.0...v0.137.1) (2026-05-28)
 
 
