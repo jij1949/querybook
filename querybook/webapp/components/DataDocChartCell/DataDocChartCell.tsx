@@ -8,7 +8,10 @@ import { IDataChartCellMeta } from 'const/datadoc';
 import { useChartSource } from 'hooks/chart/useChartSource';
 import { trackClick } from 'lib/analytics';
 import { transformData } from 'lib/chart/chart-data-transformation';
-import { getDataTransformationOptions } from 'lib/chart/chart-meta-processing';
+import {
+    getDataTransformationOptions,
+    validateChartMeta,
+} from 'lib/chart/chart-meta-processing';
 import { QueryExecutionResource } from 'resource/queryExecution';
 import { TextButton } from 'ui/Button/Button';
 import { InfoButton } from 'ui/Button/InfoButton';
@@ -47,6 +50,8 @@ export const DataDocChartCell = React.memo<IProps>(
         onChange,
         isEditable,
     }) => {
+        validateChartMeta(meta);
+
         const [cellId, setCellId] = React.useState(
             meta.data.source_type === 'cell_above'
                 ? previousQueryCellId

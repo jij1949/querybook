@@ -169,7 +169,7 @@ export const DataDocChart = React.memo<IDataDocChartProps>(
         }
 
         return (
-            <DataDocChartWrapper size={meta.visual.size}>
+            <DataDocChartWrapper size={meta.visual?.size}>
                 {chartDOM}
             </DataDocChartWrapper>
         );

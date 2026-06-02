@@ -19,6 +19,7 @@ function stringifyError(errorObj: any): string {
 
 interface IErrorBoundaryProps {
     renderError?: (errorString: string) => React.ReactNode;
+    resetKey?: React.Key;
 }
 
 export class ErrorBoundary extends React.PureComponent<
@@ -35,6 +36,15 @@ export class ErrorBoundary extends React.PureComponent<
             hasError: true,
             errorString: stringifyError(errorObj),
         });
+    }
+
+    public componentDidUpdate(prevProps: IErrorBoundaryProps) {
+        if (this.state.hasError && this.props.resetKey !== prevProps.resetKey) {
+            this.setState({
+                hasError: false,
+                errorString: '',
+            });
+        }
     }
 
     public render() {

@@ -40,12 +40,13 @@ export function processChartJSData(
     const { chart: chartMeta } = meta;
 
     const xAxisIdx = chartMeta.x_axis.col_idx;
+    const yAxisSeries = chartMeta.y_axis.series ?? {};
     const seriesNames: string[] = data[0];
     const dataRows = data.slice(1);
 
     // hide hidden series
     const hiddenSeriesIndices = new Set();
-    for (const [key, val] of Object.entries(chartMeta.y_axis.series || {})) {
+    for (const [key, val] of Object.entries(yAxisSeries)) {
         if (val.hidden) {
             hiddenSeriesIndices.add(Number(key));
         }
@@ -53,9 +54,9 @@ export function processChartJSData(
 
     let firstDataset = true;
     const coloredSeries: Record<number, number> = {};
-    for (const seriesIdx in chartMeta.y_axis.series) {
-        if ('color' in (chartMeta.y_axis.series[seriesIdx] || {})) {
-            coloredSeries[seriesIdx] = chartMeta.y_axis.series[seriesIdx].color;
+    for (const seriesIdx in yAxisSeries) {
+        if ('color' in (yAxisSeries[seriesIdx] || {})) {
+            coloredSeries[seriesIdx] = yAxisSeries[seriesIdx].color;
         }
     }
 

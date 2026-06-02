@@ -212,6 +212,7 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                 } else if (cell.cell_type === 'chart') {
                     cellDOM = (
                         <ErrorBoundary
+                            resetKey={cell.updated_at}
                             renderError={(errorString) => (
                                 <div className="DataDocChartCell">
                                     <EmptyText size="xsmall">

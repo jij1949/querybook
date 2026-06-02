@@ -1158,6 +1158,9 @@ function formValsToMeta(vals: IChartFormValues, meta: IDataChartCellMeta) {
         draft.chart.type = vals.chartType;
 
         // labels
+        if (draft.visual == null) {
+            draft.visual = {};
+        }
         draft.title = vals.title;
         draft.visual.legend_position = vals.legendPosition;
         draft.visual.legend_display = vals.legendDisplay;
