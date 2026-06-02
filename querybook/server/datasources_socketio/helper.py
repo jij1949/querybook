@@ -31,7 +31,11 @@ def register_socket(url, namespace=None, websocket_logging=True):
                             args=args,
                             kwargs=kwargs,
                         )
-                    fn(*args, **kwargs)
+                    if url == "disconnect":
+                        # socketio 5.x passes a reason arg; our handlers accept none
+                        fn()
+                    else:
+                        fn(*args, **kwargs)
                 except Exception as e:
                     LOG.error(e, exc_info=True)
                     socketio.emit(
