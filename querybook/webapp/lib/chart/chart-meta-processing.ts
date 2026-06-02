@@ -45,7 +45,10 @@ function rgb(rgbArr: number[]) {
 export function getDataTransformationOptions(meta: IDataChartCellMeta) {
     const { transformations } = meta.data;
     const aggregate = Boolean(transformations.aggregate);
-    const aggSeries = filterSeries(meta.chart.y_axis.series, 'agg_type');
+    const aggSeries = filterSeries(
+        meta.chart?.y_axis?.series ?? {},
+        'agg_type'
+    );
 
     let aggType: ChartDataAggType = 'sum';
     let formatAggCol: number;
@@ -78,19 +81,19 @@ export function getDataTransformationOptions(meta: IDataChartCellMeta) {
         switch: Boolean(transformations.switch),
         aggSeries,
         aggType,
-        sortIndex: meta.chart.x_axis.sort?.idx,
-        sortAsc: meta.chart.x_axis.sort?.asc ?? true,
-        xAxisIdx: meta.chart.x_axis.col_idx,
+        sortIndex: meta.chart?.x_axis?.sort?.idx,
+        sortAsc: meta.chart?.x_axis?.sort?.asc ?? true,
+        xAxisIdx: meta.chart?.x_axis?.col_idx,
     };
 }
 
 export function getAxisOptions(axisMeta: IChartAxisMeta) {
     return {
-        label: axisMeta.label ?? '',
-        scale: axisMeta.scale,
-        min: axisMeta.min,
-        max: axisMeta.max,
-        format: axisMeta.format ?? null,
+        label: axisMeta?.label ?? '',
+        scale: axisMeta?.scale,
+        min: axisMeta?.min,
+        max: axisMeta?.max,
+        format: axisMeta?.format ?? null,
     };
 }
 
@@ -109,9 +112,12 @@ export function mapMetaToFormVals(
         meta.data.source_type === 'execution'
             ? meta.data.source_ids[0]
             : undefined;
-    const hiddenSeries = Object.entries(meta.chart.y_axis.series || {})
+    const hiddenSeries = Object.entries(meta.chart?.y_axis?.series ?? {})
         .filter(([_, val]) => val.hidden)
         .map(([idx, _]) => Number(idx));
+
+    const xAxis = meta.chart?.x_axis;
+    const yAxis = meta.chart?.y_axis;
 
     return {
         // data source
@@ -124,33 +130,33 @@ export function mapMetaToFormVals(
         ...getDataTransformationOptions(meta),
 
         // axes
-        xAxis: getAxisOptions(meta.chart.x_axis),
-        xIndex: meta.chart.x_axis.col_idx,
-        sortIndex: meta.chart.x_axis.sort?.idx,
-        sortAsc: meta.chart.x_axis.sort?.asc ?? true,
+        xAxis: getAxisOptions(xAxis ?? ({} as IChartAxisMeta)),
+        xIndex: xAxis?.col_idx,
+        sortIndex: xAxis?.sort?.idx,
+        sortAsc: xAxis?.sort?.asc ?? true,
 
-        yAxis: getAxisOptions(meta.chart.y_axis),
-        stack: Boolean(meta.chart.y_axis.stack),
+        yAxis: getAxisOptions(yAxis ?? ({} as IChartAxisMeta)),
+        stack: Boolean(yAxis?.stack),
 
-        zIndex: meta.chart.z_axis?.col_idx,
+        zIndex: meta.chart?.z_axis?.col_idx,
 
         hiddenSeries,
-        coloredSeries: filterSeries(meta.chart.y_axis.series, 'color'),
+        coloredSeries: filterSeries(yAxis?.series ?? {}, 'color'),
         // chart
-        chartType: meta.chart.type,
+        chartType: meta.chart?.type,
 
         // labels
         title: meta.title || '',
-        legendPosition: meta.visual.legend_position ?? 'top',
-        legendDisplay: meta.visual.legend_display ?? true,
-        connectMissing: meta.visual.connect_missing ?? false,
-        size: meta.visual.size ?? ChartSize.AUTO,
+        legendPosition: meta.visual?.legend_position ?? 'top',
+        legendDisplay: meta.visual?.legend_display ?? true,
+        connectMissing: meta.visual?.connect_missing ?? false,
+        size: meta.visual?.size ?? ChartSize.AUTO,
 
         valueDisplay:
-            meta.visual.values?.display ?? ChartValueDisplayType.FALSE,
-        valuePosition: meta.visual.values?.position ?? 'center',
-        valueAlignment: meta.visual.values?.alignment ?? 'center',
-        valueSource: meta.visual.values?.source ?? ChartValueSourceType.VALUE,
+            meta.visual?.values?.display ?? ChartValueDisplayType.FALSE,
+        valuePosition: meta.visual?.values?.position ?? 'center',
+        valueAlignment: meta.visual?.values?.alignment ?? 'center',
+        valueSource: meta.visual?.values?.source ?? ChartValueSourceType.VALUE,
     };
 }
 
@@ -270,7 +276,7 @@ export function mapMetaToChartOptions(
                 return ` ${label}: ${formatNumber(value)}`;
             },
             title: (titleContext): string => {
-                if (meta.chart.y_axis.stack) {
+                if (meta.chart?.y_axis?.stack) {
                     let totalValue = 0;
                     for (const metricContext of titleContext) {
                         totalValue += Number(
@@ -293,16 +299,16 @@ export function mapMetaToChartOptions(
 
         let xAxesOptions = computeScaleOptions(
             xAxesScaleType,
-            meta.chart.x_axis,
+            meta.chart?.x_axis ?? ({} as IChartAxisMeta),
             theme,
-            meta.chart.y_axis.stack,
+            meta.chart?.y_axis?.stack,
             true
         );
         let yAxesOptions = computeScaleOptions(
             yAxesScaleType,
-            meta.chart.y_axis,
+            meta.chart?.y_axis ?? ({} as IChartAxisMeta),
             theme,
-            meta.chart.y_axis.stack
+            meta.chart?.y_axis?.stack
         );
 
         if (invertAxis) {
@@ -338,8 +344,8 @@ function computeScaleOptions(
             color: rgb(fontColor[theme].concat([0.25])),
         },
         title: {
-            display: !!axisMeta.label.length,
-            text: axisMeta.label,
+            display: !!axisMeta?.label?.length,
+            text: axisMeta?.label ?? '',
         },
         stacked: stack,
     };
@@ -367,19 +373,19 @@ function computeScaleOptions(
         };
     } else if (scaleType === 'linear' || scaleType === 'logarithmic') {
         // for empty case, it might be null or ""
-        if (axisMeta.max != null && typeof axisMeta.max === 'number') {
+        if (axisMeta?.max != null && typeof axisMeta.max === 'number') {
             axis.max = axisMeta.max;
         }
-        if (axisMeta.min != null && typeof axisMeta.min === 'number') {
+        if (axisMeta?.min != null && typeof axisMeta.min === 'number') {
             axis.min = axisMeta.min;
         } else if (!isXAxis) {
             // for yAxis, make sure 0 is shown unless specificed
             (axis as LinearScaleOptions).beginAtZero = true;
         }
 
-        if (axisMeta.format === ChartScaleFormat.DOLLAR) {
+        if (axisMeta?.format === ChartScaleFormat.DOLLAR) {
             axis.ticks = { format: { style: 'currency', currency: 'USD' } };
-        } else if (axisMeta.format === ChartScaleFormat.PERCENTAGE) {
+        } else if (axisMeta?.format === ChartScaleFormat.PERCENTAGE) {
             axis.ticks = { format: { style: 'percent' } };
         } else {
             // Prevent ticks from erroring out if there is no data provided

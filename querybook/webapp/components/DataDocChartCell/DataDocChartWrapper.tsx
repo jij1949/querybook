@@ -3,7 +3,6 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { ChartSize } from 'const/dataDocChart';
-import { ErrorBoundary } from 'ui/ErrorBoundary/ErrorBoundary';
 
 export interface IDataDocChartWrapper {
     size?: ChartSize;
@@ -33,6 +32,6 @@ export const DataDocChartWrapper: React.FC<IDataDocChartWrapper> = ({
         className={clsx(className, 'DataDocChartWrapper')}
         size={size ?? ChartSize.AUTO}
     >
-        <ErrorBoundary>{children}</ErrorBoundary>
+        {children}
     </StyledChartWrapper>
 );

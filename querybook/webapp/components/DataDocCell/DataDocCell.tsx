@@ -23,6 +23,8 @@ import { getShareUrl } from 'lib/data-doc/data-doc-utils';
 import * as dataDocActions from 'redux/dataDoc/action';
 import * as dataDocSelectors from 'redux/dataDoc/selector';
 import { IStoreState } from 'redux/store/types';
+import { ErrorBoundary } from 'ui/ErrorBoundary/ErrorBoundary';
+import { EmptyText } from 'ui/StyledText/StyledText';
 
 import './DataDocCell.scss';
 
@@ -209,13 +211,23 @@ export const DataDocCell: React.FunctionComponent<IDataDocCellProps> =
                     );
                 } else if (cell.cell_type === 'chart') {
                     cellDOM = (
-                        <DataDocChartCell
-                            {...cellProps}
-                            previousQueryCellId={lastQueryCellId}
-                            context={cell.context}
-                            meta={cell.meta}
-                            dataDocId={docId}
-                        />
+                        <ErrorBoundary
+                            renderError={(errorString) => (
+                                <div className="DataDocChartCell">
+                                    <EmptyText size="xsmall">
+                                        Chart Error: {errorString}
+                                    </EmptyText>
+                                </div>
+                            )}
+                        >
+                            <DataDocChartCell
+                                {...cellProps}
+                                previousQueryCellId={lastQueryCellId}
+                                context={cell.context}
+                                meta={cell.meta}
+                                dataDocId={docId}
+                            />
+                        </ErrorBoundary>
                     );
                 } else if (cell.cell_type === 'text') {
                     // default text
