@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.137.3](https://github.com/eg-internal/querybook/compare/v0.137.2...v0.137.3) (2026-06-03)
+
+
+### Bug Fixes
+
+* **chart:** add error boundary for chart cells with invalid config ([2da16b7](https://github.com/eg-internal/querybook/commit/2da16b74365be03ebdcbaa98f318a831793171d1))
+* **chart:** validate chart cell metadata ([6c0cc3d](https://github.com/eg-internal/querybook/commit/6c0cc3de1d1eee1154685119777e7429a2f20347))
+* Handle socketio 5.x disconnect reason argument ([#554](https://github.com/eg-internal/querybook/issues/554)) ([40ee524](https://github.com/eg-internal/querybook/commit/40ee5247282efe524434d08aba1008285f56246f))
+* Remove notice on tool list and check auth_method to return notice per tool call ([b64020a](https://github.com/eg-internal/querybook/commit/b64020aa4a279f1ccba6767871b09f62c57070ef))
+
 ## [0.137.2](https://github.com/eg-internal/querybook/compare/v0.137.1...v0.137.2) (2026-06-01)
 
 
