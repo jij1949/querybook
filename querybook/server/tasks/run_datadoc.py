@@ -120,11 +120,24 @@ def run_datadoc_with_config(
 
         # Prepping chain jobs each unit is a [make_qe_task, run_query_task] combo
         for _, query_cell in enumerate(query_cells):
+            cell_meta = query_cell.meta or {}
+
             # Skip disabled cells
-            if query_cell.meta.get("disabled", False):
+            if cell_meta.get("disabled", False):
                 continue
 
-            engine_id = query_cell.meta["engine"]
+            engine_id = cell_meta.get("engine")
+            if engine_id is None:
+                cell_title = cell_meta.get("title") or (
+                    f"Untitled Cell Id [{query_cell.id}]"
+                )
+                error_msg = f'Query cell "{cell_title}" has no engine selected'
+                on_datadoc_completion(
+                    is_success=False,
+                    error_msg=error_msg,
+                    **completion_params,
+                )
+                raise Exception(error_msg)
 
             raw_query = query_cell.context
 

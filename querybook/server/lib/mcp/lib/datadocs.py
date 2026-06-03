@@ -6,6 +6,7 @@ from lib.mcp.lib.comments import serialize_comments
 from lib.mcp.lib.query_executions import serialize_query_execution
 from lib.mcp.lib.schedules import serialize_schedule
 from lib.mcp.utils import build_querybook_url
+from logic import admin as admin_logic
 from logic.datadoc import (
     get_data_cell_by_id,
     get_data_doc_by_id,
@@ -17,6 +18,80 @@ from logic.schedule import get_task_schedule_by_name, get_data_doc_schedule_name
 from models.comment import Comment, DataCellComment
 from models.datadoc import DataDocDataCell, FavoriteDataDoc
 from models.environment import Environment
+
+
+def _get_query_cell_label(
+    meta: dict | None,
+    cell_id: int | None = None,
+    index: int | None = None,
+) -> str:
+    title = (meta or {}).get("title")
+    if title:
+        return f'Query cell "{title}"'
+    if cell_id is not None:
+        return f"Query cell {cell_id}"
+    if index is not None:
+        return f"Query cell at index {index}"
+    return "Query cell"
+
+
+def validate_query_cell_engine(
+    cell_type: str,
+    meta: dict | None,
+    uid: int,
+    session,
+    cell_id: int | None = None,
+    index: int | None = None,
+    accessible_engine_ids: set[int] | None = None,
+) -> None:
+    """Validate MCP-supplied query cell metadata before persisting it."""
+    if cell_type != "query":
+        return
+
+    cell_meta = meta or {}
+    label = _get_query_cell_label(cell_meta, cell_id=cell_id, index=index)
+    engine_id = cell_meta.get("engine")
+
+    if engine_id is None:
+        raise ValueError(f"{label} has no engine selected.")
+
+    if not isinstance(engine_id, int) or isinstance(engine_id, bool):
+        raise ValueError(f"{label} has invalid query engine id {engine_id!r}.")
+
+    if not admin_logic.get_query_engine_by_id(engine_id, session=session):
+        raise ValueError(
+            f"{label} uses query engine {engine_id}, which does not exist."
+        )
+
+    if accessible_engine_ids is None:
+        accessible_engine_ids = set(
+            admin_logic.get_all_accessible_query_engine_ids_by_uid(uid, session=session)
+        )
+
+    if engine_id not in accessible_engine_ids:
+        raise ValueError(
+            f"{label} uses query engine {engine_id}, but you do not have access to it."
+        )
+
+
+def validate_query_cells_engines(cells: list[dict], uid: int, session) -> None:
+    accessible_engine_ids = None
+    for index, cell in enumerate(cells):
+        if cell["cell_type"] == "query" and accessible_engine_ids is None:
+            accessible_engine_ids = set(
+                admin_logic.get_all_accessible_query_engine_ids_by_uid(
+                    uid, session=session
+                )
+            )
+
+        validate_query_cell_engine(
+            cell["cell_type"],
+            cell.get("meta"),
+            uid,
+            session,
+            index=index,
+            accessible_engine_ids=accessible_engine_ids,
+        )
 
 
 def serialize_datadoc_editor(editor) -> dict:
@@ -234,7 +309,9 @@ def serialize_datadoc(
                             "url": last_commit["html_url"],
                         }
                 except Exception as e:
-                    LOG.debug(f"Could not fetch GitHub commit info for datadoc {doc.id}: {e}")
+                    LOG.debug(
+                        f"Could not fetch GitHub commit info for datadoc {doc.id}: {e}"
+                    )
                     notes = "Could not fetch GitHub commit info"
 
             result["github"] = serialize_github_status(
@@ -242,17 +319,19 @@ def serialize_datadoc(
                 last_commit_info=last_commit_info,
                 repo_name=QuerybookSettings.GITHUB_REPO_NAME,
                 branch=QuerybookSettings.GITHUB_BRANCH,
-                notes=notes
+                notes=notes,
             )
         else:
             result["github"] = {
                 "linked": False,
-                "message": "DataDoc is not linked to GitHub"
+                "message": "DataDoc is not linked to GitHub",
             }
 
     # Add resource_uri and URL
     result["resource_uri"] = f"querybook://datadoc/{doc.id}"
-    result["github_history_uri"] = f"querybook://datadoc/{doc.id}/github-history?limit=&offset="
+    result["github_history_uri"] = (
+        f"querybook://datadoc/{doc.id}/github-history?limit=&offset="
+    )
 
     environment = session.query(Environment).get(doc.environment_id)
     if environment:

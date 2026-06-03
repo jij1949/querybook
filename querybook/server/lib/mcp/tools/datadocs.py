@@ -11,6 +11,8 @@ from lib.mcp.lib.datadocs import (
     serialize_datadoc_cell,
     serialize_datadoc_editor,
     get_datadoc_data,
+    validate_query_cell_engine,
+    validate_query_cells_engines,
 )
 from lib.mcp.utils import (
     READ_ONLY_ANNOTATIONS,
@@ -381,6 +383,13 @@ def register(mcp: FastMCP) -> None:
             if engine_id is not None:
                 cell_meta["engine"] = engine_id
 
+            validate_query_cell_engine(
+                cell_type,
+                cell_meta,
+                uid,
+                session,
+            )
+
             data_cell = create_data_cell(
                 cell_type=cell_type,
                 context=context,
@@ -461,6 +470,14 @@ def register(mcp: FastMCP) -> None:
                     cell_meta["title"] = title
                 if engine_id is not None:
                     cell_meta["engine"] = engine_id
+
+                validate_query_cell_engine(
+                    cell.cell_type.name,
+                    cell_meta,
+                    uid,
+                    session,
+                    cell_id=cell_id,
+                )
 
                 fields["meta"] = cell_meta
 
@@ -680,7 +697,8 @@ def register(mcp: FastMCP) -> None:
         doc = datadoc.data
         cells = [cell.model_dump() for cell in doc.cells]
         environment_id = environment_id or doc.environment_id
-        meta = doc.meta
+        # Default to an empty dict; DataDoc.meta's setter rejects None
+        meta = doc.meta or {}
         public = doc.public
         title = doc.title
 
@@ -695,6 +713,8 @@ def register(mcp: FastMCP) -> None:
             raise ValueError("Each cell must have a cell_type")
 
         with DBSession() as session:
+            validate_query_cells_engines(cells, owner_uid, session)
+
             data_doc = create_data_doc(
                 environment_id=environment_id,
                 owner_uid=owner_uid,
