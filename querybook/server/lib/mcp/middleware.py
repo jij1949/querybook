@@ -46,37 +46,30 @@ _AUTH_DEPRECATION_NOTICE = (
 
 
 class AuthDeprecationNoticeMiddleware(Middleware):
-    """Surfaces an auth deprecation notice during the migration window.
+    """Injects an auth deprecation notice into every tool call result during the migration window.
 
-    Two injection points:
-    - on_list_tools: prepends notice to every tool description (picked up at session start)
-    - on_call_tool: appends notice as a structured note in structured_content (picked up per call)
+    Appended as a structured note in structured_content.notes so LLMs see it on every call
+    while the "once per conversation" directive in the notice text prevents repetition.
     """
-
-    async def on_list_tools(self, context: MiddlewareContext, call_next):
-        tools = await call_next(context)
-        if date.today() <= _AUTH_DEPRECATION_DEADLINE:
-            for tool in tools:
-                tool.description = f"{_AUTH_DEPRECATION_NOTICE}\n\n" + (
-                    tool.description or ""
-                )
-        return tools
 
     async def on_call_tool(self, context: MiddlewareContext, call_next):
         result = await call_next(context)
-        if (
-            date.today() <= _AUTH_DEPRECATION_DEADLINE
-            and result.structured_content is not None
-        ):
-            notes = result.structured_content.get("notes", [])
-            notes.append(
-                {
-                    "level": "warning",
-                    "code": "AUTH_DEPRECATION",
-                    "message": _AUTH_DEPRECATION_NOTICE,
-                }
-            )
-            result.structured_content["notes"] = notes
+        if date.today() <= _AUTH_DEPRECATION_DEADLINE:
+            token = get_access_token()
+            if (
+                token
+                and token.claims.get("auth_method") == "api_token"
+                and result.structured_content is not None
+            ):
+                notes = result.structured_content.get("notes", [])
+                notes.append(
+                    {
+                        "level": "warning",
+                        "code": "AUTH_DEPRECATION",
+                        "message": _AUTH_DEPRECATION_NOTICE,
+                    }
+                )
+                result.structured_content["notes"] = notes
         return result
 
 
