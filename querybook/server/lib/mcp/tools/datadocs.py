@@ -388,6 +388,7 @@ def register(mcp: FastMCP) -> None:
                 cell_meta,
                 uid,
                 session,
+                doc.environment_id,
             )
 
             data_cell = create_data_cell(
@@ -471,11 +472,13 @@ def register(mcp: FastMCP) -> None:
                 if engine_id is not None:
                     cell_meta["engine"] = engine_id
 
+                doc = get_data_doc_by_id(datadoc_id, session=session)
                 validate_query_cell_engine(
                     cell.cell_type.name,
                     cell_meta,
                     uid,
                     session,
+                    doc.environment_id,
                     cell_id=cell_id,
                 )
 
@@ -713,7 +716,7 @@ def register(mcp: FastMCP) -> None:
             raise ValueError("Each cell must have a cell_type")
 
         with DBSession() as session:
-            validate_query_cells_engines(cells, owner_uid, session)
+            validate_query_cells_engines(cells, owner_uid, environment_id, session)
 
             data_doc = create_data_doc(
                 environment_id=environment_id,

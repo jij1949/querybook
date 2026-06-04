@@ -11,7 +11,9 @@ class ValidateQueryCellEngineTestCase(TestCase):
         with mock.patch(
             "lib.mcp.lib.datadocs.admin_logic.get_query_engine_by_id"
         ) as mock_get_engine:
-            validate_query_cell_engine("text", {}, uid=1, session=mock.MagicMock())
+            validate_query_cell_engine(
+                "text", {}, uid=1, session=mock.MagicMock(), environment_id=1
+            )
 
         mock_get_engine.assert_not_called()
 
@@ -24,6 +26,7 @@ class ValidateQueryCellEngineTestCase(TestCase):
                 {},
                 uid=1,
                 session=mock.MagicMock(),
+                environment_id=1,
                 index=2,
             )
 
@@ -36,6 +39,7 @@ class ValidateQueryCellEngineTestCase(TestCase):
                 {"engine": "1"},
                 uid=1,
                 session=mock.MagicMock(),
+                environment_id=1,
             )
 
     def test_query_cell_rejects_missing_engine(self):
@@ -51,6 +55,7 @@ class ValidateQueryCellEngineTestCase(TestCase):
                     {"engine": 7},
                     uid=1,
                     session=mock.MagicMock(),
+                    environment_id=1,
                 )
 
     def test_query_cell_rejects_inaccessible_engine(self):
@@ -67,10 +72,31 @@ class ValidateQueryCellEngineTestCase(TestCase):
                     {"engine": 7},
                     uid=1,
                     session=mock.MagicMock(),
+                    environment_id=1,
                     accessible_engine_ids={3},
                 )
 
-    def test_query_cell_accepts_accessible_engine(self):
+    def test_query_cell_rejects_engine_from_other_environment(self):
+        with mock.patch(
+            "lib.mcp.lib.datadocs.admin_logic.get_query_engine_by_id",
+            return_value=mock.MagicMock(),
+        ):
+            with self.assertRaisesRegex(
+                ValueError,
+                "Query cell uses query engine 7, which is not available in this "
+                "DataDoc's environment.",
+            ):
+                validate_query_cell_engine(
+                    "query",
+                    {"engine": 7},
+                    uid=1,
+                    session=mock.MagicMock(),
+                    environment_id=1,
+                    accessible_engine_ids={7},
+                    environment_engine_ids={3},
+                )
+
+    def test_query_cell_accepts_accessible_engine_in_environment(self):
         with mock.patch(
             "lib.mcp.lib.datadocs.admin_logic.get_query_engine_by_id",
             return_value=mock.MagicMock(),
@@ -80,17 +106,22 @@ class ValidateQueryCellEngineTestCase(TestCase):
                 {"engine": 7},
                 uid=1,
                 session=mock.MagicMock(),
+                environment_id=1,
                 accessible_engine_ids={7},
+                environment_engine_ids={7},
             )
 
-    def test_batch_validation_fetches_accessible_engines_once(self):
+    def test_batch_validation_fetches_lookups_once(self):
         with mock.patch(
             "lib.mcp.lib.datadocs.admin_logic.get_query_engine_by_id",
             return_value=mock.MagicMock(),
         ), mock.patch(
             "lib.mcp.lib.datadocs.admin_logic.get_all_accessible_query_engine_ids_by_uid",
             return_value=[7, 8],
-        ) as mock_get_accessible:
+        ) as mock_get_accessible, mock.patch(
+            "lib.mcp.lib.datadocs.admin_logic.get_query_engines_by_environment",
+            return_value=[mock.MagicMock(id=7), mock.MagicMock(id=8)],
+        ) as mock_get_env_engines:
             validate_query_cells_engines(
                 [
                     {"cell_type": "text", "meta": {}},
@@ -98,7 +129,9 @@ class ValidateQueryCellEngineTestCase(TestCase):
                     {"cell_type": "query", "meta": {"engine": 8}},
                 ],
                 uid=1,
+                environment_id=1,
                 session=mock.MagicMock(),
             )
 
         mock_get_accessible.assert_called_once()
+        mock_get_env_engines.assert_called_once()

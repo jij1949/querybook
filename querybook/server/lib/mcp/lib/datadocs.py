@@ -35,14 +35,25 @@ def _get_query_cell_label(
     return "Query cell"
 
 
+def _get_environment_engine_ids(environment_id: int, session) -> set[int]:
+    return {
+        engine.id
+        for engine in admin_logic.get_query_engines_by_environment(
+            environment_id, session=session
+        )
+    }
+
+
 def validate_query_cell_engine(
     cell_type: str,
     meta: dict | None,
     uid: int,
     session,
+    environment_id: int,
     cell_id: int | None = None,
     index: int | None = None,
     accessible_engine_ids: set[int] | None = None,
+    environment_engine_ids: set[int] | None = None,
 ) -> None:
     """Validate MCP-supplied query cell metadata before persisting it."""
     if cell_type != "query":
@@ -73,9 +84,21 @@ def validate_query_cell_engine(
             f"{label} uses query engine {engine_id}, but you do not have access to it."
         )
 
+    if environment_engine_ids is None:
+        environment_engine_ids = _get_environment_engine_ids(environment_id, session)
 
-def validate_query_cells_engines(cells: list[dict], uid: int, session) -> None:
+    if engine_id not in environment_engine_ids:
+        raise ValueError(
+            f"{label} uses query engine {engine_id}, which is not available in this "
+            "DataDoc's environment."
+        )
+
+
+def validate_query_cells_engines(
+    cells: list[dict], uid: int, environment_id: int, session
+) -> None:
     accessible_engine_ids = None
+    environment_engine_ids = None
     for index, cell in enumerate(cells):
         if cell["cell_type"] == "query" and accessible_engine_ids is None:
             accessible_engine_ids = set(
@@ -83,14 +106,19 @@ def validate_query_cells_engines(cells: list[dict], uid: int, session) -> None:
                     uid, session=session
                 )
             )
+            environment_engine_ids = _get_environment_engine_ids(
+                environment_id, session
+            )
 
         validate_query_cell_engine(
             cell["cell_type"],
             cell.get("meta"),
             uid,
             session,
+            environment_id,
             index=index,
             accessible_engine_ids=accessible_engine_ids,
+            environment_engine_ids=environment_engine_ids,
         )
 
 
