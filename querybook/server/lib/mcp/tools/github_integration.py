@@ -299,18 +299,19 @@ def register(mcp: FastMCP) -> None:
             }
 
     @mcp.tool(
-        title="Get Directory Recommendation",
+        title="Get DataDoc GitHub Directory Recommendation",
         annotations=READ_ONLY_ANNOTATIONS,
     )
-    def get_directory_recommendation(
+    def get_datadoc_github_directory_recommendation(
         datadoc_id: Annotated[int, "DataDoc ID to recommend directory for"],
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
         """
-        Get a smart directory recommendation based on DataDoc context.
+        Get a smart directory recommendation in the GitHub repository 
+        querybook-datadocs based on DataDoc context.
 
         Analyzes the DataDoc's ownership, visibility, collaborators, and
-        environment to suggest the most appropriate directory.
+        environment to suggest the most appropriate GitHub directory in the repo for this DataDoc.
         """
         uid = token.claims["creator_uid"]
 
@@ -430,14 +431,14 @@ def register(mcp: FastMCP) -> None:
         directory: Annotated[
             str,
             "Directory path in repo (e.g., 'user/rchandna' or 'team/analytics'). "
-            "REQUIRED: Use get_directory_recommendation to see suggestions before linking.",
+            "REQUIRED: Use  get_datadoc_github_directory_recommendation to see suggestions before linking.",
         ],
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
         """
         Link a DataDoc to a GitHub directory for version control.
 
-        IMPORTANT: You must specify a directory. Use get_directory_recommendation first
+        IMPORTANT: You must specify a directory. Use get_datadoc_github_directory_recommendation first
         to see personalized suggestions based on the DataDoc's context.
 
         The directory structure follows:
@@ -447,7 +448,7 @@ def register(mcp: FastMCP) -> None:
         - datadocs/ - Temporary/unorganized (use with caution)
 
         Workflow:
-        1. Call get_directory_recommendation(datadoc_id) to see suggestions
+        1. Call get_datadoc_github_directory_recommendation(datadoc_id) to see suggestions
         2. Present options to user or choose based on recommendation
         3. Call link_datadoc_github(datadoc_id, directory) with chosen directory
         """
@@ -483,7 +484,7 @@ def register(mcp: FastMCP) -> None:
                 raise ValueError(f"User object has no id: {user}")
 
             # Directory is now required - no auto-default
-            # Users must call get_directory_recommendation first
+            # Users must call get_datadoc_github_directory_recommendation first
 
             # Validate directory
             if not validate_directory_path(directory):
