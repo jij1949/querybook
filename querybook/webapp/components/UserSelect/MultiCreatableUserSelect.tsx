@@ -1,8 +1,10 @@
 import { debounce } from 'lodash';
 import React, { ReactElement, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import AsyncCreatableSelect, {
     Props as AsyncCreatableProps,
 } from 'react-select/async-creatable';
+import * as Yup from 'yup';
 
 import { UserBadge } from 'components/UserBadge/UserBadge';
 import {
@@ -83,13 +85,17 @@ export const MultiCreatableUserSelect: React.FunctionComponent<
         selectProps.menuPortalTarget = overlayRoot;
     }
 
+    // Helper to check if an option is a user (not email)
+    const isUserOption = (option: ISelectOption): option is ISelectUserOption =>
+        'isUser' in option && option.isUser;
+
     const valueWithLabel = useMemo(
         () =>
             (value ?? []).map((v) => ({
                 ...v,
                 label:
                     v.label ??
-                    ('isUser' in v && v.isUser ? (
+                    (isUserOption(v) ? (
                         <UserBadge uid={v.value} mini />
                     ) : (
                         v.value
@@ -97,6 +103,40 @@ export const MultiCreatableUserSelect: React.FunctionComponent<
             })),
         [value]
     );
+
+    const handleChange = (newValues: ISelectOption[]) => {
+        // Validate all email options
+        const invalidEmail = newValues.find((option) => {
+            if (isUserOption(option)) {
+                return false;
+            }
+
+            const email = String(option.value).trim();
+            return !email || !Yup.string().email().required().isValidSync(email);
+        });
+
+        if (invalidEmail) {
+            const email = String(invalidEmail.value).trim();
+            toast.error(`Invalid email address: "${email}"`);
+            setSearchText(email);
+            return;
+        }
+
+        // Silently trim email values and labels before passing to parent
+        const trimmedValues = newValues.map((v) => {
+            if (isUserOption(v)) {
+                return v;
+            }
+            const trimmedValue = String(v.value).trim();
+            return {
+                ...v,
+                value: trimmedValue,
+                label: typeof v.label === 'string' ? v.label.trim() : trimmedValue,
+            };
+        });
+
+        onChange(trimmedValues);
+    };
 
     return (
         <AccentText>
@@ -108,7 +148,7 @@ export const MultiCreatableUserSelect: React.FunctionComponent<
                 onInputChange={(text) => setSearchText(text)}
                 noOptionsMessage={() => (searchText ? 'No user found.' : null)}
                 allowCreateWhileLoading
-                onChange={onChange}
+                onChange={handleChange}
                 value={valueWithLabel}
                 isMulti
                 {...selectProps}
