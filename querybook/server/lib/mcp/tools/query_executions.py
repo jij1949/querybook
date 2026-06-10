@@ -93,7 +93,13 @@ def register(mcp: FastMCP) -> None:
         cell_id: Annotated[int, "Cell ID from get_datadoc"],
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
-        """Execute a query cell from a DataDoc. Returns the query execution ID."""
+        """Execute a query cell from a DataDoc.
+
+        Execution is asynchronous. Poll the returned query_execution_resource_uri
+        until completion. Completed statements include results_resource_uri for
+        small previews and may include results_download_url for large downloads;
+        see querybook://reference/downloading-results.
+        """
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:
@@ -226,7 +232,13 @@ def register(mcp: FastMCP) -> None:
         metadata: Annotated[dict | None, "Optional metadata for the execution"] = None,
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
-        """Execute an ad-hoc SQL query without creating a DataDoc. Returns execution details with query_execution_resource_uri for polling and results_resource_uri for each statement."""
+        """Execute an ad-hoc SQL query without creating a DataDoc.
+
+        Returns execution details with query_execution_resource_uri for polling.
+        Completed statements include results_resource_uri for small previews and
+        may include results_download_url for large downloads; see
+        querybook://reference/downloading-results.
+        """
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:

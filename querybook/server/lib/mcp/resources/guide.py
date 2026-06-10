@@ -7,9 +7,20 @@ from lib.mcp.utils import RESOURCE_ANNOTATIONS
 RESOURCE_GUIDE = """\
 # Querybook MCP Resource Guide
 
-This server exposes resource templates that provide read-only access to
-Querybook data. Use these URIs to fetch structured JSON for any entity
-by substituting the appropriate ID.
+This server exposes static reference guides and resource templates that provide
+read-only access to Querybook data. Use reference guides for Querybook-specific
+formatting and workflow instructions. Use resource template URIs to fetch
+structured JSON for entities by substituting the appropriate ID.
+
+## Static Reference Guides
+
+| URI | Description |
+|-----|-------------|
+| `querybook://reference/chart-cells` | Chart cell `meta` schema, chart types, visual settings, and examples |
+| `querybook://reference/rich-text` | HTML formatting supported by DataDoc text cells |
+| `querybook://reference/github` | DataDoc GitHub authorization, linking, commit, compare, and restore workflows |
+| `querybook://reference/downloading-results` | When and how to use `results_download_url` instead of loading result rows into MCP context |
+| `querybook://reference/agent-skill` | Optional Querybook Agent Skill overview, documentation/source links, and relationship to these built-in references |
 
 ## Resource Templates
 
@@ -81,8 +92,8 @@ def register(mcp: FastMCP) -> None:
         uri="querybook://resource-guide",
         name="Resource Guide",
         description=(
-            "Markdown guide listing all available Querybook resource templates, "
-            "their URI patterns, query parameters, and usage tips"
+            "Markdown guide listing Querybook static reference guides, resource "
+            "templates, URI patterns, query parameters, and usage tips"
         ),
         mime_type="text/markdown",
         annotations=RESOURCE_ANNOTATIONS,

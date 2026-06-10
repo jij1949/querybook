@@ -24,7 +24,11 @@ def register(mcp: FastMCP) -> None:
     @mcp.resource(
         uri="querybook://statement-execution/{statement_execution_id}/results{?limit}",
         name="Statement Execution Results",
-        description="Get the actual result data rows for a statement execution",
+        description=(
+            "Get result rows for a statement execution. For large result sets, "
+            "prefer results_download_url when available; see "
+            "querybook://reference/downloading-results."
+        ),
         mime_type="application/json",
         annotations=RESOURCE_ANNOTATIONS,
     )

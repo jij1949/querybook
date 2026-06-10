@@ -12,13 +12,14 @@ Provides 7 tools covering the complete user workflow:
 Note: GitHub status and history are available via resources:
 - querybook://datadoc/{id} - includes GitHub status with history_resource_uri
 - querybook://datadoc/{id}/github-history - commit history with pagination
+
+Workflow reference: querybook://reference/github
 """
 
 import uuid
 import webbrowser
 from datetime import datetime
-from typing import Annotated, Literal
-from urllib.parse import quote
+from typing import Annotated
 
 from fastmcp import FastMCP
 from fastmcp.server.auth import AccessToken
@@ -42,7 +43,6 @@ from lib.mcp.lib.github import (
     validate_directory_path,
 )
 from lib.mcp.utils import (
-    CREATE_ANNOTATIONS,
     DELETE_ANNOTATIONS,
     READ_ONLY_ANNOTATIONS,
     WRITE_ANNOTATIONS,
@@ -51,13 +51,10 @@ from logic import datadoc as datadoc_logic
 from logic import github as github_logic
 from logic.datadoc import restore_data_doc_from_commit
 from logic.datadoc_permission import (
-    assert_can_read,
-    assert_can_write,
     user_can_read,
     user_can_write,
 )
 from logic.user import get_user_by_id
-from models.github import GitHubLink
 
 LOG = get_logger(__file__)
 
@@ -245,13 +242,16 @@ def register(mcp: FastMCP) -> None:
 
         Returns organized directory structure (team/, user/, etc.) with usage
         statistics and personalized recommendations for where to place DataDocs.
+        See querybook://reference/github for the full linking workflow.
         """
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:
             # Check read permission on the datadoc (just for auth context)
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(f"User {uid} does not have read permission for DataDoc {datadoc_id}")
+                raise ValueError(
+                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                )
 
             # Get directories from GitHub
             try:
@@ -277,7 +277,10 @@ def register(mcp: FastMCP) -> None:
 
             # Generate recommendations
             recommendations = generate_directory_recommendations(
-                user=user, directories=directories, usage_stats=usage_stats, session=session
+                user=user,
+                directories=directories,
+                usage_stats=usage_stats,
+                session=session,
             )
 
             return {
@@ -307,17 +310,20 @@ def register(mcp: FastMCP) -> None:
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
         """
-        Get a smart directory recommendation in the GitHub repository 
+        Get a smart directory recommendation in the GitHub repository
         querybook-datadocs based on DataDoc context.
 
         Analyzes the DataDoc's ownership, visibility, collaborators, and
         environment to suggest the most appropriate GitHub directory in the repo for this DataDoc.
+        See querybook://reference/github for directory conventions.
         """
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(f"User {uid} does not have read permission for DataDoc {datadoc_id}")
+                raise ValueError(
+                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                )
 
             doc = datadoc_logic.get_data_doc_by_id(datadoc_id, session=session)
             if not doc:
@@ -351,7 +357,9 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(f"User {uid} does not have read permission for DataDoc {datadoc_id}")
+                raise ValueError(
+                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                )
 
             user = get_user_by_id(uid, session=session)
 
@@ -431,7 +439,8 @@ def register(mcp: FastMCP) -> None:
         directory: Annotated[
             str,
             "Directory path in repo (e.g., 'user/rchandna' or 'team/analytics'). "
-            "REQUIRED: Use  get_datadoc_github_directory_recommendation to see suggestions before linking.",
+            "REQUIRED: Use get_datadoc_github_directory_recommendation to see "
+            "suggestions before linking. See querybook://reference/github.",
         ],
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
@@ -451,6 +460,8 @@ def register(mcp: FastMCP) -> None:
         1. Call get_datadoc_github_directory_recommendation(datadoc_id) to see suggestions
         2. Present options to user or choose based on recommendation
         3. Call link_datadoc_github(datadoc_id, directory) with chosen directory
+
+        Full workflow reference: querybook://reference/github.
         """
         try:
             uid = token.claims["creator_uid"]
@@ -461,7 +472,9 @@ def register(mcp: FastMCP) -> None:
             # Check write permission using uid (not current_user which doesn't exist in MCP context)
             try:
                 if not user_can_write(datadoc_id, uid=uid, session=session):
-                    raise ValueError(f"User {uid} does not have write permission for DataDoc {datadoc_id}")
+                    raise ValueError(
+                        f"User {uid} does not have write permission for DataDoc {datadoc_id}"
+                    )
             except Exception as e:
                 raise ValueError(f"Permission check failed: {e}")
 
@@ -480,7 +493,7 @@ def register(mcp: FastMCP) -> None:
 
             if not user:
                 raise ValueError(f"User {uid} not found")
-            if not hasattr(user, 'id') or user.id is None:
+            if not hasattr(user, "id") or user.id is None:
                 raise ValueError(f"User object has no id: {user}")
 
             # Directory is now required - no auto-default
@@ -504,14 +517,17 @@ def register(mcp: FastMCP) -> None:
 
             # Create or update the link
             try:
-                github_link = github_logic.create_repo_link(
+                github_logic.create_repo_link(
                     datadoc_id=datadoc_id,
                     user_id=uid,
                     directory=directory,
                     session=session,
                 )
             except Exception as e:
-                LOG.error(f"Failed to create GitHub link for datadoc {datadoc_id}: {e}", exc_info=True)
+                LOG.error(
+                    f"Failed to create GitHub link for datadoc {datadoc_id}: {e}",
+                    exc_info=True,
+                )
                 raise ValueError(f"create_repo_link failed: {str(e)}")
 
             file_path = f"{directory}/datadoc_{datadoc_id}.md"
@@ -548,7 +564,9 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_write(datadoc_id, uid=uid, session=session):
-                raise ValueError(f"User {uid} does not have write permission for DataDoc {datadoc_id}")
+                raise ValueError(
+                    f"User {uid} does not have write permission for DataDoc {datadoc_id}"
+                )
 
             github_link = github_logic.get_repo_link(datadoc_id, session=session)
 
@@ -585,7 +603,9 @@ def register(mcp: FastMCP) -> None:
     def commit_datadoc_github(
         datadoc_id: Annotated[int, "DataDoc ID"],
         commit_message: Annotated[
-            str | None, "Commit message. Auto-generated if not provided"
+            str | None,
+            "Commit message. Auto-generated if not provided. See "
+            "querybook://reference/github for commit message guidance.",
         ] = None,
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
@@ -594,13 +614,15 @@ def register(mcp: FastMCP) -> None:
 
         Creates or updates the markdown file in GitHub with the DataDoc's
         current content. Commits made via MCP are automatically tagged with
-        metadata for auditing and analytics.
+        metadata for auditing and analytics. See querybook://reference/github.
         """
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:
             if not user_can_write(datadoc_id, uid=uid, session=session):
-                raise ValueError(f"User {uid} does not have write permission for DataDoc {datadoc_id}")
+                raise ValueError(
+                    f"User {uid} does not have write permission for DataDoc {datadoc_id}"
+                )
 
             # Check if linked
             github_link = github_logic.get_repo_link(datadoc_id, session=session)
@@ -637,8 +659,8 @@ def register(mcp: FastMCP) -> None:
                 datadoc_id=datadoc_id,
             )
 
-            # Serialize DataDoc to markdown
-            markdown_content = serialize_datadoc_to_markdown(datadoc, exclude_metadata=False)
+            # Validate DataDoc serialization before committing through GitHubClient.
+            serialize_datadoc_to_markdown(datadoc, exclude_metadata=False)
 
             # Commit to GitHub
             github_client = _get_github_client(datadoc_id, uid, session)
@@ -646,7 +668,10 @@ def register(mcp: FastMCP) -> None:
             try:
                 github_client.commit_datadoc(commit_message=full_commit_message)
             except Exception as e:
-                LOG.error(f"Failed to commit datadoc {datadoc_id} to GitHub: {e}", exc_info=True)
+                LOG.error(
+                    f"Failed to commit datadoc {datadoc_id} to GitHub: {e}",
+                    exc_info=True,
+                )
                 raise ValueError(f"Failed to commit to GitHub: {str(e)}")
 
             # Get the commit info
@@ -680,13 +705,16 @@ def register(mcp: FastMCP) -> None:
         Compare the current DataDoc with a specific GitHub commit.
 
         Returns both the current content and the commit content as markdown,
-        allowing you to see what changed between versions.
+        allowing you to see what changed between versions. See
+        querybook://reference/github for history workflows.
         """
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(f"User {uid} does not have read permission for DataDoc {datadoc_id}")
+                raise ValueError(
+                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                )
 
             github_client = _get_github_client(datadoc_id, uid, session)
             datadoc = datadoc_logic.get_data_doc_by_id(datadoc_id, session=session)
@@ -749,13 +777,16 @@ def register(mcp: FastMCP) -> None:
 
         Replaces the current DataDoc content with the content from
         the specified commit. This is reversible - you can restore
-        to any other commit including the current state.
+        to any other commit including the current state. See
+        querybook://reference/github for restore guidance.
         """
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:
             if not user_can_write(datadoc_id, uid=uid, session=session):
-                raise ValueError(f"User {uid} does not have write permission for DataDoc {datadoc_id}")
+                raise ValueError(
+                    f"User {uid} does not have write permission for DataDoc {datadoc_id}"
+                )
 
             github_client = _get_github_client(datadoc_id, uid, session)
 
@@ -779,7 +810,7 @@ def register(mcp: FastMCP) -> None:
                 commit_message = f"Restored to {commit_sha[:7]} via MCP"
 
             # Restore the DataDoc using existing logic
-            restored_datadoc = restore_data_doc_from_commit(
+            restore_data_doc_from_commit(
                 datadoc_id=datadoc_id,
                 commit_datadoc=commit_datadoc,
                 commit=True,
@@ -794,4 +825,3 @@ def register(mcp: FastMCP) -> None:
                 "message": f"DataDoc restored to commit {commit_sha[:7]}",
                 "datadoc_resource_uri": f"querybook://datadoc/{datadoc_id}",
             }
-

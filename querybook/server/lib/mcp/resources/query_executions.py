@@ -18,7 +18,10 @@ def register(mcp: FastMCP) -> None:
     @mcp.resource(
         uri="querybook://query-execution/{query_execution_id}",
         name="Query Execution",
-        description="Get query execution status and statement details",
+        description=(
+            "Get query execution status and statement details. For large result "
+            "sets, see querybook://reference/downloading-results."
+        ),
         mime_type="application/json",
         annotations=RESOURCE_ANNOTATIONS,
     )

@@ -76,7 +76,10 @@ def register(mcp: FastMCP) -> None:
     @mcp.resource(
         uri="querybook://datadoc/{datadoc_id}/github-history{?limit,offset}",
         name="DataDoc GitHub History",
-        description="Get GitHub commit history for a DataDoc with pagination",
+        description=(
+            "Get GitHub commit history for a DataDoc with pagination. See "
+            "querybook://reference/github for GitHub workflows."
+        ),
         mime_type="application/json",
         annotations=RESOURCE_ANNOTATIONS,
     )

@@ -47,9 +47,28 @@ from models.environment import Environment
 
 
 class DataDocCell(BaseModel):
-    cell_type: str
-    context: str = ""
-    meta: dict = Field(default_factory=dict)
+    cell_type: str = Field(
+        description=(
+            "Cell type: query, text, chart, or python. See "
+            "querybook://reference/chart-cells for chart cells and "
+            "querybook://reference/rich-text for text cells."
+        )
+    )
+    context: str = Field(
+        default="",
+        description=(
+            "Cell SQL, code, or HTML rich text. Text cells use HTML fragments; "
+            "see querybook://reference/rich-text. Chart cells use an empty "
+            "context string."
+        ),
+    )
+    meta: dict = Field(
+        default_factory=dict,
+        description=(
+            "Additional cell metadata. Chart cell schema is documented at "
+            "querybook://reference/chart-cells."
+        ),
+    )
 
 
 class DataDocData(BaseModel):
@@ -350,15 +369,26 @@ def register(mcp: FastMCP) -> None:
         datadoc_id: Annotated[int, "DataDoc ID"],
         cell_type: Annotated[
             Literal["query", "text", "chart", "python"],
-            "Type of cell: 'query', 'text', 'chart', or 'python'",
+            "Type of cell: 'query', 'text', 'chart', or 'python'. "
+            "For chart cells, see querybook://reference/chart-cells. "
+            "For text cells, see querybook://reference/rich-text.",
         ],
-        context: Annotated[str, "Cell SQL, code, or rich text content"] = "",
+        context: Annotated[
+            str,
+            "Cell SQL, code, or rich text content. Text cells expect HTML "
+            "fragments; see querybook://reference/rich-text. Chart cells "
+            "should use an empty context string.",
+        ] = "",
         title: Annotated[str | None, "Cell title"] = None,
         engine_id: Annotated[
             int | None,
             "Query engine ID from list_query_engines (required for query cells)",
         ] = None,
-        meta: Annotated[dict | None, "Additional cell metadata"] = None,
+        meta: Annotated[
+            dict | None,
+            "Additional cell metadata. Chart cells require a chart/data schema; "
+            "see querybook://reference/chart-cells.",
+        ] = None,
         index: Annotated[int | None, "Position to insert cell (default: end)"] = None,
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
@@ -417,12 +447,21 @@ def register(mcp: FastMCP) -> None:
     )
     def update_datadoc_cell(
         cell_id: Annotated[int, "Cell ID not the cell's index"],
-        context: Annotated[str | None, "Cell content/code"] = None,
+        context: Annotated[
+            str | None,
+            "Cell content/code. Text cells expect HTML fragments; see "
+            "querybook://reference/rich-text. Chart cells should use an empty "
+            "context string.",
+        ] = None,
         title: Annotated[str | None, "Cell title"] = None,
         engine_id: Annotated[
             int | None, "Query engine ID from list_query_engines (for query cells)"
         ] = None,
-        meta: Annotated[dict | None, "Additional cell metadata"] = None,
+        meta: Annotated[
+            dict | None,
+            "Additional cell metadata. Chart cells require a chart/data schema; "
+            "see querybook://reference/chart-cells.",
+        ] = None,
         token: AccessToken = CurrentAccessToken(),
     ) -> dict:
         """Update a DataDoc cell's context or metadata. Only updates non-null fields."""
@@ -686,7 +725,9 @@ def register(mcp: FastMCP) -> None:
     def upload_datadoc(
         datadoc: Annotated[
             DataDocInput,
-            "DataDoc in Querybook export format, use export_datadoc to generate",
+            "DataDoc in Querybook export format, use export_datadoc to generate. "
+            "For text/chart cell formats, see querybook://reference/rich-text "
+            "and querybook://reference/chart-cells.",
         ],
         environment_id: Annotated[
             int | None,
