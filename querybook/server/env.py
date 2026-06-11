@@ -50,6 +50,28 @@ def get_env_config(name, optional=True):
     return val
 
 
+def _parse_uri_list(raw):
+    """Normalize a config value into a list of URIs.
+
+    Accepts a JSON array, comma-separated string, or YAML list. Returns an
+    empty list when the value is unset.
+    """
+    if isinstance(raw, str):
+        return [u.strip() for u in raw.split(",") if u.strip()]
+    return raw or []
+
+
+def _resolve_allowed_redirect_uris(base_raw, extra_raw, defaults):
+    """Resolve the allowed redirect URIs from config.
+
+    ``base_raw`` (if set) overrides ``defaults`` entirely; ``extra_raw`` is
+    always appended on top. The result is deduped with order preserved.
+    """
+    base = _parse_uri_list(base_raw) or defaults
+    extra = _parse_uri_list(extra_raw)
+    return list(dict.fromkeys([*base, *extra]))
+
+
 class QuerybookSettings(object):
     # Core
     PRODUCTION = os.environ.get("production", "false") == "true"
@@ -214,18 +236,23 @@ class QuerybookSettings(object):
     MCP_AUTH_SECRET = get_env_config("MCP_AUTH_SECRET")
     MCP_OAUTH_BASE_URL = get_env_config("MCP_OAUTH_BASE_URL")
     MCP_OIDC_CONFIG_URL = get_env_config("MCP_OIDC_CONFIG_URL")
-    # Accepts JSON array, comma-separated string, or YAML list.
-    # e.g. '["http://localhost:*"]' or 'http://localhost:*,http://127.0.0.1:*'
-    _raw_redirect_uris = get_env_config("MCP_OAUTH_ALLOWED_REDIRECT_URIS")
-    if isinstance(_raw_redirect_uris, str):
-        _raw_redirect_uris = [
-            u.strip() for u in _raw_redirect_uris.split(",") if u.strip()
-        ]
-    MCP_OAUTH_ALLOWED_REDIRECT_URIS = _raw_redirect_uris or [
+    # Out-of-the-box redirect URIs. Override the full list with
+    # MCP_OAUTH_ALLOWED_REDIRECT_URIS, or append deployment-specific entries with
+    # MCP_OAUTH_EXTRA_ALLOWED_REDIRECT_URIS (keeps the Vault config small).
+    DEFAULT_MCP_OAUTH_REDIRECT_URIS = [
         "http://localhost:*",
         "http://127.0.0.1:*",
         "cursor://anysphere.cursor-mcp/*",
+        "https://analytics.expedia.biz/oauth/callback",
+        "https://analytics-test.expedia.biz/oauth/callback",
     ]
+    # Both vars accept a JSON array, comma-separated string, or YAML list.
+    # e.g. '["http://localhost:*"]' or 'http://localhost:*,http://127.0.0.1:*'
+    MCP_OAUTH_ALLOWED_REDIRECT_URIS = _resolve_allowed_redirect_uris(
+        get_env_config("MCP_OAUTH_ALLOWED_REDIRECT_URIS"),
+        get_env_config("MCP_OAUTH_EXTRA_ALLOWED_REDIRECT_URIS"),
+        DEFAULT_MCP_OAUTH_REDIRECT_URIS,
+    )
 
     # Cache Control
     CACHE_CONTROL_MAX_AGE = int(
