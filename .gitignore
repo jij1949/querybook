@@ -57,3 +57,6 @@ requirements/local.txt
 .claude/settings.local.json
 .claude/private/
 docs/superpowers/
+
+# Keep shared Claude Code settings tracked in git
+!.claude/settings.json
