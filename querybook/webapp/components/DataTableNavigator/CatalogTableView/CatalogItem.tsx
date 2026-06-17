@@ -2,12 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import { CatalogTypeIcon } from 'components/CatalogTypeIcon/CatalogTypeIcon';
 import {
     IDataSchema,
     SchemaSortKey,
     SchemaTableSortKey
 } from 'const/metastore';
 import { useIntersectionObserver } from 'hooks/useIntersectionObserver';
+import { getCatalogType } from 'lib/utils/catalog-type';
 import { defaultSortSchemaTableBy } from 'redux/dataTableSearch/const';
 import { ITableSearchResult } from 'redux/dataTableSearch/types';
 import { IStoreState } from 'redux/store/types';
@@ -69,6 +71,7 @@ const CatalogIconButton = styled(IconButton)`
 
 export const CatalogItem: React.FC<{
     name: string;
+    properties?: Record<string, any>;
     schemaCount: number;
     schemas: IDataSchema[];
     schemasDone: boolean;
@@ -92,6 +95,7 @@ export const CatalogItem: React.FC<{
     onToggle: () => void;
 }> = ({
     name,
+    properties,
     schemaCount,
     schemas,
     schemasDone,
@@ -137,6 +141,10 @@ export const CatalogItem: React.FC<{
                         {name}
                     </Title>
                     <span className="catalog-label">Catalog</span>
+                    <CatalogTypeIcon
+                        type={getCatalogType({ catalogType: properties?.catalog_type as string | undefined })}
+                        size={14}
+                    />
                 </div>
                 <OrderByButton
                     asc={schemasSortOrder.asc}

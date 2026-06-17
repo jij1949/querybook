@@ -112,6 +112,7 @@ export const CatalogTableView: React.FC<{
                     <CatalogItem
                         key={catalogId}
                         name={catalog.name}
+                        properties={catalog.properties}
                         schemaCount={catalog.schema_count}
                         schemas={catalog.schemas ?? []}
                         schemasDone={catalog.schemasDone}

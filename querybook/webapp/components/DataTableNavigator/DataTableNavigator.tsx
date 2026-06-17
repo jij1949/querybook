@@ -7,7 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { TableUploaderButton } from 'components/TableUploader/TableUploaderButton';
 import {
     tableNameDataTransferName,
-    tableNameDraggableType,
+    tableNameDraggableType
 } from 'const/metastore';
 import { SurveySurfaceType } from 'const/survey';
 import { useShallowSelector } from 'hooks/redux/useShallowSelector';
@@ -17,7 +17,7 @@ import { queryMetastoresSelector } from 'redux/dataSources/selector';
 import * as dataTableSearchActions from 'redux/dataTableSearch/action';
 import {
     ITableSearchFilters,
-    ITableSearchResult,
+    ITableSearchResult
 } from 'redux/dataTableSearch/types';
 import { currentEnvironmentSelector } from 'redux/environment/selector';
 import { Dispatch, IStoreState } from 'redux/store/types';
@@ -63,11 +63,11 @@ const useDataTableNavigatorReduxState = () => {
         searchString: state.dataTableSearch.searchString,
         searchFilters: state.dataTableSearch.searchFilters,
         metastoreId: state.dataTableSearch.metastoreId,
-        isSearching: !!state.dataTableSearch.searchRequest,
+        isSearching: !!state.dataTableSearch.searchRequest
     }));
     return {
         ...dataTableSearchState,
-        queryMetastores,
+        queryMetastores
     };
 };
 
@@ -111,13 +111,13 @@ const useDataTableNavigatorReduxDispatch = () => {
         resetSearch: useCallback(
             () => dispatch(dataTableSearchActions.resetSearch()),
             []
-        ),
+        )
     };
 };
 
 export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
     onTableRowClick,
-    selectedTableId,
+    selectedTableId
 }) => {
     const history = useHistory();
     const environmentName = useSelector(currentEnvironmentSelector).name;
@@ -128,7 +128,7 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
         searchString,
         searchFilters,
         metastoreId,
-        isSearching,
+        isSearching
     } = useDataTableNavigatorReduxState();
     const {
         resetSearchFilter,
@@ -136,7 +136,7 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
         updateSearchFilter,
         selectMetastore,
         getMoreDataTable,
-        resetSearch,
+        resetSearch
     } = useDataTableNavigatorReduxDispatch();
 
     const noMetastore = queryMetastores.length === 0;
@@ -199,7 +199,7 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
         triggerSurvey(SurveySurfaceType.TABLE_SEARCH, {
             search_query: searchString,
             search_filter: Object.keys(searchFilters),
-            is_modal: false,
+            is_modal: false
         });
     }, [searchString, searchFilters, triggerSurvey]);
 
@@ -235,7 +235,7 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
                 {makeSelectOptions(
                     queryMetastores.map((metastore) => ({
                         value: metastore.name,
-                        key: metastore.id,
+                        key: metastore.id
                     }))
                 )}
             </Select>
@@ -254,7 +254,7 @@ export const DataTableNavigator: React.FC<IDataTableNavigatorProps> = ({
         (table) => ({
             ...table,
             displayName: getTableDisplayName(table),
-            selected: selectedTableId === table.id,
+            selected: selectedTableId === table.id
         })
     );
 
@@ -322,7 +322,7 @@ const TableRow: React.FC<{
     environmentName: string;
 }> = ({ table, handleTableRowClick, environmentName }) => {
     const className = clsx({
-        selected: table.selected,
+        selected: table.selected
     });
     const tableUrl = `/${environmentName}/table/${table.id}/`;
     const handleLinkClick = useCallback(
@@ -386,11 +386,11 @@ function useTableNameDrag(tableName: string) {
     const [{ isDragging }, dragRef] = useDrag({
         type: tableNameDraggableType,
         item: {
-            type: tableNameDraggableType,
+            type: tableNameDraggableType
         },
         collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
-        }),
+            isDragging: !!monitor.isDragging()
+        })
     });
 
     const handleDragStart = useCallback(
@@ -404,7 +404,7 @@ function useTableNameDrag(tableName: string) {
         isDragging,
         dragProps: {
             ref: dragRef,
-            onDragStart: handleDragStart,
-        },
+            onDragStart: handleDragStart
+        }
     };
 }

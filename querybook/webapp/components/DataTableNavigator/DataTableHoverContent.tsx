@@ -58,9 +58,9 @@ export const DataTableHoverContent: React.FC<{
 
     return (
         <div className="DataTableHoverContent">
-            <Title className="mb4 DataTableHoverContent-name" size="smedium">
-                {tableName}
-            </Title>
+            <div className="DataTableHoverContent-name flex-row mb4">
+                <Title size="smedium">{tableName}</Title>
+            </div>
             <Loader
                 item={table}
                 itemKey={tableId}

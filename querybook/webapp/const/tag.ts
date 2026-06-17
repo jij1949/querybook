@@ -6,6 +6,7 @@ export interface ITagMeta {
     tooltip?: string;
     rank?: number;
     hidden?: boolean;
+    catalog_type?: string;
 }
 export interface ITag {
     id: number;

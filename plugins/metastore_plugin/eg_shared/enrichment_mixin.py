@@ -163,6 +163,19 @@ class EgEnrichmentMixin:
     - get_partitions(schema_name, table_name): Method to load partitions (optional)
     """
 
+    # Catalog type for this loader, declared by each concrete loader subclass
+    # (e.g. "glue", "databricks"). Drives the "Catalog Type" tag/icon. Derived
+    # from the loader itself rather than the source data lake, since the data
+    # lake is determined by fallback heuristics that can misclassify a table.
+    CATALOG_TYPE: Optional[str] = None
+
+    # Maps a CATALOG_TYPE key to its (display name, palette color in
+    # color_palette.yaml).
+    CATALOG_TYPE_DISPLAY: Dict[str, Tuple[str, str]] = {
+        "databricks": ("Databricks", "databricks-red"),  # hex #FF3621
+        "glue": ("AWS Glue", "glue-purple"),  # hex #A166FF
+    }
+
     # Shared loader configuration for all EG loaders
     loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig(
         {
@@ -599,6 +612,11 @@ class EgEnrichmentMixin:
         )
         tags.extend(source_tags)
         custom_properties.update(source_props)
+
+        # Add catalog type tag (Glue or Databricks), derived from the loader
+        catalog_type_tags, catalog_type_props = self._process_catalog_type()
+        tags.extend(catalog_type_tags)
+        custom_properties.update(catalog_type_props)
 
         # Process top tier / trending status
         table, top_tier_props = self._process_top_tier(
@@ -1101,6 +1119,39 @@ class EgEnrichmentMixin:
             custom_properties["source_schema_name"] = source_schema_name
             custom_properties["source_data_lake"] = source_data_lake
 
+        return tags, custom_properties
+
+    def _process_catalog_type(self) -> Tuple[List[DataTag], Dict[str, str]]:
+        """
+        Process catalog type tag based on the loader's own CATALOG_TYPE.
+
+        The catalog type (Databricks vs AWS Glue) is derived from the concrete
+        loader, which authoritatively knows its source. This avoids inferring it
+        from the source data lake, whose fallback heuristics can misclassify a
+        table (e.g. a Databricks table whose location/schema maps to an egdp_*
+        lake would otherwise be tagged as Glue).
+
+        Returns:
+            Tuple of (tags, custom_properties). Empty if the loader does not
+            declare a recognized CATALOG_TYPE.
+        """
+        catalog_type_key = self.CATALOG_TYPE
+        display = self.CATALOG_TYPE_DISPLAY.get(catalog_type_key)
+        if not display:
+            return [], {}
+
+        catalog_type, color = display
+
+        tags = [
+            DataTag(
+                name=f"Catalog Type: {catalog_type}",
+                type="Catalog Type",
+                description=f"This table is managed by {catalog_type}",
+                color=color,
+                meta={"rank": 35, "admin": True, "catalog_type": catalog_type_key},
+            )
+        ]
+        custom_properties = {"catalog_type": catalog_type_key}
         return tags, custom_properties
 
     def _process_top_tier(

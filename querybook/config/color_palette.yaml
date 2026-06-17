@@ -49,3 +49,9 @@
 - name: darkGrey
   color: '#6d6d6d'
   fillColor: rgba(77, 77, 77, 0.25)
+- name: databricks-red
+  color: '#FF3621'
+  fillColor: rgba(255, 54, 33, 0.2)
+- name: glue-purple
+  color: '#A166FF'
+  fillColor: rgba(161, 102, 255, 0.2)

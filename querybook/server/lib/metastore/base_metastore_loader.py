@@ -237,6 +237,14 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             LOG.info(
                 f"Found existing catalog: id={db_catalog.id}, name={db_catalog.name}"
             )
+            # Merge any new properties the loader stamped (e.g. catalog_type).
+            # Only updates when properties are explicitly provided — safe for loaders
+            # that don't set them.
+            if catalog_tuple.properties:
+                db_catalog.properties = {
+                    **(db_catalog.properties or {}),
+                    **catalog_tuple.properties,
+                }
         else:
             LOG.info(
                 f"Catalog '{catalog_name}' not found in database, creating new one"

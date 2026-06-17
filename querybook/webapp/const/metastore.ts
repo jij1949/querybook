@@ -256,6 +256,7 @@ export interface ICatalogSearchResult {
     name: string;
     schema_count: number;
     schemas?: IDataSchema[];
+    properties?: Record<string, any>;
 }
 export const tableNameDraggableType = 'TableName-';
 

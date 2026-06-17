@@ -17,6 +17,9 @@ import { Icon } from 'ui/Icon/Icon';
 import { Menu, MenuItem } from 'ui/Menu/Menu';
 import { HoverIconTag } from 'ui/Tag/HoverIconTag';
 
+import { CatalogTypeIcon } from 'components/CatalogTypeIcon/CatalogTypeIcon';
+import { getCatalogType } from 'lib/utils/catalog-type';
+
 import { CreateDataTableTag } from './CreateDataTableTag';
 import { TableTagConfigModal } from './TableTagConfigModal';
 
@@ -135,6 +138,14 @@ export const TableTag: React.FC<{
         ? tag.name.substring(tagMeta.type.length + 2)
         : tag.name;
 
+    const catalogType = getCatalogType({
+        catalogType: tagMeta?.catalog_type,
+    });
+    const customIcon =
+        catalogType !== 'unknown' ? (
+            <CatalogTypeIcon type={catalogType} size={12} />
+        ) : undefined;
+
     return (
         <div className="TableTag">
             {canUserUpdate && (
@@ -155,6 +166,7 @@ export const TableTag: React.FC<{
                 name={tagName}
                 type={tagMeta.type}
                 icon={tagMeta.icon}
+                customIcon={customIcon}
                 iconOnHover={canUserDelete ? 'X' : null}
                 onIconHoverClick={canUserDelete ? handleDeleteTag : null}
                 tooltip={tagMeta.tooltip}

@@ -144,11 +144,14 @@ def create_table_tags(
     session.query(TagItem).filter_by(table_id=table_id, uid=None).delete()
 
     for tag in tags:
-        tag_color_name = (
-            find_nearest_palette_color(tag.color)["name"]
-            if tag.color is not None
-            else None
-        )
+        if not tag.color:
+            tag_color_name = None
+        elif not tag.color.startswith('#'):
+            # Already a palette name (e.g. "databricks-red") — use directly.
+            tag_color_name = tag.color
+        else:
+            # Hex value — find the nearest palette color.
+            tag_color_name = find_nearest_palette_color(tag.color)["name"]
         meta = {
             **(tag.meta or {}),
             "type": tag.type,
@@ -189,11 +192,14 @@ def create_column_tags(
     session.query(TagItem).filter_by(column_id=column_id).delete()
 
     for tag in tags:
-        tag_color_name = (
-            find_nearest_palette_color(tag.color)["name"]
-            if tag.color is not None
-            else None
-        )
+        if not tag.color:
+            tag_color_name = None
+        elif not tag.color.startswith('#'):
+            # Already a palette name (e.g. "databricks-red") — use directly.
+            tag_color_name = tag.color
+        else:
+            # Hex value — find the nearest palette color.
+            tag_color_name = find_nearest_palette_color(tag.color)["name"]
         meta = {
             "type": tag.type,
             "tooltip": tag.description,

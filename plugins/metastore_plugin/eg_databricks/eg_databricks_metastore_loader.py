@@ -11,10 +11,10 @@ Extends DatabricksMetastoreLoader with Expedia Group-specific enrichment feature
 - AI-generated table descriptions
 - Cloverleaf tagging
 """
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from lib.logger import get_logger
-from const.metastore import DataColumn, DataTable
+from const.metastore import DataCatalog, DataColumn, DataTable
 from lib.metastore.loaders.databricks_metastore_loader import DatabricksMetastoreLoader
 from metastore_plugin.eg_shared.enrichment_mixin import EgEnrichmentMixin
 
@@ -41,6 +41,9 @@ class EgDatabricksMetastoreLoader(EgEnrichmentMixin, DatabricksMetastoreLoader):
     - Cloverleaf managed table tagging
     """
 
+    # Drives the "Catalog Type" tag/icon; see EgEnrichmentMixin.CATALOG_TYPE.
+    CATALOG_TYPE = "databricks"
+
     def __init__(self, *args, **kwargs):
         """
         Initialize the EG Databricks metastore loader.
@@ -49,6 +52,16 @@ class EgDatabricksMetastoreLoader(EgEnrichmentMixin, DatabricksMetastoreLoader):
         the parsed description cache.
         """
         super().__init__(*args, **kwargs)
+
+    def get_catalog_info(self, catalog_name: str) -> Optional[DataCatalog]:
+        """Stamp catalog_type='databricks' on catalog properties so the frontend
+        can render the Databricks icon on catalog nodes without a hardcoded name map."""
+        catalog = super().get_catalog_info(catalog_name)
+        if catalog is None:
+            return None
+        return catalog._replace(
+            properties={**(catalog.properties or {}), "catalog_type": self.CATALOG_TYPE}
+        )
 
     def get_table_and_columns(
         self, schema_name: str, table_name: str, catalog_name: str = None

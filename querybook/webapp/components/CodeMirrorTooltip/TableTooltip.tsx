@@ -12,6 +12,7 @@ import * as dataSourcesActions from 'redux/dataSources/action';
 import { IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
 import { ShowMoreText } from 'ui/ShowMoreText/ShowMoreText';
+
 import { Icon } from '../../ui/Icon/Icon';
 
 interface IProps {
@@ -27,14 +28,14 @@ export const TableTooltip: React.FunctionComponent<IProps> = ({
     columns,
     schema,
     hidePinItButton = false,
-    openTableModal,
+    openTableModal
 }) => {
     const tableName = getTableDisplayName({
-            schema: schema.name,
-            name: table.name,
-            full_name: table?.full_name,
-            catalog: schema?.catalog?.name
-        });
+        schema: schema.name,
+        name: table.name,
+        full_name: table?.full_name,
+        catalog: schema?.catalog?.name
+    });
     const description = table.description
         ? (table.description as ContentState).getPlainText()
         : '';
@@ -137,14 +138,14 @@ export const TableTooltipByName: React.FunctionComponent<{
     metastoreId,
     tableFullName,
     hidePinItButton = true,
-    showDetails = true,
+    showDetails = true
 }) => {
     const dispatch = useDispatch();
     const [tableId, setTableId] = useState(null);
 
     const openTableModal = useCallback(() => {
         navigateWithinEnv(`/table/${tableId}/`, {
-            isModal: true,
+            isModal: true
         });
     }, [tableId]);
 
@@ -164,14 +165,14 @@ export const TableTooltipByName: React.FunctionComponent<{
                 } else {
                     throw new Error('Invalid tableFullName format');
                 }
-                const table = await dispatch(
+                const table = (await dispatch(
                     dataSourcesActions.fetchDataTableByNameIfNeeded(
                         schemaName,
                         tableName,
                         metastoreId,
                         catalogName
                     )
-                ) as unknown as IDataTable;
+                )) as unknown as IDataTable;
                 if (table?.id) {
                     setTableId(table.id);
                 }
@@ -198,7 +199,7 @@ export const TableTooltipByName: React.FunctionComponent<{
             return {
                 table: tableFromState,
                 schema: schemaFromState,
-                columns: columnsFromState,
+                columns: columnsFromState
             };
         }
     );

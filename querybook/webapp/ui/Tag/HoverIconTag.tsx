@@ -10,6 +10,7 @@ export interface IHoverIconTagProps extends Omit<ITagProps, 'children'> {
     name: string;
     type?: string;
     icon?: string;
+    customIcon?: React.ReactNode;
     iconOnHover?: AllLucideIconNames;
     showType?: boolean;
     onIconHoverClick?: (e?: React.MouseEvent) => any;
@@ -23,6 +24,7 @@ export const HoverIconTag = React.forwardRef<
             name,
             type,
             icon,
+            customIcon,
             iconOnHover,
             showType = true,
             onIconHoverClick,
@@ -58,6 +60,7 @@ export const HoverIconTag = React.forwardRef<
                         <span>{type}</span>
                     </Tag>
                     <Tag mini={mini} highlighted color={color} {...extraProps}>
+                        {customIcon && <span className="mr4">{customIcon}</span>}
                         {name}
                         {hoverDOM}
                     </Tag>
@@ -67,6 +70,7 @@ export const HoverIconTag = React.forwardRef<
 
         return (
             <Tag {...tagProps} ref={ref} className={className}>
+                {customIcon && <span className="mr4">{customIcon}</span>}
                 {iconDOM}
                 <span>{name}</span>
                 {hoverDOM}

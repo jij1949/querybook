@@ -17,6 +17,7 @@ from typing import Dict, List, Tuple
 from lib.logger import get_logger
 from const.metastore import (
     DataColumn,
+    DataSchema,
     DataTable,
 )
 from lib.metastore.loaders.glue_data_catalog_loader import GlueDataCatalogLoader
@@ -44,6 +45,9 @@ class EgGlueMetastoreLoader(EgEnrichmentMixin, GlueDataCatalogLoader):
     - AI-generated table descriptions
     - Cloverleaf managed table tagging
     """
+
+    # Drives the "Catalog Type" tag/icon; see EgEnrichmentMixin.CATALOG_TYPE.
+    CATALOG_TYPE = "glue"
 
     def __init__(self, *args, **kwargs):
         """
@@ -124,6 +128,21 @@ class EgGlueMetastoreLoader(EgEnrichmentMixin, GlueDataCatalogLoader):
             params["table_type"] = description["table_type"]
 
         return params
+
+    def get_all_schema_names(self) -> List[DataSchema]:
+        """Stamp catalog_type='glue' on each catalog's properties so the frontend
+        can render the AWS Glue icon on catalog nodes without a hardcoded name map."""
+        schemas = super().get_all_schema_names()
+        return [
+            schema._replace(
+                catalog=schema.catalog._replace(
+                    properties={**(schema.catalog.properties or {}), "catalog_type": self.CATALOG_TYPE}
+                )
+            )
+            if schema.catalog
+            else schema
+            for schema in schemas
+        ]
 
     def get_table_and_columns(
         self, schema_name: str, table_name: str, catalog_name: str = None
