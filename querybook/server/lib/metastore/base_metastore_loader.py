@@ -501,8 +501,22 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
         return False
 
     def load(self):
-        schema_tables = []
+        """Sync this metastore to the DB.  Non-combo loaders use this directly."""
         schemas = self._get_all_filtered_schemas()
+        self._load_scoped(schemas)
+
+    def get_sync_units(self) -> List[int]:
+        """Return the unit IDs this loader will sync.  Base returns [self.metastore_id];
+        ComboMetastoreLoader overrides to return all child IDs."""
+        return [self.metastore_id]
+
+    def load_unit(self, unit_id: int) -> None:
+        """Sync a single unit.  Base delegates to load(); combo overrides to load_child()."""
+        self.load()
+
+    def _load_scoped(self, schemas: List["DataSchema"]):
+        """Sync schemas to the DB: prune stale rows then upsert fresh ones."""
+        schema_tables = []
 
         with DBSession() as session:
             current_schema_count = count_data_schema(self.metastore_id, session=session)
@@ -511,10 +525,14 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             )
 
             self.delete_schema_not_in_metastore(
-                self.metastore_id, schemas, session=session
+                self.metastore_id,
+                schemas,
+                session=session,
             )
             self.delete_catalog_not_in_metastore(
-                self.metastore_id, schemas, session=session
+                self.metastore_id,
+                schemas,
+                session=session,
             )
             for schema in schemas:
                 # Get filtered table names for the schema
@@ -764,11 +782,18 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             value_data_element=value_data_element, key_data_element=key_data_element
         )
 
-    @with_exception
-    def _get_all_filtered_schemas(self) -> List["DataSchema"]:
-        all_schemas = self.get_all_schema_names()
+    def _filter_schemas(self, raw_schemas: List) -> List["DataSchema"]:
+        """Apply this loader's catalog settings and ACL to a list of raw schema objects.
+
+        Accepts both DataSchema namedtuples and plain strings (backward-compat).
+        Returns only schemas that pass catalog settings and ACL validation.
+
+        Used by :meth:`_get_all_filtered_schemas` for normal single-loader syncs,
+        and by :class:`ComboMetastoreLoader` ``load_child`` to apply the *combo's*
+        settings to child-sourced raw schemas rather than each child's own settings.
+        """
         filtered = []
-        for schema in all_schemas:
+        for schema in raw_schemas:
             # Backward compatibility: convert string schema names to DataSchema objects
             if isinstance(schema, str):
                 schema = DataSchema(name=schema, catalog=None)
@@ -785,6 +810,11 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             if self.acl_checker.is_schema_valid(qualified_name):
                 filtered.append(schema)
         return filtered
+
+    @with_exception
+    def _get_all_filtered_schemas(self) -> List["DataSchema"]:
+        all_schemas = self.get_all_schema_names()
+        return self._filter_schemas(all_schemas)
 
     @with_exception
     def _get_all_filtered_table_names(self, schema: DataSchema) -> List[str]:
@@ -934,36 +964,22 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
 
     @with_session
     def delete_schema_not_in_metastore(self, metastore_id, schemas, session=None):
-        """
-        Delete schemas from DB that are not in the metastore.
+        """Delete schemas from DB that are not in the metastore."""
+        expected_schemas = {
+            (schema.catalog.name if schema.catalog else None, schema.name)
+            for schema in schemas
+        }
 
-        Args:
-            metastore_id: The metastore ID
-            schemas: List of DataSchema NamedTuples from metastore
-            session: DB session
-        """
-        # Build a set of expected (catalog_name, schema_name) tuples from metastore
-        expected_schemas = set()
-        for schema in schemas:
-            catalog_name = schema.catalog.name if schema.catalog else None
-            expected_schemas.add((catalog_name, schema.name))
-
-        # Check each schema in DB
         for data_schema in iterate_data_schema(metastore_id, session=session):
             LOG.info("checking schema %d" % data_schema.id)
 
-            # Get catalog name for this schema
             catalog_name = None
             if data_schema.catalog_id:
                 db_catalog = get_catalog_by_id(data_schema.catalog_id, session=session)
                 catalog_name = db_catalog.name if db_catalog else None
 
-            # Check if (catalog_name, schema_name) pair exists in expected set
             schema_key = (catalog_name, data_schema.name)
-
             if schema_key not in expected_schemas:
-                # We delete table 1 by 1 since we need to delete it for elasticsearch
-                # Maybe we can optimize it to allow batch deletion
                 for table in data_schema.tables:
                     table_id = table.id
                     delete_table(table_id=table_id, commit=False, session=session)
@@ -975,16 +991,13 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
 
     @with_session
     def delete_catalog_not_in_metastore(self, metastore_id, schemas, session=None):
-        """
-        Delete catalogs from DB that are no longer present in the metastore.
+        """Delete catalogs from DB that are no longer present in the metastore.
 
         Must be called after delete_schema_not_in_metastore so child schemas
         are already removed before the catalog row is deleted.
         """
         expected_catalogs = {
-            schema.catalog.name
-            for schema in schemas
-            if schema.catalog is not None
+            schema.catalog.name for schema in schemas if schema.catalog is not None
         }
 
         for db_catalog in get_all_catalogs(metastore_id, session=session):

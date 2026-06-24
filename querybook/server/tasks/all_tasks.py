@@ -23,7 +23,11 @@ from .export_query_execution import export_query_execution_task
 from .run_query import run_query_task
 from .run_sample_query import run_sample_query
 from .dummy_task import dummy_task
-from .update_metastore import update_metastore
+from .update_metastore import (
+    update_metastore,
+    update_metastore_child,
+    finalize_combo_metastore,
+)
 from .sync_elasticsearch import sync_elasticsearch
 from .run_datadoc import run_datadoc
 from .delete_mysql_cache import delete_mysql_cache
@@ -47,6 +51,8 @@ export_query_execution_task
 run_query_task
 dummy_task
 update_metastore
+update_metastore_child
+finalize_combo_metastore
 sync_elasticsearch
 run_datadoc
 delete_mysql_cache
