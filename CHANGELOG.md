@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.138.0](https://github.com/eg-internal/querybook/compare/v0.137.3...v0.138.0) (2026-06-24)
+
+
+### Features
+
+* Add Glue/Databricks catalog type icons and tags (EGANP-6146 / EGANP-6147) ([#567](https://github.com/eg-internal/querybook/issues/567)) ([89d3829](https://github.com/eg-internal/querybook/commit/89d382970a82de5439b682a80a1d267575585945))
+* **mcp:** add MCP_OAUTH_EXTRA_ALLOWED_REDIRECT_URIS to append redirect URIs ([7abe205](https://github.com/eg-internal/querybook/commit/7abe20584259acaafe153d2dbbb17eb1704939c6))
+* **mcp:** add static Querybook reference resources ([c5e3a19](https://github.com/eg-internal/querybook/commit/c5e3a19257f7a29acb6db4afd12eb491910721d9))
+* **metastore:** ComboLoader independent per-child syncs — Stage 1 & 2 (EGANP-6149) ([#564](https://github.com/eg-internal/querybook/issues/564)) ([7fed336](https://github.com/eg-internal/querybook/commit/7fed336896ac09013aa7eb2f8af3aedf8c44401b))
+
+
+### Bug Fixes
+
+* email validation and silently trim leading/trailing whitespace ([#559](https://github.com/eg-internal/querybook/issues/559)) ([70ed28f](https://github.com/eg-internal/querybook/commit/70ed28f4e2e9e159eaaf57e671b5452985d4ea8c))
+* **mcp:** scope datadoc query cell engine validation to environment ([8b9f4a1](https://github.com/eg-internal/querybook/commit/8b9f4a10fed8d5b47492f430fbcaf89c123e7886))
+* update tool name for github suite standardization ([#563](https://github.com/eg-internal/querybook/issues/563)) ([a2ad656](https://github.com/eg-internal/querybook/commit/a2ad656984f4bc47a3801f3eefa7f81297de2e1c))
+* validate datadoc query cell engines ([aeadbba](https://github.com/eg-internal/querybook/commit/aeadbba539bb0461ed9f3de243a48bbabdc8e10d))
+
 ## [0.137.3](https://github.com/eg-internal/querybook/compare/v0.137.2...v0.137.3) (2026-06-03)
 
 
