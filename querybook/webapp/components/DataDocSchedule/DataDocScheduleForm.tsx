@@ -389,6 +389,7 @@ const NotificationFormRow: React.FC<{
                             notifyToAllMeta.initialValue
                         }
                         onChange={notifyToAllHelpers.setValue}
+                        validateEmail={notification.with === 'email'}
                         selectProps={{
                             isClearable: true,
                             placeholder: getHelp(notification.with),

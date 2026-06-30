@@ -66,12 +66,21 @@ interface IUserSelectProps {
     value: ISelectOption[] | undefined;
     onChange: (values: ISelectOption[]) => any;
     usePortalMenu?: boolean;
+    // When true, free-text (non-user) options are validated as email addresses.
+    // Leave false for non-email targets such as Slack channels or Teams.
+    validateEmail?: boolean;
     selectProps?: Partial<AsyncCreatableProps<any, boolean>>;
 }
 
 export const MultiCreatableUserSelect: React.FunctionComponent<
     IUserSelectProps
-> = ({ value, onChange, usePortalMenu = true, selectProps = {} }) => {
+> = ({
+    value,
+    onChange,
+    usePortalMenu = true,
+    validateEmail = false,
+    selectProps = {},
+}) => {
     const [searchText, setSearchText] = React.useState('');
     const userReactSelectStyle = React.useMemo(
         () =>
@@ -106,20 +115,25 @@ export const MultiCreatableUserSelect: React.FunctionComponent<
 
     const handleChange = (newValues: ISelectOption[]) => {
         // Validate all email options
-        const invalidEmail = newValues.find((option) => {
-            if (isUserOption(option)) {
-                return false;
+        if (validateEmail) {
+            const invalidEmail = newValues.find((option) => {
+                if (isUserOption(option)) {
+                    return false;
+                }
+
+                const email = String(option.value).trim();
+                return (
+                    !email ||
+                    !Yup.string().email().required().isValidSync(email)
+                );
+            });
+
+            if (invalidEmail) {
+                const email = String(invalidEmail.value).trim();
+                toast.error(`Invalid email address: "${email}"`);
+                setSearchText(email);
+                return;
             }
-
-            const email = String(option.value).trim();
-            return !email || !Yup.string().email().required().isValidSync(email);
-        });
-
-        if (invalidEmail) {
-            const email = String(invalidEmail.value).trim();
-            toast.error(`Invalid email address: "${email}"`);
-            setSearchText(email);
-            return;
         }
 
         // Silently trim email values and labels before passing to parent
@@ -131,7 +145,8 @@ export const MultiCreatableUserSelect: React.FunctionComponent<
             return {
                 ...v,
                 value: trimmedValue,
-                label: typeof v.label === 'string' ? v.label.trim() : trimmedValue,
+                label:
+                    typeof v.label === 'string' ? v.label.trim() : trimmedValue,
             };
         });
 
