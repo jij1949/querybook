@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.138.1](https://github.com/eg-internal/querybook/compare/v0.138.0...v0.138.1) (2026-06-30)
+
+
+### Bug Fixes
+
+* only validate email targets for the email notifier ([0051d87](https://github.com/eg-internal/querybook/commit/0051d875f923715f681ac7c30e9d67246fd8e0ca))
+
 ## [0.138.0](https://github.com/eg-internal/querybook/compare/v0.137.3...v0.138.0) (2026-06-24)
 
 
