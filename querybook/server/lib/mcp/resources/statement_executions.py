@@ -7,6 +7,7 @@ from fastmcp.server.dependencies import CurrentAccessToken
 
 from app.db import DBSession
 from lib.config import get_config_value
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.utils import RESOURCE_ANNOTATIONS
 from lib.result_store import GenericReader
 from logic import query_execution as logic
@@ -76,8 +77,8 @@ def register(mcp: FastMCP) -> None:
             )
 
             if not (has_env_access or has_execution_access):
-                raise ValueError(
-                    "You do not have permission to access this query execution."
+                raise AuthorizationError(
+                    action="read", resource=f"query_execution:{query_execution_id}"
                 )
 
             # Read result data

@@ -11,6 +11,11 @@ from key_value.aio.wrappers.encryption import FernetEncryptionWrapper
 from app.db import DBSession
 from env import QuerybookSettings
 from lib.logger import get_logger
+from lib.mcp.audit import (
+    record_auth_failure,
+    record_auth_success,
+    record_token_issuance,
+)
 from lib.mcp.auth import QuerybookTokenVerifier
 from logic.user import create_user, get_user_by_name
 
@@ -102,12 +107,14 @@ class OktaOIDCProvider(OIDCProxy):
         if _is_api_token(token):
             token_hint = token[:8] + "..."
             if self._allow_api_tokens:
+                # The inner verifier records its own success/failure outcome.
                 api_result = await self._token_verifier.verify_token(token)
                 if api_result is not None:
                     api_result.scopes = list(self.required_scopes)
                     return api_result
                 LOG.warning("API key rejected (invalid or revoked): %s", token_hint)
             else:
+                record_auth_failure("api_token_not_allowed", "api_token")
                 LOG.warning(
                     "API key rejected (server requires OAuth): %s — "
                     "client must remove 'headers' block from MCP config",
@@ -117,30 +124,26 @@ class OktaOIDCProvider(OIDCProxy):
 
         validated = await super().verify_token(token)
         if validated is None:
+            # super() collapses every rejection cause to None. Do not classify
+            # expiry from the unverified JWT payload: a forged token can carry an
+            # old exp and would otherwise be downgraded from security signal to a
+            # routine expiry event.
+            record_auth_failure("invalid_oauth_token", "oauth")
             return None
 
-        username = validated.claims.get("preferred_username")
-        if not username:
+        fastmcp_claims = _fastmcp_token_audit_claims(self.jwt_issuer, token)
+        creator_uid = _get_or_create_querybook_user_id(validated.claims)
+        if creator_uid is None:
+            record_auth_failure("oauth_missing_username", "oauth")
             LOG.warning("OAuth token missing preferred_username claim")
             return None
 
-        email = validated.claims.get("email")
-        fullname = validated.claims.get("name")
+        validated.claims["creator_uid"] = creator_uid
+        validated.claims["auth_method"] = "oauth"
+        validated.claims["client_id"] = fastmcp_claims.get("client_id")
+        validated.claims["session_id"] = _hash_token_value(token)
 
-        with DBSession() as session:
-            user = get_user_by_name(username, session=session)
-            if not user:
-                LOG.info("Creating new user from OAuth login: %s", username)
-                user = create_user(
-                    username=username,
-                    fullname=fullname,
-                    email=email,
-                    session=session,
-                )
-                _sync_new_user(username)
-
-            validated.claims["creator_uid"] = user.id
-            validated.claims["auth_method"] = "oauth"
+        record_auth_success("valid_oauth_token", "oauth")
 
         # id_tokens don't carry scope claims, so the parent's verify_token
         # returns empty scopes. Populate them so the bearer auth middleware
@@ -148,9 +151,152 @@ class OktaOIDCProvider(OIDCProxy):
         validated.scopes = list(self.required_scopes)
         return validated
 
+    async def exchange_authorization_code(self, client, authorization_code):
+        """Issue FastMCP tokens for an authorization code (OAuth login completion).
+
+        Pure recorder for the token-lifecycle audit event (8.2): the /token
+        request runs no tool, so record_token_issuance marks it standalone and
+        RequestAuditMiddleware emits it at the boundary.
+        """
+        try:
+            token = await super().exchange_authorization_code(
+                client, authorization_code
+            )
+            record_token_issuance(
+                "token_issued",
+                "oauth",
+                success=True,
+                **_token_audit_context(
+                    token, client, getattr(self, "jwt_issuer", None)
+                ),
+            )
+            return token
+        except Exception:
+            record_token_issuance(
+                "token_issuance_failed",
+                "oauth",
+                success=False,
+                **_token_audit_context(None, client, getattr(self, "jwt_issuer", None)),
+            )
+            raise
+
+    async def exchange_refresh_token(self, client, refresh_token, scopes):
+        """Issue a new FastMCP access token from a refresh token.
+
+        Recorded like issuance (8.2): standalone token-lifecycle `auth` event,
+        emitted at the request boundary.
+        """
+        try:
+            token = await super().exchange_refresh_token(client, refresh_token, scopes)
+            record_token_issuance(
+                "token_refreshed",
+                "oauth",
+                success=True,
+                **_token_audit_context(
+                    token, client, getattr(self, "jwt_issuer", None)
+                ),
+            )
+            return token
+        except Exception:
+            record_token_issuance(
+                "token_refresh_failed",
+                "oauth",
+                success=False,
+                **_token_audit_context(None, client, getattr(self, "jwt_issuer", None)),
+            )
+            raise
+
+    async def _extract_upstream_claims(self, idp_tokens: dict) -> dict | None:
+        """Embed the Querybook user id in FastMCP tokens issued by this proxy.
+
+        FastMCP calls this hook during token issuance/refresh before it signs the
+        client-facing JWT. We keep the embedded claim deliberately small so the
+        later `auth` audit event can identify the human without exposing Okta
+        profile data in the token.
+        """
+        verification_token = (
+            idp_tokens.get("id_token")
+            if getattr(self, "_verify_id_token", False)
+            else idp_tokens.get("access_token")
+        )
+        if not verification_token:
+            return None
+
+        try:
+            validated = await self._token_validator.verify_token(verification_token)
+        except Exception as e:
+            LOG.debug("Unable to extract upstream claims for audit context: %s", e)
+            return None
+
+        if not validated or not getattr(validated, "claims", None):
+            return None
+
+        creator_uid = _get_or_create_querybook_user_id(validated.claims)
+        return {"creator_uid": creator_uid} if creator_uid is not None else None
+
 
 def _is_api_token(token: str) -> bool:
     return len(token) == 32 and all(c in "0123456789abcdef" for c in token)
+
+
+def _hash_token_value(value) -> str | None:
+    if not value:
+        return None
+    return hashlib.sha256(str(value).encode()).hexdigest()
+
+
+def _fastmcp_token_audit_claims(jwt_issuer, token: str) -> dict:
+    """Return verified FastMCP JWT metadata safe for audit context.
+
+    This is only audit decoration. The actual auth decision already happened in
+    OIDCProxy.verify_token(); if decoding unexpectedly fails here, keep the
+    request successful and emit the rest of the audit context.
+    """
+    try:
+        claims = jwt_issuer.verify_token(token)
+        return claims if isinstance(claims, dict) else {}
+    except Exception as e:
+        LOG.debug("Unable to decode FastMCP token for audit context: %s", e)
+        return {}
+
+
+def _get_or_create_querybook_user_id(claims: dict) -> int | None:
+    username = claims.get("preferred_username")
+    if not username:
+        return None
+
+    with DBSession() as session:
+        user = get_user_by_name(username, session=session)
+        if not user:
+            LOG.info("Creating new user from OAuth login: %s", username)
+            user = create_user(
+                username=username,
+                fullname=claims.get("name"),
+                email=claims.get("email"),
+                session=session,
+            )
+            _sync_new_user(username)
+        return user.id
+
+
+def _token_audit_context(token, client, jwt_issuer=None) -> dict:
+    """Best-effort context for FastMCP OAuth token lifecycle audit events.
+
+    The subject comes only from the verified FastMCP JWT's `upstream_claims`,
+    which this provider injects via _extract_upstream_claims().
+    """
+    raw_token = token.access_token if token is not None else None
+    fastmcp_claims = (
+        _fastmcp_token_audit_claims(jwt_issuer, raw_token)
+        if raw_token and jwt_issuer is not None
+        else {}
+    )
+    upstream_claims = fastmcp_claims.get("upstream_claims") or {}
+    return {
+        "subject": upstream_claims.get("creator_uid", 0),
+        "client_id": client.client_id if client is not None else None,
+        "session_id": _hash_token_value(raw_token),
+    }
 
 
 def _sync_new_user(username: str):

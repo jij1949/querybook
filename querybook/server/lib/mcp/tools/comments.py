@@ -5,6 +5,7 @@ from fastmcp.server.auth import AccessToken
 from fastmcp.server.dependencies import CurrentAccessToken
 
 from app.db import DBSession
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.lib.comments import serialize_comment, serialize_reaction
 from lib.mcp.utils import CREATE_ANNOTATIONS, DELETE_ANNOTATIONS, WRITE_ANNOTATIONS
 from logic.comment import (
@@ -16,7 +17,7 @@ from logic.comment import (
     remove_reaction,
 )
 from logic.datadoc import get_data_cell_by_id
-from logic.datadoc_permission import user_can_read, DocDoesNotExist
+from logic.datadoc_permission import user_can_read
 from models.comment import CommentReaction, DataCellComment
 from models.datadoc import DataDocDataCell
 
@@ -56,11 +57,10 @@ def register(mcp: FastMCP) -> None:
                 )
             datadoc_id = doc_cell.data_doc_id
 
-            try:
-                if not user_can_read(datadoc_id, uid, session=session):
-                    raise ValueError("You do not have access to this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_read(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="read", resource=f"datadoc:{datadoc_id}"
+                )
 
             # Create comment
             if parent_comment_id is not None:
@@ -171,11 +171,10 @@ def register(mcp: FastMCP) -> None:
                     raise ValueError("DataDoc cell is not associated with a DataDoc.")
 
                 datadoc_id = doc_cell.data_doc_id
-                try:
-                    if not user_can_read(datadoc_id, uid, session=session):
-                        raise ValueError("You do not have access to this comment.")
-                except DocDoesNotExist:
-                    raise ValueError("DataDoc not found.")
+                if not user_can_read(datadoc_id, uid, session=session):
+                    raise AuthorizationError(
+                        action="read", resource=f"datadoc:{datadoc_id}"
+                    )
             # If it's not a DataDoc cell comment, it's a table comment - no permission check needed
 
             # Add the reaction

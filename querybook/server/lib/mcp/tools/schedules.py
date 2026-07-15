@@ -6,6 +6,7 @@ from fastmcp.server.auth import AccessToken
 from fastmcp.server.dependencies import CurrentAccessToken
 
 from app.db import DBSession
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.lib.schedules import (
     DEFAULT_RETRY,
     exports_to_kwargs,
@@ -20,7 +21,7 @@ from lib.mcp.utils import (
     CREATE_ANNOTATIONS,
     DELETE_ANNOTATIONS,
 )
-from logic.datadoc_permission import user_can_write, DocDoesNotExist
+from logic.datadoc_permission import user_can_write
 from logic.schedule import (
     create_task_schedule,
     get_task_schedule_by_id,
@@ -116,13 +117,10 @@ def register(mcp: FastMCP) -> None:
         """Schedule a DataDoc to run on a cron schedule with optional notifications, retries, and exports."""
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError(
-                        "You do not have permission to schedule this DataDoc."
-                    )
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
             schedule_name = get_data_doc_schedule_name(datadoc_id)
 
@@ -219,13 +217,10 @@ def register(mcp: FastMCP) -> None:
             if datadoc_id is None:
                 raise ValueError("Schedule is not a DataDoc schedule.")
 
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError(
-                        "You do not have permission to update this schedule."
-                    )
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
             fields = {}
             if cron is not None:
@@ -277,13 +272,10 @@ def register(mcp: FastMCP) -> None:
             if datadoc_id is None:
                 raise ValueError("Schedule is not a DataDoc schedule.")
 
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError(
-                        "You do not have permission to delete this schedule."
-                    )
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="delete", resource=f"datadoc:{datadoc_id}"
+                )
 
             delete_task_schedule(schedule_id, commit=True, session=session)
             return {"deleted": schedule_id}

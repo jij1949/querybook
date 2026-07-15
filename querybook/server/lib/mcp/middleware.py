@@ -1,7 +1,8 @@
-"""MCP Event Logging Middleware and Decorators
+"""MCP Middleware: event logging, LangSmith tracing, and resource wrappers.
 
-Tracks all MCP tool calls and resource reads using Querybook's existing EventLog system.
-Uses a dedicated EventType.MCP for clean semantic separation from REST API events.
+The middleware classes here are thin wrappers that call audit.log_mcp_event()
+with the right event_type and payload. Envelope construction, routing, and
+correlation live in audit.py.
 
 NOTE: FastMCP middleware only supports tool hooks. Resource logging is handled via
 a decorator pattern since on_read_resource() is not supported.
@@ -9,32 +10,39 @@ a decorator pattern since on_read_resource() is not supported.
 
 import functools
 import time
+from contextlib import nullcontext
 from datetime import date
 
 import langsmith
 from fastmcp.server.dependencies import get_access_token
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 
-from const.event_log import EventType
-from lib.event_logger import event_logger
-from lib.logger import get_logger
+from env import QuerybookSettings
+from lib.mcp.audit import (
+    get_recorded_auth_reason,
+    get_request_context,
+    log_mcp_event,
+)
+from lib.mcp.exceptions import (
+    classify_exception,
+    find_authorization_error,
+    to_tool_error,
+)
+from lib.mcp.redact import redact, redact_text
 
-LOG = get_logger(__file__)
-
-
-def _get_user_id_from_token() -> int:
-    """Extract user ID from the current request's access token."""
-    try:
-        token = get_access_token()
-        if token:
-            return token.claims.get("creator_uid", 0)
-    except Exception as e:
-        LOG.warning(f"Failed to extract user ID from MCP context: {e}")
-    return 0
-
-
-# Maximum length for string parameters (same as BaseEventLogger)
 MAX_STR_PARAM_LENGTH = 128
+
+
+class _NoopLangSmithRun:
+    """Stand-in run for the resource wrapper when LangSmith tracing is disabled.
+
+    Lets the ``with`` block call ``.end(...)`` unconditionally without opening a
+    real LangSmith trace when ``LANGSMITH_TRACING`` is off.
+    """
+
+    def end(self, *args, **kwargs):
+        pass
+
 
 _AUTH_DEPRECATION_DEADLINE = date(2026, 6, 30)
 _AUTH_DEPRECATION_NOTICE = (
@@ -74,145 +82,128 @@ class AuthDeprecationNoticeMiddleware(Middleware):
 
 
 class MCPEventLoggingMiddleware(Middleware):
-    """Middleware that logs MCP tool calls and resource reads to Querybook's event log."""
+    """Middleware that logs MCP tool calls to the structured audit envelope."""
 
     async def on_call_tool(self, context: MiddlewareContext, call_next):
-        """Log MCP tool calls with timing and parameters.
-
-        Args:
-            context: FastMCP middleware context containing tool name and arguments
-            call_next: Next middleware/handler in the chain
-
-        Returns:
-            Tool execution result
-
-        Raises:
-            Exception: Re-raises any exceptions after logging them
-        """
         start_time = time.perf_counter()
         tool_name = context.message.name
-        user_id = self._get_user_id(context)
-        auth_method = self._get_auth_method()
+        # Auth success has no standalone record — it rides on this event.
+        auth_reason = get_recorded_auth_reason()
 
         try:
             result = await call_next(context)
             duration_ms = (time.perf_counter() - start_time) * 1000
 
-            _log_mcp_event(
-                user_id=user_id,
-                event_data={
-                    "operation_type": "tool",
+            log_mcp_event(
+                "tool_invocation",
+                {
                     "tool": tool_name,
-                    "auth_method": auth_method,
                     "status": "success",
+                    "auth_reason": auth_reason,
                     "duration_ms": round(duration_ms, 2),
-                    "parameters": self._sanitize_params(context.message.arguments),
+                    "parameters": redact(
+                        context.message.arguments, max_len=MAX_STR_PARAM_LENGTH
+                    ),
                 },
             )
             return result
 
         except Exception as e:
             duration_ms = (time.perf_counter() - start_time) * 1000
+            authz_error = find_authorization_error(e)
 
-            _log_mcp_event(
-                user_id=user_id,
-                event_data={
-                    "operation_type": "tool",
-                    "tool": tool_name,
-                    "auth_method": auth_method,
-                    "status": "error",
-                    "error": str(e)[:MAX_STR_PARAM_LENGTH],
-                    "duration_ms": round(duration_ms, 2),
-                    "parameters": self._sanitize_params(context.message.arguments),
-                },
-            )
+            if authz_error is not None:
+                # An authorization denial is the request's single record: the
+                # tool never ran, so no tool_invocation is emitted. The
+                # AuthorizationError raised at the user_can_* gate carries the
+                # action/resource (the client sees only the generic message
+                # ExceptionMappingMiddleware maps it to). emit_langsmith is False
+                # because the outer LangSmithTracingMiddleware already opened this
+                # request's one rich trace and ends it with the error — a
+                # lightweight run would duplicate it.
+                log_mcp_event(
+                    "authz",
+                    {
+                        "tool": tool_name,
+                        "result": "deny",
+                        "authz_denied_resource": authz_error.resource,
+                        "authz_denied_action": authz_error.action,
+                        "authz_reason": f"no_{authz_error.action}_permission",
+                        "auth_reason": auth_reason,
+                        "duration_ms": round(duration_ms, 2),
+                    },
+                    emit_langsmith=False,
+                )
+            else:
+                log_mcp_event(
+                    "tool_invocation",
+                    {
+                        "tool": tool_name,
+                        "status": "error",
+                        "auth_reason": auth_reason,
+                        "error": redact_text(str(e), max_len=MAX_STR_PARAM_LENGTH),
+                        "duration_ms": round(duration_ms, 2),
+                        "parameters": redact(
+                            context.message.arguments, max_len=MAX_STR_PARAM_LENGTH
+                        ),
+                    },
+                )
             raise
-
-    def _get_user_id(self, context: MiddlewareContext) -> int:
-        return _get_user_id_from_token()
-
-    def _get_auth_method(self) -> str:
-        try:
-            token = get_access_token()
-            if token:
-                return token.claims.get("auth_method", "unknown")
-        except Exception:
-            pass
-        return "unknown"
-
-    def _sanitize_params(self, params: dict) -> dict:
-        """Sanitize parameters by trimming long strings.
-
-        Recursively processes nested dictionaries and trims strings longer than
-        MAX_STR_PARAM_LENGTH to prevent logging large payloads.
-
-        Args:
-            params: Dictionary of parameters to sanitize
-
-        Returns:
-            New dictionary with sanitized parameters
-        """
-        if not isinstance(params, dict):
-            return params
-
-        sanitized = {}
-        for key, value in params.items():
-            if isinstance(value, str) and len(value) > MAX_STR_PARAM_LENGTH:
-                sanitized[key] = value[:MAX_STR_PARAM_LENGTH] + "..."
-            elif isinstance(value, dict):
-                sanitized[key] = self._sanitize_params(value)
-            elif isinstance(value, list):
-                sanitized[key] = self._sanitize_list(value)
-            else:
-                sanitized[key] = value
-
-        return sanitized
-
-    def _sanitize_list(self, items: list) -> list:
-        """Sanitize list items recursively.
-
-        Args:
-            items: List to sanitize
-
-        Returns:
-            New list with sanitized items
-        """
-        sanitized = []
-        for item in items:
-            if isinstance(item, str) and len(item) > MAX_STR_PARAM_LENGTH:
-                sanitized.append(item[:MAX_STR_PARAM_LENGTH] + "...")
-            elif isinstance(item, dict):
-                sanitized.append(self._sanitize_params(item))
-            elif isinstance(item, list):
-                sanitized.append(self._sanitize_list(item))
-            else:
-                sanitized.append(item)
-
-        return sanitized
 
 
 class LangSmithTracingMiddleware(Middleware):
     """Middleware that traces MCP tool calls in LangSmith."""
 
     async def on_call_tool(self, context: MiddlewareContext, call_next):
-        tool_name = context.message.name
-        user_id = _get_user_id_from_token()
+        # Gate on the same flag the audit router honors so LangSmith stays fully
+        # inert (no trace, no egress) when tracing is disabled.
+        if not QuerybookSettings.LANGSMITH_TRACING:
+            return await call_next(context)
 
-        async with langsmith.trace(
-            name=tool_name,
+        tool_name = context.message.name
+        ctx = get_request_context()
+
+        # Sync ``with`` (not ``async with``) to match the resource wrapper and
+        # audit/langsmith.py: run setup/teardown are synchronous and only
+        # ``call_next`` is awaited, so this stays consistent and works across the
+        # whole ``langsmith>=0.2.0`` range (async CM support on ``trace`` is newer).
+        with langsmith.trace(
+            name=f"mcp.tool.{tool_name}",
             run_type="tool",
-            inputs={"arguments": context.message.arguments},
-            metadata={"user_id": user_id},
-            tags=["mcp", "querybook"],
+            inputs={"arguments": redact(context.message.arguments)},
+            metadata={**ctx, "operation_type": "tool", "tool": tool_name},
+            tags=["mcp", "querybook", "tool"],
         ) as run:
             try:
                 result = await call_next(context)
-                outputs = result.structured_content if result.structured_content is not None else {"status": "success"}
+                outputs = (
+                    redact(result.structured_content)
+                    if result.structured_content is not None
+                    else {"status": "success"}
+                )
                 run.end(outputs=outputs)
                 return result
             except Exception as e:
-                run.end(error=str(e))
+                run.end(error=redact_text(str(e)))
                 raise
+
+
+class ExceptionMappingMiddleware(Middleware):
+    """Maps raw domain exceptions raised by tools to client-facing ToolErrors.
+
+    Registered innermost (last ``add_middleware`` call) so it sees a tool's raw
+    exception before the logging/tracing middlewares, keeping their logs and the
+    client message consistent. See ``lib.mcp.exceptions.to_tool_error``.
+    """
+
+    async def on_call_tool(self, context: MiddlewareContext, call_next):
+        try:
+            return await call_next(context)
+        except Exception as e:
+            mapped = to_tool_error(e)
+            if mapped is not None:
+                raise mapped from e
+            raise
 
 
 def wrap_mcp_resources(mcp):
@@ -238,56 +229,48 @@ def wrap_mcp_resources(mcp):
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
                 start_time = time.perf_counter()
+                ctx = get_request_context()
+                # Auth success has no standalone record — it rides on this event
+                # (mirrors the tool path in MCPEventLoggingMiddleware).
+                auth_reason = get_recorded_auth_reason()
 
-                # Extract user ID from token
-                token = None
-                for arg in args:
-                    if (
-                        hasattr(arg, "__class__")
-                        and arg.__class__.__name__ == "AccessToken"
-                    ):
-                        token = arg
-                        break
-                if not token:
-                    token = kwargs.get("token")
-
-                user_id = 0
-                auth_method = "unknown"
-                if token and hasattr(token, "claims"):
-                    user_id = token.claims.get("creator_uid", 0)
-                    auth_method = token.claims.get("auth_method", "unknown")
-
-                # Extract resource URI from decorator kwargs if available
                 resource_uri = decorator_kwargs.get(
                     "uri", f"{func.__module__}.{func.__name__}"
                 )
-
-                # Substitute parameters in URI template (e.g., {datadoc_id})
                 for key, value in kwargs.items():
                     placeholder = f"{{{key}}}"
                     if placeholder in resource_uri:
                         resource_uri = resource_uri.replace(placeholder, str(value))
-
-                # Remove query string template from URI
                 resource_uri = resource_uri.split("{?")[0]
 
-                with langsmith.trace(
-                    name=resource_uri,
-                    run_type="tool",
-                    inputs={"uri": resource_uri, "user_id": user_id},
-                    tags=["mcp", "querybook"],
-                ) as ls_run:
+                # Gate on the same flag the audit router honors so LangSmith
+                # stays fully inert (no trace, no egress) when tracing is off.
+                trace_ctx = (
+                    langsmith.trace(
+                        name="mcp.resource.read",
+                        run_type="tool",
+                        inputs={"uri": resource_uri},
+                        metadata={
+                            **ctx,
+                            "operation_type": "resource",
+                            "resource_uri": resource_uri,
+                        },
+                        tags=["mcp", "querybook", "resource"],
+                    )
+                    if QuerybookSettings.LANGSMITH_TRACING
+                    else nullcontext(_NoopLangSmithRun())
+                )
+                with trace_ctx as ls_run:
                     try:
                         result = func(*args, **kwargs)
                         duration_ms = (time.perf_counter() - start_time) * 1000
 
-                        _log_mcp_event(
-                            user_id=user_id,
-                            event_data={
-                                "operation_type": "resource",
+                        log_mcp_event(
+                            "resource_read",
+                            {
                                 "resource_uri": resource_uri,
-                                "auth_method": auth_method,
                                 "status": "success",
+                                "auth_reason": auth_reason,
                                 "duration_ms": round(duration_ms, 2),
                             },
                         )
@@ -297,50 +280,58 @@ def wrap_mcp_resources(mcp):
                     except Exception as e:
                         duration_ms = (time.perf_counter() - start_time) * 1000
 
-                        _log_mcp_event(
-                            user_id=user_id,
-                            event_data={
-                                "operation_type": "resource",
-                                "resource_uri": resource_uri,
-                                "auth_method": auth_method,
-                                "status": "error",
-                                "error": str(e)[:MAX_STR_PARAM_LENGTH],
-                                "duration_ms": round(duration_ms, 2),
-                            },
-                        )
-                        ls_run.end(error=str(e))
+                        # One walk of the cause chain yields both the client
+                        # message and the authz classification (see
+                        # classify_exception). Map first so the event log and
+                        # LangSmith run record the same client-facing message the
+                        # caller receives — mirroring the tool path, where the
+                        # innermost ExceptionMappingMiddleware maps the raw
+                        # exception before the logging/tracing middlewares see it.
+                        mapped, authz_error = classify_exception(e)
+                        error_message = str(mapped) if mapped is not None else str(e)
+
+                        if authz_error is not None:
+                            # Mirror the tool path: an authz denial is the
+                            # request's single `authz` deny record (no
+                            # resource_read). The lightweight run is suppressed
+                            # because this wrapper's own trace (ls_run, ended
+                            # below) is the one LangSmith record for the read.
+                            log_mcp_event(
+                                "authz",
+                                {
+                                    "resource_uri": resource_uri,
+                                    "result": "deny",
+                                    "authz_denied_resource": authz_error.resource,
+                                    "authz_denied_action": authz_error.action,
+                                    "authz_reason": (
+                                        f"no_{authz_error.action}_permission"
+                                    ),
+                                    "auth_reason": auth_reason,
+                                    "duration_ms": round(duration_ms, 2),
+                                },
+                                emit_langsmith=False,
+                            )
+                        else:
+                            log_mcp_event(
+                                "resource_read",
+                                {
+                                    "resource_uri": resource_uri,
+                                    "status": "error",
+                                    "auth_reason": auth_reason,
+                                    "error": redact_text(
+                                        error_message, max_len=MAX_STR_PARAM_LENGTH
+                                    ),
+                                    "duration_ms": round(duration_ms, 2),
+                                },
+                            )
+                        ls_run.end(error=redact_text(error_message))
+                        if mapped is not None:
+                            raise mapped from e
                         raise
 
-            # Apply original resource decorator to wrapped function
             return original_resource(*decorator_args, **decorator_kwargs)(wrapper)
 
         return decorator
 
-    # Replace mcp.resource with our wrapped version
     mcp.resource = logging_resource
     return mcp
-
-
-def _log_mcp_event(user_id: int, event_data: dict) -> None:
-    """Log MCP event using EventLogger singleton.
-
-    Wraps event_logger.log() with additional error handling to prevent
-    logging failures from interrupting MCP operations.
-
-    Args:
-        user_id: ID of the user performing the action
-        event_data: Event data dictionary
-    """
-    try:
-        # Note: event_logger.log() normally gets user_id from current_user (Flask context)
-        # but in MCP we don't have Flask context, so we need to pass uid directly
-        # to the underlying logger. Since event_logger.log() doesn't accept uid parameter,
-        # we call the underlying logger directly.
-        event_logger.logger.log(
-            uid=user_id,
-            event_type=EventType.MCP,
-            event_data=event_data,
-        )
-    except Exception as e:
-        # Log error but don't interrupt MCP operation
-        LOG.error(f"Failed to log MCP event: {e}", exc_info=True)

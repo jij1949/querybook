@@ -2,9 +2,10 @@
 
 from collections import defaultdict
 
+from lib.mcp.exceptions import AuthorizationError
 from logic.comment import get_comment_by_id, get_comments_by_data_cell_id
 from logic.datadoc import get_data_cell_by_id
-from logic.datadoc_permission import user_can_read, DocDoesNotExist
+from logic.datadoc_permission import user_can_read
 from models.comment import Comment, CommentReaction, DataCellComment
 from models.datadoc import DataDocDataCell
 
@@ -147,13 +148,10 @@ def get_comment_data(comment_id: int, uid: int, session) -> dict:
             .first()
         )
         if doc_cell:
-            try:
-                if not user_can_read(doc_cell.data_doc_id, uid, session=session):
-                    raise ValueError(
-                        "You do not have access to this comment's DataDoc."
-                    )
-            except DocDoesNotExist:
-                raise ValueError("The DataDoc for this comment was not found.")
+            if not user_can_read(doc_cell.data_doc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="read", resource=f"datadoc:{doc_cell.data_doc_id}"
+                )
 
     # Serialize with threads and reactions
     result = serialize_comments([comment], session, include_threads=True)
@@ -191,11 +189,8 @@ def get_datadoc_cell_comments_data(
         raise ValueError(f"DataDoc cell {cell_id} is not associated with a DataDoc.")
     datadoc_id = doc_cell.data_doc_id
 
-    try:
-        if not user_can_read(datadoc_id, uid, session=session):
-            raise ValueError("You do not have access to this DataDoc.")
-    except DocDoesNotExist:
-        raise ValueError(f"DataDoc {datadoc_id} not found.")
+    if not user_can_read(datadoc_id, uid, session=session):
+        raise AuthorizationError(action="read", resource=f"datadoc:{datadoc_id}")
 
     # Get comments
     comments = get_comments_by_data_cell_id(cell_id, session=session)

@@ -6,6 +6,7 @@ from fastmcp.server.dependencies import CurrentAccessToken
 
 from app.db import DBSession
 from const.query_execution import QueryExecutionStatus, QueryExecutionType
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.lib.query_executions import (
     serialize_query_execution,
     serialize_query_execution_summary,
@@ -15,7 +16,7 @@ from lib.query_analysis.templating import render_templated_query
 from logic import admin as admin_logic
 from logic import query_execution as logic
 from logic import datadoc as datadoc_logic
-from logic.datadoc_permission import user_can_execute, DocDoesNotExist
+from logic.datadoc_permission import user_can_execute
 
 
 def _build_mcp_metadata(user_metadata: dict | None) -> dict:
@@ -115,13 +116,10 @@ def register(mcp: FastMCP) -> None:
 
             # Check execute permission on the parent datadoc
             data_doc = cell.doc
-            try:
-                if not user_can_execute(data_doc.id, uid, session=session):
-                    raise ValueError(
-                        "You do not have permission to execute this DataDoc."
-                    )
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {data_doc.id} not found.")
+            if not user_can_execute(data_doc.id, uid, session=session):
+                raise AuthorizationError(
+                    action="execute", resource=f"datadoc:{data_doc.id}"
+                )
 
             # Get engine_id from cell metadata
             engine_id = cell.meta.get("engine")
@@ -191,13 +189,10 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             # Check execute permission
-            try:
-                if not user_can_execute(datadoc_id, uid, session=session):
-                    raise ValueError(
-                        "You do not have permission to execute this DataDoc."
-                    )
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_execute(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="execute", resource=f"datadoc:{datadoc_id}"
+                )
 
             # Send Celery task to run the datadoc
             from app.flask_app import celery

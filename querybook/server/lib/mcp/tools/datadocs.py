@@ -38,10 +38,10 @@ from logic.datadoc import (
     delete_data_doc_editor,
 )
 from logic.datadoc_permission import (
-    DocDoesNotExist,
     user_can_read,
     user_can_write,
 )
+from lib.mcp.exceptions import AuthorizationError
 from models.datadoc import DataDocDataCell
 from models.environment import Environment
 
@@ -305,11 +305,10 @@ def register(mcp: FastMCP) -> None:
             validate_variables(variables)
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
             # Build fields dict with only non-null values
             fields = {}
@@ -350,13 +349,10 @@ def register(mcp: FastMCP) -> None:
         """Delete (archive) a DataDoc. This is a soft delete - the DataDoc is archived, not permanently deleted."""
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError(
-                        "You do not have permission to delete this DataDoc."
-                    )
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="delete", resource=f"datadoc:{datadoc_id}"
+                )
 
             update_data_doc(id=datadoc_id, archived=True, commit=True, session=session)
             return {"deleted": datadoc_id, "archived": True}
@@ -396,11 +392,10 @@ def register(mcp: FastMCP) -> None:
         uid = token.claims["creator_uid"]
 
         with DBSession() as session:
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
             doc = get_data_doc_by_id(datadoc_id, session=session)
             if index is None:
@@ -486,11 +481,10 @@ def register(mcp: FastMCP) -> None:
             datadoc_id = doc_cell.data_doc_id
 
             # Check permission against the actual parent DataDoc
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
             fields = {}
             if context is not None:
@@ -563,11 +557,10 @@ def register(mcp: FastMCP) -> None:
             datadoc_id = doc_cell.data_doc_id
 
             # Check permission against the actual parent DataDoc
-            try:
-                if not user_can_write(datadoc_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
             delete_data_doc_cell(
                 data_doc_id=datadoc_id, data_cell_id=cell_id, session=session
@@ -595,11 +588,10 @@ def register(mcp: FastMCP) -> None:
         caller_uid = token.claims["creator_uid"]
 
         with DBSession() as session:
-            try:
-                if not user_can_write(datadoc_id, caller_uid, session=session):
-                    raise ValueError("You do not have permission to edit this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_write(datadoc_id, caller_uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
             editor = create_data_doc_editor(
                 data_doc_id=datadoc_id,
@@ -633,11 +625,10 @@ def register(mcp: FastMCP) -> None:
             if not editor:
                 raise ValueError(f"Editor {editor_id} not found.")
 
-            try:
-                if not user_can_write(editor.data_doc_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {editor.data_doc_id} not found.")
+            if not user_can_write(editor.data_doc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{editor.data_doc_id}"
+                )
 
             updated_editor = update_data_doc_editor(
                 id=editor_id,
@@ -667,11 +658,8 @@ def register(mcp: FastMCP) -> None:
 
             doc_id = editor.data_doc_id
 
-            try:
-                if not user_can_write(doc_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {doc_id} not found.")
+            if not user_can_write(doc_id, uid, session=session):
+                raise AuthorizationError(action="write", resource=f"datadoc:{doc_id}")
 
             delete_data_doc_editor(
                 id=editor_id,
@@ -692,11 +680,10 @@ def register(mcp: FastMCP) -> None:
         """Export a DataDoc in portable format without IDs. Suitable for upload_datadoc or UI upload."""
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_read(datadoc_id, uid, session=session):
-                    raise ValueError("You do not have access to this DataDoc.")
-            except DocDoesNotExist:
-                raise ValueError(f"DataDoc {datadoc_id} not found.")
+            if not user_can_read(datadoc_id, uid, session=session):
+                raise AuthorizationError(
+                    action="read", resource=f"datadoc:{datadoc_id}"
+                )
 
             doc = get_data_doc_by_id(id=datadoc_id, session=session)
 

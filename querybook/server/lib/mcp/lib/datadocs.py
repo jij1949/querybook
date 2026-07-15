@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.lib.comments import serialize_comments
 from lib.mcp.lib.query_executions import serialize_query_execution
 from lib.mcp.lib.schedules import serialize_schedule
@@ -13,7 +14,7 @@ from logic.datadoc import (
     get_data_doc_editors_by_doc_id,
     get_data_cells_executions,
 )
-from logic.datadoc_permission import DocDoesNotExist, user_can_read
+from logic.datadoc_permission import user_can_read
 from logic.schedule import get_task_schedule_by_name, get_data_doc_schedule_name
 from models.comment import Comment, DataCellComment
 from models.datadoc import DataDocDataCell, FavoriteDataDoc
@@ -382,13 +383,11 @@ def get_datadoc_data(datadoc_id: int, uid: int, session) -> dict:
         Serialized datadoc dict
 
     Raises:
-        ValueError: If datadoc not found or user lacks permission
+        DocDoesNotExist: If the datadoc does not exist
+        AuthorizationError: If the user lacks permission to read the datadoc
     """
-    try:
-        if not user_can_read(datadoc_id, uid, session=session):
-            raise ValueError("You do not have access to this DataDoc.")
-    except DocDoesNotExist:
-        raise ValueError(f"DataDoc {datadoc_id} not found.")
+    if not user_can_read(datadoc_id, uid, session=session):
+        raise AuthorizationError(action="read", resource=f"datadoc:{datadoc_id}")
 
     doc = get_data_doc_by_id(id=datadoc_id, session=session)
     return serialize_datadoc(
@@ -427,11 +426,10 @@ def get_datadoc_cell_data(cell_id: int, uid: int, session) -> dict:
         raise ValueError(f"DataDoc cell {cell_id} not associated with any datadoc.")
 
     # Check permission on parent datadoc
-    try:
-        if not user_can_read(doc_cell.data_doc_id, uid, session=session):
-            raise ValueError("You do not have access to this DataDoc cell.")
-    except DocDoesNotExist:
-        raise ValueError("Parent DataDoc not found.")
+    if not user_can_read(doc_cell.data_doc_id, uid, session=session):
+        raise AuthorizationError(
+            action="read", resource=f"datadoc:{doc_cell.data_doc_id}"
+        )
 
     # Serialize cell with all enrichments
     result = cell.to_dict()
@@ -469,11 +467,8 @@ def get_datadoc_github_history_data(
     from lib.mcp.lib.github import serialize_commit
 
     # Check permission
-    try:
-        if not user_can_read(datadoc_id, uid, session=session):
-            raise ValueError("You do not have access to this DataDoc.")
-    except DocDoesNotExist:
-        raise ValueError(f"DataDoc {datadoc_id} not found.")
+    if not user_can_read(datadoc_id, uid, session=session):
+        raise AuthorizationError(action="read", resource=f"datadoc:{datadoc_id}")
 
     # Check if linked to GitHub
     github_link = get_repo_link(datadoc_id, session=session)
@@ -541,11 +536,10 @@ def get_datadoc_cell_executions_data(
         raise ValueError(f"DataDoc cell {cell_id} not associated with any datadoc.")
 
     # Check permission on parent datadoc
-    try:
-        if not user_can_read(doc_cell.data_doc_id, uid, session=session):
-            raise ValueError("You do not have access to this DataDoc cell.")
-    except DocDoesNotExist:
-        raise ValueError("Parent DataDoc not found.")
+    if not user_can_read(doc_cell.data_doc_id, uid, session=session):
+        raise AuthorizationError(
+            action="read", resource=f"datadoc:{doc_cell.data_doc_id}"
+        )
 
     # Get executions
     cells_executions = get_data_cells_executions([cell_id], session=session)

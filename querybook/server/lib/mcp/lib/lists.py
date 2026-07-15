@@ -1,8 +1,9 @@
 """List utility functions for MCP tools."""
 
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.utils import build_querybook_url
 from logic.board import get_board_editors_by_board_id
-from logic.board_permission import BoardDoesNotExist, user_can_read
+from logic.board_permission import user_can_read
 from models.board import Board
 from models.environment import Environment
 
@@ -116,13 +117,11 @@ def get_list_data(list_id: int, uid: int, session) -> dict:
         Serialized list dict with items and editors
 
     Raises:
-        ValueError: If list not found or user lacks permission
+        BoardDoesNotExist: If the list does not exist
+        AuthorizationError: If the user lacks permission to read the list
     """
-    try:
-        if not user_can_read(list_id, uid, session=session):
-            raise ValueError("You do not have access to this list.")
-    except BoardDoesNotExist:
-        raise ValueError(f"List {list_id} not found.")
+    if not user_can_read(list_id, uid, session=session):
+        raise AuthorizationError(action="read", resource=f"list:{list_id}")
 
     list_obj = Board.get(id=list_id, session=session)
     return serialize_list(

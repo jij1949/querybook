@@ -5,6 +5,7 @@ from fastmcp.server.auth import AccessToken
 from fastmcp.server.dependencies import CurrentAccessToken
 
 from app.db import DBSession
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.lib.lists import (
     serialize_list,
     serialize_list_editor,
@@ -33,7 +34,7 @@ from logic.board import (
     update_board_editor as update_board_editor_logic,
     delete_board_editor as delete_board_editor_logic,
 )
-from logic.board_permission import BoardDoesNotExist, user_can_edit
+from logic.board_permission import user_can_edit
 from models.board import Board, BoardItem
 from models.environment import Environment
 
@@ -187,11 +188,8 @@ def register(mcp: FastMCP) -> None:
         """Update list properties. Only non-null fields are updated."""
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_edit(list_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {list_id} not found.")
+            if not user_can_edit(list_id, uid, session=session):
+                raise AuthorizationError(action="edit", resource=f"list:{list_id}")
 
             fields = {}
             if name is not None:
@@ -217,11 +215,8 @@ def register(mcp: FastMCP) -> None:
         """Delete a list. Cannot delete favorite lists."""
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_edit(list_id, uid, session=session):
-                    raise ValueError("You do not have permission to delete this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {list_id} not found.")
+            if not user_can_edit(list_id, uid, session=session):
+                raise AuthorizationError(action="delete", resource=f"list:{list_id}")
 
             list_obj = Board.get(id=list_id, session=session)
             if list_obj.board_type == "favorite":
@@ -251,11 +246,8 @@ def register(mcp: FastMCP) -> None:
         """Add an item to a list."""
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_edit(list_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {list_id} not found.")
+            if not user_can_edit(list_id, uid, session=session):
+                raise AuthorizationError(action="edit", resource=f"list:{list_id}")
 
             # Translate "list" to "board" for internal database API
             internal_item_type = "board" if item_type == "list" else item_type
@@ -292,11 +284,10 @@ def register(mcp: FastMCP) -> None:
                 raise ValueError(f"List item {list_item_id} not found.")
 
             # Check permission against the actual parent list
-            try:
-                if not user_can_edit(list_item.parent_board_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {list_item.parent_board_id} not found.")
+            if not user_can_edit(list_item.parent_board_id, uid, session=session):
+                raise AuthorizationError(
+                    action="edit", resource=f"list:{list_item.parent_board_id}"
+                )
 
             fields = {}
             if description is not None:
@@ -331,11 +322,8 @@ def register(mcp: FastMCP) -> None:
         """Remove an item from a list."""
         uid = token.claims["creator_uid"]
         with DBSession() as session:
-            try:
-                if not user_can_edit(list_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {list_id} not found.")
+            if not user_can_edit(list_id, uid, session=session):
+                raise AuthorizationError(action="edit", resource=f"list:{list_id}")
 
             # Translate "list" to "board" for internal database API
             internal_item_type = "board" if item_type == "list" else item_type
@@ -360,11 +348,8 @@ def register(mcp: FastMCP) -> None:
         caller_uid = token.claims["creator_uid"]
 
         with DBSession() as session:
-            try:
-                if not user_can_edit(list_id, caller_uid, session=session):
-                    raise ValueError("You do not have permission to edit this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {list_id} not found.")
+            if not user_can_edit(list_id, caller_uid, session=session):
+                raise AuthorizationError(action="edit", resource=f"list:{list_id}")
 
             editor = create_board_editor(
                 board_id=list_id,
@@ -395,11 +380,10 @@ def register(mcp: FastMCP) -> None:
             if not editor:
                 raise ValueError(f"Editor {editor_id} not found.")
 
-            try:
-                if not user_can_edit(editor.board_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {editor.board_id} not found.")
+            if not user_can_edit(editor.board_id, uid, session=session):
+                raise AuthorizationError(
+                    action="edit", resource=f"list:{editor.board_id}"
+                )
 
             updated_editor = update_board_editor_logic(
                 id=editor_id,
@@ -426,11 +410,10 @@ def register(mcp: FastMCP) -> None:
             if not editor:
                 raise ValueError(f"Editor {editor_id} not found.")
 
-            try:
-                if not user_can_edit(editor.board_id, uid, session=session):
-                    raise ValueError("You do not have permission to edit this list.")
-            except BoardDoesNotExist:
-                raise ValueError(f"List {editor.board_id} not found.")
+            if not user_can_edit(editor.board_id, uid, session=session):
+                raise AuthorizationError(
+                    action="edit", resource=f"list:{editor.board_id}"
+                )
 
             delete_board_editor_logic(
                 id=editor_id, board_id=editor.board_id, session=session

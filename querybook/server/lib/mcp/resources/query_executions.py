@@ -6,6 +6,7 @@ from fastmcp.server.auth import AccessToken
 from fastmcp.server.dependencies import CurrentAccessToken
 
 from app.db import DBSession
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.lib.query_executions import serialize_query_execution
 from lib.mcp.utils import RESOURCE_ANNOTATIONS
 from logic import query_execution as logic
@@ -48,8 +49,8 @@ def register(mcp: FastMCP) -> None:
             )
 
             if not has_execution_access:
-                raise ValueError(
-                    "You do not have permission to access this query execution."
+                raise AuthorizationError(
+                    action="read", resource=f"query_execution:{query_execution_id}"
                 )
 
             return [ResourceContent(serialize_query_execution(execution))]

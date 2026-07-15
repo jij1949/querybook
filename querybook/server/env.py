@@ -75,6 +75,11 @@ def _resolve_allowed_redirect_uris(base_raw, extra_raw, defaults):
 class QuerybookSettings(object):
     # Core
     PRODUCTION = os.environ.get("production", "false") == "true"
+    ENVIRONMENT = (
+        get_env_config("ENVIRONMENT")
+        or get_env_config("DD_ENV")
+        or ("production" if PRODUCTION else "development")
+    )
     PUBLIC_URL = get_env_config("PUBLIC_URL")
     FLASK_SECRET_KEY = get_env_config("FLASK_SECRET_KEY", optional=False)
     FLASK_CACHE_CONFIG = get_env_config("FLASK_CACHE_CONFIG")

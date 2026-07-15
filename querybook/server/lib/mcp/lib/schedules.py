@@ -1,7 +1,8 @@
 """Schedule-related utilities for MCP."""
 
 from const.schedule import TaskRunStatus
-from logic.datadoc_permission import user_can_read, DocDoesNotExist
+from lib.mcp.exceptions import AuthorizationError
+from logic.datadoc_permission import user_can_read
 from logic.schedule import get_task_schedule_by_id, get_task_run_record_run_by_name
 
 
@@ -187,11 +188,8 @@ def _get_schedule_with_read_permission(schedule_id: int, uid: int, session):
     if datadoc_id is None:
         raise ValueError("Schedule is not a DataDoc schedule.")
 
-    try:
-        if not user_can_read(datadoc_id, uid, session=session):
-            raise ValueError("You do not have access to this schedule.")
-    except DocDoesNotExist:
-        raise ValueError(f"DataDoc {datadoc_id} not found.")
+    if not user_can_read(datadoc_id, uid, session=session):
+        raise AuthorizationError(action="read", resource=f"datadoc:{datadoc_id}")
 
     return schedule
 

@@ -3,11 +3,14 @@ from pathlib import Path
 
 from mcp.types import Icon
 from fastmcp import FastMCP
+from starlette.middleware import Middleware as StarletteMiddleware
 
 from env import QuerybookSettings
 from lib.mcp.auth import QuerybookTokenVerifier
+from lib.mcp.audit import RequestAuditMiddleware, log_config_snapshot
 from lib.mcp.middleware import (
     AuthDeprecationNoticeMiddleware,
+    ExceptionMappingMiddleware,
     LangSmithTracingMiddleware,
     MCPEventLoggingMiddleware,
     wrap_mcp_resources,
@@ -99,6 +102,9 @@ mcp = FastMCP(
 mcp.add_middleware(LangSmithTracingMiddleware())
 mcp.add_middleware(MCPEventLoggingMiddleware())
 mcp.add_middleware(AuthDeprecationNoticeMiddleware())
+# Registered last so it is innermost — maps raw domain exceptions to ToolErrors
+# before the logging/tracing middlewares observe them.
+mcp.add_middleware(ExceptionMappingMiddleware())
 
 # Wrap resource decorator to add logging (FastMCP middleware doesn't support resource hooks)
 wrap_mcp_resources(mcp)
@@ -127,10 +133,13 @@ statement_executions_resources.register(mcp)
 users_resources.register(mcp)
 
 if __name__ == "__main__":
+    # Audit 8.4: record the security posture the pod actually started under.
+    log_config_snapshot(mcp)
     mcp.run(
         transport="http",
         host="0.0.0.0",
         port=QuerybookSettings.MCP_PORT,
         # Stateless mode used to enable horizontally-scaled deployments.
         stateless_http=True,
+        middleware=[StarletteMiddleware(RequestAuditMiddleware)],
     )

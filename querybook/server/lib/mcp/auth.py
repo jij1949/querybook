@@ -3,6 +3,7 @@ import hashlib
 from fastmcp.server.auth import AccessToken, TokenVerifier
 
 from app.db import DBSession
+from lib.mcp.audit import record_auth_failure, record_auth_success
 from models.admin import APIAccessToken
 
 
@@ -19,7 +20,13 @@ class QuerybookTokenVerifier(TokenVerifier):
                 .first()
             )
             if api_token is None:
+                # Pure recorder: a disabled/unknown API key is an unambiguous
+                # failure (API tokens don't expire — they're enabled/disabled in
+                # the DB), so this is always security signal. The boundary
+                # middleware emits the standalone `auth` event.
+                record_auth_failure("invalid_api_token", "api_token")
                 return None
+            record_auth_success("valid_api_token", "api_token")
             return AccessToken(
                 token=token,
                 client_id=str(api_token.creator_uid),

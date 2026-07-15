@@ -22,6 +22,7 @@ from datetime import datetime
 from typing import Annotated
 
 from fastmcp import FastMCP
+from fastmcp.exceptions import ToolError
 from fastmcp.server.auth import AccessToken
 from fastmcp.server.dependencies import CurrentAccessToken
 
@@ -32,6 +33,7 @@ from env import QuerybookSettings
 from lib.github.github import github_manager, MCP_OAUTH_SESSION_TTL
 from lib.logger import get_logger
 from lib.github.serializers import serialize_datadoc_to_markdown
+from lib.mcp.exceptions import AuthorizationError
 from lib.mcp.lib.github import (
     analyze_directory_structure,
     format_commit_message,
@@ -151,11 +153,11 @@ def register(mcp: FastMCP) -> None:
                 "repository": QuerybookSettings.GITHUB_REPO_NAME,
             }
         except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-                "message": f"Failed to revoke authorization: {str(e)}",
-            }
+            LOG.error(
+                f"Failed to revoke GitHub authorization for uid={uid}: {e}",
+                exc_info=True,
+            )
+            raise ToolError(f"Failed to revoke authorization: {str(e)}")
 
     @mcp.tool(
         title="Authorize GitHub Account",
@@ -223,11 +225,11 @@ def register(mcp: FastMCP) -> None:
             }
 
         except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-                "message": f"Failed to generate authorization URL: {str(e)}",
-            }
+            LOG.error(
+                f"Failed to generate GitHub authorization URL for uid={uid}: {e}",
+                exc_info=True,
+            )
+            raise ToolError(f"Failed to generate authorization URL: {str(e)}")
 
     @mcp.tool(
         title="Get GitHub Directory Structure",
@@ -249,8 +251,8 @@ def register(mcp: FastMCP) -> None:
         with DBSession() as session:
             # Check read permission on the datadoc (just for auth context)
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(
-                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                raise AuthorizationError(
+                    action="read", resource=f"datadoc:{datadoc_id}"
                 )
 
             # Get directories from GitHub
@@ -264,7 +266,12 @@ def register(mcp: FastMCP) -> None:
                 )
                 directories = github_client.get_repo_directories()
             except Exception as e:
-                raise ValueError(f"Failed to fetch GitHub directories: {str(e)}")
+                LOG.error(
+                    f"Failed to fetch GitHub directories for uid={uid}, "
+                    f"datadoc {datadoc_id}: {e}",
+                    exc_info=True,
+                )
+                raise ToolError(f"Failed to fetch GitHub directories: {str(e)}")
 
             # Get current user
             user = get_user_by_id(uid, session=session)
@@ -321,8 +328,8 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(
-                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                raise AuthorizationError(
+                    action="read", resource=f"datadoc:{datadoc_id}"
                 )
 
             doc = datadoc_logic.get_data_doc_by_id(datadoc_id, session=session)
@@ -357,8 +364,8 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(
-                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                raise AuthorizationError(
+                    action="read", resource=f"datadoc:{datadoc_id}"
                 )
 
             user = get_user_by_id(uid, session=session)
@@ -463,34 +470,20 @@ def register(mcp: FastMCP) -> None:
 
         Full workflow reference: querybook://reference/github.
         """
-        try:
-            uid = token.claims["creator_uid"]
-        except Exception as e:
-            raise ValueError(f"Failed to get uid from token: {e}")
+        uid = token.claims["creator_uid"]
 
         with DBSession() as session:
             # Check write permission using uid (not current_user which doesn't exist in MCP context)
-            try:
-                if not user_can_write(datadoc_id, uid=uid, session=session):
-                    raise ValueError(
-                        f"User {uid} does not have write permission for DataDoc {datadoc_id}"
-                    )
-            except Exception as e:
-                raise ValueError(f"Permission check failed: {e}")
+            if not user_can_write(datadoc_id, uid=uid, session=session):
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
+                )
 
-            try:
-                doc = datadoc_logic.get_data_doc_by_id(datadoc_id, session=session)
-            except Exception as e:
-                raise ValueError(f"Failed to get datadoc: {e}")
-
+            doc = datadoc_logic.get_data_doc_by_id(datadoc_id, session=session)
             if not doc:
                 raise ValueError(f"DataDoc {datadoc_id} not found")
 
-            try:
-                user = get_user_by_id(uid, session=session)
-            except Exception as e:
-                raise ValueError(f"Failed to get user: {e}")
-
+            user = get_user_by_id(uid, session=session)
             if not user:
                 raise ValueError(f"User {uid} not found")
             if not hasattr(user, "id") or user.id is None:
@@ -528,7 +521,7 @@ def register(mcp: FastMCP) -> None:
                     f"Failed to create GitHub link for datadoc {datadoc_id}: {e}",
                     exc_info=True,
                 )
-                raise ValueError(f"create_repo_link failed: {str(e)}")
+                raise ToolError(f"create_repo_link failed: {str(e)}")
 
             file_path = f"{directory}/datadoc_{datadoc_id}.md"
             github_url = f"https://github.com/{QuerybookSettings.GITHUB_REPO_NAME}/tree/{QuerybookSettings.GITHUB_BRANCH}/{directory}"
@@ -564,8 +557,8 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_write(datadoc_id, uid=uid, session=session):
-                raise ValueError(
-                    f"User {uid} does not have write permission for DataDoc {datadoc_id}"
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
                 )
 
             github_link = github_logic.get_repo_link(datadoc_id, session=session)
@@ -620,8 +613,8 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_write(datadoc_id, uid=uid, session=session):
-                raise ValueError(
-                    f"User {uid} does not have write permission for DataDoc {datadoc_id}"
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
                 )
 
             # Check if linked
@@ -672,7 +665,7 @@ def register(mcp: FastMCP) -> None:
                     f"Failed to commit datadoc {datadoc_id} to GitHub: {e}",
                     exc_info=True,
                 )
-                raise ValueError(f"Failed to commit to GitHub: {str(e)}")
+                raise ToolError(f"Failed to commit to GitHub: {str(e)}")
 
             # Get the commit info
             commits = github_client.get_datadoc_versions(page=1)
@@ -712,8 +705,8 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_read(datadoc_id, uid=uid, session=session):
-                raise ValueError(
-                    f"User {uid} does not have read permission for DataDoc {datadoc_id}"
+                raise AuthorizationError(
+                    action="read", resource=f"datadoc:{datadoc_id}"
                 )
 
             github_client = _get_github_client(datadoc_id, uid, session)
@@ -734,7 +727,7 @@ def register(mcp: FastMCP) -> None:
                     commit_datadoc, exclude_metadata=True
                 )
             except Exception as e:
-                raise ValueError(f"Failed to get commit {commit_sha}: {str(e)}")
+                raise ToolError(f"Failed to get commit {commit_sha}: {str(e)}")
 
             # Get commit info
             try:
@@ -784,8 +777,8 @@ def register(mcp: FastMCP) -> None:
 
         with DBSession() as session:
             if not user_can_write(datadoc_id, uid=uid, session=session):
-                raise ValueError(
-                    f"User {uid} does not have write permission for DataDoc {datadoc_id}"
+                raise AuthorizationError(
+                    action="write", resource=f"datadoc:{datadoc_id}"
                 )
 
             github_client = _get_github_client(datadoc_id, uid, session)
@@ -794,7 +787,7 @@ def register(mcp: FastMCP) -> None:
             try:
                 commit_datadoc = github_client.get_datadoc_at_commit(commit_sha)
             except Exception as e:
-                raise ValueError(f"Failed to get commit {commit_sha}: {str(e)}")
+                raise ToolError(f"Failed to get commit {commit_sha}: {str(e)}")
 
             # Get commit info for the response
             try:

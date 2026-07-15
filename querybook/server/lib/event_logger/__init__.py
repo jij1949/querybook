@@ -45,5 +45,15 @@ class EventLogger:
         except Exception as e:
             LOG.error(e, exc_info=True)
 
+    def log_mcp_event(self, uid: int, event_data: dict):
+        try:
+            self.logger.log(
+                uid=uid,
+                event_type=EventType.MCP,
+                event_data=event_data,
+            )
+        except Exception as e:
+            LOG.error(e, exc_info=True)
+
 
 event_logger = EventLogger()
