@@ -6,6 +6,8 @@ import pytest
 
 # Stub fastmcp so middleware.py can be imported without installing the package.
 _fastmcp = ModuleType("fastmcp")
+_fastmcp_exceptions = ModuleType("fastmcp.exceptions")
+_fastmcp_exceptions.ToolError = type("ToolError", (Exception,), {})
 _fastmcp_server = ModuleType("fastmcp.server")
 _fastmcp_server_deps = ModuleType("fastmcp.server.dependencies")
 _fastmcp_server_deps.get_access_token = MagicMock(return_value=None)
@@ -14,6 +16,7 @@ _fastmcp_server_middleware.Middleware = object
 _fastmcp_server_middleware.MiddlewareContext = MagicMock
 
 sys.modules.setdefault("fastmcp", _fastmcp)
+sys.modules.setdefault("fastmcp.exceptions", _fastmcp_exceptions)
 sys.modules.setdefault("fastmcp.server", _fastmcp_server)
 sys.modules.setdefault("fastmcp.server.dependencies", _fastmcp_server_deps)
 sys.modules.setdefault("fastmcp.server.middleware", _fastmcp_server_middleware)
@@ -24,6 +27,10 @@ _env = ModuleType("env")
 _env.QuerybookSettings = MagicMock(
     EVENT_LOGGER_NAME="null",
     ENVIRONMENT="test",
+    # lib.stats_logger reads this at import time (see lib/mcp/audit/router.py's
+    # stats_logger import) -- must be a real registered logger name or the
+    # import chain raises before any test in this file can run.
+    STATS_LOGGER_NAME="null",
 )
 sys.modules.setdefault("env", _env)
 
@@ -108,6 +115,7 @@ async def test_langsmith_tracing_middleware_traces_tool_call():
                 **fixed_ctx,
                 "operation_type": "tool",
                 "tool": "list_environments",
+                "auth_reason": None,
             },
             tags=["mcp", "querybook", "tool"],
         )
@@ -142,6 +150,45 @@ async def test_langsmith_tracing_middleware_records_error():
             await middleware.on_call_tool(context, call_next)
 
         mock_run.end.assert_called_once_with(error="boom")
+
+
+@pytest.mark.asyncio
+async def test_langsmith_tracing_middleware_includes_auth_reason():
+    """The rich tool trace must carry auth_reason -- it's the only LangSmith
+    signal for why a ride-along auth outcome succeeded/failed, since a
+    success has no standalone auth event of its own."""
+    from lib.mcp.middleware import LangSmithTracingMiddleware
+
+    middleware = LangSmithTracingMiddleware()
+
+    context = MagicMock()
+    context.message.name = "list_environments"
+    context.message.arguments = {}
+
+    tool_result = MagicMock()
+    tool_result.structured_content = None
+    call_next = AsyncMock(return_value=tool_result)
+
+    mock_run = MagicMock()
+    mock_run.__enter__ = MagicMock(return_value=mock_run)
+    mock_run.__exit__ = MagicMock(return_value=False)
+
+    with patch("lib.mcp.middleware.langsmith") as mock_ls, patch(
+        "lib.mcp.middleware.get_access_token", return_value=None
+    ), patch(
+        "lib.mcp.middleware.get_recorded_auth_reason",
+        return_value="valid_oauth_token",
+    ), patch(
+        "lib.mcp.middleware.QuerybookSettings.LANGSMITH_TRACING", True
+    ):
+        mock_ls.trace.return_value = mock_run
+
+        await middleware.on_call_tool(context, call_next)
+
+        assert (
+            mock_ls.trace.call_args.kwargs["metadata"]["auth_reason"]
+            == "valid_oauth_token"
+        )
 
 
 def test_wrap_mcp_resources_adds_langsmith_trace():
@@ -195,6 +242,51 @@ def test_wrap_mcp_resources_adds_langsmith_trace():
         )
         assert call_kwargs.kwargs["tags"] == ["mcp", "querybook", "resource"]
         mock_run.end.assert_called_once_with(outputs={"status": "success"})
+
+
+def test_wrap_mcp_resources_includes_auth_reason_in_langsmith():
+    """The resource-read trace must carry auth_reason for the same reason as
+    the tool trace: a successful auth has no standalone event of its own."""
+    from lib.mcp.middleware import wrap_mcp_resources
+
+    mcp = MagicMock()
+
+    def fake_resource(*args, **kwargs):
+        def decorator(func):
+            return func
+
+        return decorator
+
+    mcp.resource = fake_resource
+    wrap_mcp_resources(mcp)
+
+    wrapped_decorator = mcp.resource(uri="querybook://environment/{env_id}")
+
+    mock_func = MagicMock(return_value="result")
+    mock_func.__module__ = "test"
+    mock_func.__name__ = "get_env"
+    wrapped_func = wrapped_decorator(mock_func)
+
+    mock_run = MagicMock()
+    mock_run.__enter__ = MagicMock(return_value=mock_run)
+    mock_run.__exit__ = MagicMock(return_value=False)
+
+    with patch("lib.mcp.middleware.langsmith") as mock_ls, patch(
+        "lib.mcp.middleware.log_mcp_event"
+    ), patch(
+        "lib.mcp.middleware.get_recorded_auth_reason",
+        return_value="valid_api_token",
+    ), patch(
+        "lib.mcp.middleware.QuerybookSettings.LANGSMITH_TRACING", True
+    ):
+        mock_ls.trace.return_value = mock_run
+
+        wrapped_func(env_id=42)
+
+        assert (
+            mock_ls.trace.call_args.kwargs["metadata"]["auth_reason"]
+            == "valid_api_token"
+        )
 
 
 def test_wrap_mcp_resources_records_error_in_langsmith():

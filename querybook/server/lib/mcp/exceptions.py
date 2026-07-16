@@ -6,6 +6,7 @@ keeps per-site error handling thin and the client-visible wording uniform.
 """
 
 from fastmcp.exceptions import ToolError
+from pydantic import ValidationError
 
 from logic.board_permission import BoardDoesNotExist
 from logic.datadoc_permission import DocDoesNotExist
@@ -51,6 +52,34 @@ def _map_single(exc):
     return None
 
 
+def _walk_causes(exc):
+    """Yield ``exc`` and each ``__cause__`` once (cycle-safe).
+
+    FastMCP catches the handler's exception in its innermost ``call_tool`` layer —
+    *below all middleware* — and re-raises it as ``ToolError(...) from original``,
+    so the real domain exception is a ``__cause__`` of that wrapper by the time any
+    middleware runs. Every consumer that needs a specific exception type therefore
+    walks this chain; the ``seen`` set guards against a self-referential cause cycle.
+    """
+    seen = set()
+    current = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        yield current
+        current = current.__cause__
+
+
+def find_validation_error(exc):
+    """Return the pydantic ``ValidationError`` in ``exc``'s cause chain, or None.
+
+    Argument validation fires below all middleware; a bad/missing/uncoercible tool
+    argument surfaces as a ``ValidationError`` (possibly wrapped as a ``__cause__``)
+    up through ``call_next`` into the audit middleware, which uses this to emit a
+    distinct ``rejected_invocation`` (``reason=malformed_params``) event.
+    """
+    return next((c for c in _walk_causes(exc) if isinstance(c, ValidationError)), None)
+
+
 def classify_exception(exc):
     """Walk the ``__cause__`` chain once and return what every consumer needs.
 
@@ -63,29 +92,25 @@ def classify_exception(exc):
       reads its ``action`` / ``resource`` for the ``authz`` deny event — or
       ``None``.
 
-    Both come from a single traversal because FastMCP catches the handler's
-    exception in its innermost ``call_tool`` layer — *below all middleware* — and
-    re-raises it as ``ToolError(...) from original``. By the time any middleware
-    runs (the client-facing mapper *or* the audit classifier), the real domain
-    exception is no longer the top-level error but a ``__cause__`` of that
-    wrapper, so reading the top-level exception alone is never enough. (Resources
-    raise their exception directly, so the top-level ``exc`` is checked first
-    anyway.) Each result keeps its independent "first match wins" semantics; the
-    walk stops early once both are found.
+    Both come from a single traversal of :func:`_walk_causes` because FastMCP
+    catches the handler's exception in its innermost ``call_tool`` layer — *below
+    all middleware* — and re-raises it as ``ToolError(...) from original``. By the
+    time any middleware runs (the client-facing mapper *or* the audit classifier),
+    the real domain exception is no longer the top-level error but a ``__cause__``
+    of that wrapper, so reading the top-level exception alone is never enough.
+    (Resources raise their exception directly, so the top-level ``exc`` is checked
+    first anyway.) Each result keeps its independent "first match wins" semantics;
+    the walk stops early once both are found.
     """
-    seen = set()
-    current = exc
     tool_error = None
     authz_error = None
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
+    for current in _walk_causes(exc):
         if tool_error is None:
             tool_error = _map_single(current)
         if authz_error is None and isinstance(current, AuthorizationError):
             authz_error = current
         if tool_error is not None and authz_error is not None:
             break
-        current = current.__cause__
     return tool_error, authz_error
 
 

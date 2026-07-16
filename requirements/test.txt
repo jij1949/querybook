@@ -1,6 +1,9 @@
 pytest==7.1.2
+pytest-asyncio==0.21.2
 coverage==5.4
 moto==2.2.4
+fakeredis==2.36.2
+lupa==2.8  # Lua scripting support for fakeredis (EVAL), used by rate_limit.py tests
 
 -r auth/ldap.txt
 -r engine/hive.txt

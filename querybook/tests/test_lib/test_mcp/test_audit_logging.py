@@ -29,7 +29,12 @@ from lib.mcp.audit import (
     record_token_issuance,
 )
 from lib.mcp.exceptions import AuthorizationError
-from lib.mcp.middleware import MCPEventLoggingMiddleware
+from lib.mcp.middleware import (
+    MCPEventLoggingMiddleware,
+    PayloadSizeGuardMiddleware,
+    _freetext_bytes_over_limit,
+    wrap_mcp_resources,
+)
 
 ENVELOPE_KEYS = {
     "event_type",
@@ -67,6 +72,21 @@ def _patch_env(monkeypatch):
 def fake_logger(monkeypatch):
     capture = _EventLogCapture()
     monkeypatch.setattr(audit_router, "event_logger", capture)
+    return capture
+
+
+class _StatsCapture:
+    def __init__(self):
+        self.calls = []
+
+    def incr(self, key, tags=None):
+        self.calls.append((key, tags))
+
+
+@pytest.fixture
+def fake_stats(monkeypatch):
+    capture = _StatsCapture()
+    monkeypatch.setattr(audit_router, "stats_logger", capture)
     return capture
 
 
@@ -738,7 +758,7 @@ def test_token_refresh_failure_is_security_signal(caplog, fake_logger):
 # it in the failed call's exception chain and emits the request's single `authz`
 # deny — no per-call-site recorder. An *allow* has no record of its own: a
 # successful tool_invocation is implicitly the allow (the allow-summary fields
-# from the original 8.3 spec were intentionally dropped, see audit-logging.md).
+# from the original 8.3 spec were intentionally dropped, see mcp-security.md).
 
 
 def _make_tool_ctx(tool_name="get_datadoc"):
@@ -832,3 +852,417 @@ def test_tool_success_emits_plain_tool_invocation(fake_logger, without_token):
     assert env["status"] == "success"
     assert "authz_result" not in env
     assert "authz_denied_action" not in env
+
+
+# -- Datadog metrics (7a): single emitter inside emit_audit_event -----------
+
+
+def _keys(stats_calls):
+    return [key for key, _tags in stats_calls]
+
+
+def test_tool_invocation_success_emits_tool_call_only(
+    fake_logger, fake_stats, with_token
+):
+    log_mcp_event("tool_invocation", {"tool": "run_query", "status": "success"})
+    assert _keys(fake_stats.calls) == ["mcp.tool.call"]
+    key, tags = fake_stats.calls[0]
+    assert tags["surface"] == "tool"
+    assert tags["tool"] == "run_query"
+    assert tags["environment"] == "test"
+
+
+def test_tool_invocation_error_emits_call_and_error(
+    fake_logger, fake_stats, with_token
+):
+    log_mcp_event("tool_invocation", {"tool": "run_query", "status": "error"})
+    assert _keys(fake_stats.calls) == ["mcp.tool.call", "mcp.tool.error"]
+
+
+def test_resource_read_success_uses_resource_template_tag(
+    fake_logger, fake_stats, with_token
+):
+    """The resolved ID in resource_uri must not leak into the tag value --
+    that would make it an unbounded Datadog dimension. The middleware-supplied
+    resource_template (the registered URI template) is the bounded tag."""
+    log_mcp_event(
+        "resource_read",
+        {
+            "resource_uri": "querybook://datadoc/123",
+            "resource_template": "querybook://datadoc/{datadoc_id}",
+            "status": "success",
+        },
+    )
+    assert _keys(fake_stats.calls) == ["mcp.tool.call"]
+    key, tags = fake_stats.calls[0]
+    assert tags["surface"] == "resource"
+    assert tags["tool"] == "querybook://datadoc/{datadoc_id}"
+    assert "123" not in tags["tool"]
+
+
+def test_resource_read_without_template_emits_no_tool_tag(
+    fake_logger, fake_stats, with_token
+):
+    """resource_template is always supplied by wrap_mcp_resources (see the
+    end-to-end test below); if a payload ever lacked it, the tag is simply
+    omitted rather than falling back to the unbounded resource_uri."""
+    log_mcp_event(
+        "resource_read",
+        {"resource_uri": "querybook://datadoc/123", "status": "success"},
+    )
+    _key, tags = fake_stats.calls[0]
+    assert "tool" not in tags
+
+
+def test_wrap_mcp_resources_supplies_resource_template_to_metric(
+    fake_logger, fake_stats, without_token
+):
+    """End-to-end through the real wrap_mcp_resources wrapper (not a hand-built
+    payload): confirms the middleware actually passes resource_template
+    through to the metric, not just that the router can consume one."""
+
+    class _FakeResourceMCP:
+        def resource(self, *args, **kwargs):
+            def decorator(func):
+                return func
+
+            return decorator
+
+    mcp = wrap_mcp_resources(_FakeResourceMCP())
+    wrapped_decorator = mcp.resource(uri="querybook://datadoc/{datadoc_id}")
+
+    def get_datadoc(datadoc_id):
+        return {"id": datadoc_id}
+
+    get_datadoc.__module__ = "test"
+    get_datadoc.__name__ = "get_datadoc"
+    wrapped_func = wrapped_decorator(get_datadoc)
+
+    wrapped_func(datadoc_id=123)
+
+    _key, tags = fake_stats.calls[0]
+    assert tags["tool"] == "querybook://datadoc/{datadoc_id}"
+    assert "123" not in tags["tool"]
+
+
+def test_resource_read_error_emits_call_and_error(fake_logger, fake_stats, with_token):
+    log_mcp_event(
+        "resource_read", {"resource_uri": "querybook://datadoc/123", "status": "error"}
+    )
+    assert _keys(fake_stats.calls) == ["mcp.tool.call", "mcp.tool.error"]
+
+
+def test_auth_failure_emits_auth_failure_metric(fake_logger, fake_stats):
+    _run_boundary(
+        record=lambda: record_auth_failure("invalid_api_token", "api_token"),
+        status_code=401,
+    )
+    assert _keys(fake_stats.calls) == ["mcp.auth.failure"]
+
+
+def test_auth_success_emits_no_metric(fake_logger, fake_stats):
+    _run_boundary(
+        record=lambda: record_auth_success("valid_api_token", "api_token"),
+        status_code=200,
+    )
+    assert fake_stats.calls == []
+
+
+def test_authz_deny_emits_authz_metric(fake_logger, fake_stats, without_token):
+    async def call_next(_ctx):
+        raise AuthorizationError(action="write", resource="datadoc:5")
+
+    mw = MCPEventLoggingMiddleware()
+    with pytest.raises(AuthorizationError):
+        asyncio.run(mw.on_call_tool(_make_tool_ctx("update_datadoc"), call_next))
+
+    assert _keys(fake_stats.calls) == ["mcp.authz.deny"]
+    _key, tags = fake_stats.calls[0]
+    assert tags["tool"] == "update_datadoc"
+
+
+def test_resource_authz_deny_uses_resource_template_tag(
+    fake_logger, fake_stats, without_token
+):
+    """Resource authz denials carry resource_uri/resource_template, not tool
+    -- the same bounded-tag convention must apply here too, so this path
+    isn't left with only the environment tag."""
+    log_mcp_event(
+        "authz",
+        {
+            "resource_uri": "querybook://datadoc/123",
+            "resource_template": "querybook://datadoc/{datadoc_id}",
+            "result": "deny",
+        },
+    )
+    assert _keys(fake_stats.calls) == ["mcp.authz.deny"]
+    _key, tags = fake_stats.calls[0]
+    assert tags["tool"] == "querybook://datadoc/{datadoc_id}"
+    assert "123" not in tags["tool"]
+
+
+def test_rejected_invocation_oversized_emits_rejected_only(
+    fake_logger, fake_stats, without_token
+):
+    log_mcp_event("rejected_invocation", {"reason": "oversized"})
+    assert _keys(fake_stats.calls) == ["mcp.rejected"]
+    _key, tags = fake_stats.calls[0]
+    assert tags["reason"] == "oversized"
+
+
+def test_rejected_invocation_rate_limited_emits_both(
+    fake_logger, fake_stats, without_token
+):
+    log_mcp_event("rejected_invocation", {"reason": "rate_limited"})
+    assert _keys(fake_stats.calls) == ["mcp.rejected", "mcp.rate_limit"]
+
+
+def test_config_snapshot_emits_no_metric(fake_logger, fake_stats):
+    log_config_snapshot(_FakeMCP([], []))
+    assert fake_stats.calls == []
+
+
+def test_no_token_probe_emits_no_metric(fake_logger, fake_stats):
+    _run_boundary(record=None, status_code=401, headers=[])
+    assert fake_stats.calls == []
+
+
+def test_environment_tag_present_on_every_emitted_counter(
+    fake_logger, fake_stats, with_token
+):
+    log_mcp_event("tool_invocation", {"tool": "run_query", "status": "error"})
+    log_mcp_event("auth", {"result": "failure"})
+    log_mcp_event("rejected_invocation", {"reason": "rate_limited"})
+    assert fake_stats.calls
+    for _key, tags in fake_stats.calls:
+        assert tags["environment"] == "test"
+
+
+def test_stats_failure_does_not_break_other_sinks(
+    fake_logger, monkeypatch, without_token
+):
+    """A stats-backend error must not suppress EventLog or propagate."""
+
+    class _BrokenStats:
+        def incr(self, key, tags=None):
+            raise RuntimeError("datadog down")
+
+    monkeypatch.setattr(audit_router, "stats_logger", _BrokenStats())
+    log_mcp_event("tool_invocation", {"tool": "run_query", "status": "success"})
+    assert len(fake_logger.calls) == 1
+
+
+# -- 6a: oversized free-text argument guard ---------------------------------
+
+
+def _make_validation_error():
+    """A real pydantic ValidationError, as arg coercion would raise below the
+    middleware. Kept local to avoid a cross-module test import."""
+    from pydantic import BaseModel, ValidationError
+
+    class _Model(BaseModel):
+        n: int
+
+    try:
+        _Model(n="not-an-int")
+    except ValidationError as e:
+        return e
+
+
+def _guard_ctx(name, arguments):
+    ctx = MagicMock()
+    ctx.message.name = name
+    ctx.message.arguments = arguments
+    return ctx
+
+
+def _set_freetext_limit(monkeypatch, limit):
+    monkeypatch.setattr(
+        QuerybookSettings, "MCP_MAX_FREETEXT_INPUT_BYTES", limit, raising=False
+    )
+
+
+def test_oversized_args_rejected_before_tool_runs(
+    fake_logger, fake_stats, without_token, monkeypatch
+):
+    _set_freetext_limit(monkeypatch, 10)
+    called = []
+
+    async def call_next(_ctx):
+        called.append(True)
+        return MagicMock()
+
+    ctx = _guard_ctx("execute_ad_hoc_query", {"query": "x" * 100})
+    with pytest.raises(ToolError) as exc_info:
+        asyncio.run(PayloadSizeGuardMiddleware().on_call_tool(ctx, call_next))
+
+    # Generic message: no payload echoed back.
+    assert "maximum allowed size of 10 bytes" in str(exc_info.value)
+    assert "xxxx" not in str(exc_info.value)
+    # Tool body never ran.
+    assert called == []
+    # One rejected_invocation{oversized} event + one mcp.rejected counter.
+    assert len(fake_logger.calls) == 1
+    payload = fake_logger.calls[0]["event_data"]
+    assert payload["event_type"] == "rejected_invocation"
+    assert payload["reason"] == "oversized"
+    assert payload["tool"] == "execute_ad_hoc_query"
+    assert payload["limit_bytes"] == 10
+    assert payload["size_bytes"] > 10
+    assert _keys(fake_stats.calls) == ["mcp.rejected"]
+    assert fake_stats.calls[0][1]["reason"] == "oversized"
+
+
+def test_within_limit_passes_through(
+    fake_logger, fake_stats, without_token, monkeypatch
+):
+    _set_freetext_limit(monkeypatch, 1000)
+    called = []
+
+    async def call_next(_ctx):
+        called.append(True)
+        result = MagicMock()
+        result.structured_content = {"status": "ok"}
+        return result
+
+    ctx = _guard_ctx("execute_ad_hoc_query", {"query": "SELECT 1"})
+    asyncio.run(PayloadSizeGuardMiddleware().on_call_tool(ctx, call_next))
+    assert called == [True]
+    # No rejection event or counter.
+    assert fake_logger.calls == []
+    assert fake_stats.calls == []
+
+
+def test_zero_limit_disables_guard(fake_logger, fake_stats, without_token, monkeypatch):
+    _set_freetext_limit(monkeypatch, 0)
+    called = []
+
+    async def call_next(_ctx):
+        called.append(True)
+        return MagicMock()
+
+    ctx = _guard_ctx("execute_ad_hoc_query", {"query": "x" * 10_000})
+    asyncio.run(PayloadSizeGuardMiddleware().on_call_tool(ctx, call_next))
+    assert called == [True]
+    assert fake_logger.calls == []
+
+
+# -- 6a: _freetext_bytes_over_limit unit edges ------------------------------
+
+
+def test_freetext_boundary_exact_and_off_by_one():
+    # limit exactly hit is within budget (strict >), limit+1 is over.
+    assert _freetext_bytes_over_limit({"a": "xxx"}, 4) is None  # key 'a' + 'xxx' = 4
+    over = _freetext_bytes_over_limit({"a": "xxxx"}, 4)  # 1 + 4 = 5
+    assert over == 5
+
+
+def test_freetext_counts_utf8_bytes_not_chars():
+    # '€' is 3 UTF-8 bytes; three of them = 9 bytes, over a 5-byte limit.
+    assert _freetext_bytes_over_limit({"x": "€€€"}, 100) is None
+    over = _freetext_bytes_over_limit(["€€€"], 5)
+    assert over is not None and over >= 9
+
+
+def test_freetext_counts_dict_keys():
+    # No string values, only a large key — must still be counted.
+    assert _freetext_bytes_over_limit({"k" * 50: 123}, 10) == 50
+
+
+def test_freetext_ignores_non_string_scalars():
+    assert _freetext_bytes_over_limit({"a": 1, "b": True, "c": None}, 10) is None
+
+
+def test_freetext_deep_nesting_no_recursion_error():
+    # Build a deeply nested structure that would blow a recursive walk's stack.
+    node = "leaf"
+    for _ in range(20_000):
+        node = [node]
+    # Within a huge limit -> walks fully without RecursionError, returns None.
+    assert _freetext_bytes_over_limit(node, 10_000_000) is None
+    # Over a tiny limit -> the 4-byte leaf pushes past it (no RecursionError).
+    assert _freetext_bytes_over_limit(node, 1) == 4
+
+
+# -- 6b: rejected_invocation on malformed params ----------------------------
+
+
+def _run_event_mw(call_next):
+    mw = MCPEventLoggingMiddleware()
+    ctx = _guard_ctx("execute_ad_hoc_query", {"query": "SELECT 1"})
+    return asyncio.run(mw.on_call_tool(ctx, call_next))
+
+
+def test_validation_error_emits_malformed_params(
+    fake_logger, fake_stats, without_token
+):
+    err = _make_validation_error()
+
+    async def call_next(_ctx):
+        raise err
+
+    with pytest.raises(Exception):
+        _run_event_mw(call_next)
+
+    assert len(fake_logger.calls) == 1
+    payload = fake_logger.calls[0]["event_data"]
+    assert payload["event_type"] == "rejected_invocation"
+    assert payload["reason"] == "malformed_params"
+    assert payload["tool"] == "execute_ad_hoc_query"
+    assert "duration_ms" in payload
+    assert _keys(fake_stats.calls) == ["mcp.rejected"]
+    assert fake_stats.calls[0][1]["reason"] == "malformed_params"
+
+
+def test_validation_error_wrapped_by_fastmcp_emits_malformed_params(
+    fake_logger, fake_stats, without_token
+):
+    async def call_next(_ctx):
+        try:
+            raise _make_validation_error()
+        except Exception as e:
+            raise ToolError("Error calling tool 'execute_ad_hoc_query': ") from e
+
+    with pytest.raises(ToolError):
+        _run_event_mw(call_next)
+
+    payload = fake_logger.calls[0]["event_data"]
+    assert payload["event_type"] == "rejected_invocation"
+    assert payload["reason"] == "malformed_params"
+    # The audit error must come from the underlying ValidationError, not the
+    # generic ToolError wrapper message -- otherwise the field-level detail
+    # (which arg, what was wrong) is lost.
+    assert "n" in payload["error"]
+    assert "Error calling tool" not in payload["error"]
+
+
+def test_validation_error_emits_no_lightweight_langsmith_run(
+    fake_logger, fake_langsmith, without_token
+):
+    """emit_langsmith=False: the outer tracing middleware already ended this
+    request's rich trace with the error, so no duplicate lightweight run."""
+
+    async def call_next(_ctx):
+        raise _make_validation_error()
+
+    with pytest.raises(Exception):
+        _run_event_mw(call_next)
+    assert fake_langsmith.runs == []
+
+
+def test_non_validation_error_still_emits_generic_tool_error(
+    fake_logger, fake_stats, without_token
+):
+    """Regression guard: a non-validation error keeps the generic
+    tool_invocation{status=error} path (not malformed_params)."""
+
+    async def call_next(_ctx):
+        raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError, match="boom"):
+        _run_event_mw(call_next)
+
+    payload = fake_logger.calls[0]["event_data"]
+    assert payload["event_type"] == "tool_invocation"
+    assert payload["status"] == "error"
+    assert _keys(fake_stats.calls) == ["mcp.tool.call", "mcp.tool.error"]

@@ -14,10 +14,12 @@ from lib.mcp.audit.context import (
     get_access_token_safe,
     get_request_context,
 )
+from lib.mcp.audit.rate_limit import RateLimitMiddleware
 from lib.mcp.audit.router import LOG, emit_audit_event, log_mcp_event
 
 __all__ = [
     "LOG",
+    "RateLimitMiddleware",
     "RequestAuditMiddleware",
     "_auth_outcome_var",
     "_request_id_var",

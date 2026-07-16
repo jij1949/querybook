@@ -7,12 +7,17 @@ from starlette.middleware import Middleware as StarletteMiddleware
 
 from env import QuerybookSettings
 from lib.mcp.auth import QuerybookTokenVerifier
-from lib.mcp.audit import RequestAuditMiddleware, log_config_snapshot
+from lib.mcp.audit import (
+    RateLimitMiddleware,
+    RequestAuditMiddleware,
+    log_config_snapshot,
+)
 from lib.mcp.middleware import (
     AuthDeprecationNoticeMiddleware,
     ExceptionMappingMiddleware,
     LangSmithTracingMiddleware,
     MCPEventLoggingMiddleware,
+    PayloadSizeGuardMiddleware,
     wrap_mcp_resources,
 )
 from lib.mcp.resources import (
@@ -96,9 +101,17 @@ mcp = FastMCP(
     "Querybook MCP",
     auth=_build_auth_provider(),
     icons=[Icon(src=_build_logo_data_uri(), mimeType="image/svg+xml")],
+    # FastMCP 3.0.2 default; pinned so a future default flip can't silently
+    # reject args below the middleware where the malformed_params branch (which
+    # relies on the ValidationError propagating up through call_next) can't see
+    # it. Inputs are coerced; uncoercible/missing args still raise ValidationError.
+    strict_input_validation=False,
 )
 
 # Add tracing and event logging middleware for tools (must be registered before tools)
+# PayloadSizeGuardMiddleware is registered first so it is outermost: an oversized
+# call is rejected before a LangSmith trace opens and before the tool body runs.
+mcp.add_middleware(PayloadSizeGuardMiddleware())
 mcp.add_middleware(LangSmithTracingMiddleware())
 mcp.add_middleware(MCPEventLoggingMiddleware())
 mcp.add_middleware(AuthDeprecationNoticeMiddleware())
@@ -141,5 +154,13 @@ if __name__ == "__main__":
         port=QuerybookSettings.MCP_PORT,
         # Stateless mode used to enable horizontally-scaled deployments.
         stateless_http=True,
-        middleware=[StarletteMiddleware(RequestAuditMiddleware)],
+        # FastMCP always prepends its own auth middleware ahead of this list,
+        # so RateLimitMiddleware runs after token verification (see its module
+        # docstring) but must still precede RequestAuditMiddleware here, or a
+        # 429'd request would reach RequestAuditMiddleware and get mis-emitted
+        # as an auth/no_token event.
+        middleware=[
+            StarletteMiddleware(RateLimitMiddleware),
+            StarletteMiddleware(RequestAuditMiddleware),
+        ],
     )

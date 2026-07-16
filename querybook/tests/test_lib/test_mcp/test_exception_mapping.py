@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from fastmcp.exceptions import ToolError
+from pydantic import BaseModel, ValidationError
 from logic.board_permission import BoardDoesNotExist
 from logic.datadoc_permission import DocDoesNotExist
 
@@ -19,8 +20,21 @@ from lib.mcp.exceptions import (
     AuthorizationError,
     classify_exception,
     find_authorization_error,
+    find_validation_error,
     to_tool_error,
 )
+
+
+def _make_validation_error():
+    """Produce a real pydantic ValidationError, as arg coercion would raise."""
+
+    class _Model(BaseModel):
+        n: int
+
+    try:
+        _Model(n="not-an-int")
+    except ValidationError as e:
+        return e
 
 
 class TestAuthorizationError:
@@ -94,6 +108,28 @@ class TestFindAuthorizationError:
         wrapped = ToolError("x")
         wrapped.__cause__ = DocDoesNotExist()
         assert find_authorization_error(wrapped) is None
+
+
+class TestFindValidationError:
+    """The audit layer emits rejected_invocation{malformed_params} off the
+    pydantic ValidationError in the failed call's cause chain, so it must be found
+    both when raised directly and through FastMCP's ToolError wrapper."""
+
+    def test_finds_direct_validation_error(self):
+        err = _make_validation_error()
+        assert find_validation_error(err) is err
+
+    def test_finds_validation_error_through_cause_chain(self):
+        inner = _make_validation_error()
+        wrapped = ToolError("Error calling tool 'execute_ad_hoc_query': ")
+        wrapped.__cause__ = inner
+        assert find_validation_error(wrapped) is inner
+
+    def test_returns_none_when_absent(self):
+        assert find_validation_error(RuntimeError("boom")) is None
+        wrapped = ToolError("x")
+        wrapped.__cause__ = DocDoesNotExist()
+        assert find_validation_error(wrapped) is None
 
 
 class TestToToolError:

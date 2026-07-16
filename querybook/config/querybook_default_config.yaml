@@ -127,6 +127,15 @@ MCP_OAUTH_BASE_URL: ~
 # OIDC discovery URL (required when MCP_AUTH_MODE=oauth or dual)
 # e.g. https://your-org.okta.com/oauth2/default/.well-known/openid-configuration
 MCP_OIDC_CONFIG_URL: ~
+# Per-credential rate limit (Redis fixed-window). 0 = disabled (default).
+MCP_RATE_LIMIT_MAX_REQUESTS: 0
+MCP_RATE_LIMIT_WINDOW_SECONDS: 60
+MCP_MAX_FREETEXT_INPUT_BYTES: 1048576  # Free-text tool-arg cap. 0 = disabled.
+# Per-credential failure-burst anomaly detection (Redis fixed-window).
+# Emits an `anomaly` signal (never blocks) when one credential exceeds
+# THRESHOLD auth/authz/rejected failures within the window. 0 = disabled.
+MCP_ANOMALY_FAILURE_THRESHOLD: 0
+MCP_ANOMALY_WINDOW_SECONDS: 300
 
 # --------------- Cache Control ---------------
 # Cache control settings for HTTP responses on static assets

@@ -2,6 +2,10 @@
 
 The MCP server exposes Querybook functionality over the Model Context Protocol. It runs as a standalone HTTP service (`run_mcp.py`) using FastMCP with stateless HTTP transport for horizontal scaling.
 
+> Security posture — authentication modes, authorization, audit logging, rate
+> limiting, redaction, and MCP Security Standard alignment — is documented in
+> [`mcp-security.md`](./mcp-security.md).
+
 ## General Design Principles
 
 -   Tools should be designed similarly to the corresponding REST API endpoints.

@@ -258,6 +258,35 @@ class QuerybookSettings(object):
         get_env_config("MCP_OAUTH_EXTRA_ALLOWED_REDIRECT_URIS"),
         DEFAULT_MCP_OAUTH_REDIRECT_URIS,
     )
+    # Per-credential rate limit. 0/unset MAX_REQUESTS disables the limiter.
+    MCP_RATE_LIMIT_MAX_REQUESTS = int(
+        get_env_config("MCP_RATE_LIMIT_MAX_REQUESTS") or 0
+    )
+    MCP_RATE_LIMIT_WINDOW_SECONDS = int(
+        get_env_config("MCP_RATE_LIMIT_WINDOW_SECONDS") or 60
+    )
+    if MCP_RATE_LIMIT_MAX_REQUESTS < 0:
+        raise ValueError("MCP_RATE_LIMIT_MAX_REQUESTS must not be negative")
+    if MCP_RATE_LIMIT_WINDOW_SECONDS <= 0:
+        raise ValueError("MCP_RATE_LIMIT_WINDOW_SECONDS must be positive")
+    # Free-text tool-arg cap (bytes). 0 disables the guard.
+    MCP_MAX_FREETEXT_INPUT_BYTES = int(
+        get_env_config("MCP_MAX_FREETEXT_INPUT_BYTES") or 1048576  # 1 MiB
+    )
+    if MCP_MAX_FREETEXT_INPUT_BYTES < 0:
+        raise ValueError("MCP_MAX_FREETEXT_INPUT_BYTES must not be negative")
+    # Per-credential failure-burst anomaly detection. 0/unset THRESHOLD
+    # disables it. Detection-only: it emits an `anomaly` signal, never blocks.
+    MCP_ANOMALY_FAILURE_THRESHOLD = int(
+        get_env_config("MCP_ANOMALY_FAILURE_THRESHOLD") or 0
+    )
+    MCP_ANOMALY_WINDOW_SECONDS = int(
+        get_env_config("MCP_ANOMALY_WINDOW_SECONDS") or 300
+    )
+    if MCP_ANOMALY_FAILURE_THRESHOLD < 0:
+        raise ValueError("MCP_ANOMALY_FAILURE_THRESHOLD must not be negative")
+    if MCP_ANOMALY_WINDOW_SECONDS <= 0:
+        raise ValueError("MCP_ANOMALY_WINDOW_SECONDS must be positive")
 
     # Cache Control
     CACHE_CONTROL_MAX_AGE = int(

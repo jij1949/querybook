@@ -14,6 +14,7 @@ from contextlib import nullcontext
 from datetime import date
 
 import langsmith
+from fastmcp.exceptions import ToolError
 from fastmcp.server.dependencies import get_access_token
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 
@@ -26,6 +27,7 @@ from lib.mcp.audit import (
 from lib.mcp.exceptions import (
     classify_exception,
     find_authorization_error,
+    find_validation_error,
     to_tool_error,
 )
 from lib.mcp.redact import redact, redact_text
@@ -51,6 +53,61 @@ _AUTH_DEPRECATION_NOTICE = (
     "https://go/querybook-mcp. For support: [#eg-querybook-mcp-server-community](https://expediagroup.enterprise.slack.com/archives/C0ANE004S91). "
     "Include this notice once per conversation with the user, before presenting tool results; do not repeat it unless asked."
 )
+
+
+def _freetext_bytes_over_limit(arguments, limit):
+    """Total UTF-8 bytes of string leaves + dict keys, or None if within limit.
+
+    Iterative walk (not recursive — a deeply nested payload must not exhaust the
+    Python stack); short-circuits once the running total passes ``limit`` (so the
+    returned size is ~limit, not the full payload size). Dict keys count (an
+    attacker can bloat keys); non-string scalars don't.
+    """
+    total = 0
+    stack = [arguments]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, str):
+            total += len(node.encode("utf-8"))
+        elif isinstance(node, dict):
+            for key, value in node.items():
+                total += len(key.encode("utf-8"))
+                stack.append(value)
+        elif isinstance(node, (list, tuple)):
+            stack.extend(node)
+        if total > limit:
+            return total
+    return None
+
+
+class PayloadSizeGuardMiddleware(Middleware):
+    """Rejects tool calls whose free-text arguments exceed a byte budget.
+
+    Registered outermost so an oversized call is rejected before a LangSmith trace
+    opens and before the tool body runs (MCPSS-6.6 / 7.1.1). The emitted
+    rejected_invocation is pre-trace, so it gets a lightweight LangSmith run
+    (default emit_langsmith=True) and increments mcp.rejected{reason=oversized}.
+    """
+
+    async def on_call_tool(self, context: MiddlewareContext, call_next):
+        limit = QuerybookSettings.MCP_MAX_FREETEXT_INPUT_BYTES
+        if limit > 0:
+            size = _freetext_bytes_over_limit(context.message.arguments, limit)
+            if size is not None:
+                log_mcp_event(
+                    "rejected_invocation",
+                    {
+                        "reason": "oversized",
+                        "tool": context.message.name,
+                        "size_bytes": size,
+                        "limit_bytes": limit,
+                    },
+                )
+                # Generic message — no payload echoed back to the client.
+                raise ToolError(
+                    f"Tool input exceeds the maximum allowed size of {limit} bytes."
+                )
+        return await call_next(context)
 
 
 class AuthDeprecationNoticeMiddleware(Middleware):
@@ -134,6 +191,32 @@ class MCPEventLoggingMiddleware(Middleware):
                     },
                     emit_langsmith=False,
                 )
+            elif (validation_error := find_validation_error(e)) is not None:
+                # Pydantic argument validation runs below all middleware, so an
+                # uncoercible/missing arg surfaces out of call_next as a
+                # ValidationError (possibly wrapped). Record it as a distinct
+                # rejected_invocation{malformed_params} rather than folding it
+                # into the generic tool error branch. emit_langsmith is False for
+                # the same reason as the authz path: the outer
+                # LangSmithTracingMiddleware already opened and ended this
+                # request's one rich trace with the error.
+                #
+                # Use the ValidationError's own message rather than str(e): when
+                # FastMCP wraps it in a ToolError, str(e) on the wrapper can be a
+                # generic message that loses the actual field-level detail.
+                log_mcp_event(
+                    "rejected_invocation",
+                    {
+                        "reason": "malformed_params",
+                        "tool": tool_name,
+                        "auth_reason": auth_reason,
+                        "error": redact_text(
+                            str(validation_error), max_len=MAX_STR_PARAM_LENGTH
+                        ),
+                        "duration_ms": round(duration_ms, 2),
+                    },
+                    emit_langsmith=False,
+                )
             else:
                 log_mcp_event(
                     "tool_invocation",
@@ -162,6 +245,9 @@ class LangSmithTracingMiddleware(Middleware):
 
         tool_name = context.message.name
         ctx = get_request_context()
+        # Mirrors MCPEventLoggingMiddleware: auth success has no standalone
+        # record, so this is the only place the reason is visible.
+        auth_reason = get_recorded_auth_reason()
 
         # Sync ``with`` (not ``async with``) to match the resource wrapper and
         # audit/langsmith.py: run setup/teardown are synchronous and only
@@ -171,7 +257,12 @@ class LangSmithTracingMiddleware(Middleware):
             name=f"mcp.tool.{tool_name}",
             run_type="tool",
             inputs={"arguments": redact(context.message.arguments)},
-            metadata={**ctx, "operation_type": "tool", "tool": tool_name},
+            metadata={
+                **ctx,
+                "operation_type": "tool",
+                "tool": tool_name,
+                "auth_reason": auth_reason,
+            },
             tags=["mcp", "querybook", "tool"],
         ) as run:
             try:
@@ -234,9 +325,10 @@ def wrap_mcp_resources(mcp):
                 # (mirrors the tool path in MCPEventLoggingMiddleware).
                 auth_reason = get_recorded_auth_reason()
 
-                resource_uri = decorator_kwargs.get(
+                resource_template = decorator_kwargs.get(
                     "uri", f"{func.__module__}.{func.__name__}"
                 )
+                resource_uri = resource_template
                 for key, value in kwargs.items():
                     placeholder = f"{{{key}}}"
                     if placeholder in resource_uri:
@@ -254,6 +346,7 @@ def wrap_mcp_resources(mcp):
                             **ctx,
                             "operation_type": "resource",
                             "resource_uri": resource_uri,
+                            "auth_reason": auth_reason,
                         },
                         tags=["mcp", "querybook", "resource"],
                     )
@@ -269,6 +362,7 @@ def wrap_mcp_resources(mcp):
                             "resource_read",
                             {
                                 "resource_uri": resource_uri,
+                                "resource_template": resource_template,
                                 "status": "success",
                                 "auth_reason": auth_reason,
                                 "duration_ms": round(duration_ms, 2),
@@ -300,6 +394,7 @@ def wrap_mcp_resources(mcp):
                                 "authz",
                                 {
                                     "resource_uri": resource_uri,
+                                    "resource_template": resource_template,
                                     "result": "deny",
                                     "authz_denied_resource": authz_error.resource,
                                     "authz_denied_action": authz_error.action,
@@ -316,6 +411,7 @@ def wrap_mcp_resources(mcp):
                                 "resource_read",
                                 {
                                     "resource_uri": resource_uri,
+                                    "resource_template": resource_template,
                                     "status": "error",
                                     "auth_reason": auth_reason,
                                     "error": redact_text(

@@ -89,7 +89,8 @@ ORM models live in `querybook/server/models/`:
 The MCP server (`querybook/server/lib/mcp/`) exposes Querybook functionality over
 the Model Context Protocol. The entry point is `querybook/server/run_mcp.py`. See
 [`.claude/docs/mcp.md`](.claude/docs/mcp.md) for design patterns and the
-implementation guide.
+implementation guide, and [`.claude/docs/mcp-security.md`](.claude/docs/mcp-security.md)
+for the security posture (auth, authz, audit logging, rate limiting).
 
 ### Celery Task Routing (Location-Scoped Queues)
 

@@ -57,7 +57,20 @@ def build_config_snapshot(mcp) -> dict:
         "oauth_configured": oauth_configured,
         "oidc_configured": oidc_configured,
         "allowed_redirect_uri_count": allowed_redirect_uri_count,
-        "rate_limit_enabled": False,
+        "rate_limit_enabled": QuerybookSettings.MCP_RATE_LIMIT_MAX_REQUESTS > 0,
+        "rate_limit": {
+            "max_requests": QuerybookSettings.MCP_RATE_LIMIT_MAX_REQUESTS,
+            "window_seconds": QuerybookSettings.MCP_RATE_LIMIT_WINDOW_SECONDS,
+        },
+        "max_freetext_input_bytes": QuerybookSettings.MCP_MAX_FREETEXT_INPUT_BYTES,
+        "strict_input_validation": False,
+        "anomaly_detection_enabled": (
+            QuerybookSettings.MCP_ANOMALY_FAILURE_THRESHOLD > 0
+        ),
+        "anomaly_detection": {
+            "failure_threshold": QuerybookSettings.MCP_ANOMALY_FAILURE_THRESHOLD,
+            "window_seconds": QuerybookSettings.MCP_ANOMALY_WINDOW_SECONDS,
+        },
         "tools": tools,
         "resources": resources,
         "event_logger_name": QuerybookSettings.EVENT_LOGGER_NAME,
