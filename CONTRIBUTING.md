@@ -162,9 +162,9 @@ make docs                # docker-compose -f docs_website/docker-compose.yml up 
 ## Pull Requests
 
 This repo uses release-please and conventional commits (see
-`release-please-config.json` and `.releaserc.yml`). Write clear commit messages
-using conventional-commit prefixes (`feat:`, `fix:`, `chore:`, etc.). Run lint and
-tests before opening a PR.
+`release-please-config.json`). Write clear commit messages using
+conventional-commit prefixes (`feat:`, `fix:`, `chore:`, etc.). Run lint and tests
+before opening a PR.
 
 ## Useful Make Targets
 
