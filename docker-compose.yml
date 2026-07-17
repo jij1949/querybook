@@ -50,7 +50,7 @@ services:
         image: *querybook-image
         tty: true
         stdin_open: true
-        command: './querybook/scripts/runservice worker -c 5'
+        command: './querybook/scripts/runservice worker -c 5 -Q celery,k8s-only,ec2-only'
         env_file:
             - ./.env.local
         volumes: *querybook-volumes

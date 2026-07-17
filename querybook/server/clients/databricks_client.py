@@ -59,6 +59,11 @@ class DatabricksUnityCatalogClient:
                 "QUERYBOOK_DATABRICKS_TOKEN_PATH",
                 "/var/run/secrets/databricks/token",
             )
+            if not os.path.exists(oidc_token_filepath):
+                raise RuntimeError(
+                    f"Databricks OIDC token not found at {oidc_token_filepath}. "
+                    "This loader requires a K8s worker with a projected service account token."
+                )
             config = Config(
                 host=self.workspace_url,
                 client_id=self.client_id,

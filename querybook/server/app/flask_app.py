@@ -88,6 +88,8 @@ def make_celery(app):
         broker=QuerybookSettings.REDIS_URL,
     )
 
+    from tasks.routing import route_metastore_task  # local import avoids circular init
+
     celery.conf.update(
         worker_prefetch_multiplier=1,
         worker_max_tasks_per_child=QuerybookSettings.CELERY_MAX_TASKS_PER_CHILD,
@@ -103,6 +105,7 @@ def make_celery(app):
             # after visibility timeout
             "visibility_timeout": 180000  # 2 days + 2 hours
         },
+        task_routes=route_metastore_task,
     )
 
     LOG.info(

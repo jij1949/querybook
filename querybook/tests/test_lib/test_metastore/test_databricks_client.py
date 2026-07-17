@@ -37,9 +37,10 @@ class TestDatabricksClientAuthSelection(TestCase):
             token="dapi-test-token",
         )
 
+    @patch("clients.databricks_client.os.path.exists", return_value=True)
     @patch("clients.databricks_client.WorkspaceClient")
     @patch("clients.databricks_client.Config")
-    def test_oidc_auth_uses_file_oidc_config(self, mock_config, mock_ws):
+    def test_oidc_auth_uses_file_oidc_config(self, mock_config, mock_ws, mock_exists):
         from clients.databricks_client import DatabricksUnityCatalogClient
 
         DatabricksUnityCatalogClient(
@@ -79,3 +80,34 @@ class TestDatabricksClientAuthSelection(TestCase):
             DatabricksUnityCatalogClient(
                 workspace_url="https://example.databricks.com",
             )
+
+    @patch("clients.databricks_client.os.path.exists", return_value=False)
+    @patch("clients.databricks_client.WorkspaceClient")
+    @patch("clients.databricks_client.Config")
+    def test_oidc_raises_when_token_file_missing(self, mock_config, mock_ws, mock_exists):
+        from clients.databricks_client import DatabricksUnityCatalogClient
+
+        with self.assertRaises(RuntimeError) as ctx:
+            DatabricksUnityCatalogClient(
+                workspace_url="https://example.databricks.com",
+                client_id="test-sp-application-id",
+            )
+        self.assertIn("K8s worker", str(ctx.exception))
+        mock_config.assert_not_called()
+
+    @patch("clients.databricks_client.os.path.exists", return_value=True)
+    @patch("clients.databricks_client.WorkspaceClient")
+    @patch("clients.databricks_client.Config")
+    def test_oidc_succeeds_when_token_file_present(self, mock_config, mock_ws, mock_exists):
+        from clients.databricks_client import DatabricksUnityCatalogClient
+
+        DatabricksUnityCatalogClient(
+            workspace_url="https://example.databricks.com",
+            client_id="test-sp-application-id",
+        )
+        mock_config.assert_called_once_with(
+            host="https://example.databricks.com",
+            client_id="test-sp-application-id",
+            auth_type="file-oidc",
+            oidc_token_filepath="/var/run/secrets/databricks/token",
+        )

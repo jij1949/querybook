@@ -24,6 +24,8 @@ class DatabricksMetastoreLoader(BaseMetastoreLoader):
     and syncs it with Querybook's internal metastore.
     """
 
+    REQUIRES_OIDC_WORKER = True
+
     def __init__(self, metastore_dict: Dict):
         """
         Initialize the Databricks metastore loader.

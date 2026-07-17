@@ -55,6 +55,11 @@ LOG = get_logger(__name__)
 class BaseMetastoreLoader(metaclass=ABCMeta):
     loader_config: MetastoreLoaderConfig = MetastoreLoaderConfig({})
 
+    # Whether syncing this loader connects to a service that requires a
+    # projected OIDC token (only available on K8s workers). Drives Celery
+    # queue routing to k8s-only. Override in loaders that need it.
+    REQUIRES_OIDC_WORKER = False
+
     def _method_accepts_param(self, method_name: str, param_name: str) -> bool:
         """Check if a method accepts a specific parameter using runtime introspection.
 
