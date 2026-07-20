@@ -91,6 +91,30 @@ the Model Context Protocol. The entry point is `querybook/server/run_mcp.py`. Se
 [`.claude/docs/mcp.md`](.claude/docs/mcp.md) for design patterns and the
 implementation guide.
 
+### Celery Task Routing (Location-Scoped Queues)
+
+Some metastore syncs must run on a worker that has a projected OIDC token (only
+available on K8s), so Celery routing pins them to the right worker population. A
+`task_routes` callable in `querybook/server/tasks/routing.py` runs at dispatch
+time and sends a metastore-sync task to the `k8s-only` queue when the target
+metastore's loader requires an OIDC worker; everything else stays on the shared
+`celery` queue.
+
+-   **Queues:** `celery` (shared default) · `k8s-only` (OIDC-requiring work) ·
+    `ec2-only` (reserved for future EC2-pinned work). Workers subscribe with
+    `-Q`; a single-fleet deployment consumes all three, while a split deployment
+    has each fleet consume `celery` plus its own location queue.
+-   **Loader-declared requirement:** routing keys on the loader's
+    `REQUIRES_OIDC_WORKER` class attribute (source of truth), not a hardcoded
+    loader name. See Metastore Loader Implementation.
+-   **Combo-aware:** for a `ComboMetastoreLoader`, the resolver recurses the
+    combo's sub-loaders (reading config only, never instantiating a loader) and
+    routes the whole chain — dispatcher, children, finalize — to `k8s-only` if
+    any child requires OIDC.
+-   **Fail loud:** `DatabricksUnityCatalogClient` raises a clear `RuntimeError`
+    if the OIDC token file is missing, so a misrouted task fails obviously
+    instead of with a cryptic SDK auth error.
+
 ## Important Patterns
 
 ### Table Identifier Handling
@@ -122,6 +146,10 @@ accepts it.
 4. Register it in `querybook/server/lib/metastore/all_loaders.py`
    (add to `PROVIDED_METASTORE_LOADERS`), or provide it from a plugin via
    `ALL_PLUGIN_METASTORE_LOADERS` in the `metastore_plugin`.
+5. Set `REQUIRES_OIDC_WORKER = True` on the loader if syncing it needs a
+   projected OIDC token (i.e. it must run on a K8s worker). This routes its
+   Celery sync tasks to the `k8s-only` queue (see Celery Task Routing). Defaults
+   to `False` on `BaseMetastoreLoader`.
 
 ## Detailed Context
 
