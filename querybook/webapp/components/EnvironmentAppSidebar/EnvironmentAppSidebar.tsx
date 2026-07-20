@@ -11,7 +11,11 @@ import { QueryViewNavigator } from 'components/QueryViewNavigator/QueryViewNavig
 import { useEvent } from 'hooks/useEvent';
 import { useLocalStoreState } from 'hooks/useLocalStoreState';
 import { useResizeToCollapseSidebar } from 'hooks/useResizeToCollapse';
-import { SIDEBAR_ENTITY } from 'lib/local-store/const';
+import {
+    CHAT_SIDEBAR_WIDTH_KEY,
+    ChatSidebarWidthValue,
+    SIDEBAR_ENTITY,
+} from 'lib/local-store/const';
 import { KeyMap, matchKeyMap } from 'lib/utils/keyboard';
 import { navigateWithinEnv } from 'lib/utils/query-string';
 import { currentEnvironmentSelector } from 'redux/environment/selector';
@@ -28,7 +32,10 @@ import { Entity } from './types';
 
 import './EnvironmentAppSidebar.scss';
 
-const SIDEBAR_WIDTH = 320;
+// Minimum width, and the default width for every non-chat sidebar entity.
+const DEFAULT_SIDEBAR_WIDTH = 320;
+// The Ava chat iframe is cramped at 320px, so it opens wider by default.
+const DEFAULT_CHAT_SIDEBAR_WIDTH = 480;
 
 export const EnvironmentAppSidebar: React.FunctionComponent = () => {
     const theme = useSelector(
@@ -46,6 +53,42 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
 
     const currentEnvironment = useSelector(currentEnvironmentSelector);
 
+    const isChat = entity === 'chat';
+
+    // Persisted width for the Ava chat panel — remembered across sessions so
+    // users don't have to widen it every time.
+    const [storedChatWidth, setStoredChatWidth] =
+        useLocalStoreState<ChatSidebarWidthValue>({
+            storeKey: CHAT_SIDEBAR_WIDTH_KEY,
+            defaultValue: DEFAULT_CHAT_SIDEBAR_WIDTH,
+        });
+
+    // Width the sidebar should use for the current entity. Chat uses the
+    // persisted width when it's valid, otherwise the chat default — a corrupt
+    // or out-of-range stored value falls back to 480 rather than the bare
+    // minimum. Every other entity uses the standard width.
+    const hasValidStoredChatWidth =
+        Number.isFinite(storedChatWidth) &&
+        storedChatWidth >= DEFAULT_SIDEBAR_WIDTH;
+    const resolvedWidth = isChat
+        ? hasValidStoredChatWidth
+            ? storedChatWidth
+            : DEFAULT_CHAT_SIDEBAR_WIDTH
+        : DEFAULT_SIDEBAR_WIDTH;
+
+    // Controlled width applied while mounted, updated live during a drag.
+    const [sidebarWidth, setSidebarWidth] =
+        React.useState<number>(resolvedWidth);
+
+    // Re-sync when the resolved width changes (entity switch, async load of the
+    // persisted width) or when the sidebar is expanded after a collapse — a
+    // drag-to-collapse would otherwise leave the local width at the minimum.
+    React.useEffect(() => {
+        if (!collapsed) {
+            setSidebarWidth(resolvedWidth);
+        }
+    }, [collapsed, resolvedWidth]);
+
     const handleEntitySelect = React.useCallback(
         (newEntity: Entity | null) => {
             setEntity((oldEntity) => {
@@ -62,10 +105,42 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
         [dispatch, collapsed, setEntity]
     );
 
+    // Tracks whether the in-progress drag collapsed the sidebar, so a
+    // collapse gesture isn't mistaken for (and persisted as) a resize.
+    const collapsedDuringResize = React.useRef(false);
+
     const resizeToCollapseSidebar = useResizeToCollapseSidebar(
-        SIDEBAR_WIDTH,
+        DEFAULT_SIDEBAR_WIDTH,
         1 / 3,
-        React.useCallback(() => dispatch(setCollapsed(true)), [dispatch])
+        React.useCallback(() => {
+            collapsedDuringResize.current = true;
+            dispatch(setCollapsed(true));
+        }, [dispatch])
+    );
+
+    const handleResizeStart = React.useCallback(() => {
+        collapsedDuringResize.current = false;
+    }, []);
+
+    const handleResize = React.useCallback(
+        (event: Event, direction: string, elementRef: HTMLElement) => {
+            // Keep the controlled width in sync while the user drags. Use
+            // clientWidth to match the basis useResizeToCollapseSidebar checks.
+            setSidebarWidth(elementRef.clientWidth);
+            resizeToCollapseSidebar(event, direction, elementRef);
+        },
+        [resizeToCollapseSidebar]
+    );
+
+    const handleResizeStop = React.useCallback(
+        (_event: Event, _direction: string, elementRef: HTMLElement) => {
+            // Persist genuine resizes only, not a drag that collapsed the
+            // sidebar (which ends at the minimum width).
+            if (isChat && !collapsedDuringResize.current) {
+                setStoredChatWidth(elementRef.clientWidth);
+            }
+        },
+        [isChat, setStoredChatWidth]
     );
 
     const handleCollapseKeyDown = React.useCallback(
@@ -174,9 +249,11 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
     ) : (
         <Sidebar
             className={className}
-            initialWidth={SIDEBAR_WIDTH}
-            minWidth={SIDEBAR_WIDTH}
-            onResize={resizeToCollapseSidebar}
+            size={{ width: sidebarWidth, height: '100%' }}
+            minWidth={DEFAULT_SIDEBAR_WIDTH}
+            onResizeStart={handleResizeStart}
+            onResize={handleResize}
+            onResizeStop={handleResizeStop}
         >
             {contentDOM}
         </Sidebar>

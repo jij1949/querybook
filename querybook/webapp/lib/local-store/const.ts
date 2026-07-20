@@ -1,7 +1,7 @@
 import type { Entity } from 'components/EnvironmentAppSidebar/types';
 import type { IAdhocQuery } from 'const/adhocQuery';
-import type { ISurveyLocalRecord } from 'lib/survey/types';
 import type { SurveySurfaceType } from 'const/survey';
+import type { ISurveyLocalRecord } from 'lib/survey/types';
 
 export const DISMISSED_ANNOUNCEMENT_KEY = 'dismissed_announcement_ids';
 export type DismissedAnnouncementValue = number[];
@@ -20,6 +20,9 @@ export type AdhocQueryValue = IAdhocQuery;
 
 export const SIDEBAR_ENTITY = 'sidebar_entity';
 export type TSidebarEntity = Entity;
+
+export const CHAT_SIDEBAR_WIDTH_KEY = 'chat_sidebar_width';
+export type ChatSidebarWidthValue = number;
 
 export const SURVEY_RECORD_KEY = 'survey';
 export type TSurveyRecord = Record<SurveySurfaceType, ISurveyLocalRecord>;

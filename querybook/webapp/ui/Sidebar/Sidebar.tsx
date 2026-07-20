@@ -59,6 +59,8 @@ export const Sidebar: React.FunctionComponent<ISidebarProps> = ({
     right = false,
     left = true,
     className = '',
+    size,
+    defaultSize,
 
     ...resizableProps
 }) => (
@@ -70,10 +72,17 @@ export const Sidebar: React.FunctionComponent<ISidebarProps> = ({
     >
         <FullHeight className="sidebar-content">
             <Resizable
-                defaultSize={{
-                    width: `${initialWidth}px`,
-                    height: '100%',
-                }}
+                // Controlled (`size`) and uncontrolled (`defaultSize`) modes are
+                // mutually exclusive in re-resizable; only set the initial size
+                // when the caller is not driving the width.
+                {...(size
+                    ? { size }
+                    : {
+                          defaultSize: defaultSize ?? {
+                              width: `${initialWidth}px`,
+                              height: '100%',
+                          },
+                      })}
                 enable={enableResizable({ right: left, left: right })}
                 {...resizableProps}
             >
