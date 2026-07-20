@@ -3,7 +3,7 @@ import tempfile
 from unittest import mock
 
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 
 
 @pytest.fixture(scope="session")
@@ -39,6 +39,19 @@ def db_engine(monkeysession):
     engine = create_engine(
         database_conn, pool_pre_ping=True, encoding="utf-8", echo=True
     )
+
+    # Register a SQLite `concat` UDF so column_property expressions that use
+    # func.concat() (e.g. DataDoc.scheduled) can evaluate on the SQLite test DB.
+    # Scope: joins non-None args as strings and drops NULL args rather than
+    # propagating NULL; sufficient for the current tests, may differ from
+    # production DB engines for NULL-valued concat arguments.
+    @event.listens_for(engine, "connect")
+    def receive_connect(dbapi_conn, connection_record):
+        dbapi_conn.create_function(
+            "concat",
+            -1,
+            lambda *args: "".join(str(a) for a in args if a is not None),
+        )
 
     import models
 

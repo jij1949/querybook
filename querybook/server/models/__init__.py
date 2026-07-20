@@ -17,3 +17,4 @@ from .comment import *
 from .survey import *
 from .github import *
 from .query_review import *
+from .promotion import *

@@ -50,6 +50,11 @@ class DataDoc(Base, CRUDMixin):
 
     # AKA creator
     owner_uid = sql.Column(sql.Integer, sql.ForeignKey("user.id", ondelete="CASCADE"))
+    promoted_from_id = sql.Column(
+        sql.Integer,
+        sql.ForeignKey("data_doc.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     created_at = sql.Column(sql.DateTime, default=now, nullable=False)
     updated_at = sql.Column(sql.DateTime, default=now, nullable=False)
 
@@ -99,6 +104,7 @@ class DataDoc(Base, CRUDMixin):
             "archived": self.archived,
             "scheduled": self.scheduled,
             "owner_uid": self.owner_uid,
+            "promoted_from_id": self.promoted_from_id,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "meta": self.meta,
