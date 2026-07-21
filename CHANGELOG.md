@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.139.0](https://github.com/eg-internal/querybook/compare/v0.138.1...v0.139.0) (2026-07-21)
+
+
+### Features
+
+* **etl-promotion:** backend data models + migration (EGANP-6370) ([#579](https://github.com/eg-internal/querybook/issues/579)) ([71f5d33](https://github.com/eg-internal/querybook/commit/71f5d3309129bc58be352eb042feb90b1b729841))
+* **mcp:** audit logging & security monitoring for the MCP server (EGANP-5970) ([#574](https://github.com/eg-internal/querybook/issues/574)) ([79fba99](https://github.com/eg-internal/querybook/commit/79fba997ef5367650473f40a85de1a02ed22e85d))
+* **mcp:** audit logging, rate limiting & anomaly detection for MCP server (EGANP-5970) ([6470a4a](https://github.com/eg-internal/querybook/commit/6470a4ace7a6bb7f66c2eb897906045894a4764f))
+* Route Databricks metastore syncs to K8s-only Celery queue ([#581](https://github.com/eg-internal/querybook/issues/581)) ([ef6bb36](https://github.com/eg-internal/querybook/commit/ef6bb36145c9d986deff482cf9b03fa854c34438))
+
+
+### Bug Fixes
+
+* widen Ava chat sidebar and persist its resized width ([#577](https://github.com/eg-internal/querybook/issues/577)) ([8a37307](https://github.com/eg-internal/querybook/commit/8a37307ce0200f83a3bfff5ee3c1c54d85cafb57))
+
 ## [0.138.1](https://github.com/eg-internal/querybook/compare/v0.138.0...v0.138.1) (2026-06-30)
 
 
