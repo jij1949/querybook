@@ -56,6 +56,7 @@ SCHEMA_PREFIX_TO_DATA_LAKE = {
     "bexg_test_": "bexg_test",
     "content_prod_": "content_prod",
     "controlplane_prod_": "controlplane_prod",
+    "data_corp_": "egdataplatform_corp",
     "data_dw_": "egdataplatform_dw",
     "data_test_": "egdataplatform_test",
     "dspprod_": "dsp_prod",
@@ -217,12 +218,17 @@ def _get_data_lake_from_metastore(metastore_id: int) -> Optional[str]:
             else "test"
         )
 
-        # Metastore name-based mapping (from EG HMS loader)
+        # Metastore name-based mapping (from EG HMS loader).
+        # Both the legacy `*-waggledance` names and the newer
+        # `waggledance-glue-read-*` names are accepted for backward compatibility.
         metastore_name_mapping = {
             "egdp-analytics-waggledance": "egdp_analytics",
+            "waggledance-glue-read-egdp-analytics": "egdp_analytics",
             "egdp-test-waggledance": "egdp_test_analytics",
             "data-corp-waggledance": "egdataplatform_corp",
+            "waggledance-glue-read-data-corp": "egdataplatform_corp",
             "data-test-waggledance": "egdataplatform_test",
+            "waggledance-glue-read-data-test": "egdataplatform_test",
             "egdp-waggledance": "egdp_analytics",
         }
 

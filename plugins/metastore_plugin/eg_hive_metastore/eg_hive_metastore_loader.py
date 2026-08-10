@@ -893,6 +893,7 @@ schema_prefixes_to_data_lakes = {
     "bexg_test_": "bexg_test",
     "content_prod_": "content_prod",
     "controlplane_prod_": "controlplane_prod",
+    "data_corp_": "egdataplatform_corp",
     "data_dw_": "egdataplatform_dw",
     "data_test_": "egdataplatform_test",
     "dspprod_": "dsp_prod",
@@ -945,8 +946,13 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
             return (data_lake, schema_name[len(prefix):])
 
     # If there's no prefix, then it's not federated,
-    # so we can use the metastore name to determine the data lake
-    if metastore.name == "egdp-analytics-waggledance":
+    # so we can use the metastore name to determine the data lake.
+    # Both the legacy `*-waggledance` names and the newer
+    # `waggledance-glue-read-*` names are accepted for backward compatibility.
+    if metastore.name in (
+        "egdp-analytics-waggledance",
+        "waggledance-glue-read-egdp-analytics",
+    ):
         return ("egdp_analytics", schema_name)
     if metastore.name == "egdp-test-waggledance":
         return ("egdp_test_analytics", schema_name)
@@ -954,9 +960,9 @@ def get_source_data_lake_and_schema(metastore_id, schema_name, location):
         return ("bexg_prod", schema_name)
     if metastore.name == "bex-waggledance" and querybook_instance == "test":
         return ("bexg_test", schema_name)
-    if metastore.name == "data-corp-waggledance":
+    if metastore.name in ("data-corp-waggledance", "waggledance-glue-read-data-corp"):
         return ("egdataplatform_corp", schema_name)
-    if metastore.name == "data-test-waggledance":
+    if metastore.name in ("data-test-waggledance", "waggledance-glue-read-data-test"):
         return ("egdataplatform_test", schema_name)
     if metastore.name == "vrbo-waggledance" and querybook_instance == "prod":
         return ("vrbo_prod", schema_name)
