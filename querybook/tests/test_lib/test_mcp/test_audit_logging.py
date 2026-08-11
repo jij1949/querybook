@@ -68,6 +68,17 @@ def _patch_env(monkeypatch):
     monkeypatch.setattr(QuerybookSettings, "ENVIRONMENT", "test", raising=False)
 
 
+@pytest.fixture(autouse=True)
+def _enable_audit_log_propagation():
+    # get_logger() sets propagate=False to avoid duplicate lines under Celery's
+    # root-logger hijack. pytest's caplog captures via the root logger, so
+    # re-enable propagation for this module's logger during these tests.
+    original = LOG.propagate
+    LOG.propagate = True
+    yield
+    LOG.propagate = original
+
+
 @pytest.fixture
 def fake_logger(monkeypatch):
     capture = _EventLogCapture()
