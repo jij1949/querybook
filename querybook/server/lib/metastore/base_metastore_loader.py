@@ -138,8 +138,8 @@ class BaseMetastoreLoader(metaclass=ABCMeta):
             return schema
 
         # Loader didn't provide a catalog, create default
-        default_catalog_name = self.catalog_display_config.get(
-            "catalog_display_name", "default"
+        default_catalog_name = (
+            self.catalog_display_config.get("catalog_display_name") or "default"
         )
         default_catalog = DataCatalog(
             name=default_catalog_name, description="Default catalog"
