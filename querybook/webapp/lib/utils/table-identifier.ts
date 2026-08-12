@@ -41,12 +41,81 @@ export function getSchemaDisplayName(
             name: string;
         };
     },
-    showCatalog: boolean = false,
+    showCatalog: boolean = false
 ): string {
     if (schema.catalog && showCatalog) {
         return `${schema.catalog.name}.${schema.name}`;
     }
     return schema.name;
+}
+
+/**
+ * Builds the legacy prefixed schema name for a catalog-qualified reference.
+ *
+ * During the Glue three-level-catalog migration, a schema that a user now
+ * writes as `catalog.schema` (e.g. `egdp_analytics.plat_metrics`) may still be
+ * indexed in Querybook under its pre-catalog two-level name, with the catalog
+ * folded into the schema prefix (`egdp_analytics_plat_metrics`). This collapses
+ * the two parts into that legacy schema name.
+ *
+ * @returns The legacy `catalog_schema` name, or null when there is no catalog.
+ */
+export function getLegacyPrefixedSchemaName(
+    catalog: string | null | undefined,
+    schema: string
+): string | null {
+    if (!catalog) {
+        return null;
+    }
+    return `${catalog}_${schema}`;
+}
+
+/**
+ * Resolves a table via `fetch`, falling back to the legacy prefixed schema name
+ * when the canonical lookup misses.
+ *
+ * During the Glue three-level-catalog migration a catalog-qualified reference
+ * (`catalog.schema.table`) may still be indexed under its legacy prefixed name
+ * (`catalog_schema.table`). This runs the canonical lookup first and, only when
+ * it returns nothing, retries against the collapsed legacy schema (see
+ * {@link getLegacyPrefixedSchemaName}). Centralizing the fallback keeps every
+ * editor path (prefetch, hover tooltip, "open table") in sync, so the rule only
+ * ever has to change in one place.
+ *
+ * @param fetch - Looks up a table by (schema, name[, catalog]). The catalog is
+ * only passed on the canonical attempt, never on the collapsed legacy retry.
+ * May be undefined (e.g. the editor has no engine/metastore), in which case
+ * this resolves to undefined without attempting a lookup.
+ * @param catalog - The reference's catalog, if any.
+ * @param schema - The reference's schema.
+ * @param name - The table name.
+ * @returns The resolved table, or the canonical (falsy) result when neither hits.
+ */
+export async function resolveTableWithLegacyFallback<T>(
+    fetch:
+        | ((
+              schema: string,
+              name: string,
+              catalog?: string | null
+          ) => T | Promise<T>)
+        | undefined
+        | null,
+    catalog: string | null | undefined,
+    schema: string,
+    name: string
+): Promise<T | undefined> {
+    if (!fetch) {
+        return undefined;
+    }
+    const table = await fetch(schema, name, catalog);
+    if (table) {
+        return table;
+    }
+    const legacySchema = getLegacyPrefixedSchemaName(catalog, schema);
+    if (legacySchema) {
+        return fetch(legacySchema, name);
+    }
+    return table;
 }
 
 /**
@@ -65,7 +134,7 @@ export function getTableTokenDisplayName(
         schema: string;
         name: string;
     },
-    showCatalog: boolean = false,
+    showCatalog: boolean = false
 ): string {
     if (table.catalog && showCatalog) {
         return `${table.catalog}.${table.schema}.${table.name}`;

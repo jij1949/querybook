@@ -1,4 +1,8 @@
-import { getTableTokenDisplayName } from 'lib/utils/table-identifier';
+import {
+    getLegacyPrefixedSchemaName,
+    getTableTokenDisplayName,
+    resolveTableWithLegacyFallback,
+} from 'lib/utils/table-identifier';
 
 describe('getTableTokenDisplayName', () => {
     const tableWithCatalog = {
@@ -57,9 +61,9 @@ describe('getTableTokenDisplayName', () => {
                 schema: 'default',
                 name: 'orders',
             };
-            expect(
-                getTableTokenDisplayName(tableUndefinedCatalog, false)
-            ).toBe('default.orders');
+            expect(getTableTokenDisplayName(tableUndefinedCatalog, false)).toBe(
+                'default.orders'
+            );
         });
     });
 
@@ -119,5 +123,91 @@ describe('getTableTokenDisplayName', () => {
                 'schema-name.table_name'
             );
         });
+    });
+});
+
+describe('getLegacyPrefixedSchemaName', () => {
+    it('collapses catalog and schema into the legacy prefixed schema', () => {
+        expect(
+            getLegacyPrefixedSchemaName('egdp_analytics', 'plat_metrics')
+        ).toBe('egdp_analytics_plat_metrics');
+    });
+
+    it('returns null when catalog is null', () => {
+        expect(getLegacyPrefixedSchemaName(null, 'plat_metrics')).toBeNull();
+    });
+
+    it('returns null when catalog is undefined', () => {
+        expect(
+            getLegacyPrefixedSchemaName(undefined, 'plat_metrics')
+        ).toBeNull();
+    });
+
+    it('returns null when catalog is an empty string', () => {
+        expect(getLegacyPrefixedSchemaName('', 'plat_metrics')).toBeNull();
+    });
+});
+
+describe('resolveTableWithLegacyFallback', () => {
+    it('returns the canonical result without a fallback when it hits', async () => {
+        const fetch = jest.fn(async (schema: string) => ({ schema }));
+        const result = await resolveTableWithLegacyFallback(
+            fetch,
+            'egdp_analytics',
+            'plat_metrics',
+            'orders'
+        );
+
+        expect(result).toEqual({ schema: 'plat_metrics' });
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(fetch).toHaveBeenCalledWith(
+            'plat_metrics',
+            'orders',
+            'egdp_analytics'
+        );
+    });
+
+    it('retries with the collapsed legacy schema and no catalog when the canonical lookup misses', async () => {
+        const fetch = jest.fn(async (schema: string) =>
+            schema === 'egdp_analytics_plat_metrics' ? { schema } : null
+        );
+        const result = await resolveTableWithLegacyFallback(
+            fetch,
+            'egdp_analytics',
+            'plat_metrics',
+            'orders'
+        );
+
+        expect(result).toEqual({ schema: 'egdp_analytics_plat_metrics' });
+        expect(fetch).toHaveBeenCalledTimes(2);
+        expect(fetch).toHaveBeenNthCalledWith(
+            2,
+            'egdp_analytics_plat_metrics',
+            'orders'
+        );
+    });
+
+    it('does not retry when there is no catalog', async () => {
+        const fetch = jest.fn(async () => null);
+        const result = await resolveTableWithLegacyFallback(
+            fetch,
+            null,
+            'plat_metrics',
+            'orders'
+        );
+
+        expect(result).toBeNull();
+        expect(fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('resolves to undefined without a lookup when fetch is not provided', async () => {
+        expect(
+            await resolveTableWithLegacyFallback(
+                undefined,
+                'egdp_analytics',
+                'plat_metrics',
+                'orders'
+            )
+        ).toBeUndefined();
     });
 });

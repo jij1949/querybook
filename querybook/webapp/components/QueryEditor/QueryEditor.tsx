@@ -8,8 +8,8 @@ import React, {
     useMemo,
     useState,
 } from 'react';
-import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
 
 import { CodeEditor } from 'components/CodeEditor/CodeEditor';
 import { TDataDocMetaVariables } from 'const/datadoc';
@@ -32,7 +32,10 @@ import { mixedSQL } from 'lib/codemirror/codemirror-mixed';
 import { format, ISQLFormatOptions } from 'lib/sql-helper/sql-formatter';
 import { TableToken } from 'lib/sql-helper/sql-lexer';
 import { navigateWithinEnv } from 'lib/utils/query-string';
-import { getTableTokenDisplayName } from 'lib/utils/table-identifier';
+import {
+    getTableTokenDisplayName,
+    resolveTableWithLegacyFallback,
+} from 'lib/utils/table-identifier';
 import { IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
 
@@ -133,9 +136,12 @@ export const QueryEditor: React.FC<
 
         // Get metastore to check catalog display settings
         const metastore = useSelector((state: IStoreState) =>
-            metastoreId ? state.dataSources.queryMetastoreById[metastoreId] : null
+            metastoreId
+                ? state.dataSources.queryMetastoreById[metastoreId]
+                : null
         );
-        const showCatalog = metastore?.catalog_display_config?.show_catalog_in_ui ?? false;
+        const showCatalog =
+            metastore?.catalog_display_config?.show_catalog_in_ui ?? false;
 
         const formatQuery = useCallback(
             (options: ISQLFormatOptions) => {
@@ -245,7 +251,15 @@ export const QueryEditor: React.FC<
         useDeepCompareEffect(() => {
             Promise.all(
                 tableReferences.map((tableRef) =>
-                    getTableByName(tableRef.schema, tableRef.name)
+                    // resolveTableWithLegacyFallback applies the mid-migration
+                    // legacy-schema fallback and safely no-ops when
+                    // getTableByName is undefined (no engine/metastore).
+                    resolveTableWithLegacyFallback(
+                        getTableByName,
+                        tableRef.catalog,
+                        tableRef.schema,
+                        tableRef.name
+                    )
                 )
             ).then((tables) => {
                 // do another lint after fetching the tables
@@ -256,8 +270,10 @@ export const QueryEditor: React.FC<
                 const tablesMap = tableReferences.reduce(
                     (obj, tableRef, index) => {
                         if (tables[index]) {
-                            const fullTableName =
-                                getTableTokenDisplayName(tableRef, showCatalog);
+                            const fullTableName = getTableTokenDisplayName(
+                                tableRef,
+                                showCatalog
+                            );
                             return { ...obj, [fullTableName]: tables[index] };
                         } else {
                             return obj;
@@ -298,15 +314,20 @@ export const QueryEditor: React.FC<
             (editorView: EditorView) => {
                 const table = getTableAtCursor(editorView);
                 if (table) {
-                    getTableByName(table.schema, table.name).then(
-                        (tableInfo) => {
-                            if (tableInfo) {
-                                navigateWithinEnv(`/table/${tableInfo.id}/`, {
-                                    isModal: true,
-                                });
-                            }
+                    // Resolve with the mid-migration legacy-schema fallback so
+                    // Cmd-P "Open table" matches lint and hover behavior.
+                    resolveTableWithLegacyFallback(
+                        getTableByName,
+                        table.catalog,
+                        table.schema,
+                        table.name
+                    ).then((tableInfo) => {
+                        if (tableInfo) {
+                            navigateWithinEnv(`/table/${tableInfo.id}/`, {
+                                isModal: true,
+                            });
                         }
-                    );
+                    });
                 }
                 return true;
             },

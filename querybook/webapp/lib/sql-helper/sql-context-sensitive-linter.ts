@@ -1,26 +1,49 @@
 import { ILinterWarning, TableToken } from './sql-lexer';
 
 import { DataTableWarningSeverity } from 'const/metastore';
-import { getTableTokenDisplayName } from 'lib/utils/table-identifier';
+import {
+    getLegacyPrefixedSchemaName,
+    getTableTokenDisplayName,
+} from 'lib/utils/table-identifier';
 import { reduxStore } from 'redux/store';
 
 export function getContextSensitiveWarnings(
     metastoreId: number,
     tableReferences: TableToken[],
     ignoreTableNotExistWarnings: boolean,
-    showCatalog: boolean,
+    showCatalog: boolean
 ) {
     const contextSensitiveWarnings: ILinterWarning[] = [];
 
     const { dataTableNameToId, dataTablesById, dataTableWarningById } =
         reduxStore.getState().dataSources;
+    const nameToId = dataTableNameToId[metastoreId] || {};
     for (const table of tableReferences) {
         const implicitSchema = table.end - table.start === table.name.length;
         // Build fullName with catalog if present
         const fullName = getTableTokenDisplayName(table, showCatalog);
-        const tableExists = fullName in (dataTableNameToId[metastoreId] || {});
+        // Mid-migration fallback: a catalog-qualified reference
+        // (catalog.schema.table) may still be indexed under its legacy prefixed
+        // name (catalog_schema.table). Resolve against that too so tables that
+        // only exist in the pre-catalog form aren't flagged as "not found".
+        const legacySchema = getLegacyPrefixedSchemaName(
+            table.catalog,
+            table.schema
+        );
+        const legacyName = legacySchema
+            ? getTableTokenDisplayName({
+                  schema: legacySchema,
+                  name: table.name,
+              })
+            : null;
+        const resolvedName =
+            fullName in nameToId
+                ? fullName
+                : legacyName && legacyName in nameToId
+                ? legacyName
+                : null;
 
-        if (!tableExists) {
+        if (resolvedName === null) {
             if (!ignoreTableNotExistWarnings) {
                 contextSensitiveWarnings.push({
                     message: `Table ${table.name} is newly created or does not exist`,
@@ -40,7 +63,7 @@ export function getContextSensitiveWarnings(
                 });
             }
         } else {
-            const tableId = dataTableNameToId[metastoreId][fullName];
+            const tableId = nameToId[resolvedName];
             const dataTable = dataTablesById[tableId];
             if (dataTable.warnings?.length) {
                 const tableWarnings = dataTable.warnings.map(

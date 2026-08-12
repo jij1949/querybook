@@ -31,7 +31,8 @@ export const useHoverTooltipExtension = ({
     const metastore = useSelector((state: IStoreState) =>
         metastoreId ? state.dataSources.queryMetastoreById[metastoreId] : null
     );
-    const showCatalog = metastore?.catalog_display_config?.show_catalog_in_ui ?? false;
+    const showCatalog =
+        metastore?.catalog_display_config?.show_catalog_in_ui ?? false;
 
     const getTableAtCursor = useCallback(
         (editorView: EditorView) => {
@@ -68,8 +69,15 @@ export const useHoverTooltipExtension = ({
             } else if (context === 'table') {
                 table = sqlParserRef.current.getTableAtPos(v5Pos);
                 if (table) {
-                    // Support catalog-aware tables
-                    const tableFullName = getTableTokenDisplayName(table, showCatalog);
+                    // Always include the catalog (when present) in the lookup
+                    // name so the tooltip can resolve catalog-qualified
+                    // references — including the mid-migration fallback to the
+                    // legacy prefixed name. Display formatting inside the
+                    // tooltip still respects the metastore's catalog settings.
+                    const tableFullName = getTableTokenDisplayName(
+                        table,
+                        showCatalog || Boolean(table.catalog)
+                    );
                     tooltipComponent = (
                         <TableTooltipByName
                             metastoreId={metastoreId}

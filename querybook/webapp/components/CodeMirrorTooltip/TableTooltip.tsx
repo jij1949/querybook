@@ -7,7 +7,10 @@ import { IDataColumn, IDataSchema, IDataTable } from 'const/metastore';
 import { useShallowSelector } from 'hooks/redux/useShallowSelector';
 import { setSidebarTableId } from 'lib/querybookUI';
 import { navigateWithinEnv } from 'lib/utils/query-string';
-import { getTableDisplayName } from 'lib/utils/table-identifier';
+import {
+    getTableDisplayName,
+    resolveTableWithLegacyFallback,
+} from 'lib/utils/table-identifier';
 import * as dataSourcesActions from 'redux/dataSources/action';
 import { IStoreState } from 'redux/store/types';
 import { IconButton } from 'ui/Button/IconButton';
@@ -28,13 +31,13 @@ export const TableTooltip: React.FunctionComponent<IProps> = ({
     columns,
     schema,
     hidePinItButton = false,
-    openTableModal
+    openTableModal,
 }) => {
     const tableName = getTableDisplayName({
         schema: schema.name,
         name: table.name,
         full_name: table?.full_name,
-        catalog: schema?.catalog?.name
+        catalog: schema?.catalog?.name,
     });
     const description = table.description
         ? (table.description as ContentState).getPlainText()
@@ -138,14 +141,14 @@ export const TableTooltipByName: React.FunctionComponent<{
     metastoreId,
     tableFullName,
     hidePinItButton = true,
-    showDetails = true
+    showDetails = true,
 }) => {
     const dispatch = useDispatch();
     const [tableId, setTableId] = useState(null);
 
     const openTableModal = useCallback(() => {
         navigateWithinEnv(`/table/${tableId}/`, {
-            isModal: true
+            isModal: true,
         });
     }, [tableId]);
 
@@ -165,14 +168,21 @@ export const TableTooltipByName: React.FunctionComponent<{
                 } else {
                     throw new Error('Invalid tableFullName format');
                 }
-                const table = (await dispatch(
-                    dataSourcesActions.fetchDataTableByNameIfNeeded(
-                        schemaName,
-                        tableName,
-                        metastoreId,
-                        catalogName
-                    )
-                )) as unknown as IDataTable;
+                const table = await resolveTableWithLegacyFallback(
+                    (schema, name, catalog) =>
+                        dispatch(
+                            dataSourcesActions.fetchDataTableByNameIfNeeded(
+                                schema,
+                                name,
+                                metastoreId,
+                                catalog ?? undefined
+                            )
+                        ) as unknown as Promise<IDataTable>,
+                    catalogName,
+                    schemaName,
+                    tableName
+                );
+
                 if (table?.id) {
                     setTableId(table.id);
                 }
@@ -199,7 +209,7 @@ export const TableTooltipByName: React.FunctionComponent<{
             return {
                 table: tableFromState,
                 schema: schemaFromState,
-                columns: columnsFromState
+                columns: columnsFromState,
             };
         }
     );
