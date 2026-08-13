@@ -23,10 +23,10 @@ jobs:
                     - python
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Setup Python
               if: matrix.language == 'python'
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: '3.10'
             - name: Install Python dependencies
@@ -40,9 +40,5 @@ jobs:
               with:
                   languages: ${{ matrix.language }}
                   queries: security-extended
-                  # ℹ️ CodeQL will attempt to auto-install Python dependencies. This
-                  # behavior must be disabled when steps 'Setup Python' and
-                  # 'Install Python dependencies' are included in the workflow.
-                  setup-python-dependencies: false
             - name: Perform CodeQL Analysis
               uses: github/codeql-action/analyze@v4
