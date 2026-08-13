@@ -36,14 +36,14 @@ jobs:
                   pip install  -r ./requirements.txt
                   echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
             - name: Initialize CodeQL
-              uses: github/codeql-action/init@v2
+              uses: github/codeql-action/init@v4
               with:
                   languages: ${{ matrix.language }}
                   queries:
-                      security-extended
-                      # ℹ️ CodeQL will attempt to auto-install Python dependencies. This
-                      # behavior must be disabled when steps 'Setup Python' and
-                      # 'Install Python dependencies' are included in the workflow.
+                      - security-extended
+                  # ℹ️ CodeQL will attempt to auto-install Python dependencies. This
+                  # behavior must be disabled when steps 'Setup Python' and
+                  # 'Install Python dependencies' are included in the workflow.
                   setup-python-dependencies: false
             - name: Perform CodeQL Analysis
-              uses: github/codeql-action/analyze@v2
+              uses: github/codeql-action/analyze@v4
