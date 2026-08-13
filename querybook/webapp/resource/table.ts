@@ -126,13 +126,24 @@ export const QueryMetastoreResource = {
 };
 
 export const TableResource = {
-    get: (tableId: number) => ds.fetch<IDataTable>(`/table/${tableId}/`),
-    getByName: (metastoreId: number, schemaName: string, tableName: string, catalogName?: string) => {
+    get: (tableId: number) =>
+        ds.fetch<IDataTable>(`/table/${tableId}/`, undefined, {
+            dedupe: true,
+        }),
+    getByName: (
+        metastoreId: number,
+        schemaName: string,
+        tableName: string,
+        catalogName?: string
+    ) => {
         const params: any = { metastore_id: metastoreId };
         if (catalogName) {
             params.catalog_name = catalogName;
         }
-        return ds.fetch<IDataTable>(`/table_name/${schemaName}/${tableName}/`, params);
+        return ds.fetch<IDataTable>(
+            `/table_name/${schemaName}/${tableName}/`,
+            params
+        );
     },
     getColumnDetails: (tableId: number) =>
         ds.fetch<IDetailedDataColumn[]>(`/table/${tableId}/detailed_column/`),
@@ -231,7 +242,10 @@ export const TableStatsResource = {
 };
 
 export const TableTagResource = {
-    get: (tableId: number) => ds.fetch<ITag[]>(`/table/${tableId}/tag/`),
+    get: (tableId: number) =>
+        ds.fetch<ITag[]>(`/table/${tableId}/tag/`, undefined, {
+            dedupe: true,
+        }),
     search: (keyword: string) =>
         ds.fetch<string[]>(`/tag/keyword/`, { keyword }),
     create: (tableId: number, tag: string) =>

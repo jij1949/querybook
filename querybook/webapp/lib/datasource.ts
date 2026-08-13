@@ -12,6 +12,14 @@ type UrlOrOptions = string | AxiosRequestConfig;
 interface DatasourceOptions {
     notifyOnError?: boolean;
     timeout?: number;
+    // Coalesce concurrent identical GET requests into a single in-flight
+    // request (opt-in). Useful when several components can independently
+    // request the same resource at the same time (e.g. a table tooltip
+    // popover and the table details view). Only applies to `fetch` (GET).
+    // Note: the coalesced callers share one request, so a `.cancel()` from
+    // any of them aborts it for all — only enable where per-caller
+    // cancellation is not required.
+    dedupe?: boolean;
 }
 
 function handleRequestException(error: any, notifyOnError?: boolean) {
@@ -84,14 +92,39 @@ function syncDatasource<T>(
     return request;
 }
 
+// Tracks in-flight GET requests opted into `dedupe`, keyed by url + data, so
+// concurrent identical requests share a single request instead of each firing
+// their own. Entries are removed once the request settles.
+const inFlightGetRequests = new Map<string, ICancelablePromise<any>>();
+
 function fetchDatasource<T>(
     urlOrOptions: UrlOrOptions,
     data?: Record<string, unknown>,
     options: DatasourceOptions = {
         notifyOnError: false,
     }
-) {
-    return syncDatasource<T>('GET', urlOrOptions, data, options);
+): ICancelablePromise<{ data: T }> {
+    // Only dedupe plain string-URL GETs: an AxiosRequestConfig can carry
+    // non-serializable fields (e.g. transformResponse) or circular refs that
+    // make a stable JSON key unreliable, so those fall through to a normal
+    // request. The key intentionally covers url + data only, not options like
+    // timeout/notifyOnError -- those don't change the response, so coalescing
+    // across them is safe (the first caller's options win for the shared call).
+    if (!options.dedupe || typeof urlOrOptions !== 'string') {
+        return syncDatasource<T>('GET', urlOrOptions, data, options);
+    }
+
+    const key = JSON.stringify([urlOrOptions, data ?? null]);
+    const existing = inFlightGetRequests.get(key);
+    if (existing) {
+        return existing;
+    }
+
+    const request = syncDatasource<T>('GET', urlOrOptions, data, options);
+    inFlightGetRequests.set(key, request);
+    const cleanup = () => inFlightGetRequests.delete(key);
+    request.then(cleanup, cleanup);
+    return request;
 }
 
 function saveDatasource<T>(
