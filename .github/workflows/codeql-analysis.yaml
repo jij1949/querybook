@@ -39,8 +39,7 @@ jobs:
               uses: github/codeql-action/init@v4
               with:
                   languages: ${{ matrix.language }}
-                  queries:
-                      - security-extended
+                  queries: security-extended
                   # ℹ️ CodeQL will attempt to auto-install Python dependencies. This
                   # behavior must be disabled when steps 'Setup Python' and
                   # 'Install Python dependencies' are included in the workflow.
