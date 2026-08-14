@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.140.0](https://github.com/eg-internal/querybook/compare/v0.139.0...v0.140.0) (2026-08-14)
+
+
+### Features
+
+* **logging:** add Celery task name/id to logs and fix duplicate lines ([#586](https://github.com/eg-internal/querybook/issues/586)) ([e125bce](https://github.com/eg-internal/querybook/commit/e125bceb5b8f2135f2418390c68507040d06ae40))
+
+
+### Bug Fixes
+
+* dedupe concurrent data table and tag fetches ([e2446d2](https://github.com/eg-internal/querybook/commit/e2446d26e273019f70711c183d21827aae7633c1))
+* Fix empty default catalog name falling through as blank string ([#589](https://github.com/eg-internal/querybook/issues/589)) ([20a24ca](https://github.com/eg-internal/querybook/commit/20a24ca5303e29613b61096f76de97eba213e5b4))
+* log SURVEY view once per mount instead of every render ([ca81a11](https://github.com/eg-internal/querybook/commit/ca81a112e8b966b5eea639523b3f599bd51f98c2))
+* resolve 'Source Data Lake: Unknown' for data_corp_ and renamed metastores ([#585](https://github.com/eg-internal/querybook/issues/585)) ([89e5c42](https://github.com/eg-internal/querybook/commit/89e5c42178ea085981361ef17224ff3ac982870f))
+* resolve 3-part catalog table refs to legacy prefixed names in editor ([c80c58e](https://github.com/eg-internal/querybook/commit/c80c58e7008d9192e47807dda0c88ba4f55e660a))
+
 ## [0.139.0](https://github.com/eg-internal/querybook/compare/v0.138.1...v0.139.0) (2026-07-21)
 
 
