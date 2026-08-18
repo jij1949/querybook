@@ -283,6 +283,23 @@ describe('ava origin and messaging', () => {
         expect(getAvaOrigin('*')).toBeNull();
     });
 
+    test('forces the test Ava origin when Querybook runs on the -test hostname', () => {
+        const originalHostname = window.location.hostname;
+        Object.defineProperty(window, 'location', {
+            value: { ...window.location, hostname: 'querybook-test.expedia.biz' },
+            writable: true,
+        });
+
+        expect(getAvaOrigin('https://analytics.expedia.biz')).toBe(
+            'https://analytics-test.expedia.biz'
+        );
+
+        Object.defineProperty(window, 'location', {
+            value: { ...window.location, hostname: originalHostname },
+            writable: true,
+        });
+    });
+
     test('builds iframe src and message envelope', () => {
         const payload = buildAvaContext({
             environment: { id: 1, name: 'dev' } as any,
