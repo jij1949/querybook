@@ -28,6 +28,7 @@ import {
     IDataQueryCell,
 } from 'const/datadoc';
 import { ISearchOptions, ISearchResult } from 'const/searchAndReplace';
+import { AvaHostContext } from 'context/AvaContext';
 import { DataDocContext, IDataDocContextType } from 'context/DataDoc';
 import { trackClick, trackView } from 'lib/analytics';
 import {
@@ -91,6 +92,9 @@ interface IState {
 }
 
 class DataDocComponent extends React.PureComponent<IProps, IState> {
+    public static contextType = AvaHostContext;
+    public context!: React.ContextType<typeof AvaHostContext>;
+
     public readonly state = {
         errorObj: null,
         focusedCellIndex: null,
@@ -162,7 +166,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
     }
 
     @bind
-    public focusCellAt(index: number) {
+    public focusCellAt(index: number, publishAvaContext = true) {
         this.setState(
             {
                 focusedCellIndex: index,
@@ -170,6 +174,9 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
             () => {
                 this.updateDocCursor(index);
                 this.updateDocUrl();
+                if (publishAvaContext) {
+                    this.publishAvaDataDocContext();
+                }
             }
         );
     }
@@ -267,7 +274,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
     @bind
     public onCellBlur(index: number) {
         if (index === this.state.focusedCellIndex) {
-            this.focusCellAt(null);
+            this.focusCellAt(null, false);
         }
     }
 
@@ -524,8 +531,37 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
             }),
             () => {
                 this.updateDocUrl(cellId, executionId);
+                this.publishAvaDataDocContext();
             }
         );
+    }
+
+    @bind
+    public publishAvaDataDocContext(docId: number = this.props.docId) {
+        const { dataDoc } = this.props;
+        const { focusedCellIndex, cellIdToExecutionId } = this.state;
+        const focusedCell =
+            focusedCellIndex != null
+                ? dataDoc?.dataDocCells?.[focusedCellIndex]
+                : null;
+
+        this.context.publishDataDocContext({
+            dataDocId: docId,
+            cellId: focusedCell?.id ?? null,
+            queryExecutionId:
+                focusedCell?.id != null
+                    ? cellIdToExecutionId[focusedCell.id] ?? null
+                    : null,
+        });
+    }
+
+    @bind
+    public publishEmptyAvaDataDocContext(docId: number = this.props.docId) {
+        this.context.publishDataDocContext({
+            dataDocId: docId,
+            cellId: null,
+            queryExecutionId: null,
+        });
     }
 
     @decorate(memoizeOne)
@@ -841,6 +877,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
         trackView(ComponentType.DATADOC_PAGE);
         this.autoFocusCell({}, this.props);
         this.openDataDoc(this.props.docId);
+        this.publishEmptyAvaDataDocContext();
         this.publishDataDocTitle(this.props.dataDoc?.title);
         window.addEventListener('keydown', this.onKeyDown, true);
     }
@@ -866,6 +903,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
                 this.searchAndReplaceRef.current?.reset();
             }
             this.openDataDoc(this.props.docId);
+            this.publishEmptyAvaDataDocContext();
         }
 
         if (
@@ -908,6 +946,7 @@ class DataDocComponent extends React.PureComponent<IProps, IState> {
 
     public componentWillUnmount() {
         this.closeDataDoc(this.props.docId);
+        this.context.clearDataDocContext();
         window.removeEventListener('keydown', this.onKeyDown, true);
     }
 

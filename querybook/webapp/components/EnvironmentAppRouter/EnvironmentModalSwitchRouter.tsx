@@ -1,7 +1,9 @@
 import React from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
 
+import { AvaHostContext } from 'context/AvaContext';
 import { useModalRoute } from 'hooks/useModalRoute';
+import { deriveAvaRouteContext } from 'lib/ava/context';
 import { FourOhFour } from 'ui/ErrorPage/FourOhFour';
 import { Loading } from 'ui/Loading/Loading';
 import { Modal } from 'ui/Modal/Modal';
@@ -41,6 +43,7 @@ const UserSettingsMenuRoute = React.lazy(
 
 export const EnvironmentModalSwitchRouter: React.FC = () => {
     const location = useLocation();
+    const { setRouteContext } = React.useContext(AvaHostContext);
     const [lastNotModalLocation, setLastNotModalLocation] =
         React.useState(null);
 
@@ -52,6 +55,19 @@ export const EnvironmentModalSwitchRouter: React.FC = () => {
 
     const needsToShowModal =
         useModalRoute(location) && lastNotModalLocation !== location; // not initial render
+
+    const avaRouteContext = React.useMemo(
+        () =>
+            deriveAvaRouteContext(
+                location,
+                needsToShowModal ? lastNotModalLocation : null
+            ),
+        [lastNotModalLocation, location, needsToShowModal]
+    );
+
+    React.useEffect(() => {
+        setRouteContext(avaRouteContext);
+    }, [avaRouteContext, setRouteContext]);
 
     const modalRoutes = [
         <Route

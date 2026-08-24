@@ -8,16 +8,20 @@ import { IFrameNavigator } from 'components/IFrameNavigator/IFrameNavigator';
 import { QueryReviewsNavigator } from 'components/QueryReviewsNavigator/QueryReviewsNavigator';
 import { QuerySnippetNavigator } from 'components/QuerySnippetNavigator/QuerySnippetNavigator';
 import { QueryViewNavigator } from 'components/QueryViewNavigator/QueryViewNavigator';
+import { AvaHostContext } from 'context/AvaContext';
 import { useEvent } from 'hooks/useEvent';
 import { useLocalStoreState } from 'hooks/useLocalStoreState';
 import { useResizeToCollapseSidebar } from 'hooks/useResizeToCollapse';
+import { buildAvaContext, buildAvaIframeSrc, IAvaContext } from 'lib/ava/context';
 import {
     CHAT_SIDEBAR_WIDTH_KEY,
     ChatSidebarWidthValue,
     SIDEBAR_ENTITY,
 } from 'lib/local-store/const';
+import { AVA_ORIGIN } from 'lib/public-config';
 import { KeyMap, matchKeyMap } from 'lib/utils/keyboard';
 import { navigateWithinEnv } from 'lib/utils/query-string';
+import { Message } from 'ui/Message/Message';
 import { currentEnvironmentSelector } from 'redux/environment/selector';
 import { setCollapsed } from 'redux/querybookUI/action';
 import { Dispatch, IStoreState } from 'redux/store/types';
@@ -41,6 +45,7 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
     const theme = useSelector(
         (state: IStoreState) => state.user.computedSettings.theme
     );
+    const { routeContext, dataDocContext } = React.useContext(AvaHostContext);
 
     const collapsed: boolean = useSelector(
         (state: IStoreState) => state.querybookUI.isEnvCollapsed
@@ -52,6 +57,39 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
     });
 
     const currentEnvironment = useSelector(currentEnvironmentSelector);
+    const adhocExecutionId = useSelector((state: IStoreState) =>
+        currentEnvironment?.id != null
+            ? state.adhocQuery[currentEnvironment.id]?.executionId
+            : null
+    );
+    const adhocEngineId = useSelector((state: IStoreState) =>
+        currentEnvironment?.id != null
+            ? state.adhocQuery[currentEnvironment.id]?.engineId
+            : null
+    );
+
+    const avaContext: IAvaContext = React.useMemo(
+        () =>
+            buildAvaContext({
+                environment: currentEnvironment,
+                routeContext,
+                adhocExecutionId,
+                adhocEngineId,
+                dataDocContext,
+            }),
+        [
+            adhocEngineId,
+            adhocExecutionId,
+            currentEnvironment,
+            dataDocContext,
+            routeContext,
+        ]
+    );
+
+    const avaSrc = React.useMemo(
+        () => buildAvaIframeSrc(AVA_ORIGIN, theme === 'dark' ? 'dark' : 'light'),
+        [theme]
+    );
 
     const isChat = entity === 'chat';
 
@@ -179,11 +217,19 @@ export const EnvironmentAppSidebar: React.FunctionComponent = () => {
             ) : entity === 'review' ? (
                 <QueryReviewsNavigator />
             ) : entity === 'chat' ? (
-                <IFrameNavigator
-                    src={`https://analytics.expedia.biz/ava?fullscreen=true&ref=querybook&theme=${
-                        theme === 'dark' ? 'dark' : 'light'
-                    }`}
-                />
+                avaSrc ? (
+                    <IFrameNavigator
+                        src={avaSrc}
+                        message={avaContext}
+                        targetOrigin={AVA_ORIGIN}
+                    />
+                ) : (
+                    <Message
+                        title="Ava is unavailable"
+                        message="The configured Ava origin is invalid."
+                        type="error"
+                    />
+                )
             ) : (
                 <div />
             );

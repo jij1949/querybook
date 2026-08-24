@@ -1,4 +1,5 @@
 import PublicConfig from 'config/querybook_public_config.yaml';
+import { getAvaOrigin } from 'lib/ava/origin';
 
 export const isAIFeatureEnabled = (
     featureKey?:
@@ -51,3 +52,5 @@ export const PEER_REVIEW_CONFIG = PublicConfig.peer_review ?? {
         approve_message: '',
     },
 };
+
+export const AVA_ORIGIN = getAvaOrigin(PublicConfig.ava_origin);

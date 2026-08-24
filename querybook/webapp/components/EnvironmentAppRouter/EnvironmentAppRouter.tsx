@@ -4,6 +4,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import { EnvironmentModalSwitchRouter } from 'components/EnvironmentAppRouter/EnvironmentModalSwitchRouter';
 import { EnvironmentAppSidebar } from 'components/EnvironmentAppSidebar/EnvironmentAppSidebar';
+import { AvaHostContextProvider } from 'context/AvaContext';
 import { rehydrateAdhocQueryForEnvironment } from 'redux/adhocQuery/action';
 import { fetchQueryMetastore } from 'redux/dataSources/action';
 import { IEnvironment } from 'redux/environment/types';
@@ -54,11 +55,13 @@ export const EnvironmentAppRouter: React.FunctionComponent<
     }
 
     return (
-        <FullHeight className="EnvironmentAppRouter" flex="row">
-            <EnvironmentAppSidebar />
-            <div className="EnvironmentAppRouter-content">
-                <EnvironmentModalSwitchRouter />
-            </div>
-        </FullHeight>
+        <AvaHostContextProvider>
+            <FullHeight className="EnvironmentAppRouter" flex="row">
+                <EnvironmentAppSidebar />
+                <div className="EnvironmentAppRouter-content">
+                    <EnvironmentModalSwitchRouter />
+                </div>
+            </FullHeight>
+        </AvaHostContextProvider>
     );
 };

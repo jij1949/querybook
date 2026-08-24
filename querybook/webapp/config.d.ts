@@ -86,6 +86,7 @@ declare module 'config/color_palette.yaml' {
 
 declare module 'config/querybook_public_config.yaml' {
     const data: {
+        ava_origin?: string;
         ai_assistant: {
             enabled: boolean;
             query_title_generation: {
@@ -108,6 +109,9 @@ declare module 'config/querybook_public_config.yaml' {
             };
 
             sql_complete: {
+                enabled: boolean;
+            };
+            data_doc_title_generation: {
                 enabled: boolean;
             };
         };
