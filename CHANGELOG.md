@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.141.0](https://github.com/eg-internal/querybook/compare/v0.140.0...v0.141.0) (2026-08-24)
+
+
+### Features
+
+* **ava:** send Querybook workflow context to sidebar iframe ([#522](https://github.com/eg-internal/querybook/issues/522)) ([d685bc5](https://github.com/eg-internal/querybook/commit/d685bc5a1717821063089abf180b2575910fd8b7))
+
 ## [0.140.0](https://github.com/eg-internal/querybook/compare/v0.139.0...v0.140.0) (2026-08-14)
 
 
