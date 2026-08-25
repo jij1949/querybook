@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.141.1](https://github.com/eg-internal/querybook/compare/v0.141.0...v0.141.1) (2026-08-25)
+
+
+### Bug Fixes
+
+* Revert ava_origin default in public config ([3716fde](https://github.com/eg-internal/querybook/commit/3716fde0d75f7da707e8ab7edf0dfc2eb388e878))
+
 ## [0.141.0](https://github.com/eg-internal/querybook/compare/v0.140.0...v0.141.0) (2026-08-24)
 
 
