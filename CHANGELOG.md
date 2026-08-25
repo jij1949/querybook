@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.141.2](https://github.com/eg-internal/querybook/compare/v0.141.1...v0.141.2) (2026-08-25)
+
+
+### Bug Fixes
+
+* Pin Ava test origin when Querybook runs on -test hostname ([97ce337](https://github.com/eg-internal/querybook/commit/97ce337720ee4ae704cb16f7ef035a91dec049d4))
+
 ## [0.141.1](https://github.com/eg-internal/querybook/compare/v0.141.0...v0.141.1) (2026-08-25)
 
 
