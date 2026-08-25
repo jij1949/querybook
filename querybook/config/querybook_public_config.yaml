@@ -1,7 +1,5 @@
 # Public Configs are shared between backend and frontend and are not sensitive
-# Optional local/dev override. Production and test values should come from
-# environment-specific config.
-# ava_origin: 'http://localhost:4000'
+ava_origin: 'https://analytics.expedia.biz'
 
 # --------------- AI Assistant ---------------
 ai_assistant:
