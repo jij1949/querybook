@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.141.3](https://github.com/eg-internal/querybook/compare/v0.141.2...v0.141.3) (2026-08-27)
+
+
+### Bug Fixes
+
+* Event log uid FK requires MCP Audit events not pass uid=0 ([b3a1847](https://github.com/eg-internal/querybook/commit/b3a18479adea901104351ba78421e0d514190454))
+
 ## [0.141.2](https://github.com/eg-internal/querybook/compare/v0.141.1...v0.141.2) (2026-08-25)
 
 
