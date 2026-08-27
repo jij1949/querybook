@@ -60,7 +60,10 @@ def emit_audit_event(
             LOG.info("MCP %s subject=%s %s", event_type, subject, detail)
 
         if QuerybookSettings.EVENT_LOGGER_NAME != "null":
-            event_logger.log_mcp_event(uid=subject, event_data=envelope)
+            # Subject 0 means no authenticated user; store NULL so the
+            # event_log.uid foreign key is satisfied.
+            uid = None if subject == 0 else subject
+            event_logger.log_mcp_event(uid=uid, event_data=envelope)
 
         is_routine_auth = event_type == "no_token"
         if (
