@@ -116,6 +116,19 @@ class DataDoc(Base, CRUDMixin):
 
         return data_doc_dict
 
+    def to_summary_dict(self):
+        """Serialization used by endpoints that return many DataDocs at once
+        (sidebar lists, board contents, scheduled doc lists).
+
+        Omits `meta`, which holds the templated variable config and can be
+        arbitrarily large. A single doc with a multi-megabyte variable value
+        would otherwise bloat every list response that happens to include it.
+        Consumers that need `meta` fetch the full doc via GET /datadoc/<id>/.
+        """
+        data_doc_dict = self.to_dict()
+        data_doc_dict.pop("meta", None)
+        return data_doc_dict
+
     def get_query_cells(self):
         return [cell for cell in self.cells if cell.cell_type == DataCellType.query]
 

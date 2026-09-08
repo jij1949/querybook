@@ -90,7 +90,7 @@ def get_data_docs(
             docs = logic.get_user_recent_data_docs(
                 current_user.id, environment_id=environment_id, session=session
             )
-        return docs
+        return [doc.to_summary_dict() for doc in docs]
 
 
 @register("/datadoc/", methods=["POST"])
@@ -451,7 +451,13 @@ def get_my_datadoc_with_schedule(environment_id, offset=0, limit=10, filters=Non
         filters=filters,
     )
 
-    return {"docs": docs, "count": count}
+    return {
+        "docs": [
+            {**doc_with_schedule, "doc": doc_with_schedule["doc"].to_summary_dict()}
+            for doc_with_schedule in docs
+        ],
+        "count": count,
+    }
 
 
 @register("/datadoc/<int:doc_id>/editor/<int:uid>/", methods=["POST"])

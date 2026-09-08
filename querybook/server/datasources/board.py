@@ -28,6 +28,18 @@ from lib.notify.utils import notify_user
 LOG = get_logger(__file__)
 
 
+def serialize_board_with_items(board: Board):
+    """Serialize a board along with its items.
+
+    DataDocs are serialized without their `meta` (see
+    DataDoc.to_summary_dict) so that one doc with a huge templated variable
+    value cannot bloat the whole board payload.
+    """
+    board_dict = board.to_dict(extra_fields=["tables", "boards", "queries", "items"])
+    board_dict["docs"] = [doc.to_summary_dict() for doc in board.docs]
+    return board_dict
+
+
 @register(
     "/board/",
     methods=["GET"],
@@ -64,9 +76,7 @@ def get_board_by_id(board_id, environment_id):
             board is not None, "Invalid board id", RESOURCE_NOT_FOUND_STATUS_CODE
         )
         verify_environment_permission([board.environment_id])
-        return board.to_dict(
-            extra_fields=["docs", "tables", "boards", "queries", "items"]
-        )
+        return serialize_board_with_items(board)
 
 
 @register(
@@ -150,9 +160,7 @@ def update_board(board_id, **fields):
         board = Board.get(id=board_id, session=session)
 
         board = logic.update_board(id=board_id, **fields, session=session)
-        return board.to_dict(
-            extra_fields=["docs", "tables", "boards", "queries", "items"]
-        )
+        return serialize_board_with_items(board)
 
 
 @register(

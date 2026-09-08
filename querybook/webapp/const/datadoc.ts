@@ -105,7 +105,9 @@ export interface IDataDoc {
     created_at: number;
     updated_at: number;
 
-    meta: IDataDocMeta;
+    // Only present when the full doc is fetched (GET /datadoc/<id>/).
+    // List endpoints omit it since it can be arbitrarily large.
+    meta?: IDataDocMeta;
     title: string;
 
     cells?: number[];

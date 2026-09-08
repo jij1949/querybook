@@ -21,7 +21,7 @@ export const DataDocTemplateCell: React.FunctionComponent<IProps> = ({
     isExecutable,
 }) => {
     const hasMeta = useMemo(
-        () => dataDoc.meta.variables.length > 0,
+        () => (dataDoc.meta?.variables ?? []).length > 0,
         [dataDoc.meta]
     );
     const [showFacade, setShowFacade] = useState(!hasMeta && isEditable);
@@ -64,7 +64,7 @@ export const DataDocTemplateCell: React.FunctionComponent<IProps> = ({
                 <DataDocTemplateVarForm
                     isEditable={isEditable}
                     isExecutable={isExecutable}
-                    variables={dataDoc.meta.variables}
+                    variables={dataDoc.meta?.variables ?? []}
                     onSave={(newVariables) => {
                         if (newVariables.length === 0) {
                             setShowFacade(true);
